@@ -7,6 +7,7 @@ type Props = { product: Product };
 const { product } = Astro.props;
 const artist = artistName(product.artistId);
 const sold = product.status === "soldout";
+const hasTitle = artist !== product.title;
 ---
 
 <a
@@ -22,10 +23,8 @@ const sold = product.status === "soldout";
     <img class="print" src={asset(`images/prints/${product.print}`)} alt="" width="800" height="800" />
   </div>
   <div class="card-meta">
-    {product.artistId !== "studio" && artist !== product.title && (
-      <div class="card-artist">{artist}</div>
-    )}
-    <div class="card-title">{product.title}</div>
+    {product.artistId !== "studio" && <div class="card-artist">{artist}</div>}
+    {hasTitle && <div class="card-title">{product.title}</div>}
     <div class="card-price">{formatPrice(product.price)}</div>
   </div>
 </a>
