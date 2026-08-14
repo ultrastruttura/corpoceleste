@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import PrivacyCheck from "../../components/PrivacyCheck.astro";
 import { productBySlug, formatPrice, artistName, products } from "../../data/products";
 import { artistById } from "../../data/artists";
 import { site } from "../../data/site";
@@ -58,6 +59,7 @@ const sold = product.status === "soldout";
                 {site.sizes.map((s) => <option>{s}</option>)}
               </select>
             </div>
+            <PrivacyCheck id="re-privacy" />
             <button class="btn" type="submit">Richiedi ristampa</button>
           </form>
         ) : (

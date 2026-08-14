@@ -16,6 +16,8 @@ export const site = {
    * Se c'è, il bottone PayPal resta sulla pagina invece di reindirizzare.
    */
   paypalClientId: "",
+  sede: "Bergamo (BG), Italia",
+  vatId: "",
   sizes: ["S", "M", "L", "XL"] as const,
 };
 

@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { site } from "../data/site";
 ---
 
@@ -26,16 +27,20 @@ import { site } from "../data/site";
           <label for="ct-msg">Messaggio</label>
           <textarea id="ct-msg" name="messaggio" required></textarea>
         </div>
+        <PrivacyCheck id="ct-privacy" />
         <button class="btn" type="submit">Invia</button>
       </form>
       <div>
         <h2>Newsletter</h2>
-        <form class="newsletter-row" style="margin-bottom:36px" action={`https://formsubmit.co/${site.email}`} method="POST">
+        <form class="newsletter-form" style="margin-bottom:36px" action={`https://formsubmit.co/${site.email}`} method="POST">
           <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
           <input type="hidden" name="_captcha" value="false" />
           <input type="hidden" name="_next" data-next-grazie />
-          <input type="email" name="email" required placeholder="Email" aria-label="Email newsletter" />
-          <button type="submit">Iscriviti</button>
+          <div class="newsletter-row">
+            <input type="email" name="email" required placeholder="Email" aria-label="Email newsletter" />
+            <button type="submit">Iscriviti</button>
+          </div>
+          <PrivacyCheck id="ct-nl-privacy" newsletter />
         </form>
         <h2>Studio</h2>
         <p>

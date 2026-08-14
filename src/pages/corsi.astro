@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { site } from "../data/site";
 import { pastWorkshops } from "../data/workshops";
 import { asset } from "../lib/paths";
@@ -32,6 +33,7 @@ import { asset } from "../lib/paths";
             <label for="ws-note">Note</label>
             <textarea id="ws-note" name="note"></textarea>
           </div>
+          <PrivacyCheck id="ws-privacy" />
             <button class="btn" type="submit">Iscriviti</button>
         </form>
       </div>
@@ -58,6 +60,7 @@ import { asset } from "../lib/paths";
             <label for="sp-note">Messaggio</label>
             <textarea id="sp-note" name="messaggio" required></textarea>
           </div>
+          <PrivacyCheck id="sp-privacy" />
             <button class="btn" type="submit">Invia</button>
         </form>
       </div>

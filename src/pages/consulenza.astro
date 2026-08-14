@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { site } from "../data/site";
 import { asset } from "../lib/paths";
 ---
@@ -44,6 +45,7 @@ import { asset } from "../lib/paths";
           <label for="c-msg">Messaggio</label>
           <textarea id="c-msg" name="messaggio" required></textarea>
         </div>
+        <PrivacyCheck id="c-privacy" />
           <button class="btn" type="submit">Invia</button>
       </form>
     </div>

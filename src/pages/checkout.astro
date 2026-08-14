@@ -1,6 +1,8 @@
 ---
 import Base from "../layouts/Base.astro";
+import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { site } from "../data/site";
+import { url } from "../lib/paths";
 ---
 
 <Base title="Checkout — Corpoceleste">
@@ -19,9 +21,13 @@ import { site } from "../data/site";
       </p>
     </div>
 
-    <label class="check" style="margin: 20px 0">
+    <label class="check" style="margin: 20px 0 12px">
       <input type="checkbox" data-disclaimer />
       <span>Ho letto i tempi di spedizione.</span>
+    </label>
+    <label class="check" style="margin: 0 0 20px">
+      <input type="checkbox" data-privacy />
+      <span>Ho letto l’<a href={url("privacy/")}>informativa privacy</a>.</span>
     </label>
 
     <div class="field" style="margin-bottom: 8px">
@@ -92,6 +98,7 @@ import { site } from "../data/site";
         <label for="o-note">Note</label>
         <textarea id="o-note" name="note"></textarea>
       </div>
+      <PrivacyCheck id="o-privacy" />
       <button class="btn" type="submit">Invia ordine</button>
     </form>
   </div>
@@ -114,6 +121,7 @@ import { site } from "../data/site";
   const recap = document.querySelector("[data-recap]");
   const shipSel = document.querySelector<HTMLSelectElement>("[data-ship]");
   const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
+  const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
   const payBox = document.querySelector("[data-pay-box]");
   const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
   const paypalItems = document.querySelector("[data-paypal-items]");
@@ -177,11 +185,12 @@ import { site } from "../data/site";
   }
 
   function unlockPay() {
-    payBox?.classList.toggle("is-locked", !disclaimer?.checked);
+    payBox?.classList.toggle("is-locked", !disclaimer?.checked || !privacy?.checked);
   }
 
   shipSel?.addEventListener("change", renderRecap);
   disclaimer?.addEventListener("change", unlockPay);
+  privacy?.addEventListener("change", unlockPay);
   renderRecap();
   unlockPay();
 
@@ -197,7 +206,7 @@ import { site } from "../data/site";
     if (!paypal || !el || !items.length) return;
     paypal.Buttons({
       onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
-        if (!disclaimer?.checked) return actions.reject();
+        if (!disclaimer?.checked || !privacy?.checked) return actions.reject();
         return actions.resolve();
       },
       createOrder: (_: unknown, actions: { order: { create: (o: object) => Promise<string> } }) => {

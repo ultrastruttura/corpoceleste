@@ -1,6 +1,7 @@
 ---
 import { site } from "../data/site";
 import { url } from "../lib/paths";
+import PrivacyCheck from "./PrivacyCheck.astro";
 
 const year = new Date().getFullYear();
 ---
@@ -10,16 +11,19 @@ const year = new Date().getFullYear();
     <div>
       <h2>Newsletter</h2>
       <form
-        class="newsletter-row"
+        class="newsletter-form"
         action={`https://formsubmit.co/${site.email}`}
         method="POST"
       >
         <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_next" data-next-grazie />
-        <label class="visually-hidden" for="nl-email">Email</label>
-        <input id="nl-email" type="email" name="email" required placeholder="Email" />
-        <button type="submit">Iscriviti</button>
+        <div class="newsletter-row">
+          <label class="visually-hidden" for="nl-email">Email</label>
+          <input id="nl-email" type="email" name="email" required placeholder="Email" />
+          <button type="submit">Iscriviti</button>
+        </div>
+        <PrivacyCheck id="nl-privacy" newsletter />
       </form>
     </div>
     <div>
@@ -54,7 +58,10 @@ const year = new Date().getFullYear();
         </svg>
       </a>
     </nav>
-    <p class="footer-made">Made in Bergamo. {year} Corpoceleste</p>
+    <p class="footer-made">
+      Made in Bergamo. {year} Corpoceleste
+      · <a href={url("privacy/")}>Privacy</a>
+    </p>
   </div>
 </footer>
 

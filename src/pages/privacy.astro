@@ -1,0 +1,106 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+---
+
+<Base title="Privacy — Corpoceleste">
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>Privacy</h1>
+      <p class="lede">Informativa sul trattamento dei dati e sull’uso di cookie e storage, art. 13 GDPR.</p>
+    </header>
+
+    <div class="prose" style="padding-bottom:80px">
+      <p>Ultimo aggiornamento: 14 agosto 2026.</p>
+
+      <h2>Titolare</h2>
+      <p>
+        {site.intestatario}, in qualità di titolare del trattamento per il sito Corpoceleste.<br />
+        Sede: {site.sede}.<br />
+        {site.vatId && <>P. IVA {site.vatId}.<br /></>}
+        Contatto: <a href={`mailto:${site.email}`}>{site.email}</a>
+      </p>
+
+      <h2>Cookie e storage</h2>
+      <p>
+        Questo sito non usa cookie di profilazione, analytics o pubblicità. Non c’è un banner di consenso
+        perché, secondo le Linee guida del Garante (cookie e altri identificatori, 10 giugno 2021, ancora
+        il riferimento in Italia nel 2026), il consenso serve solo per strumenti non tecnici.
+      </p>
+      <p>Strumenti di prima parte, tutti tecnici:</p>
+      <ul>
+        <li>
+          <strong>localStorage <code>corpoceleste-cart</code></strong> — contenuto del carrello, sul tuo
+          browser. Serve a comprare. Resta finché lo svuoti o pulisci i dati del sito.
+        </li>
+        <li>
+          <strong>sessionStorage <code>cc-shuffle</code></strong> — ordine delle maglie in vetrina, solo
+          per la sessione. Non è un profilo.
+        </li>
+      </ul>
+      <p>
+        Nessun dato del carrello va su un server nostro: il sito è statico (GitHub Pages). Chiudi il
+        browser o cancella i dati del sito per toglierli.
+      </p>
+      <p>
+        Se paghi con PayPal, lasci questo sito e valgono i cookie e l’informativa di PayPal
+        (<a href="https://www.paypal.com/it/legalhub/paypal/privacy-full" rel="noopener noreferrer">paypal.com</a>).
+      </p>
+
+      <h2>Quali dati, perché</h2>
+      <p>
+        Trattiamo solo ciò che ci scrivi tu, per queste finalità e basi giuridiche (art. 6 GDPR):
+      </p>
+      <ul>
+        <li>
+          <strong>Ordine (bonifico)</strong> — nome, email, telefono, indirizzo, contenuto dell’ordine.
+          Base: contratto, art. 6.1.b. Conservazione: il tempo dell’ordine, della spedizione e degli
+          obblighi contabili/fiscali.
+        </li>
+        <li>
+          <strong>Pagamento PayPal</strong> — l’importo e l’indirizzo li gestisce PayPal. Base: contratto,
+          art. 6.1.b.
+        </li>
+        <li>
+          <strong>Contatti, corsi, consulenza, richiesta ristampa</strong> — nome, email, messaggio.
+          Base: misure precontrattuali o legittimo interesse a rispondere, art. 6.1.b o 6.1.f.
+          Conservazione: finché serve a gestire la richiesta, poi cancellazione.
+        </li>
+        <li>
+          <strong>Newsletter</strong> — solo l’email, e solo se spunti la casella. Base: consenso, art.
+          6.1.a. Puoi revocare in qualsiasi momento scrivendo a {site.email}. Conservazione: fino alla
+          revoca.
+        </li>
+      </ul>
+      <p>Non facciamo profilazione, né decisioni automatizzate.</p>
+
+      <h2>Chi riceve i dati</h2>
+      <ul>
+        <li>
+          <strong>FormSubmit.co</strong> — i moduli del sito gli arrivano e ci inoltra la mail. Opera
+          anche fuori UE; il trasferimento avviene perché hai inviato il form (art. 49.1.b GDPR).
+          Informativa: <a href="https://formsubmit.co/" rel="noopener noreferrer">formsubmit.co</a>.
+        </li>
+        <li>
+          <strong>PayPal (Europe) S.à r.l. et Cie, S.C.A.</strong> — se scegli PayPal.
+        </li>
+        <li>
+          <strong>GitHub Pages (GitHub, Inc. / Microsoft)</strong> — hosting delle pagine pubbliche, non
+          dei moduli. Informativa GitHub sul sito github.com.
+        </li>
+        <li>
+          Corrieri, solo per spedire un ordine.
+        </li>
+      </ul>
+      <p>I dati non si vendono e non si cedono per marketing di terzi.</p>
+
+      <h2>Diritti</h2>
+      <p>
+        Puoi chiedere accesso, rettifica, cancellazione, limitazione, opposizione e, dove applicabile,
+        portabilità, scrivendo a <a href={`mailto:${site.email}`}>{site.email}</a>. Puoi revocare il
+        consenso alla newsletter senza pregiudicare quanto fatto prima. Reclamo: Garante per la
+        protezione dei dati personali, <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.
+      </p>
+    </div>
+  </div>
+</Base>

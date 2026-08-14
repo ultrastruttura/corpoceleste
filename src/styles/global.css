@@ -513,9 +513,13 @@ body.nav-open {
   max-width: 62ch;
 }
 
-.prose h2 {
-  font-size: 16px;
-  margin: 28px 0 10px;
+.prose ul {
+  margin: 0 0 30px;
+  padding-left: 1.2em;
+}
+
+.prose li {
+  margin-bottom: 8px;
 }
 
 /* Product page */
@@ -694,10 +698,15 @@ body.nav-open {
   text-decoration: underline;
 }
 
+.newsletter-form {
+  display: grid;
+  gap: 10px;
+  max-width: 420px;
+}
+
 .newsletter-row {
   display: flex;
   gap: 0;
-  max-width: 420px;
 }
 
 .newsletter-row input {

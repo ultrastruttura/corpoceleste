@@ -1,0 +1,33 @@
+---
+import { url } from "../lib/paths";
+
+type Props = {
+  id: string;
+  newsletter?: boolean;
+};
+const { id, newsletter = false } = Astro.props;
+---
+
+<label class="check">
+  {
+    newsletter ? (
+      <input id={id} type="checkbox" name="consenso_newsletter" value="sì" required />
+    ) : (
+      <input id={id} type="checkbox" name="privacy" value="presa visione" required />
+    )
+  }
+  <span>
+    {
+      newsletter ? (
+        <>
+          Voglio ricevere la newsletter. Ho letto l’
+          <a href={url("privacy/")}>informativa privacy</a>.
+        </>
+      ) : (
+        <>
+          Ho letto l’<a href={url("privacy/")}>informativa privacy</a>.
+        </>
+      )
+    }
+  </span>
+</label>
