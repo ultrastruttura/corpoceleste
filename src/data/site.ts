@@ -5,6 +5,7 @@ export const site = {
   instagram: "https://www.instagram.com/ultrastruttura/",
   facebook: "https://www.facebook.com/ultrastruttura",
   corpoc: "https://ccoorrppoocc.wordpress.com/",
+  ultrastruttura: "https://ultrastruttura.com/",
   shippingItaly: 8,
   shippingEU: 16,
   iban: "IT00 X000 0000 0000 0000 0000 000",
