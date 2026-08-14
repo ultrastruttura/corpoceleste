@@ -11,10 +11,10 @@ npm run dev
 
 ## Pubblicare su GitHub Pages
 
-1. Push su `https://github.com/ultrastruttura/corporceleste`.
+1. Push su `https://github.com/ultrastruttura/corpoceleste`.
 2. Su GitHub: **Settings → Pages → Source: GitHub Actions**.
 3. Il workflow in `.github/workflows/deploy.yml` pubblica a ogni push su `main`.
-4. URL: `https://ultrastruttura.github.io/corporceleste/`
+4. URL: `https://ultrastruttura.github.io/corpoceleste/`
 
 Se usi un dominio (es. corpoceleste.com): in `astro.config.mjs` metti `base: "/"` e `site: "https://corpoceleste.com"`, e togli `GITHUB_PAGES: "true"` dal workflow.
 
