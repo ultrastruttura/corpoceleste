@@ -9,9 +9,18 @@
   --btn-hover: #4f4f4f;
   --danger: #d0021b;
   --sans: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  --marker: "Nerko One", "Permanent Marker", cursive;
   --header: 56px;
   --gap: 15px;
   --pad: 20px;
+}
+
+@font-face {
+  font-family: "Nerko One";
+  src: url("./fonts/NerkoOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 *,
@@ -356,6 +365,12 @@ body.nav-open {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity 0.12s linear;
+}
+
+.card:not(.is-sold):hover .card-frame img,
+.card:not(.is-sold):hover .card-frame .print {
+  opacity: 0.82;
 }
 
 .card-meta {
@@ -697,7 +712,7 @@ body.nav-open {
 }
 
 .footer {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ink);
   padding: 48px 0 30px;
   background: var(--white);
 }
@@ -713,7 +728,14 @@ body.nav-open {
   }
 }
 
-.footer h2,
+.footer h2 {
+  font-family: var(--marker);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
 .footer h3 {
   font-size: 18px;
   font-weight: 500;
