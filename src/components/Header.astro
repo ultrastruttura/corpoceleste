@@ -1,0 +1,52 @@
+---
+import { asset, url } from "../lib/paths";
+
+const path = Astro.url.pathname;
+
+function active(href: string) {
+  const full = url(href);
+  if (!href) return path === full ? "is-active" : "";
+  return path.startsWith(full) ? "is-active" : "";
+}
+---
+
+<header class="header">
+  <div class="header-inner">
+    <a class="logo" href={url()}>
+      <img class="logo-mark" src={asset("brand/logo-stella.png")} alt="" width="40" height="41" />
+      <img class="logo-word" src={asset("brand/logo-scritta-sm.png")} alt="Corpoceleste" width="1200" height="105" />
+    </a>
+    <nav class="nav" aria-label="Principale">
+      <a class={active("")} href={url()}>Shop</a>
+      <a class={active("artisti/")} href={url("artisti/")}>Artisti</a>
+      <a class={active("news/")} href={url("news/")}>News</a>
+      <a class={active("corsi/")} href={url("corsi/")}>Corsi</a>
+      <a class={active("consulenza/")} href={url("consulenza/")}>Consulenza</a>
+      <a class={active("contatti/")} href={url("contatti/")}>Contatti</a>
+    </nav>
+    <div class="header-tools">
+      <a class="icon-btn" href={url("carrello/")} aria-label="Carrello" data-open-cart>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M6 7h15l-1.5 9h-12z"></path>
+          <path d="M6 7L5 4H2"></path>
+          <circle cx="9" cy="20" r="1.2" fill="currentColor" stroke="none"></circle>
+          <circle cx="18" cy="20" r="1.2" fill="currentColor" stroke="none"></circle>
+        </svg>
+        <span class="bag-count" data-bag-count data-count="0"></span>
+      </a>
+      <button class="icon-btn menu-toggle" type="button" aria-label="Menu" data-menu-toggle>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-nav" data-mobile-nav>
+  <a href={url()}>Shop</a>
+  <a href={url("artisti/")}>Artisti</a>
+  <a href={url("news/")}>News</a>
+  <a href={url("corsi/")}>Corsi</a>
+  <a href={url("consulenza/")}>Consulenza</a>
+  <a href={url("contatti/")}>Contatti</a>
+  <a href={url("carrello/")}>Carrello</a>
+</nav>

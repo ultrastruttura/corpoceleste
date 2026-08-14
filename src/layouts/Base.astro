@@ -1,0 +1,52 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { asset, url } from "../lib/paths";
+import "../styles/global.css";
+
+type Props = {
+  title: string;
+  description?: string;
+};
+
+const { title, description = "Corpoceleste" } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" href={asset("brand/favicon.png")} type="image/png" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+
+    <div class="drawer-bg" data-cart-bg></div>
+    <aside class="drawer" data-cart-drawer aria-label="Carrello">
+      <div class="drawer-head">
+        <span>Carrello</span>
+        <button class="icon-btn" type="button" data-close-cart aria-label="Chiudi">✕</button>
+      </div>
+      <div class="drawer-body" data-cart-lines>
+        <p class="empty">Il carrello è vuoto.</p>
+      </div>
+      <div class="drawer-foot">
+        <p style="margin-bottom:12px;font-weight:600" data-cart-total></p>
+        <a class="btn btn--full" href={url("checkout/")}>Checkout</a>
+      </div>
+    </aside>
+
+    <script>
+      import "../scripts/shop.ts";
+    </script>
+  </body>
+</html>

@@ -1,0 +1,246 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+---
+
+<Base title="Checkout — Corpoceleste">
+  <div class="wrap" style="padding:48px 0 80px;max-width:640px">
+    <h1>Checkout</h1>
+    {
+      (site.paypalEmail || site.paypalClientId) && (
+        <p>Pagamento PayPal. Indirizzo di spedizione su PayPal.</p>
+      )
+    }
+
+    <div class="disclaimer">
+      <h3>Spedizioni</h3>
+      <p>
+        Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.
+      </p>
+    </div>
+
+    <label class="check" style="margin: 20px 0">
+      <input type="checkbox" data-disclaimer />
+      <span>Ho letto i tempi di spedizione.</span>
+    </label>
+
+    <div class="field" style="margin-bottom: 8px">
+      <label class="field-label" for="ship-to">Spedizione</label>
+      <select id="ship-to" data-ship>
+        <option value="it" selected>Italia — {site.shippingItaly} €</option>
+        <option value="eu">Europa — {site.shippingEU} €</option>
+      </select>
+    </div>
+
+    <div class="recap" data-recap></div>
+
+    {
+      (site.paypalClientId || site.paypalEmail) && (
+        <div class="pay-box is-locked" data-pay-box>
+          {site.paypalClientId ? (
+            <div id="paypal-buttons"></div>
+          ) : (
+            <form data-paypal-form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+              <input type="hidden" name="cmd" value="_cart" />
+              <input type="hidden" name="upload" value="1" />
+              <input type="hidden" name="business" value={site.paypalEmail} />
+              <input type="hidden" name="currency_code" value="EUR" />
+              <input type="hidden" name="lc" value="IT" />
+              <input type="hidden" name="charset" value="utf-8" />
+              <input type="hidden" name="no_shipping" value="2" />
+              <input type="hidden" name="rm" value="1" />
+              <input type="hidden" name="cbt" value="Torna a Corpoceleste" />
+              <input type="hidden" name="return" data-paypal-return />
+              <input type="hidden" name="cancel_return" data-paypal-cancel />
+              <div data-paypal-items></div>
+              <button class="btn btn--full" type="submit" data-paypal-submit>
+                Paga con PayPal
+              </button>
+            </form>
+          )}
+        </div>
+      )
+    }
+
+    <h2 style="margin:40px 0 16px">Bonifico</h2>
+    <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
+      <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_next" data-next-grazie />
+      <input type="hidden" name="ordine" data-order-field />
+      <div>
+        <label for="o-name">Nome e cognome</label>
+        <input id="o-name" name="nome" required />
+      </div>
+      <div>
+        <label for="o-email">Email</label>
+        <input id="o-email" type="email" name="email" required />
+      </div>
+      <div>
+        <label for="o-tel">Telefono</label>
+        <input id="o-tel" name="telefono" required />
+      </div>
+      <div>
+        <label for="o-addr">Indirizzo</label>
+        <input id="o-addr" name="indirizzo" required />
+      </div>
+      <div>
+        <label for="o-cap">CAP e città</label>
+        <input id="o-cap" name="citta" required />
+      </div>
+      <div>
+        <label for="o-note">Note</label>
+        <textarea id="o-note" name="note"></textarea>
+      </div>
+      <button class="btn" type="submit">Invia ordine</button>
+    </form>
+  </div>
+</Base>
+
+{site.paypalClientId && (
+  <script define:vars={{ clientId: site.paypalClientId }}>
+    const s = document.createElement("script");
+    s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=it_IT`;
+    document.head.append(s);
+  </script>
+)}
+
+<script>
+  import { getCart, total, clearCart } from "../scripts/cart";
+  import { site } from "../data/site";
+
+  const base = import.meta.env.BASE_URL;
+  const items = getCart();
+  const recap = document.querySelector("[data-recap]");
+  const shipSel = document.querySelector<HTMLSelectElement>("[data-ship]");
+  const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
+  const payBox = document.querySelector("[data-pay-box]");
+  const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
+  const paypalItems = document.querySelector("[data-paypal-items]");
+  const ret = document.querySelector<HTMLInputElement>("[data-paypal-return]");
+  const cancel = document.querySelector<HTMLInputElement>("[data-paypal-cancel]");
+
+  if (ret) ret.value = `${location.origin}${base}grazie/`;
+  if (cancel) cancel.value = `${location.origin}${base}checkout/`;
+
+  function shipping() {
+    return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
+  }
+
+  function money(n: number) {
+    return n.toFixed(2);
+  }
+
+  function renderRecap() {
+    if (!recap) return;
+    const ship = shipping();
+    const merce = total();
+    const rows = items
+      .map(
+        (i) =>
+          `<div class="recap-row"><span>${i.title} · ${i.size} × ${i.qty}</span><span>${i.price * i.qty} €</span></div>`
+      )
+      .join("");
+    recap.innerHTML =
+      rows +
+      `<div class="recap-row"><span>Spedizione</span><span>${ship} €</span></div>` +
+      `<div class="recap-row"><strong>Totale</strong><strong>${merce + ship} €</strong></div>`;
+    fillPaypal();
+    if (orderField) {
+      orderField.value = [
+        ...items.map((i) => `${i.title} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
+        `Spedizione ${ship}€`,
+        `Totale ${merce + ship}€`,
+      ].join("\n");
+    }
+  }
+
+  function fillPaypal() {
+    if (!paypalItems) return;
+    const ship = shipping();
+    paypalItems.innerHTML = "";
+    items.forEach((item, idx) => {
+      const n = idx + 1;
+      paypalItems.append(hidden(`item_name_${n}`, `${item.title} (${item.size})`));
+      paypalItems.append(hidden(`amount_${n}`, money(item.price)));
+      paypalItems.append(hidden(`quantity_${n}`, String(item.qty)));
+    });
+    paypalItems.append(hidden("handling_cart", money(ship)));
+  }
+
+  function hidden(name: string, value: string) {
+    const i = document.createElement("input");
+    i.type = "hidden";
+    i.name = name;
+    i.value = value;
+    return i;
+  }
+
+  function unlockPay() {
+    payBox?.classList.toggle("is-locked", !disclaimer?.checked);
+  }
+
+  shipSel?.addEventListener("change", renderRecap);
+  disclaimer?.addEventListener("change", unlockPay);
+  renderRecap();
+  unlockPay();
+
+  if (!items.length) {
+    payBox?.classList.add("is-locked");
+    if (recap) recap.innerHTML = `<p class="empty">Il carrello è vuoto.</p>`;
+  }
+
+  function mountButtons() {
+    const paypal = (window as unknown as { paypal?: { Buttons: (o: object) => { render: (s: string) => void } } })
+      .paypal;
+    const el = document.querySelector("#paypal-buttons");
+    if (!paypal || !el || !items.length) return;
+    paypal.Buttons({
+      onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
+        if (!disclaimer?.checked) return actions.reject();
+        return actions.resolve();
+      },
+      createOrder: (_: unknown, actions: { order: { create: (o: object) => Promise<string> } }) => {
+        const ship = shipping();
+        const merce = total();
+        return actions.order.create({
+          purchase_units: [
+            {
+              description: "Corpoceleste",
+              amount: {
+                currency_code: "EUR",
+                value: money(merce + ship),
+                breakdown: {
+                  item_total: { currency_code: "EUR", value: money(merce) },
+                  shipping: { currency_code: "EUR", value: money(ship) },
+                },
+              },
+              items: items.map((i) => ({
+                name: `${i.title} (${i.size})`.slice(0, 127),
+                quantity: String(i.qty),
+                unit_amount: { currency_code: "EUR", value: money(i.price) },
+              })),
+            },
+          ],
+          application_context: {
+            brand_name: "Corpoceleste",
+            shipping_preference: "GET_FROM_FILE",
+          },
+        });
+      },
+      onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
+        await actions.order.capture();
+        clearCart();
+        location.href = `${base}grazie/`;
+      },
+    }).render("#paypal-buttons");
+  }
+
+  if (site.paypalClientId) {
+    const wait = () => {
+      if ((window as unknown as { paypal?: unknown }).paypal) mountButtons();
+      else setTimeout(wait, 80);
+    };
+    wait();
+  }
+</script>

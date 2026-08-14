@@ -1,0 +1,22 @@
+---
+import Base from "../../layouts/Base.astro";
+import { artists } from "../../data/artists";
+import { url } from "../../lib/paths";
+---
+
+<Base title="Artisti — Corpoceleste">
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>Artisti</h1>
+    </header>
+    <ul class="name-list">
+      {
+        artists.map((a) => (
+          <li>
+            <a href={url(`artisti/${a.slug}/`)}>{a.name}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>

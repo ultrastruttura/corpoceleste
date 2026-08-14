@@ -1,0 +1,25 @@
+---
+import Base from "../../layouts/Base.astro";
+import { news, newsBySlug, formatDate } from "../../data/news";
+import { url } from "../../lib/paths";
+
+export function getStaticPaths() {
+  return news.map((n) => ({ params: { slug: n.slug } }));
+}
+
+const item = newsBySlug(Astro.params.slug!);
+if (!item) return Astro.redirect(url("news/"));
+const paras = item.body.split("\n\n");
+---
+
+<Base title={`${item.title} — Corpoceleste`} description={item.excerpt}>
+  <div class="wrap" style="padding-bottom:80px">
+    <header class="page-hero">
+      <p class="card-artist"><a href={url("news/")}>News</a> · {formatDate(item.date)}</p>
+      <h1>{item.title}</h1>
+    </header>
+    <div class="prose">
+      {paras.map((p) => <p>{p}</p>)}
+    </div>
+  </div>
+</Base>

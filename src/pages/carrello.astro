@@ -1,0 +1,55 @@
+---
+import Base from "../layouts/Base.astro";
+import { url } from "../lib/paths";
+---
+
+<Base title="Carrello — Corpoceleste">
+  <div class="wrap" style="padding:48px 0 80px;max-width:720px">
+    <h1>Carrello</h1>
+    <div data-cart-page style="margin:28px 0"></div>
+    <p data-cart-page-total style="font-weight:600;margin-bottom:20px"></p>
+    <a class="btn" href={url("checkout/")}>Checkout</a>
+    <a class="btn btn--ghost" href={url()} style="margin-left:8px">Shop</a>
+  </div>
+</Base>
+
+<script>
+  import { getCart, removeItem, total } from "../scripts/cart";
+
+  const base = import.meta.env.BASE_URL;
+  function asset(path: string) {
+    return `${base}${path.replace(/^\//, "")}`;
+  }
+
+  function render() {
+    const root = document.querySelector("[data-cart-page]");
+    const tot = document.querySelector("[data-cart-page-total]");
+    if (!root) return;
+    const items = getCart();
+    if (!items.length) {
+      root.innerHTML = `<p class="empty">Il carrello è vuoto.</p>`;
+      if (tot) tot.textContent = "";
+      return;
+    }
+    root.innerHTML = items
+      .map(
+        (i) => `
+      <div class="cart-line">
+        <div class="cart-thumb"><img src="${asset(`images/prints/${i.print}`)}" alt="" /></div>
+        <div>
+          <h4>${i.title}</h4>
+          <p>${i.size} · ${i.qty} × ${i.price} €</p>
+          <button class="cart-remove" data-remove="${i.id}" data-size="${i.size}" type="button">Rimuovi</button>
+        </div>
+        <div>${i.price * i.qty} €</div>
+      </div>`
+      )
+      .join("");
+    root.querySelectorAll<HTMLElement>("[data-remove]").forEach((btn) => {
+      btn.addEventListener("click", () => removeItem(btn.dataset.remove!, btn.dataset.size!));
+    });
+    if (tot) tot.textContent = `Totale ${total()} €`;
+  }
+  render();
+  window.addEventListener("cart:change", render);
+</script>

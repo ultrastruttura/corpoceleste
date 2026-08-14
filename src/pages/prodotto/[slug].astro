@@ -1,0 +1,92 @@
+---
+import Base from "../../layouts/Base.astro";
+import { productBySlug, formatPrice, artistName, products } from "../../data/products";
+import { artistById } from "../../data/artists";
+import { site } from "../../data/site";
+import { asset, url } from "../../lib/paths";
+
+export function getStaticPaths() {
+  return products.map((p) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const product = productBySlug(slug!);
+if (!product) return Astro.redirect(url());
+
+const artist = artistName(product.artistId);
+const artistSlug = artistById(product.artistId)?.slug ?? "corpoceleste";
+const sold = product.status === "soldout";
+---
+
+<Base title={`${product.title} — Corpoceleste`}>
+  <div class="wrap product-layout">
+    <div class="product-stage">
+      <img
+        src={asset(`images/prints/${product.print}`)}
+        alt={product.title}
+        width="800"
+        height="800"
+      />
+    </div>
+    <div class="product-info">
+      {
+        product.artistId !== "studio" && artist !== product.title && (
+          <a class="card-artist" href={url(`artisti/${artistSlug}/`)}>
+            {artist}
+          </a>
+        )
+      }
+      <h1>{product.title}</h1>
+      <div class="price">{formatPrice(product.price)}</div>
+      {product.description && <p>{product.description}</p>}
+
+      {
+        sold ? (
+          <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+            <input type="hidden" name="_subject" value={`Ristampa: ${product.title}`} />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_next" data-next-grazie />
+            <input type="hidden" name="prodotto" value={product.title} />
+            <p>Esaurita.</p>
+            <div>
+              <label for="re-email">Email</label>
+              <input id="re-email" type="email" name="email" required />
+            </div>
+            <div>
+              <label for="re-size">Taglia</label>
+              <select id="re-size" name="taglia">
+                {site.sizes.map((s) => <option>{s}</option>)}
+              </select>
+            </div>
+            <button class="btn" type="submit">Richiedi ristampa</button>
+          </form>
+        ) : (
+          <form data-add-form>
+            <input type="hidden" name="id" value={product.id} />
+            <input type="hidden" name="slug" value={product.slug} />
+            <input type="hidden" name="title" value={product.title} />
+            <input type="hidden" name="price" value={product.price} />
+            <input type="hidden" name="color" value={product.color} />
+            <input type="hidden" name="print" value={product.print} />
+            <div class="field-label">Taglia</div>
+            <div class="size-row">
+              {site.sizes.map((s) => (
+                <label>
+                  <input type="radio" name="size" value={s} checked={s === "M"} />
+                  <span>{s}</span>
+                </label>
+              ))}
+            </div>
+            <button class="btn" type="submit">Aggiungi al carrello</button>
+          </form>
+        )
+      }
+
+      <ul class="attrs">
+        <li>{product.colorName}</li>
+        <li>Serigrafia, un colore</li>
+        <li>Spedizione Italia {site.shippingItaly} €, Europa {site.shippingEU} €</li>
+      </ul>
+    </div>
+  </div>
+</Base>

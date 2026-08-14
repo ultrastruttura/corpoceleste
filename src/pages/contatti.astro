@@ -1,0 +1,54 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+---
+
+<Base title="Contatti — Corpoceleste">
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>Contatti</h1>
+    </header>
+
+    <div class="split">
+      <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+        <input type="hidden" name="_subject" value="Contatto dal sito Corpoceleste" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" data-next-grazie />
+        <div>
+          <label for="ct-name">Nome</label>
+          <input id="ct-name" name="nome" required />
+        </div>
+        <div>
+          <label for="ct-email">Email</label>
+          <input id="ct-email" type="email" name="email" required />
+        </div>
+        <div>
+          <label for="ct-msg">Messaggio</label>
+          <textarea id="ct-msg" name="messaggio" required></textarea>
+        </div>
+        <button class="btn" type="submit">Invia</button>
+      </form>
+      <div>
+        <h2>Newsletter</h2>
+        <form class="newsletter-row" style="margin-bottom:36px" action={`https://formsubmit.co/${site.email}`} method="POST">
+          <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_next" data-next-grazie />
+          <input type="email" name="email" required placeholder="Email" aria-label="Email newsletter" />
+          <button type="submit">Iscriviti</button>
+        </form>
+        <h2>Studio</h2>
+        <p>
+          <a href={`mailto:${site.email}`}>{site.email}</a><br />
+          <a href={site.instagram} rel="noopener noreferrer">Instagram</a><br />
+          <a href={site.facebook} rel="noopener noreferrer">Facebook</a>
+        </p>
+        <h2>Corpoc</h2>
+        <p>
+          Shop precedente, 2012–2019.<br />
+          <a href={site.corpoc} rel="noopener noreferrer">ccoorrppoocc.wordpress.com</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Base>

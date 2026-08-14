@@ -1,0 +1,11 @@
+---
+import type { Product } from "../data/products";
+import ProductCard from "./ProductCard.astro";
+
+type Props = { products: Product[]; class?: string };
+const { products, class: className } = Astro.props;
+---
+
+<div class:list={["grid", className]} data-product-grid>
+  {products.map((p) => <ProductCard product={p} />)}
+</div>

@@ -1,0 +1,25 @@
+---
+import Base from "../../layouts/Base.astro";
+import { news, formatDate } from "../../data/news";
+import { url } from "../../lib/paths";
+---
+
+<Base title="News — Corpoceleste">
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>News</h1>
+    </header>
+    {
+      news.length > 0 && (
+        <ul class="name-list">
+          {news.map((n) => (
+            <li>
+              <span class="date">{formatDate(n.date)}</span>
+              <a href={url(`news/${n.slug}/`)}>{n.title}</a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</Base>

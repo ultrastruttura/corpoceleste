@@ -1,0 +1,83 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+import { pastWorkshops } from "../data/workshops";
+import { asset } from "../lib/paths";
+---
+
+<Base title="Corsi — Corpoceleste">
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>Corsi</h1>
+    </header>
+    <img class="page-photo" src={asset("images/photos/studio.jpg")} alt="" width="1080" height="1350" />
+
+    <div class="split">
+      <div>
+        <h2>Lista d’attesa</h2>
+        <p>Quando si raggiunge un minimo di iscritti, fisso la data.</p>
+        <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+          <input type="hidden" name="_subject" value="Iscrizione workshop in studio" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_next" data-next-grazie />
+          <div>
+            <label for="ws-name">Nome</label>
+            <input id="ws-name" name="nome" required />
+          </div>
+          <div>
+            <label for="ws-email">Email</label>
+            <input id="ws-email" type="email" name="email" required />
+          </div>
+          <div>
+            <label for="ws-note">Note</label>
+            <textarea id="ws-note" name="note"></textarea>
+          </div>
+            <button class="btn" type="submit">Iscriviti</button>
+        </form>
+      </div>
+      <div>
+        <h2>Workshop presso di voi</h2>
+        <p>Corso nella vostra sede.</p>
+        <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+          <input type="hidden" name="_subject" value="Proposta workshop presso di voi" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_next" data-next-grazie />
+          <div>
+            <label for="sp-name">Nome e spazio</label>
+            <input id="sp-name" name="nome" required />
+          </div>
+          <div>
+            <label for="sp-email">Email</label>
+            <input id="sp-email" type="email" name="email" required />
+          </div>
+          <div>
+            <label for="sp-where">Città / sede</label>
+            <input id="sp-where" name="sede" required />
+          </div>
+          <div>
+            <label for="sp-note">Messaggio</label>
+            <textarea id="sp-note" name="messaggio" required></textarea>
+          </div>
+            <button class="btn" type="submit">Invia</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Archivio</h2>
+    </div>
+    <p class="archive-note">Dal 2014.</p>
+    {
+      pastWorkshops.map((block) => (
+        <section class="year-block">
+          <h3>{block.year}</h3>
+          <ul>
+            {block.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>

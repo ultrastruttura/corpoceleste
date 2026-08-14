@@ -1,0 +1,26 @@
+---
+import Base from "../../layouts/Base.astro";
+import ProductGrid from "../../components/ProductGrid.astro";
+import { artists, artistBySlug } from "../../data/artists";
+import { productsByArtist } from "../../data/products";
+import { url } from "../../lib/paths";
+
+export function getStaticPaths() {
+  return artists.map((a) => ({ params: { slug: a.slug } }));
+}
+
+const artist = artistBySlug(Astro.params.slug!);
+if (!artist) return Astro.redirect(url("artisti/"));
+const works = productsByArtist(artist.id);
+---
+
+<Base title={`${artist.name} — Corpoceleste`} description={artist.bio}>
+  <div class="wrap">
+    <header class="page-hero">
+      <p class="card-artist"><a href={url("artisti/")}>Artisti</a></p>
+      <h1>{artist.name}</h1>
+      {artist.bio && <p class="lede">{artist.bio}</p>}
+    </header>
+    <ProductGrid products={works} />
+  </div>
+</Base>

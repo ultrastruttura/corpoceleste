@@ -1,0 +1,25 @@
+---
+import Base from "../layouts/Base.astro";
+import ProductGrid from "../components/ProductGrid.astro";
+import { availableProducts, soldOutProducts } from "../data/products";
+
+const available = availableProducts();
+const sold = soldOutProducts();
+---
+
+<Base title="Corpoceleste">
+  <div class="wrap shop-home">
+    <ProductGrid products={available} />
+
+    {
+      sold.length > 0 && (
+        <>
+          <div class="section-head">
+            <h2>Esaurite</h2>
+          </div>
+          <ProductGrid products={sold} />
+        </>
+      )
+    }
+  </div>
+</Base>

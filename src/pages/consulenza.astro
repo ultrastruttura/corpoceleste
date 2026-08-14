@@ -1,0 +1,51 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+import { asset } from "../lib/paths";
+---
+
+<Base title="Consulenza — Corpoceleste">
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>Consulenza</h1>
+    </header>
+
+    <div class="split">
+      <div class="prose">
+        <img class="page-photo" src={asset("images/photos/andrea.jpg")} alt="" width="1080" height="1350" />
+        <h2>Stampa</h2>
+        <p>Impianti, inchiostri, flussi di lavoro, formazione.</p>
+        <p>Formazione del personale Za.Er. ad Asmara, in studio e in Eritrea. Responsabile R&amp;D in Quaglia.</p>
+        <h2>Stampa dal vivo</h2>
+        <p>Telai in sede durante eventi.</p>
+      </div>
+      <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+        <input type="hidden" name="_subject" value="Richiesta consulenza / stampa dal vivo" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" data-next-grazie />
+        <div>
+          <label for="c-name">Nome</label>
+          <input id="c-name" name="nome" required />
+        </div>
+        <div>
+          <label for="c-email">Email</label>
+          <input id="c-email" type="email" name="email" required />
+        </div>
+        <div>
+          <label for="c-tipo">Di cosa si tratta</label>
+          <select id="c-tipo" name="tipo">
+            <option>Consulenza di stampa</option>
+            <option>Formazione personale</option>
+            <option>Stampa dal vivo</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div>
+          <label for="c-msg">Messaggio</label>
+          <textarea id="c-msg" name="messaggio" required></textarea>
+        </div>
+          <button class="btn" type="submit">Invia</button>
+      </form>
+    </div>
+  </div>
+</Base>

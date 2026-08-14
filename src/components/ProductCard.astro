@@ -1,0 +1,31 @@
+---
+import type { Product } from "../data/products";
+import { artistName, formatPrice } from "../data/products";
+import { asset, url } from "../lib/paths";
+
+type Props = { product: Product };
+const { product } = Astro.props;
+const artist = artistName(product.artistId);
+const sold = product.status === "soldout";
+---
+
+<a
+  class:list={["card", sold && "is-sold"]}
+  href={url(`prodotto/${product.slug}/`)}
+  data-product
+  data-nuovo={product.nuovo ? "1" : "0"}
+  data-status={product.status}
+  data-created={product.createdAt}
+>
+  <div class="card-frame">
+    {sold && <span class="badge">Esaurito</span>}
+    <img class="print" src={asset(`images/prints/${product.print}`)} alt="" width="800" height="800" />
+  </div>
+  <div class="card-meta">
+    {product.artistId !== "studio" && artist !== product.title && (
+      <div class="card-artist">{artist}</div>
+    )}
+    <div class="card-title">{product.title}</div>
+    <div class="card-price">{formatPrice(product.price)}</div>
+  </div>
+</a>
