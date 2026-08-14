@@ -629,6 +629,42 @@ body.nav-open {
   color: var(--muted);
 }
 
+.news-list {
+  list-style: none;
+  margin: 0 0 80px;
+  padding: 0;
+}
+
+.news-list li {
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+}
+
+.news-list .date {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.news-list h2 {
+  font-size: 20px;
+  margin: 6px 0 10px;
+}
+
+.news-list h2 a {
+  text-decoration: none;
+}
+
+.news-list h2 a:hover {
+  text-decoration: underline;
+}
+
+.news-list p {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--muted);
+}
+
 /* Workshops archive */
 .year-block {
   display: grid;

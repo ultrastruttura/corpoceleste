@@ -11,11 +11,14 @@ import { url } from "../../lib/paths";
     </header>
     {
       news.length > 0 && (
-        <ul class="name-list">
+        <ul class="news-list">
           {news.map((n) => (
             <li>
               <span class="date">{formatDate(n.date)}</span>
-              <a href={url(`news/${n.slug}/`)}>{n.title}</a>
+              <h2>
+                <a href={url(`news/${n.slug}/`)}>{n.title}</a>
+              </h2>
+              <p>{n.excerpt}</p>
             </li>
           ))}
         </ul>
