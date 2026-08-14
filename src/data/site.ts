@@ -10,7 +10,7 @@ export const site = {
   iban: "IT00 X000 0000 0000 0000 0000 000",
   intestatario: "Andrea Baldelli",
   /** Email dell'account PayPal Business (gratis). Basta questa per accettare pagamenti. */
-  paypalEmail: "",
+  paypalEmail: "baldellimtt@gmail.com",
   /**
    * Opzionale: Client ID da developer.paypal.com (gratis).
    * Se c'è, il bottone PayPal resta sulla pagina invece di reindirizzare.

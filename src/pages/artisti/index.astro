@@ -2,6 +2,8 @@
 import Base from "../../layouts/Base.astro";
 import { artists } from "../../data/artists";
 import { url } from "../../lib/paths";
+
+const listed = [...artists].sort((a, b) => a.name.localeCompare(b.name, "it"));
 ---
 
 <Base title="Artisti — Corpoceleste">
@@ -11,7 +13,7 @@ import { url } from "../../lib/paths";
     </header>
     <ul class="name-list">
       {
-        artists.map((a) => (
+        listed.map((a) => (
           <li>
             <a href={url(`artisti/${a.slug}/`)}>{a.name}</a>
           </li>
