@@ -114,6 +114,7 @@ import { url } from "../lib/paths";
 
 <script>
   import { getCart, total, clearCart } from "../scripts/cart";
+  import { artistName, products } from "../data/products";
   import { site } from "../data/site";
 
   const base = import.meta.env.BASE_URL;
@@ -139,6 +140,13 @@ import { url } from "../lib/paths";
     return n.toFixed(2);
   }
 
+  function lineName(item: (typeof items)[number]) {
+    const p = products.find((x) => x.id === item.id);
+    const artist = p ? artistName(p.artistId) : "";
+    if (artist && artist !== item.title) return `${artist} · ${item.title}`;
+    return item.title;
+  }
+
   function renderRecap() {
     if (!recap) return;
     const ship = shipping();
@@ -146,7 +154,7 @@ import { url } from "../lib/paths";
     const rows = items
       .map(
         (i) =>
-          `<div class="recap-row"><span>${i.title} · ${i.size} × ${i.qty}</span><span>${i.price * i.qty} €</span></div>`
+          `<div class="recap-row"><span>${lineName(i)} · ${i.size} × ${i.qty}</span><span>${i.price * i.qty} €</span></div>`
       )
       .join("");
     recap.innerHTML =
@@ -156,7 +164,7 @@ import { url } from "../lib/paths";
     fillPaypal();
     if (orderField) {
       orderField.value = [
-        ...items.map((i) => `${i.title} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
+        ...items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
         `Spedizione ${ship}€`,
         `Totale ${merce + ship}€`,
       ].join("\n");
@@ -169,7 +177,7 @@ import { url } from "../lib/paths";
     paypalItems.innerHTML = "";
     items.forEach((item, idx) => {
       const n = idx + 1;
-      paypalItems.append(hidden(`item_name_${n}`, `${item.title} (${item.size})`));
+      paypalItems.append(hidden(`item_name_${n}`, `${lineName(item)} (${item.size})`));
       paypalItems.append(hidden(`amount_${n}`, money(item.price)));
       paypalItems.append(hidden(`quantity_${n}`, String(item.qty)));
     });
@@ -225,7 +233,7 @@ import { url } from "../lib/paths";
                 },
               },
               items: items.map((i) => ({
-                name: `${i.title} (${i.size})`.slice(0, 127),
+                name: `${lineName(i)} (${i.size})`.slice(0, 127),
                 quantity: String(i.qty),
                 unit_amount: { currency_code: "EUR", value: money(i.price) },
               })),
