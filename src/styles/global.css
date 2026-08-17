@@ -238,9 +238,20 @@ p:last-child {
 }
 
 @media (min-width: 1024px) {
+  .header-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+
   .nav {
     display: flex;
+    justify-self: center;
   }
+
+  .header-tools {
+    justify-self: end;
+  }
+
   .menu-toggle {
     display: none;
   }
