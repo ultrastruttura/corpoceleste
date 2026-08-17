@@ -107,7 +107,7 @@ p:last-child {
   top: 0;
   z-index: 40;
   background: var(--white);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--ink);
   height: var(--header);
   display: flex;
   align-items: center;
@@ -349,6 +349,7 @@ body.nav-open {
   aspect-ratio: 1;
   position: relative;
   overflow: hidden;
+  border: 1px solid var(--ink);
 }
 
 .card-frame img,
@@ -365,7 +366,7 @@ body.nav-open {
 }
 
 .card-meta {
-  padding: 14px 4px 8px;
+  padding: 22px 4px 8px;
   text-align: center;
 }
 
@@ -378,7 +379,7 @@ body.nav-open {
 
 .card-title {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 400;
   margin-bottom: 4px;
 }
 
@@ -782,7 +783,7 @@ body.nav-open {
 .footer-bar {
   margin-top: 48px;
   padding-top: 20px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ink);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
