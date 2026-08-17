@@ -4,13 +4,50 @@ import { url } from "../lib/paths";
 ---
 
 <Base title="Ricevuto — Corpoceleste">
-  <div class="wrap" style="padding:80px 0;max-width:560px">
-    <h1>Ricevuto</h1>
+  <div class="wrap page-main page-main--thanks">
+    <h1 data-thanks-title>Ricevuto</h1>
+    <p data-thanks-body></p>
+    <div class="recap" data-thanks-recap hidden></div>
     <a class="btn" href={url()}>Shop</a>
   </div>
-</Base>
 
-<script>
-  import { clearCart } from "../scripts/cart";
-  clearCart();
-</script>
+  <script>
+  import { clearCart, getCart, readOrderSnapshot } from "../scripts/cart";
+  import { renderRecap } from "../scripts/cart-ui";
+
+  const copy: Record<string, { title: string; body: string; order?: boolean }> = {
+    contatto: { title: "Ricevuto", body: "Ti rispondo per email." },
+    newsletter: { title: "Ricevuto", body: "Quando c’è una maglia nuova, scrivo." },
+    ristampa: { title: "Ricevuto", body: "Se ristampo, ti avviso." },
+    consulenza: { title: "Ricevuto", body: "Ti rispondo per email." },
+    corsi: { title: "Ricevuto", body: "Quando il gruppo c’è, fisso la data." },
+    workshop: { title: "Ricevuto", body: "Ti rispondo per email." },
+    ordine: { title: "Ordine ricevuto", body: "Ti scrivo per il bonifico.", order: true },
+    paypal: { title: "Ordine ricevuto", body: "Il pagamento è su PayPal. Ti scrivo per la spedizione.", order: true },
+    form: { title: "Ricevuto", body: "" },
+  };
+
+  const from = new URLSearchParams(location.search).get("from") || "form";
+  const msg = copy[from] ?? copy.form;
+  const title = document.querySelector("[data-thanks-title]");
+  const body = document.querySelector("[data-thanks-body]");
+  const recap = document.querySelector("[data-thanks-recap]");
+
+  if (title) title.textContent = msg.title;
+  if (body) {
+    body.textContent = msg.body;
+    body.hidden = !msg.body;
+  }
+
+  if (msg.order && recap) {
+    const snap = readOrderSnapshot();
+    const items = snap?.items ?? getCart();
+    const shipping = snap?.shipping ?? 0;
+    if (items.length) {
+      recap.hidden = false;
+      renderRecap(recap, items, shipping);
+    }
+    clearCart();
+  }
+  </script>
+</Base>

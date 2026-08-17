@@ -6,258 +6,284 @@ import { url } from "../lib/paths";
 ---
 
 <Base title="Checkout — Corpoceleste">
-  <div class="wrap" style="padding:48px 0 80px;max-width:640px">
+  <div class="wrap page-main page-main--narrow checkout-page">
     <h1>Checkout</h1>
-    {
-      (site.paypalEmail || site.paypalClientId) && (
-        <p>Pagamento PayPal. Indirizzo di spedizione su PayPal.</p>
-      )
-    }
 
-    <div class="disclaimer">
-      <h3>Spedizioni</h3>
-      <p>
-        Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.
-      </p>
-    </div>
+    <p class="empty" data-checkout-empty hidden>
+      Il carrello è vuoto. <a href={url()}>Shop</a>
+    </p>
 
-    <label class="check" style="margin: 20px 0 12px">
-      <input type="checkbox" data-disclaimer />
-      <span>Ho letto i tempi di spedizione.</span>
-    </label>
-    <label class="check" style="margin: 0 0 20px">
-      <input type="checkbox" data-privacy />
-      <span>Ho letto l’<a href={url("privacy/")}>informativa privacy</a>.</span>
-    </label>
+    <div data-checkout-flow hidden>
+      {
+        (site.paypalEmail || site.paypalClientId) && (
+          <p>Pagamento PayPal. Indirizzo di spedizione su PayPal.</p>
+        )
+      }
 
-    <div class="field" style="margin-bottom: 8px">
-      <label class="field-label" for="ship-to">Spedizione</label>
-      <select id="ship-to" data-ship>
-        <option value="it" selected>Italia — {site.shippingItaly} €</option>
-        <option value="eu">Europa — {site.shippingEU} €</option>
-      </select>
-    </div>
+      <div class="disclaimer">
+        <h3>Spedizioni</h3>
+        <p>
+          Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.
+        </p>
+      </div>
 
-    <div class="recap" data-recap></div>
+      <label class="check checkout-check">
+        <input type="checkbox" data-disclaimer />
+        <span>Ho letto i tempi di spedizione.</span>
+      </label>
+      <label class="check checkout-check">
+        <input type="checkbox" data-privacy />
+        <span>Ho letto l’<a href={url("privacy/")}>informativa privacy</a>.</span>
+      </label>
 
-    {
-      (site.paypalClientId || site.paypalEmail) && (
-        <div class="pay-box is-locked" data-pay-box>
-          {site.paypalClientId ? (
-            <div id="paypal-buttons"></div>
-          ) : (
-            <form data-paypal-form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-              <input type="hidden" name="cmd" value="_cart" />
-              <input type="hidden" name="upload" value="1" />
-              <input type="hidden" name="business" value={site.paypalEmail} />
-              <input type="hidden" name="currency_code" value="EUR" />
-              <input type="hidden" name="lc" value="IT" />
-              <input type="hidden" name="charset" value="utf-8" />
-              <input type="hidden" name="no_shipping" value="2" />
-              <input type="hidden" name="rm" value="1" />
-              <input type="hidden" name="cbt" value="Torna a Corpoceleste" />
-              <input type="hidden" name="return" data-paypal-return />
-              <input type="hidden" name="cancel_return" data-paypal-cancel />
-              <div data-paypal-items></div>
-              <button class="btn btn--full" type="submit" data-paypal-submit>
-                Paga con PayPal
-              </button>
-            </form>
-          )}
+      <div class="field checkout-ship">
+        <label class="field-label" for="ship-to">Spedizione</label>
+        <select id="ship-to" data-ship>
+          <option value="it" selected>Italia — {site.shippingItaly} €</option>
+          <option value="eu">Europa — {site.shippingEU} €</option>
+        </select>
+      </div>
+
+      <div class="recap" data-recap></div>
+
+      {
+        (site.paypalClientId || site.paypalEmail) && (
+          <div class="pay-box is-locked" data-pay-box>
+            {site.paypalClientId ? (
+              <div id="paypal-buttons"></div>
+            ) : (
+              <form data-paypal-form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                <input type="hidden" name="cmd" value="_cart" />
+                <input type="hidden" name="upload" value="1" />
+                <input type="hidden" name="business" value={site.paypalEmail} />
+                <input type="hidden" name="currency_code" value="EUR" />
+                <input type="hidden" name="lc" value="IT" />
+                <input type="hidden" name="charset" value="utf-8" />
+                <input type="hidden" name="no_shipping" value="2" />
+                <input type="hidden" name="rm" value="1" />
+                <input type="hidden" name="cbt" value="Torna a Corpoceleste" />
+                <input type="hidden" name="return" data-paypal-return />
+                <input type="hidden" name="cancel_return" data-paypal-cancel />
+                <div data-paypal-items></div>
+                <button class="btn btn--full" type="submit" data-paypal-submit>
+                  Paga con PayPal
+                </button>
+              </form>
+            )}
+          </div>
+        )
+      }
+
+      <h2 class="checkout-bank-title">Bonifico</h2>
+      <form class="form is-locked" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
+        <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" data-next-grazie="ordine" />
+        <input type="hidden" name="ordine" data-order-field />
+        <div>
+          <label for="o-name">Nome e cognome</label>
+          <input id="o-name" name="nome" required />
         </div>
-      )
-    }
-
-    <h2 style="margin:40px 0 16px">Bonifico</h2>
-    <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
-      <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
-      <input type="hidden" name="_captcha" value="false" />
-      <input type="hidden" name="_next" data-next-grazie />
-      <input type="hidden" name="ordine" data-order-field />
-      <div>
-        <label for="o-name">Nome e cognome</label>
-        <input id="o-name" name="nome" required />
-      </div>
-      <div>
-        <label for="o-email">Email</label>
-        <input id="o-email" type="email" name="email" required />
-      </div>
-      <div>
-        <label for="o-tel">Telefono</label>
-        <input id="o-tel" name="telefono" required />
-      </div>
-      <div>
-        <label for="o-addr">Indirizzo</label>
-        <input id="o-addr" name="indirizzo" required />
-      </div>
-      <div>
-        <label for="o-cap">CAP e città</label>
-        <input id="o-cap" name="citta" required />
-      </div>
-      <div>
-        <label for="o-note">Note</label>
-        <textarea id="o-note" name="note"></textarea>
-      </div>
-      <PrivacyCheck id="o-privacy" />
-      <button class="btn" type="submit">Invia ordine</button>
-    </form>
+        <div>
+          <label for="o-email">Email</label>
+          <input id="o-email" type="email" name="email" required />
+        </div>
+        <div>
+          <label for="o-tel">Telefono</label>
+          <input id="o-tel" name="telefono" required />
+        </div>
+        <div>
+          <label for="o-addr">Indirizzo</label>
+          <input id="o-addr" name="indirizzo" required />
+        </div>
+        <div>
+          <label for="o-cap">CAP e città</label>
+          <input id="o-cap" name="citta" required />
+        </div>
+        <div>
+          <label for="o-note">Note</label>
+          <textarea id="o-note" name="note"></textarea>
+        </div>
+        <PrivacyCheck id="o-privacy" />
+        <button class="btn" type="submit" data-bank-submit disabled>Invia ordine</button>
+      </form>
+    </div>
   </div>
-</Base>
 
-{site.paypalClientId && (
-  <script define:vars={{ clientId: site.paypalClientId }}>
-    const s = document.createElement("script");
-    s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=it_IT`;
-    document.head.append(s);
-  </script>
-)}
-
-<script>
-  import { getCart, total, clearCart } from "../scripts/cart";
-  import { artistName, products } from "../data/products";
-  import { site } from "../data/site";
-
-  const base = import.meta.env.BASE_URL;
-  const items = getCart();
-  const recap = document.querySelector("[data-recap]");
-  const shipSel = document.querySelector<HTMLSelectElement>("[data-ship]");
-  const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
-  const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
-  const payBox = document.querySelector("[data-pay-box]");
-  const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
-  const paypalItems = document.querySelector("[data-paypal-items]");
-  const ret = document.querySelector<HTMLInputElement>("[data-paypal-return]");
-  const cancel = document.querySelector<HTMLInputElement>("[data-paypal-cancel]");
-
-  if (ret) ret.value = `${location.origin}${base}grazie/`;
-  if (cancel) cancel.value = `${location.origin}${base}checkout/`;
-
-  function shipping() {
-    return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
+  {
+    site.paypalClientId && (
+      <script define:vars={{ clientId: site.paypalClientId }}>
+        const s = document.createElement("script");
+        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=it_IT`;
+        document.head.append(s);
+      </script>
+    )
   }
 
-  function money(n: number) {
-    return n.toFixed(2);
-  }
+  <script>
+    import { getCart, total, clearCart, saveOrderSnapshot } from "../scripts/cart";
+    import { lineName, renderRecap } from "../scripts/cart-ui";
+    import { site } from "../data/site";
 
-  function lineName(item: (typeof items)[number]) {
-    const p = products.find((x) => x.id === item.id);
-    const artist = p ? artistName(p.artistId) : "";
-    if (artist && artist !== item.title) return `${artist} · ${item.title}`;
-    return item.title;
-  }
+    const base = import.meta.env.BASE_URL;
+    const page = document.querySelector(".checkout-page");
+    const emptyEl = document.querySelector("[data-checkout-empty]");
+    const flowEl = document.querySelector("[data-checkout-flow]");
+    const recap = document.querySelector("[data-recap]");
+    const shipSel = document.querySelector<HTMLSelectElement>("[data-ship]");
+    const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
+    const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
+    const payBox = document.querySelector("[data-pay-box]");
+    const bankForm = document.querySelector<HTMLFormElement>("[data-checkout-form]");
+    const bankSubmit = document.querySelector<HTMLButtonElement>("[data-bank-submit]");
+    const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
+    const paypalItems = document.querySelector("[data-paypal-items]");
+    const paypalForm = document.querySelector<HTMLFormElement>("[data-paypal-form]");
+    const ret = document.querySelector<HTMLInputElement>("[data-paypal-return]");
+    const cancel = document.querySelector<HTMLInputElement>("[data-paypal-cancel]");
 
-  function renderRecap() {
-    if (!recap) return;
-    const ship = shipping();
-    const merce = total();
-    const rows = items
-      .map(
-        (i) =>
-          `<div class="recap-row"><span>${lineName(i)} · ${i.size} × ${i.qty}</span><span>${i.price * i.qty} €</span></div>`
-      )
-      .join("");
-    recap.innerHTML =
-      rows +
-      `<div class="recap-row"><span>Spedizione</span><span>${ship} €</span></div>` +
-      `<div class="recap-row"><strong>Totale</strong><strong>${merce + ship} €</strong></div>`;
-    fillPaypal();
-    if (orderField) {
-      orderField.value = [
-        ...items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
-        `Spedizione ${ship}€`,
-        `Totale ${merce + ship}€`,
-      ].join("\n");
+    if (ret) ret.value = `${location.origin}${base}grazie/?from=paypal`;
+    if (cancel) cancel.value = `${location.origin}${base}checkout/`;
+
+    function shipping() {
+      return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
     }
-  }
 
-  function fillPaypal() {
-    if (!paypalItems) return;
-    const ship = shipping();
-    paypalItems.innerHTML = "";
-    items.forEach((item, idx) => {
-      const n = idx + 1;
-      paypalItems.append(hidden(`item_name_${n}`, `${lineName(item)} (${item.size})`));
-      paypalItems.append(hidden(`amount_${n}`, money(item.price)));
-      paypalItems.append(hidden(`quantity_${n}`, String(item.qty)));
-    });
-    paypalItems.append(hidden("handling_cart", money(ship)));
-  }
+    function money(n: number) {
+      return n.toFixed(2);
+    }
 
-  function hidden(name: string, value: string) {
-    const i = document.createElement("input");
-    i.type = "hidden";
-    i.name = name;
-    i.value = value;
-    return i;
-  }
+    function hidden(name: string, value: string) {
+      const i = document.createElement("input");
+      i.type = "hidden";
+      i.name = name;
+      i.value = value;
+      return i;
+    }
 
-  function unlockPay() {
-    payBox?.classList.toggle("is-locked", !disclaimer?.checked || !privacy?.checked);
-  }
+    function fillPaypal() {
+      if (!paypalItems) return;
+      const items = getCart();
+      const ship = shipping();
+      paypalItems.replaceChildren();
+      items.forEach((item, idx) => {
+        const n = idx + 1;
+        paypalItems.append(hidden(`item_name_${n}`, `${lineName(item)} (${item.size})`));
+        paypalItems.append(hidden(`amount_${n}`, money(item.price)));
+        paypalItems.append(hidden(`quantity_${n}`, String(item.qty)));
+      });
+      paypalItems.append(hidden("handling_cart", money(ship)));
+    }
 
-  shipSel?.addEventListener("change", renderRecap);
-  disclaimer?.addEventListener("change", unlockPay);
-  privacy?.addEventListener("change", unlockPay);
-  renderRecap();
-  unlockPay();
+    function unlocked() {
+      return Boolean(disclaimer?.checked && privacy?.checked && getCart().length);
+    }
 
-  if (!items.length) {
-    payBox?.classList.add("is-locked");
-    if (recap) recap.innerHTML = `<p class="empty">Il carrello è vuoto.</p>`;
-  }
+    function syncLock() {
+      const ok = unlocked();
+      payBox?.classList.toggle("is-locked", !ok);
+      bankForm?.classList.toggle("is-locked", !ok);
+      if (bankSubmit) bankSubmit.disabled = !ok;
+    }
 
-  function mountButtons() {
-    const paypal = (window as unknown as { paypal?: { Buttons: (o: object) => { render: (s: string) => void } } })
-      .paypal;
-    const el = document.querySelector("#paypal-buttons");
-    if (!paypal || !el || !items.length) return;
-    paypal.Buttons({
-      onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
-        if (!disclaimer?.checked || !privacy?.checked) return actions.reject();
-        return actions.resolve();
-      },
-      createOrder: (_: unknown, actions: { order: { create: (o: object) => Promise<string> } }) => {
+    function syncPage() {
+      const items = getCart();
+      const empty = !items.length;
+      if (emptyEl) emptyEl.hidden = !empty;
+      if (flowEl) flowEl.hidden = empty;
+      if (!empty && recap) {
         const ship = shipping();
-        const merce = total();
-        return actions.order.create({
-          purchase_units: [
-            {
-              description: "Corpoceleste",
-              amount: {
-                currency_code: "EUR",
-                value: money(merce + ship),
-                breakdown: {
-                  item_total: { currency_code: "EUR", value: money(merce) },
-                  shipping: { currency_code: "EUR", value: money(ship) },
-                },
-              },
-              items: items.map((i) => ({
-                name: `${lineName(i)} (${i.size})`.slice(0, 127),
-                quantity: String(i.qty),
-                unit_amount: { currency_code: "EUR", value: money(i.price) },
-              })),
-            },
-          ],
-          application_context: {
-            brand_name: "Corpoceleste",
-            shipping_preference: "GET_FROM_FILE",
-          },
-        });
-      },
-      onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
-        await actions.order.capture();
-        clearCart();
-        location.href = `${base}grazie/`;
-      },
-    }).render("#paypal-buttons");
-  }
+        renderRecap(recap, items, ship);
+        fillPaypal();
+        if (orderField) {
+          orderField.value = [
+            ...items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
+            `Spedizione ${ship}€`,
+            `Totale ${total() + ship}€`,
+          ].join("\n");
+        }
+      }
+      syncLock();
+      page?.classList.add("is-ready");
+    }
 
-  if (site.paypalClientId) {
-    const wait = () => {
-      if ((window as unknown as { paypal?: unknown }).paypal) mountButtons();
-      else setTimeout(wait, 80);
-    };
-    wait();
-  }
-</script>
+    shipSel?.addEventListener("change", syncPage);
+    disclaimer?.addEventListener("change", syncLock);
+    privacy?.addEventListener("change", syncLock);
+    window.addEventListener("cart:change", syncPage);
+
+    paypalForm?.addEventListener("submit", (e) => {
+      if (!unlocked()) {
+        e.preventDefault();
+        return;
+      }
+      saveOrderSnapshot(shipping());
+    });
+
+    bankForm?.addEventListener("submit", (e) => {
+      if (!unlocked()) {
+        e.preventDefault();
+        return;
+      }
+      saveOrderSnapshot(shipping());
+    });
+
+    syncPage();
+
+    function mountButtons() {
+      const paypal = (window as unknown as { paypal?: { Buttons: (o: object) => { render: (s: string) => void } } })
+        .paypal;
+      const node = document.querySelector("#paypal-buttons");
+      if (!paypal || !node || !getCart().length) return;
+      paypal.Buttons({
+        onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
+          if (!unlocked()) return actions.reject();
+          return actions.resolve();
+        },
+        createOrder: (_: unknown, actions: { order: { create: (o: object) => Promise<string> } }) => {
+          const items = getCart();
+          const ship = shipping();
+          const merce = total();
+          return actions.order.create({
+            purchase_units: [
+              {
+                description: "Corpoceleste",
+                amount: {
+                  currency_code: "EUR",
+                  value: money(merce + ship),
+                  breakdown: {
+                    item_total: { currency_code: "EUR", value: money(merce) },
+                    shipping: { currency_code: "EUR", value: money(ship) },
+                  },
+                },
+                items: items.map((i) => ({
+                  name: `${lineName(i)} (${i.size})`.slice(0, 127),
+                  quantity: String(i.qty),
+                  unit_amount: { currency_code: "EUR", value: money(i.price) },
+                })),
+              },
+            ],
+            application_context: {
+              brand_name: "Corpoceleste",
+              shipping_preference: "GET_FROM_FILE",
+            },
+          });
+        },
+        onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
+          saveOrderSnapshot(shipping());
+          await actions.order.capture();
+          clearCart();
+          location.href = `${base}grazie/?from=paypal`;
+        },
+      }).render("#paypal-buttons");
+    }
+
+    if (site.paypalClientId) {
+      const wait = () => {
+        if ((window as unknown as { paypal?: unknown }).paypal) mountButtons();
+        else setTimeout(wait, 80);
+      };
+      wait();
+    }
+  </script>
+</Base>

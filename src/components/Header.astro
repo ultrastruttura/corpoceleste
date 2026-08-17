@@ -34,14 +34,21 @@ function active(href: string) {
         </svg>
         <span class="bag-count" data-bag-count data-count="0"></span>
       </a>
-      <button class="icon-btn menu-toggle" type="button" aria-label="Menu" data-menu-toggle>
+      <button
+        class="icon-btn menu-toggle"
+        type="button"
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="site-menu"
+        data-menu-toggle
+      >
         <span></span>
       </button>
     </div>
   </div>
 </header>
 
-<nav class="mobile-nav" data-mobile-nav>
+<nav class="mobile-nav" id="site-menu" data-mobile-nav>
   <a href={url()}>Shop</a>
   <a href={url("artisti/")}>Artisti</a>
   <a href={url("news/")}>News</a>

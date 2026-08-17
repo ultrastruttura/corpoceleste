@@ -13,7 +13,7 @@ import { asset } from "../lib/paths";
 
     <div class="split">
       <div class="prose">
-        <img class="page-photo" src={asset("images/photos/andrea.jpg")} alt="" width="1080" height="1350" />
+        <img class="page-photo" src={asset("images/photos/andrea.jpg")} alt="Andrea Baldelli" width="1080" height="1350" loading="lazy" decoding="async" />
         <h2>Stampa</h2>
         <p>Impianti, inchiostri, flussi di lavoro, formazione.</p>
         <p>Formazione del personale Za.Er. ad Asmara, in studio e in Eritrea. Responsabile R&amp;D in Quaglia.</p>
@@ -23,7 +23,7 @@ import { asset } from "../lib/paths";
       <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
         <input type="hidden" name="_subject" value="Richiesta consulenza / stampa dal vivo" />
         <input type="hidden" name="_captcha" value="false" />
-        <input type="hidden" name="_next" data-next-grazie />
+        <input type="hidden" name="_next" data-next-grazie="consulenza" />
         <div>
           <label for="c-name">Nome</label>
           <input id="c-name" name="nome" required />

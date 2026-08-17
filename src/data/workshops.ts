@@ -3,9 +3,6 @@ export type PastWorkshop = {
   items: string[];
 };
 
-export const upcomingNote =
-  "I workshop in studio partono quando c’è un numero minimo di iscritti. Lascia i dati: quando il gruppo c’è, fisso la data.";
-
 export const pastWorkshops: PastWorkshop[] = [
   {
     year: 2026,

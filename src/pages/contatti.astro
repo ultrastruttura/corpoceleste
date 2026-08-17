@@ -14,7 +14,7 @@ import { site } from "../data/site";
       <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
         <input type="hidden" name="_subject" value="Contatto dal sito Corpoceleste" />
         <input type="hidden" name="_captcha" value="false" />
-        <input type="hidden" name="_next" data-next-grazie />
+        <input type="hidden" name="_next" data-next-grazie="contatto" />
         <div>
           <label for="ct-name">Nome</label>
           <input id="ct-name" name="nome" required />
@@ -32,10 +32,10 @@ import { site } from "../data/site";
       </form>
       <div>
         <h2>Newsletter</h2>
-        <form class="newsletter-form" style="margin-bottom:36px" action={`https://formsubmit.co/${site.email}`} method="POST">
+        <form class="newsletter-form newsletter-form--block" action={`https://formsubmit.co/${site.email}`} method="POST">
           <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
           <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_next" data-next-grazie />
+          <input type="hidden" name="_next" data-next-grazie="newsletter" />
           <div class="newsletter-row">
             <input type="email" name="email" required placeholder="Email" aria-label="Email newsletter" />
             <button type="submit">Iscriviti</button>

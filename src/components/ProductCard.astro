@@ -1,13 +1,16 @@
 ---
+import { Image } from "astro:assets";
 import type { Product } from "../data/products";
 import { artistName, formatPrice } from "../data/products";
-import { asset, url } from "../lib/paths";
+import { printImage } from "../lib/prints";
+import { url } from "../lib/paths";
 
-type Props = { product: Product };
-const { product } = Astro.props;
+type Props = { product: Product; eager?: boolean };
+const { product, eager = false } = Astro.props;
 const artist = artistName(product.artistId);
 const sold = product.status === "soldout";
 const hasTitle = artist !== product.title;
+const alt = hasTitle ? `${artist}, ${product.title}` : artist;
 ---
 
 <a
@@ -16,11 +19,19 @@ const hasTitle = artist !== product.title;
   data-product
   data-nuovo={product.nuovo ? "1" : "0"}
   data-status={product.status}
-  data-created={product.createdAt}
 >
   <div class="card-frame">
     {sold && <span class="badge">Esaurito</span>}
-    <img class="print" src={asset(`images/prints/${product.print}`)} alt="" width="800" height="800" />
+    <Image
+      class="print"
+      src={printImage(product.print)}
+      alt={alt}
+      widths={[400, 800, 1200]}
+      sizes="(max-width: 359px) 100vw, (max-width: 1023px) 50vw, 30vw"
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      fetchpriority={eager ? "high" : undefined}
+    />
   </div>
   <div class="card-meta">
     {product.artistId !== "studio" && <div class="card-artist">{artist}</div>}

@@ -21,7 +21,7 @@ Se usi un dominio (es. corpoceleste.com): in `astro.config.mjs` metti `base: "/"
 ## Contenuti da cambiare
 
 - Email, Instagram, IBAN: `src/data/site.ts`
-- Maglie: `src/data/products.ts` + file in `public/images/prints/` (poi foto vere)
+- Maglie: `src/data/products.ts` + file in `src/assets/prints/`
 - Artisti: `src/data/artists.ts`
 - News: `src/data/news.ts`
 - Corsi: `src/data/workshops.ts`

@@ -2,6 +2,8 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { asset, url } from "../lib/paths";
+import { printFiles } from "../lib/prints";
+import { getImage } from "astro:assets";
 import "../styles/global.css";
 
 type Props = {
@@ -11,6 +13,12 @@ type Props = {
 
 const { title, description = "Corpoceleste" } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const thumbs: Record<string, string> = {};
+for (const [file, meta] of Object.entries(printFiles())) {
+  const img = await getImage({ src: meta, width: 160, format: "webp" });
+  thumbs[file] = img.src;
+}
 ---
 
 <!doctype html>
@@ -31,19 +39,30 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <Footer />
 
     <div class="drawer-bg" data-cart-bg></div>
-    <aside class="drawer" data-cart-drawer aria-label="Carrello">
+    <aside
+      class="drawer"
+      data-cart-drawer
+      role="dialog"
+      aria-labelledby="cart-title"
+      aria-hidden="true"
+      inert
+    >
       <div class="drawer-head">
-        <span>Carrello</span>
+        <span id="cart-title">Carrello</span>
         <button class="icon-btn" type="button" data-close-cart aria-label="Chiudi">✕</button>
       </div>
       <div class="drawer-body" data-cart-lines>
         <p class="empty">Il carrello è vuoto.</p>
       </div>
       <div class="drawer-foot">
-        <p style="margin-bottom:12px;font-weight:600" data-cart-total></p>
-        <a class="btn btn--full" href={url("checkout/")}>Checkout</a>
+        <p class="drawer-total" data-cart-total></p>
+        <a class="btn btn--full" href={url("checkout/")} data-cart-checkout hidden>Checkout</a>
       </div>
     </aside>
+
+    <script define:vars={{ printThumbs: thumbs }}>
+      window.__printThumbs = printThumbs;
+    </script>
 
     <script>
       import "../scripts/shop.ts";

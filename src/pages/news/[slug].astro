@@ -13,7 +13,7 @@ const paras = item.body.split("\n\n");
 ---
 
 <Base title={`${item.title} — Corpoceleste`} description={item.excerpt}>
-  <div class="wrap" style="padding-bottom:80px">
+  <div class="wrap page-main page-main--article">
     <header class="page-hero">
       <p class="card-artist"><a href={url("news/")}>News</a> · {formatDate(item.date)}</p>
       <h1>{item.title}</h1>

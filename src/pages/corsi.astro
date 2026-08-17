@@ -11,7 +11,7 @@ import { asset } from "../lib/paths";
     <header class="page-hero">
       <h1>Corsi</h1>
     </header>
-    <img class="page-photo" src={asset("images/photos/studio.jpg")} alt="" width="1080" height="1350" />
+    <img class="page-photo" src={asset("images/photos/studio.jpg")} alt="Studio" width="1080" height="1350" loading="lazy" decoding="async" />
 
     <div class="split">
       <div>
@@ -20,7 +20,7 @@ import { asset } from "../lib/paths";
         <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
           <input type="hidden" name="_subject" value="Iscrizione workshop in studio" />
           <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_next" data-next-grazie />
+          <input type="hidden" name="_next" data-next-grazie="corsi" />
           <div>
             <label for="ws-name">Nome</label>
             <input id="ws-name" name="nome" required />
@@ -43,7 +43,7 @@ import { asset } from "../lib/paths";
         <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
           <input type="hidden" name="_subject" value="Proposta workshop presso di voi" />
           <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_next" data-next-grazie />
+          <input type="hidden" name="_next" data-next-grazie="workshop" />
           <div>
             <label for="sp-name">Nome e spazio</label>
             <input id="sp-name" name="nome" required />
