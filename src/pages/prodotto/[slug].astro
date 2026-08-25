@@ -6,15 +6,17 @@ import { productBySlug, formatPrice, artistName, products } from "../../data/pro
 import { artistById } from "../../data/artists";
 import { site } from "../../data/site";
 import { printImage } from "../../lib/prints";
-import { url } from "../../lib/paths";
+import { currentLocale, pageUrl, t } from "../../i18n";
 
 export function getStaticPaths() {
   return products.map((p) => ({ params: { slug: p.slug } }));
 }
 
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 const { slug } = Astro.params;
 const product = productBySlug(slug!);
-if (!product) return Astro.redirect(url());
+if (!product) return Astro.redirect(pageUrl(locale));
 
 const artist = artistName(product.artistId);
 const artistSlug = artistById(product.artistId)?.slug ?? "corpoceleste";
@@ -22,6 +24,7 @@ const sold = product.status === "soldout";
 const alt = artist !== product.title ? `${artist}, ${product.title}` : product.title;
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const defaultSize = sizes.includes("M") ? "M" : sizes[0];
+const color = copy.product.colors[product.colorName] ?? product.colorName;
 ---
 
 <Base title={`${product.title} — Corpoceleste`}>
@@ -39,7 +42,7 @@ const defaultSize = sizes.includes("M") ? "M" : sizes[0];
     <div class="product-info">
       {
         product.artistId !== "studio" && artist !== product.title && (
-          <a class="card-artist" href={url(`artisti/${artistSlug}/`)}>
+          <a class="card-artist" href={pageUrl(locale, `artisti/${artistSlug}/`)}>
             {artist}
           </a>
         )
@@ -55,19 +58,19 @@ const defaultSize = sizes.includes("M") ? "M" : sizes[0];
             <input type="hidden" name="_captcha" value="false" />
             <input type="hidden" name="_next" data-next-grazie="ristampa" />
             <input type="hidden" name="prodotto" value={product.title} />
-            <p>Esaurita.</p>
+            <p>{copy.product.sold}</p>
             <div>
-              <label for="re-email">Email</label>
+              <label for="re-email">{copy.forms.email}</label>
               <input id="re-email" type="email" name="email" required />
             </div>
             <div>
-              <label for="re-size">Taglia</label>
+              <label for="re-size">{copy.product.size}</label>
               <select id="re-size" name="taglia">
                 {sizes.map((s) => <option>{s}</option>)}
               </select>
             </div>
             <PrivacyCheck id="re-privacy" />
-            <button class="btn" type="submit">Richiedi ristampa</button>
+            <button class="btn" type="submit">{copy.product.reprint}</button>
           </form>
         ) : (
           <form data-add-form>
@@ -78,7 +81,7 @@ const defaultSize = sizes.includes("M") ? "M" : sizes[0];
             <input type="hidden" name="color" value={product.color} />
             <input type="hidden" name="print" value={product.print} />
             <fieldset class="size-fieldset">
-              <legend class="field-label">Taglia</legend>
+              <legend class="field-label">{copy.product.size}</legend>
               <div class="size-row">
                 {sizes.map((s) => (
                   <label>
@@ -88,15 +91,15 @@ const defaultSize = sizes.includes("M") ? "M" : sizes[0];
                 ))}
               </div>
             </fieldset>
-            <button class="btn" type="submit">Aggiungi al carrello</button>
+            <button class="btn" type="submit">{copy.product.add}</button>
           </form>
         )
       }
 
       <ul class="attrs">
-        <li>{product.colorName}</li>
-        <li>Serigrafia, un colore</li>
-        <li>Spedizione Italia {site.shippingItaly} €, Europa {site.shippingEU} €</li>
+        <li>{color}</li>
+        <li>{copy.product.printOne}</li>
+        <li>{copy.product.shipLine(site.shippingItaly, site.shippingEU)}</li>
       </ul>
     </div>
   </div>

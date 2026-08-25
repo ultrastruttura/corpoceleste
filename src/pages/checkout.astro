@@ -2,45 +2,48 @@
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { site } from "../data/site";
-import { url } from "../lib/paths";
+import { currentLocale, pageUrl, paypalLc, paypalSdkLocale, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 ---
 
-<Base title="Checkout — Corpoceleste">
+<Base title={`${copy.checkout.title} — Corpoceleste`}>
   <div class="wrap page-main page-main--narrow checkout-page">
-    <h1>Checkout</h1>
+    <h1>{copy.checkout.title}</h1>
 
     <p class="empty" data-checkout-empty hidden>
-      Il carrello è vuoto. <a href={url()}>Shop</a>
+      {copy.checkout.empty} <a href={pageUrl(locale)}>{copy.nav.shop}</a>
     </p>
 
     <div data-checkout-flow hidden>
       {
         (site.paypalEmail || site.paypalClientId) && (
-          <p>Pagamento PayPal. Indirizzo di spedizione su PayPal.</p>
+          <p>{copy.checkout.paypalNote}</p>
         )
       }
 
       <div class="disclaimer">
-        <h3>Spedizioni</h3>
-        <p>
-          Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.
-        </p>
+        <h3>{copy.checkout.shippingTitle}</h3>
+        <p>{copy.checkout.shippingBody}</p>
       </div>
 
       <label class="check checkout-check">
         <input type="checkbox" data-disclaimer />
-        <span>Ho letto i tempi di spedizione.</span>
+        <span>{copy.checkout.readShipping}</span>
       </label>
       <label class="check checkout-check">
         <input type="checkbox" data-privacy />
-        <span>Ho letto l’<a href={url("privacy/")}>informativa privacy</a>.</span>
+        <span>
+          {copy.forms.privacyLead}<a href={pageUrl(locale, "privacy/")}>{copy.checkout.privacyLink}</a>{copy.forms.privacyTail}
+        </span>
       </label>
 
       <div class="field checkout-ship">
-        <label class="field-label" for="ship-to">Spedizione</label>
+        <label class="field-label" for="ship-to">{copy.checkout.shipTo}</label>
         <select id="ship-to" data-ship>
-          <option value="it" selected>Italia — {site.shippingItaly} €</option>
-          <option value="eu">Europa — {site.shippingEU} €</option>
+          <option value="it" selected>{copy.checkout.italy(site.shippingItaly)}</option>
+          <option value="eu">{copy.checkout.europe(site.shippingEU)}</option>
         </select>
       </div>
 
@@ -57,16 +60,16 @@ import { url } from "../lib/paths";
                 <input type="hidden" name="upload" value="1" />
                 <input type="hidden" name="business" value={site.paypalEmail} />
                 <input type="hidden" name="currency_code" value="EUR" />
-                <input type="hidden" name="lc" value="IT" />
+                <input type="hidden" name="lc" value={paypalLc[locale]} />
                 <input type="hidden" name="charset" value="utf-8" />
                 <input type="hidden" name="no_shipping" value="2" />
                 <input type="hidden" name="rm" value="1" />
-                <input type="hidden" name="cbt" value="Torna a Corpoceleste" />
+                <input type="hidden" name="cbt" value={copy.checkout.paypalBack} />
                 <input type="hidden" name="return" data-paypal-return />
                 <input type="hidden" name="cancel_return" data-paypal-cancel />
                 <div data-paypal-items></div>
                 <button class="btn btn--full" type="submit" data-paypal-submit>
-                  Paga con PayPal
+                  {copy.checkout.paypal}
                 </button>
               </form>
             )}
@@ -74,47 +77,47 @@ import { url } from "../lib/paths";
         )
       }
 
-      <h2 class="checkout-bank-title">Bonifico</h2>
+      <h2 class="checkout-bank-title">{copy.checkout.bank}</h2>
       <form class="form is-locked" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
         <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_next" data-next-grazie="ordine" />
         <input type="hidden" name="ordine" data-order-field />
         <div>
-          <label for="o-name">Nome e cognome</label>
+          <label for="o-name">{copy.checkout.name}</label>
           <input id="o-name" name="nome" required />
         </div>
         <div>
-          <label for="o-email">Email</label>
+          <label for="o-email">{copy.checkout.email}</label>
           <input id="o-email" type="email" name="email" required />
         </div>
         <div>
-          <label for="o-tel">Telefono</label>
+          <label for="o-tel">{copy.checkout.phone}</label>
           <input id="o-tel" name="telefono" required />
         </div>
         <div>
-          <label for="o-addr">Indirizzo</label>
+          <label for="o-addr">{copy.checkout.address}</label>
           <input id="o-addr" name="indirizzo" required />
         </div>
         <div>
-          <label for="o-cap">CAP e città</label>
+          <label for="o-cap">{copy.checkout.city}</label>
           <input id="o-cap" name="citta" required />
         </div>
         <div>
-          <label for="o-note">Note</label>
+          <label for="o-note">{copy.checkout.notes}</label>
           <textarea id="o-note" name="note"></textarea>
         </div>
         <PrivacyCheck id="o-privacy" />
-        <button class="btn" type="submit" data-bank-submit disabled>Invia ordine</button>
+        <button class="btn" type="submit" data-bank-submit disabled>{copy.checkout.sendOrder}</button>
       </form>
     </div>
   </div>
 
   {
     site.paypalClientId && (
-      <script define:vars={{ clientId: site.paypalClientId }}>
+      <script define:vars={{ clientId: site.paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
-        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=it_IT`;
+        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=${sdkLocale}`;
         document.head.append(s);
       </script>
     )
@@ -126,6 +129,7 @@ import { url } from "../lib/paths";
     import { site } from "../data/site";
 
     const base = import.meta.env.BASE_URL;
+    const prefix = document.documentElement.dataset.localePrefix || "";
     const page = document.querySelector(".checkout-page");
     const emptyEl = document.querySelector("[data-checkout-empty]");
     const flowEl = document.querySelector("[data-checkout-flow]");
@@ -142,8 +146,8 @@ import { url } from "../lib/paths";
     const ret = document.querySelector<HTMLInputElement>("[data-paypal-return]");
     const cancel = document.querySelector<HTMLInputElement>("[data-paypal-cancel]");
 
-    if (ret) ret.value = `${location.origin}${base}grazie/?from=paypal`;
-    if (cancel) cancel.value = `${location.origin}${base}checkout/`;
+    if (ret) ret.value = `${location.origin}${base}${prefix}grazie/?from=paypal`;
+    if (cancel) cancel.value = `${location.origin}${base}${prefix}checkout/`;
 
     function shipping() {
       return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
@@ -273,7 +277,7 @@ import { url } from "../lib/paths";
           saveOrderSnapshot(shipping());
           await actions.order.capture();
           clearCart();
-          location.href = `${base}grazie/?from=paypal`;
+          location.href = `${base}${prefix}grazie/?from=paypal`;
         },
       }).render("#paypal-buttons");
     }

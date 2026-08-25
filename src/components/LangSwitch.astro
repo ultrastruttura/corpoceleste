@@ -1,0 +1,25 @@
+---
+import { currentLocale, localeCodes, localeNames, locales, switchLocaleUrl, t } from "../i18n";
+import type { Locale } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const path = Astro.url.pathname;
+---
+
+<nav class="lang" aria-label={copy.nav.language}>
+  {
+    locales.map((code) => {
+      const label = localeCodes[code];
+      const name = localeNames[code];
+      if (code === locale) {
+        return (
+          <span aria-current="true" title={name}>{label}</span>
+        );
+      }
+      return (
+        <a href={switchLocaleUrl(path, code as Locale)} hreflang={code} lang={code} title={name}>{label}</a>
+      );
+    })
+  }
+</nav>

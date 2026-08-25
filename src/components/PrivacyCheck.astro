@@ -1,11 +1,14 @@
 ---
-import { url } from "../lib/paths";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 type Props = {
   id: string;
   newsletter?: boolean;
 };
 const { id, newsletter = false } = Astro.props;
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const privacyHref = pageUrl(locale, "privacy/");
 ---
 
 <label class="check">
@@ -17,17 +20,6 @@ const { id, newsletter = false } = Astro.props;
     )
   }
   <span>
-    {
-      newsletter ? (
-        <>
-          Voglio ricevere la newsletter. Ho letto l’
-          <a href={url("privacy/")}>informativa privacy</a>.
-        </>
-      ) : (
-        <>
-          Ho letto l’<a href={url("privacy/")}>informativa privacy</a>.
-        </>
-      )
-    }
+    {newsletter ? copy.forms.newsletterLead : copy.forms.privacyLead}<a href={privacyHref}>{copy.forms.privacy}</a>{copy.forms.privacyTail}
   </span>
 </label>

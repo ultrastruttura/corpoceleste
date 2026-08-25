@@ -187,6 +187,34 @@ p:last-child {
   flex-shrink: 0;
 }
 
+.lang {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lang a,
+.lang span {
+  color: var(--quiet);
+  text-decoration: none;
+}
+
+.lang a:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.lang [aria-current="true"] {
+  color: var(--ink);
+}
+
 .icon-btn {
   appearance: none;
   background: none;

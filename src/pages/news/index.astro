@@ -1,24 +1,27 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { news, formatDate } from "../../data/news";
-import { url } from "../../lib/paths";
+import { news, newsField } from "../../data/news";
+import { currentLocale, formatDate, pageUrl, t } from "../../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 ---
 
-<Base title="News — Corpoceleste">
+<Base title={`${copy.news.title} — Corpoceleste`}>
   <div class="wrap">
     <header class="page-hero">
-      <h1>News</h1>
+      <h1>{copy.news.title}</h1>
     </header>
     {
       news.length > 0 && (
         <ul class="news-list">
           {news.map((n) => (
             <li>
-              <span class="date">{formatDate(n.date)}</span>
+              <span class="date">{formatDate(n.date, locale)}</span>
               <h2>
-                <a href={url(`news/${n.slug}/`)}>{n.title}</a>
+                <a href={pageUrl(locale, `news/${n.slug}/`)}>{newsField(n, locale, "title")}</a>
               </h2>
-              <p>{n.excerpt}</p>
+              <p>{newsField(n, locale, "excerpt")}</p>
             </li>
           ))}
         </ul>

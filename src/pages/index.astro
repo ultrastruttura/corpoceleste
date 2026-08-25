@@ -3,7 +3,10 @@ import Base from "../layouts/Base.astro";
 import ProductGrid from "../components/ProductGrid.astro";
 import { availableProducts, soldOutProducts } from "../data/products";
 import { shuffle } from "../lib/shuffle";
+import { currentLocale, t } from "../i18n";
 
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 const available = availableProducts();
 const listed = [
   ...available.filter((p) => p.nuovo),
@@ -20,7 +23,7 @@ const sold = soldOutProducts();
       sold.length > 0 && (
         <>
           <div class="section-head">
-            <h2>Esaurite</h2>
+            <h2>{copy.shop.soldOut}</h2>
           </div>
           <ProductGrid products={sold} />
         </>

@@ -1,21 +1,23 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { artists } from "../../data/artists";
-import { url } from "../../lib/paths";
+import { currentLocale, pageUrl, t } from "../../i18n";
 
-const listed = [...artists].sort((a, b) => a.name.localeCompare(b.name, "it"));
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const listed = [...artists].sort((a, b) => a.name.localeCompare(b.name, locale));
 ---
 
-<Base title="Artisti — Corpoceleste">
+<Base title={`${copy.artists.title} — Corpoceleste`}>
   <div class="wrap">
     <header class="page-hero">
-      <h1>Artisti</h1>
+      <h1>{copy.artists.title}</h1>
     </header>
     <ul class="name-list">
       {
         listed.map((a) => (
           <li>
-            <a href={url(`artisti/${a.slug}/`)}>{a.name}</a>
+            <a href={pageUrl(locale, `artisti/${a.slug}/`)}>{a.name}</a>
           </li>
         ))
       }

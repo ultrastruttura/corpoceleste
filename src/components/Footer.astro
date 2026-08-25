@@ -1,9 +1,11 @@
 ---
 import { site } from "../data/site";
-import { url } from "../lib/paths";
 import PrivacyCheck from "./PrivacyCheck.astro";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 const year = new Date().getFullYear();
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 ---
 
 <footer class="footer">
@@ -27,33 +29,33 @@ const year = new Date().getFullYear();
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_next" data-next-grazie="newsletter" />
         <div class="newsletter-row">
-          <label class="visually-hidden" for="nl-email">Email</label>
-          <input id="nl-email" type="email" name="email" required placeholder="Email" />
-          <button type="submit">Iscriviti</button>
+          <label class="visually-hidden" for="nl-email">{copy.forms.email}</label>
+          <input id="nl-email" type="email" name="email" required placeholder={copy.forms.email} />
+          <button type="submit">{copy.footer.subscribe}</button>
         </div>
         <PrivacyCheck id="nl-privacy" newsletter />
       </form>
     </div>
     <div>
-      <h3>Studio</h3>
+      <h3>{copy.footer.studio}</h3>
       <div class="footer-menu">
-        <a href={url("corsi/")}>Corsi</a>
-        <a href={url("consulenza/")}>Consulenza</a>
-        <a href={url("contatti/")}>Contatti</a>
+        <a href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
+        <a href={pageUrl(locale, "consulenza/")}>{copy.nav.consulting}</a>
+        <a href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
         <a href={site.corpoc} rel="noopener noreferrer">Corpoc, 2012–2019</a>
         <a href={site.ultrastruttura} rel="noopener noreferrer">Ultrastruttura</a>
       </div>
     </div>
     <div>
-      <h3>Shop</h3>
+      <h3>{copy.nav.shop}</h3>
       <div class="footer-menu">
-        <a href={url("artisti/")}>Artisti</a>
-        <a href={url("news/")}>News</a>
+        <a href={pageUrl(locale, "artisti/")}>{copy.nav.artists}</a>
+        <a href={pageUrl(locale, "news/")}>{copy.nav.news}</a>
       </div>
     </div>
   </div>
   <div class="wrap footer-bar">
-    <nav class="footer-social" aria-label="Social">
+    <nav class="footer-social" aria-label={copy.footer.social}>
       <a href={site.instagram} rel="noopener noreferrer" target="_blank" aria-label="Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
           <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect>
@@ -68,9 +70,8 @@ const year = new Date().getFullYear();
       </a>
     </nav>
     <p class="footer-made">
-      Made in Bergamo. {year} Corpoceleste
-      · <a href={url("privacy/")}>Privacy</a>
+      {copy.footer.made} {year} Corpoceleste
+      · <a href={pageUrl(locale, "privacy/")}>{copy.privacy.title}</a>
     </p>
   </div>
 </footer>
-

@@ -3,50 +3,54 @@ import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { site } from "../data/site";
 import { asset } from "../lib/paths";
+import { currentLocale, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 ---
 
-<Base title="Consulenza — Corpoceleste">
+<Base title={`${copy.consulting.title} — Corpoceleste`}>
   <div class="wrap">
     <header class="page-hero">
-      <h1>Consulenza</h1>
+      <h1>{copy.consulting.title}</h1>
     </header>
 
     <div class="split">
       <div class="prose">
         <img class="page-photo" src={asset("images/photos/andrea.jpg")} alt="Andrea Baldelli" width="1080" height="1350" loading="lazy" decoding="async" />
-        <h2>Stampa</h2>
-        <p>Impianti, inchiostri, flussi di lavoro, formazione.</p>
-        <p>Formazione del personale Za.Er. ad Asmara, in studio e in Eritrea. Responsabile R&amp;D in Quaglia.</p>
-        <h2>Stampa dal vivo</h2>
-        <p>Telai in sede durante eventi.</p>
+        <h2>{copy.consulting.print}</h2>
+        <p>{copy.consulting.printBody}</p>
+        <p>{copy.consulting.printCv}</p>
+        <h2>{copy.consulting.live}</h2>
+        <p>{copy.consulting.liveBody}</p>
       </div>
       <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
         <input type="hidden" name="_subject" value="Richiesta consulenza / stampa dal vivo" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_next" data-next-grazie="consulenza" />
         <div>
-          <label for="c-name">Nome</label>
+          <label for="c-name">{copy.forms.name}</label>
           <input id="c-name" name="nome" required />
         </div>
         <div>
-          <label for="c-email">Email</label>
+          <label for="c-email">{copy.forms.email}</label>
           <input id="c-email" type="email" name="email" required />
         </div>
         <div>
-          <label for="c-tipo">Di cosa si tratta</label>
+          <label for="c-tipo">{copy.consulting.about}</label>
           <select id="c-tipo" name="tipo">
-            <option>Consulenza di stampa</option>
-            <option>Formazione personale</option>
-            <option>Stampa dal vivo</option>
-            <option>Altro</option>
+            <option>{copy.consulting.optPrint}</option>
+            <option>{copy.consulting.optStaff}</option>
+            <option>{copy.consulting.optLive}</option>
+            <option>{copy.consulting.optOther}</option>
           </select>
         </div>
         <div>
-          <label for="c-msg">Messaggio</label>
+          <label for="c-msg">{copy.forms.message}</label>
           <textarea id="c-msg" name="messaggio" required></textarea>
         </div>
         <PrivacyCheck id="c-privacy" />
-          <button class="btn" type="submit">Invia</button>
+          <button class="btn" type="submit">{copy.forms.send}</button>
       </form>
     </div>
   </div>

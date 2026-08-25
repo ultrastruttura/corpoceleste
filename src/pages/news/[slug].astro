@@ -1,22 +1,25 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { news, newsBySlug, formatDate } from "../../data/news";
-import { url } from "../../lib/paths";
+import { news, newsBySlug, newsField } from "../../data/news";
+import { currentLocale, formatDate, pageUrl } from "../../i18n";
 
 export function getStaticPaths() {
   return news.map((n) => ({ params: { slug: n.slug } }));
 }
 
+const locale = currentLocale(Astro.currentLocale);
 const item = newsBySlug(Astro.params.slug!);
-if (!item) return Astro.redirect(url("news/"));
-const paras = item.body.split("\n\n");
+if (!item) return Astro.redirect(pageUrl(locale, "news/"));
+const title = newsField(item, locale, "title");
+const excerpt = newsField(item, locale, "excerpt");
+const paras = newsField(item, locale, "body").split("\n\n");
 ---
 
-<Base title={`${item.title} — Corpoceleste`} description={item.excerpt}>
+<Base title={`${title} — Corpoceleste`} description={excerpt}>
   <div class="wrap page-main page-main--article">
     <header class="page-hero">
-      <p class="card-artist"><a href={url("news/")}>News</a> · {formatDate(item.date)}</p>
-      <h1>{item.title}</h1>
+      <p class="card-artist"><a href={pageUrl(locale, "news/")}>News</a> · {formatDate(item.date, locale)}</p>
+      <h1>{title}</h1>
     </header>
     <div class="prose">
       {paras.map((p) => <p>{p}</p>)}

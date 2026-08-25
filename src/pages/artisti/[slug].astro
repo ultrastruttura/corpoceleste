@@ -3,21 +3,23 @@ import Base from "../../layouts/Base.astro";
 import ProductGrid from "../../components/ProductGrid.astro";
 import { artists, artistBySlug } from "../../data/artists";
 import { productsByArtist } from "../../data/products";
-import { url } from "../../lib/paths";
+import { currentLocale, pageUrl, t } from "../../i18n";
 
 export function getStaticPaths() {
   return artists.map((a) => ({ params: { slug: a.slug } }));
 }
 
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 const artist = artistBySlug(Astro.params.slug!);
-if (!artist) return Astro.redirect(url("artisti/"));
+if (!artist) return Astro.redirect(pageUrl(locale, "artisti/"));
 const works = productsByArtist(artist.id);
 ---
 
 <Base title={`${artist.name} — Corpoceleste`} description={artist.bio}>
   <div class="wrap">
     <header class="page-hero">
-      <p class="card-artist"><a href={url("artisti/")}>Artisti</a></p>
+      <p class="card-artist"><a href={pageUrl(locale, "artisti/")}>{copy.artists.title}</a></p>
       <h1>{artist.name}</h1>
       {artist.bio && <p class="lede">{artist.bio}</p>}
     </header>

@@ -1,12 +1,15 @@
 ---
 import Base from "../layouts/Base.astro";
-import { url } from "../lib/paths";
+import { currentLocale, pageUrl, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 ---
 
-<Base title="Pagina non trovata — Corpoceleste">
+<Base title={`${copy.notFound.title} — Corpoceleste`}>
   <div class="wrap page-main page-main--404">
     <h1>404</h1>
-    <p>Questa pagina non c’è.</p>
-    <a class="btn" href={url()}>Shop</a>
+    <p>{copy.notFound.body}</p>
+    <a class="btn" href={pageUrl(locale)}>{copy.nav.shop}</a>
   </div>
 </Base>

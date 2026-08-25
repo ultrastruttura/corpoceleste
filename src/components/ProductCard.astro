@@ -3,10 +3,12 @@ import { Image } from "astro:assets";
 import type { Product } from "../data/products";
 import { artistName, formatPrice } from "../data/products";
 import { printImage } from "../lib/prints";
-import { url } from "../lib/paths";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 type Props = { product: Product; eager?: boolean };
 const { product, eager = false } = Astro.props;
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 const artist = artistName(product.artistId);
 const sold = product.status === "soldout";
 const hasTitle = artist !== product.title;
@@ -15,13 +17,13 @@ const alt = hasTitle ? `${artist}, ${product.title}` : artist;
 
 <a
   class:list={["card", sold && "is-sold"]}
-  href={url(`prodotto/${product.slug}/`)}
+  href={pageUrl(locale, `prodotto/${product.slug}/`)}
   data-product
   data-nuovo={product.nuovo ? "1" : "0"}
   data-status={product.status}
 >
   <div class="card-frame">
-    {sold && <span class="badge">Esaurito</span>}
+    {sold && <span class="badge">{copy.shop.soldBadge}</span>}
     <Image
       class="print"
       src={printImage(product.print)}

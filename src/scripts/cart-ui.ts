@@ -1,4 +1,6 @@
 import { artistName, products } from "../data/products";
+import { ui } from "../i18n/dict";
+import { currentLocale } from "../i18n/runtime";
 import {
   changeSize,
   count,
@@ -8,6 +10,10 @@ import {
   total,
   type CartItem,
 } from "./cart";
+
+function copy() {
+  return ui[currentLocale(document.documentElement.lang)];
+}
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -45,11 +51,12 @@ export function renderRecap(root: Element, items: CartItem[], shipping: number) 
     row.append(el("span", undefined, `${item.price * item.qty} €`));
     root.append(row);
   }
+  const labels = copy();
   const ship = el("div", "recap-row");
-  ship.append(el("span", undefined, "Spedizione"), el("span", undefined, `${shipping} €`));
+  ship.append(el("span", undefined, labels.cart.shipping), el("span", undefined, `${shipping} €`));
   root.append(ship);
   const tot = el("div", "recap-row");
-  tot.append(el("strong", undefined, "Totale"), el("strong", undefined, `${merce + shipping} €`));
+  tot.append(el("strong", undefined, labels.cart.totalLabel), el("strong", undefined, `${merce + shipping} €`));
   root.append(tot);
 }
 
@@ -84,8 +91,9 @@ function lineEl(item: CartItem) {
   const meta = el("div");
   meta.append(el("h4", undefined, item.title));
 
+  const labels = copy();
   const select = el("select", "cart-size");
-  select.setAttribute("aria-label", `Taglia ${item.title}`);
+  select.setAttribute("aria-label", labels.cart.sizeOf(item.title));
   select.dataset.changeSize = item.id;
   select.dataset.fromSize = item.size;
   for (const s of sizesFor(item.id)) {
@@ -99,18 +107,18 @@ function lineEl(item: CartItem) {
   const qty = el("div", "cart-qty");
   const minus = el("button", undefined, "−");
   minus.type = "button";
-  minus.setAttribute("aria-label", "Diminuisci quantità");
+  minus.setAttribute("aria-label", labels.cart.qtyDown);
   minus.dataset.qty = "-1";
   const n = el("span", undefined, String(item.qty));
   n.setAttribute("aria-live", "polite");
   const plus = el("button", undefined, "+");
   plus.type = "button";
-  plus.setAttribute("aria-label", "Aumenta quantità");
+  plus.setAttribute("aria-label", labels.cart.qtyUp);
   plus.dataset.qty = "1";
   qty.append(minus, n, plus);
   meta.append(qty);
 
-  const remove = el("button", "cart-remove", "Rimuovi");
+  const remove = el("button", "cart-remove", labels.cart.remove);
   remove.type = "button";
   remove.dataset.remove = item.id;
   remove.dataset.size = item.size;
@@ -125,7 +133,7 @@ function renderRoot(root: Element) {
   root.replaceChildren();
   const items = getCart();
   if (!items.length) {
-    root.append(el("p", "empty", "Il carrello è vuoto."));
+    root.append(el("p", "empty", copy().cart.empty));
     return;
   }
   for (const item of items) root.append(lineEl(item));
@@ -139,7 +147,7 @@ export function renderCart() {
   const pageTotal = document.querySelector("[data-cart-page-total]");
   const checkoutBtns = document.querySelectorAll<HTMLElement>("[data-cart-checkout]");
   const n = count();
-  const sum = n ? `Totale ${total()} €` : "";
+  const sum = n ? copy().cart.total(total()) : "";
 
   if (drawerLines) renderRoot(drawerLines);
   if (drawerTotal) drawerTotal.textContent = sum;

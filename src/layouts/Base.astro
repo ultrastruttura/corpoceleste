@@ -1,9 +1,10 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { asset, url } from "../lib/paths";
+import { asset } from "../lib/paths";
 import { printFiles } from "../lib/prints";
 import { getImage } from "astro:assets";
+import { currentLocale, innerPath, localePrefix, locales, pageAbs, pageUrl, t } from "../i18n";
 import "../styles/global.css";
 
 type Props = {
@@ -11,8 +12,12 @@ type Props = {
   description?: string;
 };
 
-const { title, description = "Corpoceleste" } = Astro.props;
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const { title, description = copy.meta.description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const rest = innerPath(Astro.url.pathname);
+const prefix = localePrefix(locale);
 
 const thumbs: Record<string, string> = {};
 for (const [file, meta] of Object.entries(printFiles())) {
@@ -22,13 +27,15 @@ for (const [file, meta] of Object.entries(printFiles())) {
 ---
 
 <!doctype html>
-<html lang="it">
+<html lang={locale} data-locale={locale} data-locale-prefix={prefix}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
+    {locales.map((code) => <link rel="alternate" hreflang={code} href={pageAbs(code, rest)} />)}
+    <link rel="alternate" hreflang="x-default" href={pageAbs("it", rest)} />
     <link rel="icon" href={asset("brand/favicon.png")} type="image/png" />
   </head>
   <body>
@@ -48,15 +55,17 @@ for (const [file, meta] of Object.entries(printFiles())) {
       inert
     >
       <div class="drawer-head">
-        <span id="cart-title">Carrello</span>
-        <button class="icon-btn" type="button" data-close-cart aria-label="Chiudi">✕</button>
+        <span id="cart-title">{copy.cart.title}</span>
+        <button class="icon-btn" type="button" data-close-cart aria-label={copy.cart.close}>✕</button>
       </div>
       <div class="drawer-body" data-cart-lines>
-        <p class="empty">Il carrello è vuoto.</p>
+        <p class="empty">{copy.cart.empty}</p>
       </div>
       <div class="drawer-foot">
         <p class="drawer-total" data-cart-total></p>
-        <a class="btn btn--full" href={url("checkout/")} data-cart-checkout hidden>Checkout</a>
+        <a class="btn btn--full" href={pageUrl(locale, "checkout/")} data-cart-checkout hidden>
+          {copy.cart.checkout}
+        </a>
       </div>
     </aside>
 

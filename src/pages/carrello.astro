@@ -1,14 +1,17 @@
 ---
 import Base from "../layouts/Base.astro";
-import { url } from "../lib/paths";
+import { currentLocale, pageUrl, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 ---
 
-<Base title="Carrello — Corpoceleste">
+<Base title={`${copy.cart.title} — Corpoceleste`}>
   <div class="wrap page-main page-main--cart">
-    <h1>Carrello</h1>
+    <h1>{copy.cart.title}</h1>
     <div class="cart-page-lines" data-cart-page></div>
     <p class="cart-page-total" data-cart-page-total></p>
-    <a class="btn" href={url("checkout/")} data-cart-checkout>Checkout</a>
-    <a class="btn btn--ghost" href={url()}>Shop</a>
+    <a class="btn" href={pageUrl(locale, "checkout/")} data-cart-checkout>{copy.cart.checkout}</a>
+    <a class="btn btn--ghost" href={pageUrl(locale)}>{copy.nav.shop}</a>
   </div>
 </Base>

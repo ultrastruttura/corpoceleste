@@ -9,4 +9,11 @@ export default defineConfig({
   site: "https://ultrastruttura.github.io",
   base: githubPages ? "/corpoceleste/" : "/",
   trailingSlash: "always",
+  i18n: {
+    defaultLocale: "it",
+    locales: ["it", "en", "de"],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
 });

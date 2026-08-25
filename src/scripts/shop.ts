@@ -10,7 +10,8 @@ function bind() {
 
   document.querySelectorAll<HTMLInputElement>("[data-next-grazie]").forEach((node) => {
     const from = node.getAttribute("data-next-grazie") || "form";
-    node.value = `${location.origin}${base}grazie/?from=${encodeURIComponent(from)}`;
+    const prefix = document.documentElement.dataset.localePrefix || "";
+    node.value = `${location.origin}${base}${prefix}grazie/?from=${encodeURIComponent(from)}`;
   });
 
   document.querySelectorAll<HTMLFormElement>("[data-add-form]").forEach((form) => {
