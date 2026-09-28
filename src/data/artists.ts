@@ -1,21 +1,49 @@
+import matter from "gray-matter";
+import type { Locale } from "../i18n/locales";
+
+export type Localized = { it: string; en: string; de: string };
+
 export type Artist = {
   id: string;
   slug: string;
   name: string;
-  bio: string;
+  bio: Localized;
   instagram?: string;
 };
 
-export const artists: Artist[] = [
-  { id: "daniele-de-batte", slug: "daniele-de-batte", name: "Daniele De Batté", bio: "" },
-  { id: "dr-pira", slug: "dr-pira", name: "Dr. Pira", bio: "" },
-  { id: "rocco-lombardi", slug: "rocco-lombardi", name: "Rocco Lombardi", bio: "" },
-  { id: "ruco", slug: "ruco", name: "Ruco", bio: "" },
-  { id: "ratigher", slug: "ratigher", name: "Ratigher", bio: "" },
-  { id: "angelini-taddei", slug: "angelini-taddei", name: "Angelini & Taddei", bio: "" },
-  { id: "centootto", slug: "108", name: "108", bio: "" },
-  { id: "millo", slug: "millo", name: "Millo", bio: "" },
-];
+function emptyLocalized(): Localized {
+  return { it: "", en: "", de: "" };
+}
+
+function asLocalized(value: unknown): Localized {
+  if (!value || typeof value !== "object") return emptyLocalized();
+  const o = value as Record<string, unknown>;
+  return {
+    it: String(o.it ?? ""),
+    en: String(o.en ?? ""),
+    de: String(o.de ?? ""),
+  };
+}
+
+const files = import.meta.glob("../../content/artists/*.md", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+}) as Record<string, string>;
+
+export const artists: Artist[] = Object.entries(files)
+  .map(([path, raw]) => {
+    const { data } = matter(raw);
+    const slug = path.split("/").pop()!.replace(/\.md$/, "");
+    return {
+      id: slug,
+      slug,
+      name: String(data.name ?? slug),
+      bio: asLocalized(data.bio),
+      instagram: data.instagram ? String(data.instagram) : undefined,
+    };
+  })
+  .sort((a, b) => a.name.localeCompare(b.name, "it"));
 
 export function artistById(id: string) {
   return artists.find((a) => a.id === id);
@@ -23,4 +51,12 @@ export function artistById(id: string) {
 
 export function artistBySlug(slug: string) {
   return artists.find((a) => a.slug === slug);
+}
+
+export function artistName(id: string) {
+  return artistById(id)?.name ?? id;
+}
+
+export function artistBio(artist: Artist, locale: Locale) {
+  return artist.bio[locale] || artist.bio.it || "";
 }

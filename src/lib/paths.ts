@@ -7,3 +7,10 @@ export function url(path = "") {
 export function asset(path: string) {
   return url(path.replace(/^\//, ""));
 }
+
+/** Public media path from Tina (/uploads/...) or absolute URL. */
+export function mediaUrl(path: string) {
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  return asset(path.replace(/^\//, ""));
+}

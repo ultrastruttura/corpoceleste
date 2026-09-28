@@ -1,8 +1,7 @@
 ---
-import { Image } from "astro:assets";
 import type { Product } from "../data/products";
 import { artistName, formatPrice } from "../data/products";
-import { printImage } from "../lib/prints";
+import { mediaUrl } from "../lib/paths";
 import { currentLocale, pageUrl, t } from "../i18n";
 
 type Props = { product: Product; eager?: boolean };
@@ -13,6 +12,7 @@ const artist = artistName(product.artistId);
 const sold = product.status === "soldout";
 const hasTitle = artist !== product.title;
 const alt = hasTitle ? `${artist}, ${product.title}` : artist;
+const cover = product.images[0] ? mediaUrl(product.images[0]) : "";
 ---
 
 <a
@@ -24,16 +24,20 @@ const alt = hasTitle ? `${artist}, ${product.title}` : artist;
 >
   <div class="card-frame">
     {sold && <span class="badge">{copy.shop.soldBadge}</span>}
-    <Image
-      class="print"
-      src={printImage(product.print)}
-      alt={alt}
-      widths={[400, 800, 1200]}
-      sizes="(max-width: 359px) 100vw, (max-width: 1023px) 50vw, 30vw"
-      loading={eager ? "eager" : "lazy"}
-      decoding="async"
-      fetchpriority={eager ? "high" : undefined}
-    />
+    {
+      cover && (
+        <img
+          class="print"
+          src={cover}
+          alt={alt}
+          width="1400"
+          height="933"
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          fetchpriority={eager ? "high" : undefined}
+        />
+      )
+    }
   </div>
   <div class="card-meta">
     {product.artistId !== "studio" && <div class="card-artist">{artist}</div>}

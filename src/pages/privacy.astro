@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { site } from "../data/site";
-import { currentLocale, t } from "../i18n";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
@@ -40,6 +40,11 @@ const p = copy.privacy;
       <p>
         {p.cookiesPaypal}
         (<a href="https://www.paypal.com/it/legalhub/paypal/privacy-full" rel="noopener noreferrer">paypal.com</a>).
+      </p>
+      <p>
+        {p.cookiesMore}
+        {" "}
+        <a href={pageUrl(locale, "cookie/")}>{p.cookiesMoreLink}</a>.
       </p>
 
       <h2>{p.data}</h2>

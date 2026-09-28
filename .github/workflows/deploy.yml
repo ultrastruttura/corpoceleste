@@ -19,9 +19,27 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAGES: "true"
+      TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
+      TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+      GITHUB_BRANCH: main
     steps:
       - uses: actions/checkout@v4
-      - uses: withastro/action@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build TinaCMS admin
+        run: |
+          if [ -n "$TINA_CLIENT_ID" ] && [ -n "$TINA_TOKEN" ]; then
+            npx tinacms build
+          else
+            npx tinacms build --local --skip-cloud-checks
+          fi
+      - run: npx astro build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
   deploy:
     needs: build
     runs-on: ubuntu-latest

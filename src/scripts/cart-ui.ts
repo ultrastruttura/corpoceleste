@@ -1,6 +1,6 @@
-import { artistName, products } from "../data/products";
 import { ui } from "../i18n/dict";
 import { currentLocale } from "../i18n/runtime";
+import { catalogProducts } from "./catalog";
 import {
   changeSize,
   count,
@@ -19,24 +19,24 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 let lastFocus: HTMLElement | null = null;
-let thumbs: Record<string, string> = {};
-
-function loadThumbs() {
-  thumbs = (window as unknown as { __printThumbs?: Record<string, string> }).__printThumbs ?? {};
-}
 
 function thumbSrc(print: string) {
-  if (!/^[\w.-]+$/.test(print)) return "";
-  return thumbs[print] || "";
+  if (!print) return "";
+  if (/^https?:\/\//i.test(print)) return print;
+  if (print.startsWith("/")) {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    return `${base}${print}`;
+  }
+  return "";
 }
 
 function sizesFor(id: string) {
-  return products.find((p) => p.id === id)?.sizes ?? ["S", "M", "L", "XL"];
+  return catalogProducts().find((p) => p.id === id)?.sizes ?? ["S", "M", "L", "XL"];
 }
 
 export function lineName(item: CartItem) {
-  const p = products.find((x) => x.id === item.id);
-  const artist = p ? artistName(p.artistId) : "";
+  const p = catalogProducts().find((x) => x.id === item.id);
+  const artist = p?.artistName ?? "";
   if (artist && artist !== item.title) return `${artist} · ${item.title}`;
   return item.title;
 }
@@ -252,7 +252,6 @@ function bindRoots() {
 }
 
 export function bindCart() {
-  loadThumbs();
   bindRoots();
   renderCart();
 

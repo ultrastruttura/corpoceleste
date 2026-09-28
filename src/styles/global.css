@@ -673,6 +673,37 @@ body.cart-open {
   display: block;
 }
 
+.product-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  background: var(--white);
+  padding: 0;
+}
+
+.product-thumb {
+  appearance: none;
+  border: 1px solid var(--line);
+  padding: 0;
+  background: var(--paper);
+  cursor: pointer;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+}
+
+.product-thumb.is-active {
+  border-color: var(--ink);
+}
+
+.product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .product-info .card-artist {
   font-size: 16px;
   margin-bottom: 8px;

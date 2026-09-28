@@ -1,11 +1,10 @@
 ---
 import Base from "../../layouts/Base.astro";
 import PrivacyCheck from "../../components/PrivacyCheck.astro";
-import { Image } from "astro:assets";
-import { productBySlug, formatPrice, artistName, products } from "../../data/products";
+import { productBySlug, formatPrice, artistName, products, productDescription } from "../../data/products";
 import { artistById } from "../../data/artists";
 import { site } from "../../data/site";
-import { printImage } from "../../lib/prints";
+import { mediaUrl } from "../../lib/paths";
 import { currentLocale, pageUrl, t } from "../../i18n";
 
 export function getStaticPaths() {
@@ -25,19 +24,44 @@ const alt = artist !== product.title ? `${artist}, ${product.title}` : product.t
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const defaultSize = sizes.includes("M") ? "M" : sizes[0];
 const color = copy.product.colors[product.colorName] ?? product.colorName;
+const description = productDescription(product, locale);
+const images = product.images.map(mediaUrl).filter(Boolean);
+const cover = images[0] ?? "";
 ---
 
 <Base title={`${product.title} — Corpoceleste`}>
   <div class="wrap product-layout">
     <div class="product-stage">
-      <Image
-        src={printImage(product.print)}
-        alt={alt}
-        widths={[800, 1200, 1600]}
-        sizes="(max-width: 899px) 100vw, 55vw"
-        loading="eager"
-        fetchpriority="high"
-      />
+      {
+        cover && (
+          <img
+            src={cover}
+            alt={alt}
+            width="1400"
+            height="933"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            data-product-main
+          />
+        )
+      }
+      {
+        images.length > 1 && (
+          <div class="product-thumbs" role="list">
+            {images.map((src, i) => (
+              <button
+                type="button"
+                class:list={["product-thumb", i === 0 && "is-active"]}
+                data-product-thumb={src}
+                aria-label={`${product.title} ${i + 1}`}
+              >
+                <img src={src} alt="" width="160" height="160" loading="lazy" decoding="async" />
+              </button>
+            ))}
+          </div>
+        )
+      }
     </div>
     <div class="product-info">
       {
@@ -49,7 +73,7 @@ const color = copy.product.colors[product.colorName] ?? product.colorName;
       }
       <h1>{product.title}</h1>
       <div class="price">{formatPrice(product.price)}</div>
-      {product.description && <p>{product.description}</p>}
+      {description && <p>{description}</p>}
 
       {
         sold ? (
@@ -103,4 +127,17 @@ const color = copy.product.colors[product.colorName] ?? product.colorName;
       </ul>
     </div>
   </div>
+
+  <script>
+    const main = document.querySelector<HTMLImageElement>("[data-product-main]");
+    document.querySelectorAll<HTMLButtonElement>("[data-product-thumb]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const src = btn.dataset.productThumb;
+        if (!main || !src) return;
+        main.src = src;
+        document.querySelectorAll("[data-product-thumb]").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+      });
+    });
+  </script>
 </Base>

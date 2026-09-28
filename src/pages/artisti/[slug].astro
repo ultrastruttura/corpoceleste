@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import ProductGrid from "../../components/ProductGrid.astro";
-import { artists, artistBySlug } from "../../data/artists";
+import { artists, artistBySlug, artistBio } from "../../data/artists";
 import { productsByArtist } from "../../data/products";
 import { currentLocale, pageUrl, t } from "../../i18n";
 
@@ -14,14 +14,15 @@ const copy = t(locale);
 const artist = artistBySlug(Astro.params.slug!);
 if (!artist) return Astro.redirect(pageUrl(locale, "artisti/"));
 const works = productsByArtist(artist.id);
+const bio = artistBio(artist, locale);
 ---
 
-<Base title={`${artist.name} — Corpoceleste`} description={artist.bio}>
+<Base title={`${artist.name} — Corpoceleste`} description={bio || undefined}>
   <div class="wrap">
     <header class="page-hero">
       <p class="card-artist"><a href={pageUrl(locale, "artisti/")}>{copy.artists.title}</a></p>
       <h1>{artist.name}</h1>
-      {artist.bio && <p class="lede">{artist.bio}</p>}
+      {bio && <p class="lede">{bio}</p>}
     </header>
     <ProductGrid products={works} />
   </div>

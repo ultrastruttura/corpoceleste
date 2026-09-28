@@ -2,8 +2,7 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { asset } from "../lib/paths";
-import { printFiles } from "../lib/prints";
-import { getImage } from "astro:assets";
+import { products, artistName } from "../data/products";
 import { currentLocale, innerPath, localePrefix, locales, pageAbs, pageUrl, t } from "../i18n";
 import "../styles/global.css";
 
@@ -18,12 +17,14 @@ const { title, description = copy.meta.description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const rest = innerPath(Astro.url.pathname);
 const prefix = localePrefix(locale);
-
-const thumbs: Record<string, string> = {};
-for (const [file, meta] of Object.entries(printFiles())) {
-  const img = await getImage({ src: meta, width: 160, format: "webp" });
-  thumbs[file] = img.src;
-}
+const catalog = {
+  products: products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    artistName: artistName(p.artistId),
+    sizes: p.sizes,
+  })),
+};
 ---
 
 <!doctype html>
@@ -69,8 +70,8 @@ for (const [file, meta] of Object.entries(printFiles())) {
       </div>
     </aside>
 
-    <script define:vars={{ printThumbs: thumbs }}>
-      window.__printThumbs = printThumbs;
+    <script define:vars={{ catalog }}>
+      window.__catalog = catalog;
     </script>
 
     <script>

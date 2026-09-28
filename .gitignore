@@ -3,3 +3,9 @@ dist/
 .astro/
 .DS_Store
 Thumbs.db
+public/admin/
+tina/__generated__/
+.env
+.env.*
+!.env.example
+bug.jpg

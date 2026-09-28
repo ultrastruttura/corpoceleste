@@ -1,6 +1,10 @@
-import { artists } from "./artists";
+import matter from "gray-matter";
+import { artistName, artists } from "./artists";
+import type { Locale } from "../i18n/locales";
 
 export type ProductStatus = "available" | "soldout";
+
+export type Localized = { it: string; en: string; de: string };
 
 export type Product = {
   id: string;
@@ -13,127 +17,70 @@ export type Product = {
   status: ProductStatus;
   color: string;
   colorName: string;
+  images: string[];
+  /** First image path — kept for cart line thumbs */
   print: string;
   sizes: string[];
-  description: string;
+  description: Localized;
 };
 
-export const products: Product[] = [
-  {
-    id: "daniele-de-batte",
-    slug: "daniele-de-batte",
-    title: "Daniele De Batté",
-    artistId: "daniele-de-batte",
-    price: 38,
-    nuovo: true,
-    createdAt: "2018-11-04",
-    status: "available",
-    color: "#141414",
-    colorName: "Nero",
-    print: "stella.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-  {
-    id: "dr-pira-barba",
-    slug: "ha-la-barba-spaziale",
-    title: "Ha la barba spaziale",
-    artistId: "dr-pira",
-    price: 38,
-    nuovo: true,
-    createdAt: "2017-05-14",
-    status: "available",
-    color: "#5b3a8c",
-    colorName: "Viola",
-    print: "orbite.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-  {
-    id: "rocco-lombardi",
-    slug: "il-mio-cuore-e-una-zolla-di-terra",
-    title: "Il mio cuore è una zolla di terra",
-    artistId: "rocco-lombardi",
-    price: 38,
-    createdAt: "2017-05-14",
-    status: "available",
-    color: "#141414",
-    colorName: "Nero",
-    print: "raggio.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-  {
-    id: "ruco",
-    slug: "ruco",
-    title: "Ruco",
-    artistId: "ruco",
-    price: 38,
-    createdAt: "2017-05-14",
-    status: "available",
-    color: "#141414",
-    colorName: "Nero",
-    print: "meridiana.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-  {
-    id: "ratigher",
-    slug: "internet-si-rompera",
-    title: "Internet si romperà",
-    artistId: "ratigher",
-    price: 38,
-    createdAt: "2017-05-14",
-    status: "available",
-    color: "#141414",
-    colorName: "Nero",
-    print: "polarita.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-  {
-    id: "anubi",
-    slug: "anubi",
-    title: "Anubi",
-    artistId: "angelini-taddei",
-    price: 38,
-    createdAt: "2017-05-14",
-    status: "available",
-    color: "#141414",
-    colorName: "Nero",
-    print: "corpo.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-  {
-    id: "108",
-    slug: "mamuthones-e-issohadores",
-    title: "Mamuthones e Issohadores",
-    artistId: "centootto",
-    price: 38,
-    createdAt: "2017-05-14",
-    status: "soldout",
-    color: "#141414",
-    colorName: "Nero",
-    print: "notturno.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-  {
-    id: "millo",
-    slug: "millo",
-    title: "Millo",
-    artistId: "millo",
-    price: 38,
-    createdAt: "2017-05-14",
-    status: "soldout",
-    color: "#141414",
-    colorName: "Nero",
-    print: "eclisse.jpg",
-    sizes: ["S", "M", "L", "XL"],
-    description: "",
-  },
-];
+function emptyLocalized(): Localized {
+  return { it: "", en: "", de: "" };
+}
+
+function asLocalized(value: unknown): Localized {
+  if (!value || typeof value !== "object") return emptyLocalized();
+  const o = value as Record<string, unknown>;
+  return {
+    it: String(o.it ?? ""),
+    en: String(o.en ?? ""),
+    de: String(o.de ?? ""),
+  };
+}
+
+function artistIdFromRef(ref: unknown): string {
+  const s = String(ref ?? "");
+  const match = s.match(/artists\/([^/]+?)(?:\.md)?$/);
+  return match?.[1] ?? s;
+}
+
+const files = import.meta.glob("../../content/products/*.md", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+}) as Record<string, string>;
+
+export const products: Product[] = Object.entries(files).map(([path, raw]) => {
+  const { data } = matter(raw);
+  const slug = path.split("/").pop()!.replace(/\.md$/, "");
+  const images = Array.isArray(data.images)
+    ? data.images.map((x: unknown) => String(x)).filter(Boolean)
+    : [];
+  const sizes = Array.isArray(data.sizes)
+    ? data.sizes.map((x: unknown) => String(x))
+    : ["S", "M", "L", "XL"];
+  const created =
+    data.createdAt instanceof Date
+      ? data.createdAt.toISOString().slice(0, 10)
+      : String(data.createdAt ?? "").slice(0, 10);
+
+  return {
+    id: slug,
+    slug,
+    title: String(data.title ?? slug),
+    artistId: artistIdFromRef(data.artist),
+    price: Number(data.price ?? 0),
+    nuovo: Boolean(data.nuovo),
+    createdAt: created || "2017-01-01",
+    status: data.status === "soldout" ? "soldout" : "available",
+    color: String(data.color ?? "#141414"),
+    colorName: String(data.colorName ?? "Nero"),
+    images,
+    print: images[0] ?? "",
+    sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],
+    description: asLocalized(data.description),
+  };
+});
 
 export function productBySlug(slug: string) {
   return products.find((p) => p.slug === slug);
@@ -143,9 +90,7 @@ export function productsByArtist(artistId: string) {
   return products.filter((p) => p.artistId === artistId);
 }
 
-export function artistName(artistId: string) {
-  return artists.find((a) => a.id === artistId)?.name ?? artistId;
-}
+export { artistName, artists };
 
 export function availableProducts() {
   return products.filter((p) => p.status === "available");
@@ -157,4 +102,8 @@ export function soldOutProducts() {
 
 export function formatPrice(n: number) {
   return `${n} €`;
+}
+
+export function productDescription(product: Product, locale: Locale) {
+  return product.description[locale] || product.description.it || "";
 }
