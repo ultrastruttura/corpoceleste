@@ -14,6 +14,7 @@ sizes:
   - XL
 images:
   - /uploads/prints/corpo.jpg
+  - /uploads/prints/corpo-dettaglio.jpg
 description:
   it: |-
     Disegno di Angelini & Taddei. Serigrafia a un colore su maglia di cotone, stampata a mano nello studio Corpoceleste a Bergamo.
