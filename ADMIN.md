@@ -37,13 +37,14 @@ git push
 1. Crea un progetto gratis su [app.tina.io](https://app.tina.io) collegato al repo `ultrastruttura/corpoceleste`
 2. Copia **Client ID** e **Token**
 3. Su GitHub → Settings → Secrets and variables → Actions, aggiungi:
-   - `TINA_CLIENT_ID`
-   - `TINA_TOKEN`
-4. Dopo il deploy, apri:  
+   - `TINA_CLIENT_ID` (Client ID da Overview)
+   - `TINA_TOKEN` (token Content Read)
+4. **Actions → Run workflow** (il Client ID va nel build come `NEXT_PUBLIC_…`, altrimenti login = Forbidden)
+5. Dopo il deploy, apri:  
    `https://ultrastruttura.github.io/corpoceleste/admin/`  
    Accedi con GitHub, modifica, salva → Tina fa commit → Pages si ricostruisce.
 
-Senza questi secret l’admin online non salva (in locale funziona comunque).
+Senza questi secret (o senza un nuovo deploy dopo averli messi) l’admin online non autentica.
 
 ## Flusso tipico: nuova maglia
 

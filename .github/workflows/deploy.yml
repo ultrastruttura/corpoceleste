@@ -20,6 +20,7 @@ jobs:
     env:
       GITHUB_PAGES: "true"
       TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
+      NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
       TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
       GITHUB_BRANCH: main
     steps:
@@ -32,8 +33,10 @@ jobs:
       - name: Build TinaCMS admin
         run: |
           if [ -n "$TINA_CLIENT_ID" ] && [ -n "$TINA_TOKEN" ]; then
+            echo "Building Tina admin with TinaCloud (client id present)"
             npx tinacms build
           else
+            echo "WARNING: TINA_CLIENT_ID / TINA_TOKEN secrets missing — building local admin (login online will fail)"
             npx tinacms build --local --skip-cloud-checks
           fi
       - run: npx astro build

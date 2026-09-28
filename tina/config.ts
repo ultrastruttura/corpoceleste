@@ -35,7 +35,8 @@ const localizedText = (name: string, label: string, textarea = true) => ({
 
 export default defineConfig({
   branch,
-  clientId: process.env.TINA_CLIENT_ID || null,
+  // Client ID must use NEXT_PUBLIC_ / TINA_PUBLIC_ so tinacms build embeds it in /admin
+  clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID || process.env.TINA_CLIENT_ID || null,
   token: process.env.TINA_TOKEN || null,
   build: {
     outputFolder: "admin",
