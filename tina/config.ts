@@ -185,7 +185,7 @@ export default defineConfig({
           },
         },
         fields: [
-          { type: "string", name: "title", label: "Titolo interno", isTitle: true },
+          { type: "string", name: "title", label: "Titolo interno", isTitle: true, required: true },
           localizedText("metaDescription", "Meta description sito (home e fallback)"),
           localizedText("homeTitle", "H1 home", false),
           localizedText("homeLede", "Sottotitolo home"),
