@@ -23,10 +23,14 @@ let lastFocus: HTMLElement | null = null;
 function thumbSrc(print: string) {
   if (!print) return "";
   if (/^https?:\/\//i.test(print)) return print;
-  if (print.startsWith("/")) {
-    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-    return `${base}${print}`;
+  const clean = print.replace(/^\//, "");
+  const file = clean.split("/").pop() || "";
+  const stem = file.replace(/\.[^.]+$/, "");
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  if (stem && clean.includes("uploads/prints/")) {
+    return `${base}/uploads/prints/card/${stem}.jpg`;
   }
+  if (print.startsWith("/")) return `${base}${print}`;
   return "";
 }
 

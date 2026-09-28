@@ -212,7 +212,7 @@ p:last-child {
   display: flex;
   align-items: center;
   height: 100%;
-  color: var(--quiet);
+  color: var(--muted);
   text-decoration: none;
 }
 
@@ -461,13 +461,16 @@ body.cart-open {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: var(--white);
-  color: var(--ink);
+  z-index: 1;
+  background: var(--ink);
+  color: var(--white);
   font-size: 12px;
-  padding: 3px 7px;
+  font-weight: 600;
+  padding: 4px 8px;
 }
 
-.card.is-sold .card-frame {
+.card.is-sold .card-frame img,
+.card.is-sold .card-frame .print {
   opacity: 0.55;
 }
 

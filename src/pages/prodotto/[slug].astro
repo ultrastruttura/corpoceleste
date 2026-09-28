@@ -12,7 +12,7 @@ import {
 } from "../../data/products";
 import { artistById } from "../../data/artists";
 import { site } from "../../data/site";
-import { mediaUrl } from "../../lib/paths";
+import { mediaUrl, largeImageUrls } from "../../lib/paths";
 import { absoluteUrl, metaSnippet } from "../../lib/seo";
 import { currentLocale, pageAbs, pageUrl, t } from "../../i18n";
 
@@ -35,12 +35,16 @@ const defaultSize = sizes.includes("M") ? "M" : sizes[0];
 const color = copy.product.colors[product.colorName] ?? product.colorName;
 const description = productDescription(product, locale);
 const seoDescription = metaSnippet(productSeoDescription(product, locale) || copy.meta.description);
-const images = product.images.map(mediaUrl).filter(Boolean);
-const cover = images[0] ?? "";
+const imageSet = product.images.map((src) => ({
+  raw: src,
+  ...largeImageUrls(src),
+  thumb: mediaUrl(src),
+}));
+const cover = imageSet[0];
 const pageTitle = `${product.title} — Corpoceleste`;
 const productUrl = pageAbs(locale, `prodotto/${product.slug}/`);
 const absImages = product.images
-  .map((src) => absoluteUrl(src, Astro.site))
+  .map((src) => absoluteUrl(largeImageUrls(src).jpg, Astro.site))
   .filter(Boolean);
 
 const jsonLd = {
@@ -78,37 +82,43 @@ const jsonLd = {
 <Base
   title={pageTitle}
   description={seoDescription}
-  image={product.print || cover}
+  image={product.print || cover?.jpg}
   type="product"
   jsonLd={jsonLd}
+  preloadImage={cover?.webp}
+  preloadImageType="image/webp"
 >
   <div class="wrap product-layout">
     <div class="product-stage">
       {
         cover && (
-          <img
-            src={cover}
-            alt={alt}
-            width="1400"
-            height="933"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-            data-product-main
-          />
+          <picture>
+            <source type="image/webp" srcset={cover.webp} data-product-main-webp />
+            <img
+              src={cover.jpg}
+              alt={alt}
+              width="1200"
+              height="1200"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              data-product-main
+            />
+          </picture>
         )
       }
       {
-        images.length > 1 && (
+        imageSet.length > 1 && (
           <div class="product-thumbs" role="list">
-            {images.map((src, i) => (
+            {imageSet.map((img, i) => (
               <button
                 type="button"
                 class:list={["product-thumb", i === 0 && "is-active"]}
-                data-product-thumb={src}
+                data-product-thumb={img.jpg}
+                data-product-thumb-webp={img.webp}
                 aria-label={`${product.title} ${i + 1}`}
               >
-                <img src={src} alt="" width="160" height="160" loading="lazy" decoding="async" />
+                <img src={img.jpg} alt="" width="160" height="160" loading="lazy" decoding="async" />
               </button>
             ))}
           </div>
@@ -185,11 +195,14 @@ const jsonLd = {
 
   <script>
     const main = document.querySelector<HTMLImageElement>("[data-product-main]");
+    const mainWebp = document.querySelector<HTMLSourceElement>("[data-product-main-webp]");
     document.querySelectorAll<HTMLButtonElement>("[data-product-thumb]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const src = btn.dataset.productThumb;
+        const webp = btn.dataset.productThumbWebp;
         if (!main || !src) return;
         main.src = src;
+        if (mainWebp && webp) mainWebp.srcset = webp;
         document.querySelectorAll("[data-product-thumb]").forEach((b) => b.classList.remove("is-active"));
         btn.classList.add("is-active");
       });

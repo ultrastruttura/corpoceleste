@@ -4,6 +4,7 @@ import ProductGrid from "../components/ProductGrid.astro";
 import { availableProducts, soldOutProducts } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { shuffle } from "../lib/shuffle";
+import { cardImageUrls } from "../lib/paths";
 import { metaSnippet } from "../lib/seo";
 import { currentLocale, t } from "../i18n";
 
@@ -20,12 +21,15 @@ const homeLede = localizedSetting("homeLede", locale) || copy.home.lede;
 const description = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
+const lcp = listed[0]?.images[0] ? cardImageUrls(listed[0].images[0]) : null;
 ---
 
 <Base
   title={`Corpoceleste — ${homeTitle}`}
   description={description}
   image={siteSettings.ogImage}
+  preloadImage={lcp?.webp}
+  preloadImageType="image/webp"
 >
   <div class="wrap shop-home">
     <header class="page-hero shop-home-hero">
@@ -34,7 +38,7 @@ const description = metaSnippet(
       {homeLede && <p class="lede">{homeLede}</p>}
     </header>
 
-    <ProductGrid products={listed} eager={3} />
+    <ProductGrid products={listed} eager={1} />
 
     {
       sold.length > 0 && (

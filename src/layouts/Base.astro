@@ -14,6 +14,8 @@ type Props = {
   image?: string;
   type?: "website" | "product";
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  preloadImage?: string;
+  preloadImageType?: string;
 };
 
 const locale = currentLocale(Astro.currentLocale);
@@ -26,6 +28,8 @@ const {
   image = siteSettings.ogImage,
   type = "website",
   jsonLd,
+  preloadImage,
+  preloadImageType = "image/webp",
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const rest = innerPath(Astro.url.pathname);
@@ -66,6 +70,17 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {
+      preloadImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={preloadImage}
+          type={preloadImageType}
+          fetchpriority="high"
+        />
+      )
+    }
     <link rel="icon" href={asset("brand/favicon.png")} type="image/png" />
     {
       jsonLdBlocks.map((block) => (

@@ -1,7 +1,7 @@
 ---
 import type { Product } from "../data/products";
 import { artistName, formatPrice } from "../data/products";
-import { mediaUrl } from "../lib/paths";
+import { cardImageUrls } from "../lib/paths";
 import { currentLocale, pageUrl, t } from "../i18n";
 
 type Props = { product: Product; eager?: boolean };
@@ -12,7 +12,7 @@ const artist = artistName(product.artistId);
 const sold = product.status === "soldout";
 const hasTitle = artist !== product.title;
 const alt = hasTitle ? `${artist}, ${product.title}` : artist;
-const cover = product.images[0] ? mediaUrl(product.images[0]) : "";
+const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
 ---
 
 <a
@@ -26,16 +26,20 @@ const cover = product.images[0] ? mediaUrl(product.images[0]) : "";
     {sold && <span class="badge">{copy.shop.soldBadge}</span>}
     {
       cover && (
-        <img
-          class="print"
-          src={cover}
-          alt={alt}
-          width="1400"
-          height="933"
-          loading={eager ? "eager" : "lazy"}
-          decoding="async"
-          fetchpriority={eager ? "high" : undefined}
-        />
+        <picture>
+          <source type="image/webp" srcset={cover.webp} />
+          <img
+            class="print"
+            src={cover.jpg}
+            alt={alt}
+            width="800"
+            height="800"
+            sizes="(max-width: 359px) 92vw, (max-width: 1023px) 46vw, 280px"
+            loading={eager ? "eager" : "lazy"}
+            decoding="async"
+            fetchpriority={eager ? "high" : "low"}
+          />
+        </picture>
       )
     }
   </div>

@@ -17,8 +17,8 @@ function active(href: string) {
 <header class="header">
   <div class="header-inner">
     <a class="logo" href={pageUrl(locale)}>
-      <img class="logo-mark" src={asset("brand/logo-stella.png")} alt="" width="40" height="41" />
-      <img class="logo-word" src={asset("brand/logo-scritta-sm.png")} alt="Corpoceleste" width="1200" height="105" />
+      <img class="logo-mark" src={asset("brand/logo-stella.png")} alt="" width="40" height="41" decoding="async" fetchpriority="low" />
+      <img class="logo-word" src={asset("brand/logo-scritta-sm.png")} alt="Corpoceleste" width="240" height="21" decoding="async" fetchpriority="low" />
     </a>
     <nav class="nav" aria-label={copy.nav.main}>
       <a class={active("")} href={pageUrl(locale)}>{copy.nav.shop}</a>

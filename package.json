@@ -8,6 +8,7 @@
     "build": "tinacms build --local --skip-cloud-checks && astro build",
     "build:cloud": "tinacms build && astro build",
     "build:site": "astro build",
+    "optimize:prints": "node scripts/optimize-prints.mjs",
     "preview": "astro preview"
   },
   "dependencies": {
