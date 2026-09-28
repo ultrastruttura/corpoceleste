@@ -3,6 +3,9 @@ export type CatalogProduct = {
   title: string;
   artistName: string;
   sizes: string[];
+  price: number;
+  status: "available" | "soldout";
+  print: string;
 };
 
 declare global {
@@ -13,4 +16,8 @@ declare global {
 
 export function catalogProducts(): CatalogProduct[] {
   return window.__catalog?.products ?? [];
+}
+
+export function catalogProduct(id: string) {
+  return catalogProducts().find((p) => p.id === id);
 }

@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
+import FormHoney from "../components/FormHoney.astro";
 import { site } from "../data/site";
 import { pastWorkshops } from "../data/workshops";
 import { asset } from "../lib/paths";
@@ -23,8 +24,8 @@ const copy = t(locale);
         <p>{copy.workshops.waitlistBody}</p>
         <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
           <input type="hidden" name="_subject" value="Iscrizione workshop in studio" />
-          <input type="hidden" name="_captcha" value="false" />
           <input type="hidden" name="_next" data-next-grazie="corsi" />
+          <FormHoney />
           <div>
             <label for="ws-name">{copy.forms.name}</label>
             <input id="ws-name" name="nome" required />
@@ -46,8 +47,8 @@ const copy = t(locale);
         <p>{copy.workshops.onSiteBody}</p>
         <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
           <input type="hidden" name="_subject" value="Proposta workshop presso di voi" />
-          <input type="hidden" name="_captcha" value="false" />
           <input type="hidden" name="_next" data-next-grazie="workshop" />
+          <FormHoney />
           <div>
             <label for="sp-name">{copy.workshops.spaceName}</label>
             <input id="sp-name" name="nome" required />

@@ -1,10 +1,11 @@
 ---
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
+import FormHoney from "../components/FormHoney.astro";
 import { site } from "../data/site";
-import { localizedSetting, siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
 import { metaSnippet } from "../lib/seo";
+import { localizedSetting, siteSettings } from "../data/settings";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
@@ -49,8 +50,8 @@ const description = metaSnippet(andreaBio || copy.meta.description);
       </div>
       <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
         <input type="hidden" name="_subject" value="Richiesta consulenza / stampa dal vivo" />
-        <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_next" data-next-grazie="consulenza" />
+        <FormHoney />
         <div>
           <label for="c-name">{copy.forms.name}</label>
           <input id="c-name" name="nome" required />

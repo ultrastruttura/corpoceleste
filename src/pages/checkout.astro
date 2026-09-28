@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
+import FormHoney from "../components/FormHoney.astro";
 import { site } from "../data/site";
 import { currentLocale, pageUrl, paypalLc, paypalSdkLocale, t } from "../i18n";
 
@@ -78,11 +79,12 @@ const copy = t(locale);
       }
 
       <h2 class="checkout-bank-title">{copy.checkout.bank}</h2>
+      <p>{copy.checkout.bankNote}</p>
       <form class="form is-locked" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
         <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
-        <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_next" data-next-grazie="ordine" />
         <input type="hidden" name="ordine" data-order-field />
+        <FormHoney />
         <div>
           <label for="o-name">{copy.checkout.name}</label>
           <input id="o-name" name="nome" required />
@@ -124,7 +126,7 @@ const copy = t(locale);
   }
 
   <script>
-    import { getCart, total, clearCart, saveOrderSnapshot } from "../scripts/cart";
+    import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
     import { site } from "../data/site";
 
@@ -167,7 +169,7 @@ const copy = t(locale);
 
     function fillPaypal() {
       if (!paypalItems) return;
-      const items = getCart();
+      const items = sanitizeCart();
       const ship = shipping();
       paypalItems.replaceChildren();
       items.forEach((item, idx) => {
@@ -180,7 +182,7 @@ const copy = t(locale);
     }
 
     function unlocked() {
-      return Boolean(disclaimer?.checked && privacy?.checked && getCart().length);
+      return Boolean(disclaimer?.checked && privacy?.checked && sanitizeCart().length);
     }
 
     function syncLock() {
@@ -191,7 +193,7 @@ const copy = t(locale);
     }
 
     function syncPage() {
-      const items = getCart();
+      const items = sanitizeCart();
       const empty = !items.length;
       if (emptyEl) emptyEl.hidden = !empty;
       if (flowEl) flowEl.hidden = empty;
@@ -217,6 +219,8 @@ const copy = t(locale);
     window.addEventListener("cart:change", syncPage);
 
     paypalForm?.addEventListener("submit", (e) => {
+      sanitizeCart();
+      fillPaypal();
       if (!unlocked()) {
         e.preventDefault();
         return;
@@ -225,6 +229,8 @@ const copy = t(locale);
     });
 
     bankForm?.addEventListener("submit", (e) => {
+      sanitizeCart();
+      syncPage();
       if (!unlocked()) {
         e.preventDefault();
         return;
@@ -238,14 +244,14 @@ const copy = t(locale);
       const paypal = (window as unknown as { paypal?: { Buttons: (o: object) => { render: (s: string) => void } } })
         .paypal;
       const node = document.querySelector("#paypal-buttons");
-      if (!paypal || !node || !getCart().length) return;
+      if (!paypal || !node || !sanitizeCart().length) return;
       paypal.Buttons({
         onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
           if (!unlocked()) return actions.reject();
           return actions.resolve();
         },
         createOrder: (_: unknown, actions: { order: { create: (o: object) => Promise<string> } }) => {
-          const items = getCart();
+          const items = sanitizeCart();
           const ship = shipping();
           const merce = total();
           return actions.order.create({

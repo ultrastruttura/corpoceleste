@@ -1,0 +1,14 @@
+---
+/** FormSubmit honeypot — leave empty; bots that fill it are dropped. */
+---
+<input type="text" name="_honey" value="" tabindex="-1" autocomplete="off" class="honey" aria-hidden="true" />
+
+<style>
+  .honey {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>

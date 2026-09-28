@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
+import FormHoney from "../components/FormHoney.astro";
 import { site } from "../data/site";
 import { currentLocale, t } from "../i18n";
 
@@ -17,8 +18,8 @@ const copy = t(locale);
     <div class="split">
       <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
         <input type="hidden" name="_subject" value="Contatto dal sito Corpoceleste" />
-        <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_next" data-next-grazie="contatto" />
+        <FormHoney />
         <div>
           <label for="ct-name">{copy.forms.name}</label>
           <input id="ct-name" name="nome" required />
@@ -38,8 +39,8 @@ const copy = t(locale);
         <h2>Newsletter</h2>
         <form class="newsletter-form newsletter-form--block" action={`https://formsubmit.co/${site.email}`} method="POST">
           <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
-          <input type="hidden" name="_captcha" value="false" />
           <input type="hidden" name="_next" data-next-grazie="newsletter" />
+          <FormHoney />
           <div class="newsletter-row">
             <input type="email" name="email" required placeholder={copy.forms.email} aria-label={copy.forms.newsletterEmail} />
             <button type="submit">{copy.forms.subscribe}</button>

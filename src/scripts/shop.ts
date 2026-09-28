@@ -1,5 +1,6 @@
 import { addItem } from "./cart";
 import { bindCart, openCart } from "./cart-ui";
+import { catalogProduct } from "./catalog";
 import { bindNav } from "./nav";
 
 const base = import.meta.env.BASE_URL;
@@ -18,16 +19,17 @@ function bind() {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const fd = new FormData(form);
-      addItem({
-        id: String(fd.get("id")),
-        slug: String(fd.get("slug")),
-        title: String(fd.get("title")),
-        price: Number(fd.get("price")),
-        size: String(fd.get("size") || "M"),
-        color: String(fd.get("color")),
-        print: String(fd.get("print")),
+      const id = String(fd.get("id") || "");
+      const p = catalogProduct(id);
+      if (!p || p.status !== "available") return;
+      const ok = addItem({
+        id,
+        slug: String(fd.get("slug") || id),
+        size: String(fd.get("size") || p.sizes[0] || "M"),
+        color: String(fd.get("color") || ""),
+        print: p.print,
       });
-      openCart();
+      if (ok) openCart();
     });
   });
 }

@@ -60,7 +60,8 @@ const it = {
   checkout: {
     title: "Checkout",
     empty: "Il carrello è vuoto.",
-    paypalNote: "Pagamento PayPal. Indirizzo di spedizione su PayPal.",
+    paypalNote:
+      "Pagamento PayPal. Controlla l’importo su PayPal prima di confermare. L’indirizzo di spedizione lo chiedono loro.",
     shippingTitle: "Spedizioni",
     shippingBody:
       "Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.",
@@ -73,6 +74,8 @@ const it = {
     paypal: "Paga con PayPal",
     paypalBack: "Torna a Corpoceleste",
     bank: "Bonifico",
+    bankNote:
+      "Dopo l’invio ti scrivo io con l’IBAN. L’ordine è confermato solo quando ricevo il pagamento.",
     name: "Nome e cognome",
     email: "Email",
     phone: "Telefono",
@@ -141,8 +144,9 @@ const it = {
     newsletter: "Quando c’è una maglia nuova, scrivo.",
     reprint: "Se ristampo, ti avviso.",
     waitlist: "Quando il gruppo c’è, fisso la data.",
-    bank: "Ti scrivo per il bonifico.",
-    paypal: "Il pagamento è su PayPal. Ti scrivo per la spedizione.",
+    bank: "Ti scrivo per il bonifico. L’ordine vale quando arriva il pagamento.",
+    paypal:
+      "Se PayPal ha confermato il pagamento, ti scrivo per la spedizione. Questa pagina da sola non è una ricevuta.",
   },
   notFound: {
     title: "Pagina non trovata",
@@ -297,7 +301,8 @@ const en: typeof it = {
   checkout: {
     title: "Checkout",
     empty: "Your cart is empty.",
-    paypalNote: "PayPal checkout. Shipping address is collected on PayPal.",
+    paypalNote:
+      "PayPal checkout. Check the amount on PayPal before you confirm. They collect the shipping address.",
     shippingTitle: "Shipping",
     shippingBody:
       "One-person studio: I print and pack the shirts myself. I ship twice a week. If you need them by a given date, write before you order.",
@@ -310,6 +315,8 @@ const en: typeof it = {
     paypal: "Pay with PayPal",
     paypalBack: "Back to Corpoceleste",
     bank: "Bank transfer",
+    bankNote:
+      "After you send the order I’ll email the IBAN. The order is confirmed only when payment arrives.",
     name: "Full name",
     email: "Email",
     phone: "Phone",
@@ -378,8 +385,9 @@ const en: typeof it = {
     newsletter: "When a new shirt is ready, I’ll write.",
     reprint: "If I reprint, I’ll let you know.",
     waitlist: "When the group is together, I’ll set the date.",
-    bank: "I’ll write with the transfer details.",
-    paypal: "Payment is with PayPal. I’ll write about shipping.",
+    bank: "I’ll write with the transfer details. The order stands when payment arrives.",
+    paypal:
+      "If PayPal confirmed the payment, I’ll write about shipping. This page alone is not a receipt.",
   },
   notFound: {
     title: "Page not found",
@@ -534,7 +542,8 @@ const de: typeof it = {
   checkout: {
     title: "Kasse",
     empty: "Der Warenkorb ist leer.",
-    paypalNote: "Zahlung über PayPal. Die Lieferadresse wird bei PayPal angegeben.",
+    paypalNote:
+      "Zahlung über PayPal. Prüfe den Betrag bei PayPal, bevor du bestätigst. Die Lieferadresse erfragen sie.",
     shippingTitle: "Versand",
     shippingBody:
       "Ein-Personen-Atelier: ich drucke und packe selbst. Ich schicke zweimal die Woche. Wenn du die Shirts zu einem bestimmten Datum brauchst, schreib vor der Bestellung.",
@@ -547,6 +556,8 @@ const de: typeof it = {
     paypal: "Mit PayPal bezahlen",
     paypalBack: "Zurück zu Corpoceleste",
     bank: "Überweisung",
+    bankNote:
+      "Nach dem Absenden schreibe ich dir die IBAN. Die Bestellung gilt erst, wenn die Zahlung da ist.",
     name: "Vor- und Nachname",
     email: "E-Mail",
     phone: "Telefon",
@@ -615,8 +626,9 @@ const de: typeof it = {
     newsletter: "Wenn ein neues Shirt da ist, schreibe ich.",
     reprint: "Wenn ich nachdrucke, gebe ich Bescheid.",
     waitlist: "Wenn die Gruppe steht, lege ich den Termin fest.",
-    bank: "Ich schreibe wegen der Überweisung.",
-    paypal: "Die Zahlung läuft über PayPal. Ich schreibe zum Versand.",
+    bank: "Ich schreibe wegen der Überweisung. Die Bestellung gilt, wenn die Zahlung da ist.",
+    paypal:
+      "Wenn PayPal die Zahlung bestätigt hat, schreibe ich zum Versand. Diese Seite allein ist keine Quittung.",
   },
   notFound: {
     title: "Seite nicht gefunden",

@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import PrivacyCheck from "../../components/PrivacyCheck.astro";
+import FormHoney from "../../components/FormHoney.astro";
 import {
   productBySlug,
   formatPrice,
@@ -133,9 +134,9 @@ const jsonLd = {
         sold ? (
           <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
             <input type="hidden" name="_subject" value={`Ristampa: ${product.title}`} />
-            <input type="hidden" name="_captcha" value="false" />
             <input type="hidden" name="_next" data-next-grazie="ristampa" />
             <input type="hidden" name="prodotto" value={product.title} />
+            <FormHoney />
             <p>{copy.product.sold}</p>
             <div>
               <label for="re-email">{copy.forms.email}</label>

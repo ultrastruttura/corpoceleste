@@ -8,13 +8,14 @@ export const site = {
   ultrastruttura: "https://ultrastruttura.com/",
   shippingItaly: 8,
   shippingEU: 16,
-  iban: "IT00 X000 0000 0000 0000 0000 000",
+  iban: "",
   intestatario: "Andrea Baldelli",
   /** Email dell'account PayPal Business (gratis). Basta questa per accettare pagamenti. */
   paypalEmail: "baldellimtt@gmail.com",
   /**
-   * Opzionale: Client ID da developer.paypal.com (gratis).
-   * Se c'è, il bottone PayPal resta sulla pagina invece di reindirizzare.
+   * Consigliato: Client ID da developer.paypal.com (gratis).
+   * Se c’è, il bottone PayPal resta sulla pagina invece del form classico.
+   * Gli importi partono comunque dal catalogo buildato, non dai campi del browser.
    */
   paypalClientId: "",
   sede: "Bergamo (BG), Italia",

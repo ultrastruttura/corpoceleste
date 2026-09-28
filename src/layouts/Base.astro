@@ -37,6 +37,9 @@ const catalog = {
     title: p.title,
     artistName: artistName(p.artistId),
     sizes: p.sizes,
+    price: p.price,
+    status: p.status,
+    print: p.print,
   })),
 };
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
