@@ -9,8 +9,20 @@ export function bindNav() {
     btn.setAttribute("aria-expanded", String(open));
   };
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
     setOpen(!nav.classList.contains("is-open"));
+  });
+
+  nav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!nav.classList.contains("is-open")) return;
+    const t = e.target as Node;
+    if (nav.contains(t) || btn.contains(t)) return;
+    setOpen(false);
   });
 
   document.addEventListener("keydown", (e) => {

@@ -135,53 +135,59 @@ const jsonLd = {
       }
       <h1>{product.title}</h1>
       <div class="price">{formatPrice(product.price)}</div>
-      {
-        description &&
-          description.split(/\n\n+/).map((para) => <p>{para}</p>)
-      }
+
+      <div class="product-buy">
+        {
+          sold ? (
+            <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+              <input type="hidden" name="_subject" value={`Ristampa: ${product.title}`} />
+              <input type="hidden" name="_next" data-next-grazie="ristampa" />
+              <input type="hidden" name="prodotto" value={product.title} />
+              <FormHoney />
+              <p>{copy.product.sold}</p>
+              <div>
+                <label for="re-email">{copy.forms.email}</label>
+                <input id="re-email" type="email" name="email" required />
+              </div>
+              <div>
+                <label for="re-size">{copy.product.size}</label>
+                <select id="re-size" name="taglia">
+                  {sizes.map((s) => <option>{s}</option>)}
+                </select>
+              </div>
+              <PrivacyCheck id="re-privacy" />
+              <button class="btn" type="submit">{copy.product.reprint}</button>
+            </form>
+          ) : (
+            <form data-add-form>
+              <input type="hidden" name="id" value={product.id} />
+              <input type="hidden" name="slug" value={product.slug} />
+              <input type="hidden" name="title" value={product.title} />
+              <input type="hidden" name="price" value={product.price} />
+              <input type="hidden" name="color" value={product.color} />
+              <input type="hidden" name="print" value={product.print} />
+              <fieldset class="size-fieldset">
+                <legend class="field-label">{copy.product.size}</legend>
+                <div class="size-row">
+                  {sizes.map((s) => (
+                    <label>
+                      <input type="radio" name="size" value={s} checked={s === defaultSize} />
+                      <span>{s}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <button class="btn" type="submit">{copy.product.add}</button>
+            </form>
+          )
+        }
+      </div>
 
       {
-        sold ? (
-          <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
-            <input type="hidden" name="_subject" value={`Ristampa: ${product.title}`} />
-            <input type="hidden" name="_next" data-next-grazie="ristampa" />
-            <input type="hidden" name="prodotto" value={product.title} />
-            <FormHoney />
-            <p>{copy.product.sold}</p>
-            <div>
-              <label for="re-email">{copy.forms.email}</label>
-              <input id="re-email" type="email" name="email" required />
-            </div>
-            <div>
-              <label for="re-size">{copy.product.size}</label>
-              <select id="re-size" name="taglia">
-                {sizes.map((s) => <option>{s}</option>)}
-              </select>
-            </div>
-            <PrivacyCheck id="re-privacy" />
-            <button class="btn" type="submit">{copy.product.reprint}</button>
-          </form>
-        ) : (
-          <form data-add-form>
-            <input type="hidden" name="id" value={product.id} />
-            <input type="hidden" name="slug" value={product.slug} />
-            <input type="hidden" name="title" value={product.title} />
-            <input type="hidden" name="price" value={product.price} />
-            <input type="hidden" name="color" value={product.color} />
-            <input type="hidden" name="print" value={product.print} />
-            <fieldset class="size-fieldset">
-              <legend class="field-label">{copy.product.size}</legend>
-              <div class="size-row">
-                {sizes.map((s) => (
-                  <label>
-                    <input type="radio" name="size" value={s} checked={s === defaultSize} />
-                    <span>{s}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-            <button class="btn" type="submit">{copy.product.add}</button>
-          </form>
+        description && (
+          <div class="product-copy">
+            {description.split(/\n\n+/).map((para) => <p>{para}</p>)}
+          </div>
         )
       }
 

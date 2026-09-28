@@ -54,11 +54,11 @@ function active(href: string) {
 </header>
 
 <nav class="mobile-nav" id="site-menu" data-mobile-nav>
-  <a href={pageUrl(locale)}>{copy.nav.shop}</a>
-  <a href={pageUrl(locale, "artisti/")}>{copy.nav.artists}</a>
-  <a href={pageUrl(locale, "news/")}>{copy.nav.news}</a>
-  <a href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
-  <a href={pageUrl(locale, "consulenza/")}>{copy.nav.consulting}</a>
-  <a href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
-  <a href={pageUrl(locale, "carrello/")}>{copy.nav.cart}</a>
+  <a class={active("")} href={pageUrl(locale)}>{copy.nav.shop}</a>
+  <a class={active("artisti/")} href={pageUrl(locale, "artisti/")}>{copy.nav.artists}</a>
+  <a class={active("news/")} href={pageUrl(locale, "news/")}>{copy.nav.news}</a>
+  <a class={active("corsi/")} href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
+  <a class={active("consulenza/")} href={pageUrl(locale, "consulenza/")}>{copy.nav.consulting}</a>
+  <a class={active("contatti/")} href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
+  <a class={active("carrello/")} href={pageUrl(locale, "carrello/")}>{copy.nav.cart}</a>
 </nav>

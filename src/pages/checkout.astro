@@ -17,101 +17,102 @@ const copy = t(locale);
       {copy.checkout.empty} <a href={pageUrl(locale)}>{copy.nav.shop}</a>
     </p>
 
-    <div data-checkout-flow hidden>
-      {
-        (site.paypalEmail || site.paypalClientId) && (
-          <p>{copy.checkout.paypalNote}</p>
-        )
-      }
+    <div class="checkout-flow" data-checkout-flow hidden>
+      <section class="checkout-step checkout-step--order">
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-to">{copy.checkout.shipTo}</label>
+          <select id="ship-to" data-ship>
+            <option value="it" selected>{copy.checkout.italy(site.shippingItaly)}</option>
+            <option value="eu">{copy.checkout.europe(site.shippingEU)}</option>
+          </select>
+        </div>
+        <div class="recap" data-recap></div>
+      </section>
 
-      <div class="disclaimer">
-        <h3>{copy.checkout.shippingTitle}</h3>
-        <p>{copy.checkout.shippingBody}</p>
-      </div>
-
-      <label class="check checkout-check">
-        <input type="checkbox" data-disclaimer />
-        <span>{copy.checkout.readShipping}</span>
-      </label>
-      <label class="check checkout-check">
-        <input type="checkbox" data-privacy />
-        <span>
-          {copy.forms.privacyLead}<a href={pageUrl(locale, "privacy/")}>{copy.checkout.privacyLink}</a>{copy.forms.privacyTail}
-        </span>
-      </label>
-
-      <div class="field checkout-ship">
-        <label class="field-label" for="ship-to">{copy.checkout.shipTo}</label>
-        <select id="ship-to" data-ship>
-          <option value="it" selected>{copy.checkout.italy(site.shippingItaly)}</option>
-          <option value="eu">{copy.checkout.europe(site.shippingEU)}</option>
-        </select>
-      </div>
-
-      <div class="recap" data-recap></div>
+      <section class="checkout-step checkout-step--confirm">
+        <div class="disclaimer">
+          <h3>{copy.checkout.shippingTitle}</h3>
+          <p>{copy.checkout.shippingBody}</p>
+        </div>
+        <label class="check checkout-check">
+          <input type="checkbox" data-disclaimer />
+          <span>{copy.checkout.readShipping}</span>
+        </label>
+        <label class="check checkout-check">
+          <input type="checkbox" data-privacy />
+          <span>
+            {copy.forms.privacyLead}<a href={pageUrl(locale, "privacy/")}>{copy.checkout.privacyLink}</a>{copy.forms.privacyTail}
+          </span>
+        </label>
+      </section>
 
       {
         (site.paypalClientId || site.paypalEmail) && (
-          <div class="pay-box is-locked" data-pay-box>
-            {site.paypalClientId ? (
-              <div id="paypal-buttons"></div>
-            ) : (
-              <form data-paypal-form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-                <input type="hidden" name="cmd" value="_cart" />
-                <input type="hidden" name="upload" value="1" />
-                <input type="hidden" name="business" value={site.paypalEmail} />
-                <input type="hidden" name="currency_code" value="EUR" />
-                <input type="hidden" name="lc" value={paypalLc[locale]} />
-                <input type="hidden" name="charset" value="utf-8" />
-                <input type="hidden" name="no_shipping" value="2" />
-                <input type="hidden" name="rm" value="1" />
-                <input type="hidden" name="cbt" value={copy.checkout.paypalBack} />
-                <input type="hidden" name="return" data-paypal-return />
-                <input type="hidden" name="cancel_return" data-paypal-cancel />
-                <div data-paypal-items></div>
-                <button class="btn btn--full" type="submit" data-paypal-submit>
-                  {copy.checkout.paypal}
-                </button>
-              </form>
-            )}
-          </div>
+          <section class="checkout-step checkout-step--pay">
+            <p class="checkout-pay-note">{copy.checkout.paypalNote}</p>
+            <div class="pay-box is-locked" data-pay-box>
+              {site.paypalClientId ? (
+                <div id="paypal-buttons"></div>
+              ) : (
+                <form data-paypal-form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                  <input type="hidden" name="cmd" value="_cart" />
+                  <input type="hidden" name="upload" value="1" />
+                  <input type="hidden" name="business" value={site.paypalEmail} />
+                  <input type="hidden" name="currency_code" value="EUR" />
+                  <input type="hidden" name="lc" value={paypalLc[locale]} />
+                  <input type="hidden" name="charset" value="utf-8" />
+                  <input type="hidden" name="no_shipping" value="2" />
+                  <input type="hidden" name="rm" value="1" />
+                  <input type="hidden" name="cbt" value={copy.checkout.paypalBack} />
+                  <input type="hidden" name="return" data-paypal-return />
+                  <input type="hidden" name="cancel_return" data-paypal-cancel />
+                  <div data-paypal-items></div>
+                  <button class="btn btn--full" type="submit" data-paypal-submit>
+                    {copy.checkout.paypal}
+                  </button>
+                </form>
+              )}
+            </div>
+          </section>
         )
       }
 
-      <h2 class="checkout-bank-title">{copy.checkout.bank}</h2>
-      <p>{copy.checkout.bankNote}</p>
-      <form class="form is-locked" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
-        <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
-        <input type="hidden" name="_next" data-next-grazie="ordine" />
-        <input type="hidden" name="ordine" data-order-field />
-        <FormHoney />
-        <div>
-          <label for="o-name">{copy.checkout.name}</label>
-          <input id="o-name" name="nome" required />
-        </div>
-        <div>
-          <label for="o-email">{copy.checkout.email}</label>
-          <input id="o-email" type="email" name="email" required />
-        </div>
-        <div>
-          <label for="o-tel">{copy.checkout.phone}</label>
-          <input id="o-tel" name="telefono" required />
-        </div>
-        <div>
-          <label for="o-addr">{copy.checkout.address}</label>
-          <input id="o-addr" name="indirizzo" required />
-        </div>
-        <div>
-          <label for="o-cap">{copy.checkout.city}</label>
-          <input id="o-cap" name="citta" required />
-        </div>
-        <div>
-          <label for="o-note">{copy.checkout.notes}</label>
-          <textarea id="o-note" name="note"></textarea>
-        </div>
-        <PrivacyCheck id="o-privacy" />
-        <button class="btn" type="submit" data-bank-submit disabled>{copy.checkout.sendOrder}</button>
-      </form>
+      <section class="checkout-step checkout-step--bank">
+        <h2 class="checkout-bank-title">{copy.checkout.bank}</h2>
+        <p>{copy.checkout.bankNote}</p>
+        <form class="form is-locked" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
+          <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
+          <input type="hidden" name="_next" data-next-grazie="ordine" />
+          <input type="hidden" name="ordine" data-order-field />
+          <FormHoney />
+          <div>
+            <label for="o-name">{copy.checkout.name}</label>
+            <input id="o-name" name="nome" required />
+          </div>
+          <div>
+            <label for="o-email">{copy.checkout.email}</label>
+            <input id="o-email" type="email" name="email" required />
+          </div>
+          <div>
+            <label for="o-tel">{copy.checkout.phone}</label>
+            <input id="o-tel" name="telefono" required />
+          </div>
+          <div>
+            <label for="o-addr">{copy.checkout.address}</label>
+            <input id="o-addr" name="indirizzo" required />
+          </div>
+          <div>
+            <label for="o-cap">{copy.checkout.city}</label>
+            <input id="o-cap" name="citta" required />
+          </div>
+          <div>
+            <label for="o-note">{copy.checkout.notes}</label>
+            <textarea id="o-note" name="note"></textarea>
+          </div>
+          <PrivacyCheck id="o-privacy" />
+          <button class="btn" type="submit" data-bank-submit disabled>{copy.checkout.sendOrder}</button>
+        </form>
+      </section>
     </div>
   </div>
 
