@@ -3,9 +3,9 @@ title: Anubi
 artist: content/artists/angelini-taddei.md
 price: 38
 status: available
-nuovo: false
+nuovo: true
 createdAt: 2017-05-14T00:00:00.000Z
-color: "#141414"
+color: '#141414'
 colorName: Nero
 sizes:
   - S
@@ -14,13 +14,9 @@ sizes:
   - XL
 images:
   - /uploads/prints/corpo.jpg
-seoDescription:
-  it: Anubi di Angelini & Taddei — maglia serigrafata a un colore, cotone, stampata a mano a Bergamo da Corpoceleste.
-  en: Anubi by Angelini & Taddei — one-colour screen-printed cotton shirt, hand-printed in Bergamo by Corpoceleste.
-  de: Anubi von Angelini & Taddei — einfarbig siebgedrucktes Baumwollshirt, handgedruckt in Bergamo von Corpoceleste.
 description:
   it: |-
-    Disegno di Angelini & Taddei. Serigrafia a un colore su maglia di cotone, stampata a mano nello studio Corpoceleste a Bergamo.
+    PROVA CONFIG Disegno di Angelini & Taddei. Serigrafia a un colore su maglia di cotone, stampata a mano nello studio Corpoceleste a Bergamo.
 
     Non è print-on-demand: quando il telaio è in macchina, stampo. Taglie S–XL.
   en: |-
@@ -31,4 +27,9 @@ description:
     Zeichnung von Angelini & Taddei. Einfarbiger Siebdruck auf einem Baumwollshirt, handgedruckt im Corpoceleste-Atelier in Bergamo.
 
     Kein Print-on-Demand: wenn der Rahmen auf der Maschine ist, drucke ich. Größen S–XL.
+seoDescription:
+  it: 'Anubi di Angelini & Taddei — maglia serigrafata a un colore, cotone, stampata a mano a Bergamo da Corpoceleste.'
+  en: 'Anubi by Angelini & Taddei — one-colour screen-printed cotton shirt, hand-printed in Bergamo by Corpoceleste.'
+  de: 'Anubi von Angelini & Taddei — einfarbig siebgedrucktes Baumwollshirt, handgedruckt in Bergamo von Corpoceleste.'
 ---
+
