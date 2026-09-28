@@ -30,13 +30,17 @@ const it = {
   shop: {
     soldOut: "Esaurite",
     soldBadge: "Esaurito",
+    preorderBadge: "Pre-order",
   },
   product: {
     size: "Taglia",
     add: "Aggiungi al carrello",
     sold: "Esaurita.",
+    preorder: "Pre-order. Spedizione quando la stampa è pronta.",
     reprint: "Richiedi ristampa",
     printOne: "Serigrafia, un colore",
+    galleryPrev: "Foto precedente",
+    galleryNext: "Foto successiva",
     shipLine: (itPrice: number, euPrice: number) =>
       `Spedizione Italia ${itPrice} €, Europa ${euPrice} €`,
     colors: {
@@ -271,13 +275,17 @@ const en: typeof it = {
   shop: {
     soldOut: "Sold out",
     soldBadge: "Sold out",
+    preorderBadge: "Pre-order",
   },
   product: {
     size: "Size",
     add: "Add to cart",
     sold: "Sold out.",
+    preorder: "Pre-order. Ships when the print is ready.",
     reprint: "Request a reprint",
     printOne: "Screen print, one colour",
+    galleryPrev: "Previous photo",
+    galleryNext: "Next photo",
     shipLine: (itPrice: number, euPrice: number) =>
       `Shipping Italy ${itPrice} €, Europe ${euPrice} €`,
     colors: {
@@ -512,13 +520,17 @@ const de: typeof it = {
   shop: {
     soldOut: "Ausverkauft",
     soldBadge: "Ausverkauft",
+    preorderBadge: "Pre-order",
   },
   product: {
     size: "Größe",
     add: "In den Warenkorb",
     sold: "Ausverkauft.",
+    preorder: "Pre-order. Versand, sobald der Druck fertig ist.",
     reprint: "Nachdruck anfragen",
     printOne: "Siebdruck, eine Farbe",
+    galleryPrev: "Vorheriges Foto",
+    galleryNext: "Nächstes Foto",
     shipLine: (itPrice: number, euPrice: number) =>
       `Versand Italien ${itPrice} €, Europa ${euPrice} €`,
     colors: {

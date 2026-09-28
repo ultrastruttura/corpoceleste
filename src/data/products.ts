@@ -2,7 +2,7 @@ import matter from "gray-matter";
 import { artistName, artists } from "./artists";
 import type { Locale } from "../i18n/locales";
 
-export type ProductStatus = "available" | "soldout";
+export type ProductStatus = "available" | "preorder" | "soldout";
 
 export type Localized = { it: string; en: string; de: string };
 
@@ -45,6 +45,16 @@ function artistIdFromRef(ref: unknown): string {
   return match?.[1] ?? s;
 }
 
+function parseStatus(raw: unknown): ProductStatus {
+  if (raw === "soldout") return "soldout";
+  if (raw === "preorder") return "preorder";
+  return "available";
+}
+
+export function isPurchasable(status: ProductStatus) {
+  return status === "available" || status === "preorder";
+}
+
 const files = import.meta.glob("../../content/products/*.md", {
   eager: true,
   query: "?raw",
@@ -73,7 +83,7 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     price: Number(data.price ?? 0),
     nuovo: Boolean(data.nuovo),
     createdAt: created || "2017-01-01",
-    status: data.status === "soldout" ? "soldout" : "available",
+    status: parseStatus(data.status),
     color: String(data.color ?? "#141414"),
     colorName: String(data.colorName ?? "Nero"),
     images,
@@ -95,7 +105,7 @@ export function productsByArtist(artistId: string) {
 export { artistName, artists };
 
 export function availableProducts() {
-  return products.filter((p) => p.status === "available");
+  return products.filter((p) => isPurchasable(p.status));
 }
 
 export function soldOutProducts() {

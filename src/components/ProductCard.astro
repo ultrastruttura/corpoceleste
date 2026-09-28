@@ -10,13 +10,14 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const artist = artistName(product.artistId);
 const sold = product.status === "soldout";
+const preorder = product.status === "preorder";
 const hasTitle = artist !== product.title;
 const alt = hasTitle ? `${artist}, ${product.title}` : artist;
 const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
 ---
 
 <a
-  class:list={["card", sold && "is-sold"]}
+  class:list={["card", sold && "is-sold", preorder && "is-preorder"]}
   href={pageUrl(locale, `prodotto/${product.slug}/`)}
   data-product
   data-nuovo={product.nuovo ? "1" : "0"}
@@ -24,6 +25,7 @@ const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
 >
   <div class="card-frame">
     {sold && <span class="badge">{copy.shop.soldBadge}</span>}
+    {preorder && <span class="badge badge--quiet">{copy.shop.preorderBadge}</span>}
     {
       cover && (
         <picture>

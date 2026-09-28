@@ -4,7 +4,7 @@ export type CatalogProduct = {
   artistName: string;
   sizes: string[];
   price: number;
-  status: "available" | "soldout";
+  status: "available" | "preorder" | "soldout";
   print: string;
 };
 

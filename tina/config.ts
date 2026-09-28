@@ -86,6 +86,7 @@ export default defineConfig({
             required: true,
             options: [
               { value: "available", label: "Disponibile" },
+              { value: "preorder", label: "Pre-order" },
               { value: "soldout", label: "Esaurita" },
             ],
           },
@@ -112,7 +113,7 @@ export default defineConfig({
           {
             type: "image",
             name: "images",
-            label: "Foto (2–3)",
+            label: "Foto (fino a 4)",
             list: true,
             required: true,
           },

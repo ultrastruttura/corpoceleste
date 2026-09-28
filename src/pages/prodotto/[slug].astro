@@ -12,7 +12,7 @@ import {
 } from "../../data/products";
 import { artistById } from "../../data/artists";
 import { site } from "../../data/site";
-import { mediaUrl, largeImageUrls } from "../../lib/paths";
+import { cardImageUrls, largeImageUrls } from "../../lib/paths";
 import { absoluteUrl, metaSnippet } from "../../lib/seo";
 import { currentLocale, pageAbs, pageUrl, t } from "../../i18n";
 
@@ -29,6 +29,7 @@ if (!product) return Astro.redirect(pageUrl(locale));
 const artist = artistName(product.artistId);
 const artistSlug = artistById(product.artistId)?.slug ?? "corpoceleste";
 const sold = product.status === "soldout";
+const preorder = product.status === "preorder";
 const alt = artist !== product.title ? `${artist}, ${product.title}` : product.title;
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const defaultSize = sizes.includes("M") ? "M" : sizes[0];
@@ -38,14 +39,21 @@ const seoDescription = metaSnippet(productSeoDescription(product, locale) || cop
 const imageSet = product.images.map((src) => ({
   raw: src,
   ...largeImageUrls(src),
-  thumb: mediaUrl(src),
+  thumb: cardImageUrls(src),
 }));
 const cover = imageSet[0];
+const multi = imageSet.length > 1;
 const pageTitle = `${product.title} — Corpoceleste`;
 const productUrl = pageAbs(locale, `prodotto/${product.slug}/`);
 const absImages = product.images
   .map((src) => absoluteUrl(largeImageUrls(src).jpg, Astro.site))
   .filter(Boolean);
+
+const availability = sold
+  ? "https://schema.org/OutOfStock"
+  : preorder
+    ? "https://schema.org/PreOrder"
+    : "https://schema.org/InStock";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -71,9 +79,7 @@ const jsonLd = {
     url: productUrl,
     priceCurrency: "EUR",
     price: String(product.price),
-    availability: sold
-      ? "https://schema.org/OutOfStock"
-      : "https://schema.org/InStock",
+    availability,
     itemCondition: "https://schema.org/NewCondition",
   },
 };
@@ -89,36 +95,71 @@ const jsonLd = {
   preloadImageType="image/webp"
 >
   <div class="wrap product-layout">
-    <div class="product-stage">
+    <div class="product-stage" data-gallery={multi ? "" : undefined}>
       {
         cover && (
-          <picture>
-            <source type="image/webp" srcset={cover.webp} data-product-main-webp />
-            <img
-              src={cover.jpg}
-              alt={alt}
-              width="1200"
-              height="1200"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              data-product-main
-            />
-          </picture>
+          <div class="product-stage-frame" data-gallery-frame>
+            <picture>
+              <source type="image/webp" srcset={cover.webp} data-product-main-webp />
+              <img
+                src={cover.jpg}
+                alt={alt}
+                width="1200"
+                height="1200"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                data-product-main
+                draggable="false"
+              />
+            </picture>
+            {
+              multi && (
+                <>
+                  <button
+                    type="button"
+                    class="gallery-hit gallery-hit--prev"
+                    data-gallery-prev
+                    aria-label={copy.product.galleryPrev}
+                  ></button>
+                  <button
+                    type="button"
+                    class="gallery-hit gallery-hit--next"
+                    data-gallery-next
+                    aria-label={copy.product.galleryNext}
+                  ></button>
+                  <p class="gallery-index" data-gallery-index aria-live="polite">
+                    1 / {imageSet.length}
+                  </p>
+                </>
+              )
+            }
+          </div>
         )
       }
       {
-        imageSet.length > 1 && (
-          <div class="product-thumbs" role="list">
+        multi && (
+          <div class="product-thumbs" role="tablist" aria-label={product.title}>
             {imageSet.map((img, i) => (
               <button
                 type="button"
+                role="tab"
                 class:list={["product-thumb", i === 0 && "is-active"]}
-                data-product-thumb={img.jpg}
-                data-product-thumb-webp={img.webp}
+                data-product-thumb
+                data-index={i}
+                data-jpg={img.jpg}
+                data-webp={img.webp}
+                aria-selected={i === 0 ? "true" : "false"}
                 aria-label={`${product.title} ${i + 1}`}
               >
-                <img src={img.jpg} alt="" width="160" height="160" loading="lazy" decoding="async" />
+                <img
+                  src={img.thumb.jpg}
+                  alt=""
+                  width="160"
+                  height="160"
+                  loading="lazy"
+                  decoding="async"
+                />
               </button>
             ))}
           </div>
@@ -135,6 +176,7 @@ const jsonLd = {
       }
       <h1>{product.title}</h1>
       <div class="price">{formatPrice(product.price)}</div>
+      {preorder && <p class="product-status">{copy.product.preorder}</p>}
 
       <div class="product-buy">
         {
@@ -200,18 +242,78 @@ const jsonLd = {
   </div>
 
   <script>
+    const root = document.querySelector<HTMLElement>("[data-gallery]");
     const main = document.querySelector<HTMLImageElement>("[data-product-main]");
     const mainWebp = document.querySelector<HTMLSourceElement>("[data-product-main-webp]");
-    document.querySelectorAll<HTMLButtonElement>("[data-product-thumb]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const src = btn.dataset.productThumb;
-        const webp = btn.dataset.productThumbWebp;
-        if (!main || !src) return;
-        main.src = src;
+    const indexEl = document.querySelector<HTMLElement>("[data-gallery-index]");
+    const thumbs = [...document.querySelectorAll<HTMLButtonElement>("[data-product-thumb]")];
+    if (!main || thumbs.length < 2) {
+      /* single image: nothing to wire */
+    } else {
+      let i = 0;
+      const total = thumbs.length;
+
+      const show = (next: number) => {
+        i = ((next % total) + total) % total;
+        const btn = thumbs[i];
+        const jpg = btn.dataset.jpg;
+        const webp = btn.dataset.webp;
+        if (!jpg) return;
+        main.src = jpg;
         if (mainWebp && webp) mainWebp.srcset = webp;
-        document.querySelectorAll("[data-product-thumb]").forEach((b) => b.classList.remove("is-active"));
-        btn.classList.add("is-active");
+        thumbs.forEach((t, n) => {
+          const on = n === i;
+          t.classList.toggle("is-active", on);
+          t.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        if (indexEl) indexEl.textContent = `${i + 1} / ${total}`;
+      };
+
+      thumbs.forEach((btn) => {
+        btn.addEventListener("click", () => show(Number(btn.dataset.index) || 0));
       });
-    });
+
+      document.querySelector("[data-gallery-prev]")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        show(i - 1);
+      });
+      document.querySelector("[data-gallery-next]")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        show(i + 1);
+      });
+
+      const frame = document.querySelector<HTMLElement>("[data-gallery-frame]");
+      let x0: number | null = null;
+      frame?.addEventListener(
+        "touchstart",
+        (e) => {
+          x0 = e.changedTouches[0]?.clientX ?? null;
+        },
+        { passive: true, capture: true },
+      );
+      frame?.addEventListener(
+        "touchend",
+        (e) => {
+          if (x0 == null) return;
+          const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
+          x0 = null;
+          if (Math.abs(dx) < 40) return;
+          show(i + (dx < 0 ? 1 : -1));
+        },
+        { passive: true, capture: true },
+      );
+
+      root?.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          show(i - 1);
+        }
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          show(i + 1);
+        }
+      });
+      if (root && !root.hasAttribute("tabindex")) root.tabIndex = 0;
+    }
   </script>
 </Base>

@@ -1,5 +1,9 @@
 import { catalogProduct } from "./catalog";
 
+function canBuy(status: string | undefined) {
+  return status === "available" || status === "preorder";
+}
+
 const KEY = "corpoceleste-cart";
 export const LAST_ORDER_KEY = "cc-last-order";
 
@@ -40,7 +44,7 @@ export function sanitizeCart() {
 
   for (const item of raw) {
     const p = catalogProduct(item.id);
-    if (!p || p.status !== "available") continue;
+    if (!p || !canBuy(p.status)) continue;
     const size = p.sizes.includes(item.size) ? item.size : p.sizes[0];
     if (!size) continue;
     const qty = Math.max(1, Math.min(99, Math.floor(Number(item.qty) || 1)));
@@ -82,7 +86,7 @@ export function total() {
 
 export function addItem(item: Omit<CartItem, "qty" | "price" | "title"> & { qty?: number; price?: number; title?: string }) {
   const p = catalogProduct(item.id);
-  if (!p || p.status !== "available") return false;
+  if (!p || !canBuy(p.status)) return false;
   const size = p.sizes.includes(item.size) ? item.size : p.sizes[0];
   if (!size) return false;
 

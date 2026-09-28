@@ -21,7 +21,7 @@ function bind() {
       const fd = new FormData(form);
       const id = String(fd.get("id") || "");
       const p = catalogProduct(id);
-      if (!p || p.status !== "available") return;
+      if (!p || (p.status !== "available" && p.status !== "preorder")) return;
       const ok = addItem({
         id,
         slug: String(fd.get("slug") || id),
