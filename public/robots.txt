@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ultrastruttura.github.io/corpoceleste/sitemap-index.xml

@@ -2,7 +2,12 @@ import type { Locale } from "./locales";
 
 const it = {
   meta: {
-    description: "Maglie serigrafate. Studio a Bergamo.",
+    description:
+      "Maglie serigrafate a un colore, stampate a mano a Bergamo. Edizioni d’artista, cotone, spedizione in Italia e in Europa.",
+  },
+  home: {
+    title: "Maglie serigrafate",
+    lede: "Edizioni d’artista stampate a mano nello studio di Bergamo. Un colore, cotone, non print-on-demand.",
   },
   nav: {
     main: "Principale",
@@ -234,7 +239,12 @@ const it = {
 
 const en: typeof it = {
   meta: {
-    description: "Screen-printed shirts. Studio in Bergamo.",
+    description:
+      "One-colour screen-printed shirts, hand-printed in Bergamo. Artist editions on cotton. Shipping in Italy and across Europe.",
+  },
+  home: {
+    title: "Screen-printed shirts",
+    lede: "Artist editions hand-printed in the Bergamo studio. One colour, cotton — not print-on-demand.",
   },
   nav: {
     main: "Main",
@@ -466,7 +476,12 @@ const en: typeof it = {
 
 const de: typeof it = {
   meta: {
-    description: "Siebgedruckte Shirts. Atelier in Bergamo.",
+    description:
+      "Einfarbig siebgedruckte Shirts, handgedruckt in Bergamo. Künstlereditionen auf Baumwolle. Versand in Italien und Europa.",
+  },
+  home: {
+    title: "Siebgedruckte Shirts",
+    lede: "Künstlereditionen, handgedruckt im Atelier in Bergamo. Eine Farbe, Baumwolle — kein Print-on-Demand.",
   },
   nav: {
     main: "Hauptnavigation",

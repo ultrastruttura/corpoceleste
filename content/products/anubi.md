@@ -14,8 +14,21 @@ sizes:
   - XL
 images:
   - /uploads/prints/corpo.jpg
+seoDescription:
+  it: Anubi di Angelini & Taddei — maglia serigrafata a un colore, cotone, stampata a mano a Bergamo da Corpoceleste.
+  en: Anubi by Angelini & Taddei — one-colour screen-printed cotton shirt, hand-printed in Bergamo by Corpoceleste.
+  de: Anubi von Angelini & Taddei — einfarbig siebgedrucktes Baumwollshirt, handgedruckt in Bergamo von Corpoceleste.
 description:
-  it: ""
-  en: ""
-  de: ""
+  it: |-
+    Disegno di Angelini & Taddei. Serigrafia a un colore su maglia di cotone, stampata a mano nello studio Corpoceleste a Bergamo.
+
+    Non è print-on-demand: quando il telaio è in macchina, stampo. Taglie S–XL.
+  en: |-
+    A drawing by Angelini & Taddei. One-colour screen print on a cotton shirt, hand-printed in the Corpoceleste studio in Bergamo.
+
+    Not print-on-demand: when the screen is on the press, I print. Sizes S–XL.
+  de: |-
+    Zeichnung von Angelini & Taddei. Einfarbiger Siebdruck auf einem Baumwollshirt, handgedruckt im Corpoceleste-Atelier in Bergamo.
+
+    Kein Print-on-Demand: wenn der Rahmen auf der Maschine ist, drucke ich. Größen S–XL.
 ---

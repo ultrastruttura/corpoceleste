@@ -14,8 +14,21 @@ sizes:
   - XL
 images:
   - /uploads/prints/notturno.jpg
+seoDescription:
+  it: Mamuthones e Issohadores di 108 — maglia serigrafata Corpoceleste (esaurita; puoi chiedere ristampa).
+  en: Mamuthones e Issohadores by 108 — Corpoceleste screen-printed shirt (sold out; reprint request available).
+  de: Mamuthones e Issohadores von 108 — Corpoceleste-Siebdruckshirt (ausverkauft; Nachdruck anfragbar).
 description:
-  it: ""
-  en: ""
-  de: ""
+  it: |-
+    Disegno di 108. Serigrafia a un colore su maglia di cotone, stampata a mano a Bergamo.
+
+    Edizione esaurita: puoi lasciare l’email per una eventuale ristampa. Taglie S–XL.
+  en: |-
+    A drawing by 108. One-colour screen print on a cotton shirt, hand-printed in Bergamo.
+
+    Sold out: leave your email if you want a possible reprint. Sizes S–XL.
+  de: |-
+    Zeichnung von 108. Einfarbiger Siebdruck auf einem Baumwollshirt, handgedruckt in Bergamo.
+
+    Ausverkauft: E-Mail hinterlassen für einen möglichen Nachdruck. Größen S–XL.
 ---

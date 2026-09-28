@@ -6,9 +6,10 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 
 | Sezione | Azioni |
 |---------|--------|
-| **Maglie** | Aggiungere / togliere prodotti, prezzo, stato, taglie, **2–3 foto**, descrizione IT/EN/DE |
-| **Artisti** | Aggiungere / togliere artisti, bio |
+| **Maglie** | Aggiungere / togliere prodotti, prezzo, stato, taglie, **2–3 foto**, descrizione IT/EN/DE, **meta SEO** |
+| **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO** |
 | **News** | Aggiungere / togliere / modificare articoli |
+| **SEO e home** | Meta description, H1 home, immagine Open Graph, **bio Andrea** |
 
 Le foto vanno caricate dal pannello (finiscono in `public/uploads/`).
 

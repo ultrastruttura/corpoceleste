@@ -2,14 +2,19 @@
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { site } from "../data/site";
+import { localizedSetting, siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
+import { metaSnippet } from "../lib/seo";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
+const andreaName = siteSettings.andreaName;
+const andreaBio = localizedSetting("andreaBio", locale);
+const description = metaSnippet(andreaBio || copy.meta.description);
 ---
 
-<Base title={`${copy.consulting.title} — Corpoceleste`}>
+<Base title={`${copy.consulting.title} — Corpoceleste`} description={description} image="images/photos/andrea.jpg">
   <div class="wrap">
     <header class="page-hero">
       <h1>{copy.consulting.title}</h1>
@@ -17,7 +22,25 @@ const copy = t(locale);
 
     <div class="split">
       <div class="prose">
-        <img class="page-photo" src={asset("images/photos/andrea.jpg")} alt="Andrea Baldelli" width="1080" height="1350" loading="lazy" decoding="async" />
+        <img
+          class="page-photo"
+          src={asset("images/photos/andrea.jpg")}
+          alt={andreaName}
+          width="1080"
+          height="1350"
+          loading="lazy"
+          decoding="async"
+        />
+        {
+          andreaBio && (
+            <>
+              <h2>{andreaName}</h2>
+              {andreaBio.split(/\n\n+/).map((para) => (
+                <p>{para}</p>
+              ))}
+            </>
+          )
+        }
         <h2>{copy.consulting.print}</h2>
         <p>{copy.consulting.printBody}</p>
         <p>{copy.consulting.printCv}</p>

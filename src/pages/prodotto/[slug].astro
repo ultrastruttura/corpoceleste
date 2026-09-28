@@ -1,11 +1,19 @@
 ---
 import Base from "../../layouts/Base.astro";
 import PrivacyCheck from "../../components/PrivacyCheck.astro";
-import { productBySlug, formatPrice, artistName, products, productDescription } from "../../data/products";
+import {
+  productBySlug,
+  formatPrice,
+  artistName,
+  products,
+  productDescription,
+  productSeoDescription,
+} from "../../data/products";
 import { artistById } from "../../data/artists";
 import { site } from "../../data/site";
 import { mediaUrl } from "../../lib/paths";
-import { currentLocale, pageUrl, t } from "../../i18n";
+import { absoluteUrl, metaSnippet } from "../../lib/seo";
+import { currentLocale, pageAbs, pageUrl, t } from "../../i18n";
 
 export function getStaticPaths() {
   return products.map((p) => ({ params: { slug: p.slug } }));
@@ -25,11 +33,54 @@ const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const defaultSize = sizes.includes("M") ? "M" : sizes[0];
 const color = copy.product.colors[product.colorName] ?? product.colorName;
 const description = productDescription(product, locale);
+const seoDescription = metaSnippet(productSeoDescription(product, locale) || copy.meta.description);
 const images = product.images.map(mediaUrl).filter(Boolean);
 const cover = images[0] ?? "";
+const pageTitle = `${product.title} — Corpoceleste`;
+const productUrl = pageAbs(locale, `prodotto/${product.slug}/`);
+const absImages = product.images
+  .map((src) => absoluteUrl(src, Astro.site))
+  .filter(Boolean);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: product.title,
+  description: seoDescription,
+  image: absImages,
+  sku: product.id,
+  brand: {
+    "@type": "Brand",
+    name: "Corpoceleste",
+  },
+  ...(artist && artist !== product.title
+    ? {
+        creator: {
+          "@type": "Person",
+          name: artist,
+        },
+      }
+    : {}),
+  offers: {
+    "@type": "Offer",
+    url: productUrl,
+    priceCurrency: "EUR",
+    price: String(product.price),
+    availability: sold
+      ? "https://schema.org/OutOfStock"
+      : "https://schema.org/InStock",
+    itemCondition: "https://schema.org/NewCondition",
+  },
+};
 ---
 
-<Base title={`${product.title} — Corpoceleste`}>
+<Base
+  title={pageTitle}
+  description={seoDescription}
+  image={product.print || cover}
+  type="product"
+  jsonLd={jsonLd}
+>
   <div class="wrap product-layout">
     <div class="product-stage">
       {
@@ -73,7 +124,10 @@ const cover = images[0] ?? "";
       }
       <h1>{product.title}</h1>
       <div class="price">{formatPrice(product.price)}</div>
-      {description && <p>{description}</p>}
+      {
+        description &&
+          description.split(/\n\n+/).map((para) => <p>{para}</p>)
+      }
 
       {
         sold ? (

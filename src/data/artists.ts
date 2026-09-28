@@ -8,6 +8,7 @@ export type Artist = {
   slug: string;
   name: string;
   bio: Localized;
+  seoDescription: Localized;
   instagram?: string;
 };
 
@@ -40,6 +41,7 @@ export const artists: Artist[] = Object.entries(files)
       slug,
       name: String(data.name ?? slug),
       bio: asLocalized(data.bio),
+      seoDescription: asLocalized(data.seoDescription),
       instagram: data.instagram ? String(data.instagram) : undefined,
     };
   })
@@ -59,4 +61,8 @@ export function artistName(id: string) {
 
 export function artistBio(artist: Artist, locale: Locale) {
   return artist.bio[locale] || artist.bio.it || "";
+}
+
+export function artistSeoDescription(artist: Artist, locale: Locale) {
+  return artist.seoDescription[locale] || artist.seoDescription.it || artistBio(artist, locale);
 }

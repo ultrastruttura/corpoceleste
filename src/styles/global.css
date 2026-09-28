@@ -1149,6 +1149,14 @@ body.cart-open {
   padding-top: 28px;
 }
 
+.shop-home-hero {
+  margin-bottom: 28px;
+}
+
+.shop-home-hero .lede {
+  max-width: 36rem;
+}
+
 .page-photo {
   width: min(100%, 420px);
   height: auto;

@@ -7,6 +7,32 @@ const branch =
   process.env.VERCEL_GIT_COMMIT_REF ||
   "main";
 
+const localizedText = (name: string, label: string, textarea = true) => ({
+  type: "object" as const,
+  name,
+  label,
+  fields: [
+    {
+      type: "string" as const,
+      name: "it",
+      label: "Italiano",
+      ...(textarea ? { ui: { component: "textarea" as const } } : {}),
+    },
+    {
+      type: "string" as const,
+      name: "en",
+      label: "English",
+      ...(textarea ? { ui: { component: "textarea" as const } } : {}),
+    },
+    {
+      type: "string" as const,
+      name: "de",
+      label: "Deutsch",
+      ...(textarea ? { ui: { component: "textarea" as const } } : {}),
+    },
+  ],
+});
+
 export default defineConfig({
   branch,
   clientId: process.env.TINA_CLIENT_ID || null,
@@ -89,16 +115,8 @@ export default defineConfig({
             list: true,
             required: true,
           },
-          {
-            type: "object",
-            name: "description",
-            label: "Descrizione",
-            fields: [
-              { type: "string", name: "it", label: "Italiano", ui: { component: "textarea" } },
-              { type: "string", name: "en", label: "English", ui: { component: "textarea" } },
-              { type: "string", name: "de", label: "Deutsch", ui: { component: "textarea" } },
-            ],
-          },
+          localizedText("description", "Descrizione (pagina prodotto)"),
+          localizedText("seoDescription", "Meta SEO (max ~160 caratteri)"),
         ],
       },
       {
@@ -120,16 +138,8 @@ export default defineConfig({
         },
         fields: [
           { type: "string", name: "name", label: "Nome", isTitle: true, required: true },
-          {
-            type: "object",
-            name: "bio",
-            label: "Bio",
-            fields: [
-              { type: "string", name: "it", label: "Italiano", ui: { component: "textarea" } },
-              { type: "string", name: "en", label: "English", ui: { component: "textarea" } },
-              { type: "string", name: "de", label: "Deutsch", ui: { component: "textarea" } },
-            ],
-          },
+          localizedText("bio", "Bio"),
+          localizedText("seoDescription", "Meta SEO (max ~160 caratteri)"),
           { type: "string", name: "instagram", label: "Instagram (URL)" },
         ],
       },
@@ -161,6 +171,31 @@ export default defineConfig({
           { type: "string", name: "body_it", label: "Testo (IT)", ui: { component: "textarea" }, required: true },
           { type: "string", name: "body_en", label: "Body (EN)", ui: { component: "textarea" }, required: true },
           { type: "string", name: "body_de", label: "Text (DE)", ui: { component: "textarea" }, required: true },
+        ],
+      },
+      {
+        name: "settings",
+        label: "SEO e home",
+        path: "content/settings",
+        format: "md",
+        ui: {
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
+        fields: [
+          { type: "string", name: "title", label: "Titolo interno", isTitle: true },
+          localizedText("metaDescription", "Meta description sito (home e fallback)"),
+          localizedText("homeTitle", "H1 home", false),
+          localizedText("homeLede", "Sottotitolo home"),
+          {
+            type: "image",
+            name: "ogImage",
+            label: "Immagine Open Graph (condivisione social)",
+          },
+          { type: "string", name: "andreaName", label: "Nome (bio studio)" },
+          localizedText("andreaBio", "Bio Andrea"),
         ],
       },
     ],

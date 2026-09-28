@@ -22,6 +22,7 @@ export type Product = {
   print: string;
   sizes: string[];
   description: Localized;
+  seoDescription: Localized;
 };
 
 function emptyLocalized(): Localized {
@@ -79,6 +80,7 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     print: images[0] ?? "",
     sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],
     description: asLocalized(data.description),
+    seoDescription: asLocalized(data.seoDescription),
   };
 });
 
@@ -106,4 +108,12 @@ export function formatPrice(n: number) {
 
 export function productDescription(product: Product, locale: Locale) {
   return product.description[locale] || product.description.it || "";
+}
+
+export function productSeoDescription(product: Product, locale: Locale) {
+  return (
+    product.seoDescription[locale] ||
+    product.seoDescription.it ||
+    productDescription(product, locale)
+  );
 }

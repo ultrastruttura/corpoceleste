@@ -2,21 +2,35 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { asset } from "../lib/paths";
+import { absoluteUrl } from "../lib/seo";
 import { products, artistName } from "../data/products";
+import { localizedSetting, siteSettings } from "../data/settings";
 import { currentLocale, innerPath, localePrefix, locales, pageAbs, pageUrl, t } from "../i18n";
 import "../styles/global.css";
 
 type Props = {
   title: string;
   description?: string;
+  image?: string;
+  type?: "website" | "product";
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 };
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
-const { title, description = copy.meta.description } = Astro.props;
+const defaultDescription =
+  localizedSetting("metaDescription", locale) || copy.meta.description;
+const {
+  title,
+  description = defaultDescription,
+  image = siteSettings.ogImage,
+  type = "website",
+  jsonLd,
+} = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const rest = innerPath(Astro.url.pathname);
 const prefix = localePrefix(locale);
+const ogImage = absoluteUrl(image || siteSettings.ogImage || "brand/favicon.png", Astro.site);
 const catalog = {
   products: products.map((p) => ({
     id: p.id,
@@ -25,6 +39,7 @@ const catalog = {
     sizes: p.sizes,
   })),
 };
+const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
@@ -37,7 +52,23 @@ const catalog = {
     <link rel="canonical" href={canonical.href} />
     {locales.map((code) => <link rel="alternate" hreflang={code} href={pageAbs(code, rest)} />)}
     <link rel="alternate" hreflang="x-default" href={pageAbs("it", rest)} />
+    <meta property="og:type" content={type === "product" ? "product" : "website"} />
+    <meta property="og:site_name" content="Corpoceleste" />
+    <meta property="og:locale" content={locale === "it" ? "it_IT" : locale === "de" ? "de_DE" : "en_GB"} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
     <link rel="icon" href={asset("brand/favicon.png")} type="image/png" />
+    {
+      jsonLdBlocks.map((block) => (
+        <script type="application/ld+json" set:html={JSON.stringify(block)} />
+      ))
+    }
   </head>
   <body>
     <Header />

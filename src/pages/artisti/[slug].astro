@@ -1,8 +1,9 @@
 ---
 import Base from "../../layouts/Base.astro";
 import ProductGrid from "../../components/ProductGrid.astro";
-import { artists, artistBySlug, artistBio } from "../../data/artists";
+import { artists, artistBySlug, artistBio, artistSeoDescription } from "../../data/artists";
 import { productsByArtist } from "../../data/products";
+import { metaSnippet } from "../../lib/seo";
 import { currentLocale, pageUrl, t } from "../../i18n";
 
 export function getStaticPaths() {
@@ -15,14 +16,19 @@ const artist = artistBySlug(Astro.params.slug!);
 if (!artist) return Astro.redirect(pageUrl(locale, "artisti/"));
 const works = productsByArtist(artist.id);
 const bio = artistBio(artist, locale);
+const description = metaSnippet(artistSeoDescription(artist, locale) || bio || copy.meta.description);
+const cover = works[0]?.print;
 ---
 
-<Base title={`${artist.name} — Corpoceleste`} description={bio || undefined}>
+<Base title={`${artist.name} — Corpoceleste`} description={description} image={cover}>
   <div class="wrap">
     <header class="page-hero">
       <p class="card-artist"><a href={pageUrl(locale, "artisti/")}>{copy.artists.title}</a></p>
       <h1>{artist.name}</h1>
-      {bio && <p class="lede">{bio}</p>}
+      {
+        bio &&
+          bio.split(/\n\n+/).map((para) => <p class="lede">{para}</p>)
+      }
     </header>
     <ProductGrid products={works} />
   </div>

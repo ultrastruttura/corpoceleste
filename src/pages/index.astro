@@ -2,7 +2,9 @@
 import Base from "../layouts/Base.astro";
 import ProductGrid from "../components/ProductGrid.astro";
 import { availableProducts, soldOutProducts } from "../data/products";
+import { localizedSetting, siteSettings } from "../data/settings";
 import { shuffle } from "../lib/shuffle";
+import { metaSnippet } from "../lib/seo";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
@@ -13,10 +15,25 @@ const listed = [
   ...shuffle(available.filter((p) => !p.nuovo)),
 ];
 const sold = soldOutProducts();
+const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
+const homeLede = localizedSetting("homeLede", locale) || copy.home.lede;
+const description = metaSnippet(
+  localizedSetting("metaDescription", locale) || copy.meta.description,
+);
 ---
 
-<Base title="Corpoceleste">
+<Base
+  title={`Corpoceleste — ${homeTitle}`}
+  description={description}
+  image={siteSettings.ogImage}
+>
   <div class="wrap shop-home">
+    <header class="page-hero shop-home-hero">
+      <p class="card-artist">Corpoceleste</p>
+      <h1>{homeTitle}</h1>
+      {homeLede && <p class="lede">{homeLede}</p>}
+    </header>
+
     <ProductGrid products={listed} eager={3} />
 
     {
