@@ -614,12 +614,6 @@ body.cart-open {
   margin-bottom: 8px;
 }
 
-.checkout-pay-note {
-  margin: 0 0 16px;
-  font-size: 15px;
-  color: var(--muted);
-}
-
 .checkout-bank-title {
   margin: 0 0 16px;
   font-size: 18px;

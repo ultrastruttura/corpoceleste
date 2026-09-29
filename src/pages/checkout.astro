@@ -51,7 +51,6 @@ const shopEmail = siteSettings.shopEmail;
       {
         (site.paypalClientId || site.paypalEmail) && (
           <section class="checkout-step checkout-step--pay">
-            <p class="checkout-pay-note">{copy.checkout.paypalNote}</p>
             <div class="pay-box is-locked" data-pay-box>
               {site.paypalClientId ? (
                 <div id="paypal-buttons"></div>

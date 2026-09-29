@@ -66,8 +66,6 @@ const it = {
   checkout: {
     title: "Checkout",
     empty: "Il carrello è vuoto.",
-    paypalNote:
-      "Pagamento PayPal. Controlla l’importo su PayPal prima di confermare. L’indirizzo di spedizione lo chiedono loro.",
     shippingTitle: "Spedizioni",
     shippingBody:
       "Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.",
@@ -313,8 +311,6 @@ const en: typeof it = {
   checkout: {
     title: "Checkout",
     empty: "Your cart is empty.",
-    paypalNote:
-      "PayPal checkout. Check the amount on PayPal before you confirm. They collect the shipping address.",
     shippingTitle: "Shipping",
     shippingBody:
       "One-person studio: I print and pack the shirts myself. I ship twice a week. If you need them by a given date, write before you order.",
@@ -560,8 +556,6 @@ const de: typeof it = {
   checkout: {
     title: "Kasse",
     empty: "Der Warenkorb ist leer.",
-    paypalNote:
-      "Zahlung über PayPal. Prüfe den Betrag bei PayPal, bevor du bestätigst. Die Lieferadresse erfragen sie.",
     shippingTitle: "Versand",
     shippingBody:
       "Ein-Personen-Atelier: ich drucke und packe selbst. Ich schicke zweimal die Woche. Wenn du die Shirts zu einem bestimmten Datum brauchst, schreib vor der Bestellung.",
