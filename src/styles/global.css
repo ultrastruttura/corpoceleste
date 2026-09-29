@@ -746,14 +746,14 @@ body.cart-open {
 }
 
 .product-stage {
-  background: var(--paper);
+  background: var(--white);
   overflow: hidden;
 }
 
 .product-stage-frame {
   position: relative;
   aspect-ratio: 1;
-  background: var(--paper);
+  background: var(--white);
   overflow: hidden;
   touch-action: pan-y;
 }
@@ -815,7 +815,7 @@ body.cart-open {
   appearance: none;
   border: 1px solid var(--line);
   padding: 0;
-  background: var(--paper);
+  background: var(--white);
   cursor: pointer;
   width: 72px;
   height: 72px;
