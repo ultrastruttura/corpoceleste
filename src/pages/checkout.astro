@@ -55,32 +55,49 @@ const paypalSdk = Boolean(site.paypalClientId);
       <section class="checkout-step checkout-step--pay">
         <h2 class="checkout-bank-title">{copy.checkout.payTitle}</h2>
 
-        {
-          paypalSdk && (
-            <div class="pay-methods">
-              <p class="checkout-vat">{copy.checkout.payChoose}</p>
-              <label class="check">
-                <input type="radio" name="metodo-pagamento" value="paypal" checked data-method />
-                <span>{copy.checkout.methodPaypal}</span>
-              </label>
-              <label class="check">
-                <input type="radio" name="metodo-pagamento" value="bonifico" data-method />
-                <span>{copy.checkout.bank}</span>
-              </label>
-            </div>
-          )
-        }
+        <div class="pay-methods">
+          <p class="checkout-vat">{copy.checkout.payChoose}</p>
+          <label class="check">
+            <input
+              type="radio"
+              name="metodo-pagamento"
+              value="paypal"
+              checked={paypalSdk}
+              data-method
+            />
+            <span>{copy.checkout.methodPaypal}</span>
+          </label>
+          <label class="check">
+            <input
+              type="radio"
+              name="metodo-pagamento"
+              value="bonifico"
+              checked={!paypalSdk}
+              data-method
+            />
+            <span>{copy.checkout.bank}</span>
+          </label>
+        </div>
 
-        {
-          paypalSdk && (
-            <div data-method-panel="paypal">
-              <p class="checkout-obligation">{copy.checkout.payObligation}</p>
-              <div class="pay-box is-locked" data-pay-box>
-                <div id="paypal-buttons"></div>
+        <div data-method-panel="paypal" hidden={!paypalSdk}>
+          {
+            paypalSdk ? (
+              <>
+                <p class="checkout-obligation">{copy.checkout.payObligation}</p>
+                <div class="pay-box is-locked" data-pay-box>
+                  <div id="paypal-buttons"></div>
+                </div>
+              </>
+            ) : (
+              <div class="pay-box">
+                <button class="btn btn--full" type="button" disabled>
+                  {copy.checkout.paypal}
+                </button>
+                <p class="checkout-vat">{copy.checkout.paypalSoon}</p>
               </div>
-            </div>
-          )
-        }
+            )
+          }
+        </div>
 
         <div data-method-panel="bonifico" hidden={paypalSdk}>
           <h3 class="checkout-bank-title">{copy.checkout.bank}</h3>

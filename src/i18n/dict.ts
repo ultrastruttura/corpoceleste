@@ -107,6 +107,7 @@ const it = {
     payTitle: "Pagamento",
     payChoose: "Scegli un metodo: paghi una volta sola.",
     methodPaypal: "PayPal o carta",
+    paypalSoon: "Attivo appena collego l’account PayPal. Per ora usa il bonifico.",
     bank: "Bonifico",
     bankNote:
       "Invia il modulo: ricevi l’IBAN via email. L’ordine è confermato quando arriva il pagamento; poi spedisco.",
@@ -458,6 +459,7 @@ const en: typeof it = {
     payTitle: "Payment",
     payChoose: "Pick one method: you pay only once.",
     methodPaypal: "PayPal or card",
+    paypalSoon: "Active as soon as the PayPal account is connected. For now use the bank transfer.",
     bank: "Bank transfer",
     bankNote:
       "Send the form: you’ll get the IBAN by email. The order is confirmed when payment arrives; then I ship.",
@@ -809,6 +811,7 @@ const de: typeof it = {
     payTitle: "Zahlung",
     payChoose: "Wähle eine Methode: du zahlst nur einmal.",
     methodPaypal: "PayPal oder Karte",
+    paypalSoon: "Aktiv, sobald das PayPal-Konto verbunden ist. Zahle bis dahin per Überweisung.",
     bank: "Überweisung",
     bankNote:
       "Schick das Formular: du bekommst die IBAN per E-Mail. Die Bestellung gilt, wenn die Zahlung da ist; danach verschicke ich.",

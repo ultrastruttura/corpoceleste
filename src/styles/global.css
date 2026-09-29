@@ -1537,6 +1537,11 @@ body.cart-open {
   margin-top: 0;
 }
 
+.pay-box .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .pay-box.is-locked,
 .form.is-locked {
   opacity: 0.4;
