@@ -1,4 +1,8 @@
-import { catalogProduct } from "./catalog";
+import {
+  catalogMaxQty,
+  catalogProduct,
+  catalogSizeInStock,
+} from "./catalog";
 
 function canBuy(status: string | undefined) {
   return status === "available" || status === "preorder";
@@ -44,14 +48,16 @@ export function sanitizeCart() {
 
   for (const item of raw) {
     const p = catalogProduct(item.id);
-    if (!p || !canBuy(p.status)) continue;
-    const size = p.sizes.includes(item.size) ? item.size : p.sizes[0];
-    if (!size) continue;
-    const qty = Math.max(1, Math.min(99, Math.floor(Number(item.qty) || 1)));
+    if (!p || !canBuy(p.status) || !catalogSizeInStock(p, item.size)) continue;
+    const size = p.sizes.includes(item.size) ? item.size : "";
+    if (!size || !catalogSizeInStock(p, size)) continue;
+    const max = catalogMaxQty(p, size);
+    if (max < 1) continue;
+    const qty = Math.max(1, Math.min(max, Math.floor(Number(item.qty) || 1)));
     const key = `${p.id}::${size}`;
     const prev = merged.get(key);
     if (prev) {
-      prev.qty = Math.min(99, prev.qty + qty);
+      prev.qty = Math.min(max, prev.qty + qty);
       continue;
     }
     merged.set(key, {
@@ -87,14 +93,20 @@ export function total() {
 export function addItem(item: Omit<CartItem, "qty" | "price" | "title"> & { qty?: number; price?: number; title?: string }) {
   const p = catalogProduct(item.id);
   if (!p || !canBuy(p.status)) return false;
-  const size = p.sizes.includes(item.size) ? item.size : p.sizes[0];
-  if (!size) return false;
+  const size = p.sizes.includes(item.size) ? item.size : p.sizes.find((s) => catalogSizeInStock(p, s));
+  if (!size || !catalogSizeInStock(p, size)) return false;
+
+  const max = catalogMaxQty(p, size);
+  if (max < 1) return false;
 
   const items = sanitizeCart();
   const i = items.findIndex((x) => x.id === p.id && x.size === size);
-  const qty = Math.max(1, Math.min(99, Math.floor(item.qty ?? 1)));
-  if (i >= 0) items[i].qty = Math.min(99, items[i].qty + qty);
-  else {
+  const qty = Math.max(1, Math.min(max, Math.floor(item.qty ?? 1)));
+  if (i >= 0) {
+    const next = Math.min(max, items[i].qty + qty);
+    if (next === items[i].qty) return false;
+    items[i].qty = next;
+  } else {
     items.push({
       id: p.id,
       slug: item.slug || p.id,
@@ -115,7 +127,9 @@ export function removeItem(id: string, size: string) {
 }
 
 export function setQty(id: string, size: string, qty: number) {
-  const q = Math.max(0, Math.min(99, Math.floor(qty)));
+  const p = catalogProduct(id);
+  const max = p ? catalogMaxQty(p, size) : 0;
+  const q = Math.max(0, Math.min(max, Math.floor(qty)));
   if (q < 1) {
     removeItem(id, size);
     return;
@@ -130,16 +144,19 @@ export function setQty(id: string, size: string, qty: number) {
 export function changeSize(id: string, from: string, to: string) {
   if (from === to) return;
   const p = catalogProduct(id);
-  if (!p || !p.sizes.includes(to)) return;
+  if (!p || !p.sizes.includes(to) || !catalogSizeInStock(p, to)) return;
   const items = sanitizeCart();
   const i = items.findIndex((x) => x.id === id && x.size === from);
   if (i < 0) return;
+  const max = catalogMaxQty(p, to);
+  if (max < 1) return;
   const j = items.findIndex((x) => x.id === id && x.size === to);
   if (j >= 0) {
-    items[j].qty = Math.min(99, items[j].qty + items[i].qty);
+    items[j].qty = Math.min(max, items[j].qty + items[i].qty);
     items.splice(i, 1);
   } else {
     items[i].size = to;
+    items[i].qty = Math.min(max, items[i].qty);
   }
   write(items);
 }

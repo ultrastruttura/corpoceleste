@@ -8,4 +8,5 @@ tina/__generated__/
 .env
 .env.*
 !.env.example
+.vercel
 bug.jpg

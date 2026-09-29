@@ -6,6 +6,9 @@ export type ProductStatus = "available" | "preorder" | "soldout";
 
 export type Localized = { it: string; en: string; de: string };
 
+/** Pezzi a magazzino per taglia. Aggiornare a mano dopo ogni vendita. */
+export type ProductStock = Partial<Record<string, number>>;
+
 export type Product = {
   id: string;
   slug: string;
@@ -21,6 +24,7 @@ export type Product = {
   /** First image path — kept for cart line thumbs */
   print: string;
   sizes: string[];
+  stock: ProductStock;
   description: Localized;
   seoDescription: Localized;
 };
@@ -55,6 +59,40 @@ export function isPurchasable(status: ProductStatus) {
   return status === "available" || status === "preorder";
 }
 
+function parseStock(raw: unknown, sizes: string[]): ProductStock {
+  const stock: ProductStock = {};
+  if (!raw || typeof raw !== "object") {
+    for (const size of sizes) stock[size] = 0;
+    return stock;
+  }
+  const o = raw as Record<string, unknown>;
+  for (const size of sizes) {
+    const n = Number(o[size]);
+    stock[size] = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+  }
+  return stock;
+}
+
+/** Pezzi disponibili per taglia (0 = esaurita). */
+export function stockOf(product: Product, size: string) {
+  const n = Number(product.stock[size]);
+  return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+}
+
+export function maxQtyFor(product: Product, size: string) {
+  return Math.min(99, stockOf(product, size));
+}
+
+export function sizeInStock(product: Product, size: string) {
+  return stockOf(product, size) > 0;
+}
+
+/** Almeno una taglia con pezzi > 0 e stato acquistabile. */
+export function isInStock(product: Product) {
+  if (!isPurchasable(product.status)) return false;
+  return product.sizes.some((s) => sizeInStock(product, s));
+}
+
 const files = import.meta.glob("../../content/products/*.md", {
   eager: true,
   query: "?raw",
@@ -70,6 +108,7 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
   const sizes = Array.isArray(data.sizes)
     ? data.sizes.map((x: unknown) => String(x))
     : ["S", "M", "L", "XL"];
+  const resolvedSizes = sizes.length ? sizes : ["S", "M", "L", "XL"];
   const created =
     data.createdAt instanceof Date
       ? data.createdAt.toISOString().slice(0, 10)
@@ -88,7 +127,8 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     colorName: String(data.colorName ?? "Nero"),
     images,
     print: images[0] ?? "",
-    sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],
+    sizes: resolvedSizes,
+    stock: parseStock(data.stock, resolvedSizes),
     description: asLocalized(data.description),
     seoDescription: asLocalized(data.seoDescription),
   };
@@ -105,11 +145,11 @@ export function productsByArtist(artistId: string) {
 export { artistName, artists };
 
 export function availableProducts() {
-  return products.filter((p) => isPurchasable(p.status));
+  return products.filter((p) => isInStock(p));
 }
 
 export function soldOutProducts() {
-  return products.filter((p) => p.status === "soldout");
+  return products.filter((p) => !isInStock(p));
 }
 
 export function formatPrice(n: number) {

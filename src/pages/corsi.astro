@@ -2,13 +2,14 @@
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
-import { site } from "../data/site";
 import { pastWorkshops } from "../data/workshops";
+import { siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
+const shopEmail = siteSettings.shopEmail;
 ---
 
 <Base title={`${copy.workshops.title} — Corpoceleste`}>
@@ -22,7 +23,7 @@ const copy = t(locale);
       <div>
         <h2>{copy.workshops.waitlist}</h2>
         <p>{copy.workshops.waitlistBody}</p>
-        <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+        <form class="form" action={`https://formsubmit.co/${shopEmail}`} method="POST">
           <input type="hidden" name="_subject" value="Iscrizione workshop in studio" />
           <input type="hidden" name="_next" data-next-grazie="corsi" />
           <FormHoney />
@@ -45,7 +46,7 @@ const copy = t(locale);
       <div>
         <h2>{copy.workshops.onSite}</h2>
         <p>{copy.workshops.onSiteBody}</p>
-        <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+        <form class="form" action={`https://formsubmit.co/${shopEmail}`} method="POST">
           <input type="hidden" name="_subject" value="Proposta workshop presso di voi" />
           <input type="hidden" name="_next" data-next-grazie="workshop" />
           <FormHoney />

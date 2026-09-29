@@ -111,6 +111,18 @@ export default defineConfig({
             options: ["S", "M", "L", "XL"],
           },
           {
+            type: "object",
+            name: "stock",
+            label: "Magazzino (pezzi per taglia)",
+            required: true,
+            fields: [
+              { type: "number", name: "S", label: "S", required: true },
+              { type: "number", name: "M", label: "M", required: true },
+              { type: "number", name: "L", label: "L", required: true },
+              { type: "number", name: "XL", label: "XL", required: true },
+            ],
+          },
+          {
             type: "image",
             name: "images",
             label: "Foto (fino a 4)",
@@ -188,6 +200,13 @@ export default defineConfig({
         },
         fields: [
           { type: "string", name: "title", label: "Titolo interno", isTitle: true, required: true },
+          {
+            type: "string",
+            name: "shopEmail",
+            label: "Email shop (ordini e form)",
+            description:
+              "Destinazione FormSubmit: ordini (bonifico / PayPal), contatti, newsletter, corsi, consulenza, ristampe. Se vuoto, usa il fallback in codice.",
+          },
           localizedText("metaDescription", "Meta description sito (home e fallback)"),
           localizedText("homeTitle", "H1 home", false),
           localizedText("homeLede", "Sottotitolo home"),

@@ -3,14 +3,16 @@ import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { site } from "../data/site";
+import { siteSettings } from "../data/settings";
 import { currentLocale, pageUrl, paypalLc, paypalSdkLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
+const shopEmail = siteSettings.shopEmail;
 ---
 
 <Base title={`${copy.checkout.title} — Corpoceleste`}>
-  <div class="wrap page-main page-main--narrow checkout-page">
+  <div class="wrap page-main page-main--narrow checkout-page" data-shop-email={shopEmail}>
     <h1>{copy.checkout.title}</h1>
 
     <p class="empty" data-checkout-empty hidden>
@@ -80,7 +82,7 @@ const copy = t(locale);
       <section class="checkout-step checkout-step--bank">
         <h2 class="checkout-bank-title">{copy.checkout.bank}</h2>
         <p>{copy.checkout.bankNote}</p>
-        <form class="form is-locked" action={`https://formsubmit.co/${site.email}`} method="POST" data-checkout-form>
+        <form class="form is-locked" action={`https://formsubmit.co/${shopEmail}`} method="POST" data-checkout-form>
           <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
           <input type="hidden" name="_next" data-next-grazie="ordine" />
           <input type="hidden" name="ordine" data-order-field />
@@ -130,6 +132,7 @@ const copy = t(locale);
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
     import { site } from "../data/site";
+    import { encodeOrderLines, encodeSku } from "../lib/paypal-lines";
 
     const base = import.meta.env.BASE_URL;
     const prefix = document.documentElement.dataset.localePrefix || "";
@@ -182,6 +185,46 @@ const copy = t(locale);
       paypalItems.append(hidden("handling_cart", money(ship)));
     }
 
+    /** Same line format as the bank FormSubmit `ordine` field. */
+    function orderText() {
+      const items = sanitizeCart();
+      const ship = shipping();
+      return [
+        ...items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
+        `Spedizione ${ship}€`,
+        `Totale ${total() + ship}€`,
+      ].join("\n");
+    }
+
+    /** Notify shop via FormSubmit after PayPal capture (SDK path only). */
+    async function notifyPaypalOrder(ordine: string) {
+      const email = page?.getAttribute("data-shop-email")?.trim();
+      if (!email) return;
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 4000);
+      try {
+        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            _subject: "Ordine shop Corpoceleste (PayPal)",
+            _captcha: "false",
+            _honey: "",
+            metodo: "PayPal",
+            ordine,
+          }),
+          signal: ctrl.signal,
+        });
+      } catch {
+        /* checkout still completes */
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
     function unlocked() {
       return Boolean(disclaimer?.checked && privacy?.checked && sanitizeCart().length);
     }
@@ -202,13 +245,7 @@ const copy = t(locale);
         const ship = shipping();
         renderRecap(recap, items, ship);
         fillPaypal();
-        if (orderField) {
-          orderField.value = [
-            ...items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
-            `Spedizione ${ship}€`,
-            `Totale ${total() + ship}€`,
-          ].join("\n");
-        }
+        if (orderField) orderField.value = orderText();
       }
       syncLock();
       page?.classList.add("is-ready");
@@ -259,6 +296,9 @@ const copy = t(locale);
             purchase_units: [
               {
                 description: "Corpoceleste",
+                custom_id: encodeOrderLines(
+                  items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+                ),
                 amount: {
                   currency_code: "EUR",
                   value: money(merce + ship),
@@ -269,8 +309,10 @@ const copy = t(locale);
                 },
                 items: items.map((i) => ({
                   name: `${lineName(i)} (${i.size})`.slice(0, 127),
+                  sku: encodeSku(i.id, i.size),
                   quantity: String(i.qty),
                   unit_amount: { currency_code: "EUR", value: money(i.price) },
+                  category: "PHYSICAL_GOODS",
                 })),
               },
             ],
@@ -281,8 +323,10 @@ const copy = t(locale);
           });
         },
         onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
+          const ordine = orderText();
           saveOrderSnapshot(shipping());
           await actions.order.capture();
+          await notifyPaypalOrder(ordine);
           clearCart();
           location.href = `${base}${prefix}grazie/?from=paypal`;
         },

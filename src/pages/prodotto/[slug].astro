@@ -9,9 +9,13 @@ import {
   products,
   productDescription,
   productSeoDescription,
+  isInStock,
+  sizeInStock,
+  stockOf,
 } from "../../data/products";
 import { artistById } from "../../data/artists";
 import { site } from "../../data/site";
+import { siteSettings } from "../../data/settings";
 import { cardImageUrls, largeImageUrls } from "../../lib/paths";
 import { absoluteUrl, metaSnippet } from "../../lib/seo";
 import { currentLocale, pageAbs, pageUrl, t } from "../../i18n";
@@ -28,11 +32,14 @@ if (!product) return Astro.redirect(pageUrl(locale));
 
 const artist = artistName(product.artistId);
 const artistSlug = artistById(product.artistId)?.slug ?? "corpoceleste";
-const sold = product.status === "soldout";
-const preorder = product.status === "preorder";
+const sold = !isInStock(product);
+const preorder = product.status === "preorder" && !sold;
 const alt = artist !== product.title ? `${artist}, ${product.title}` : product.title;
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
-const defaultSize = sizes.includes("M") ? "M" : sizes[0];
+const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
+const defaultSize = inStockSizes.includes("M")
+  ? "M"
+  : inStockSizes[0] ?? sizes[0];
 const color = copy.product.colors[product.colorName] ?? product.colorName;
 const description = productDescription(product, locale);
 const seoDescription = metaSnippet(productSeoDescription(product, locale) || copy.meta.description);
@@ -181,7 +188,7 @@ const jsonLd = {
       <div class="product-buy">
         {
           sold ? (
-            <form class="form" action={`https://formsubmit.co/${site.email}`} method="POST">
+            <form class="form" action={`https://formsubmit.co/${siteSettings.shopEmail}`} method="POST">
               <input type="hidden" name="_subject" value={`Ristampa: ${product.title}`} />
               <input type="hidden" name="_next" data-next-grazie="ristampa" />
               <input type="hidden" name="prodotto" value={product.title} />
@@ -211,12 +218,32 @@ const jsonLd = {
               <fieldset class="size-fieldset">
                 <legend class="field-label">{copy.product.size}</legend>
                 <div class="size-row">
-                  {sizes.map((s) => (
-                    <label>
-                      <input type="radio" name="size" value={s} checked={s === defaultSize} />
-                      <span>{s}</span>
-                    </label>
-                  ))}
+                  {sizes.map((s) => {
+                    const available = sizeInStock(product, s);
+                    const qty = stockOf(product, s);
+                    return (
+                      <label class:list={{ "is-oos": !available }}>
+                        <input
+                          type="radio"
+                          name="size"
+                          value={s}
+                          checked={s === defaultSize}
+                          disabled={!available}
+                        />
+                        <span>
+                          {s}
+                          {!available && (
+                            <span class="size-oos"> · {copy.product.sizeOut}</span>
+                          )}
+                        </span>
+                        {available && qty <= 3 && (
+                          <span class="visually-hidden">
+                            {copy.product.stockLeft(qty)}
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
                 </div>
               </fieldset>
               <button class="btn" type="submit">{copy.product.add}</button>

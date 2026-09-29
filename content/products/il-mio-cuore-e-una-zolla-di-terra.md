@@ -12,6 +12,11 @@ sizes:
   - M
   - L
   - XL
+stock:
+  S: 0
+  M: 0
+  L: 0
+  XL: 0
 images:
   - /uploads/prints/raggio.jpg
 description:

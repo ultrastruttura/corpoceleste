@@ -1,6 +1,7 @@
 import matter from "gray-matter";
 import type { Locale } from "../i18n/locales";
 import type { Localized } from "./artists";
+import { site } from "./site";
 
 function emptyLocalized(): Localized {
   return { it: "", en: "", de: "" };
@@ -25,7 +26,11 @@ const raw = import.meta.glob("../../content/settings/site.md", {
 const file = Object.values(raw)[0] ?? "";
 const { data } = matter(file || "---\n---\n");
 
+const shopEmailFromCms = String(data.shopEmail ?? "").trim();
+
 export const siteSettings = {
+  /** FormSubmit destination; falls back to `site.email` if empty in CMS. */
+  shopEmail: shopEmailFromCms || site.email,
   metaDescription: asLocalized(data.metaDescription),
   homeTitle: asLocalized(data.homeTitle),
   homeLede: asLocalized(data.homeLede),

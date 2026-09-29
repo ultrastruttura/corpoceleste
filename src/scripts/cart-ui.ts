@@ -1,6 +1,11 @@
 import { ui } from "../i18n/dict";
 import { currentLocale } from "../i18n/runtime";
-import { catalogProducts } from "./catalog";
+import {
+  catalogMaxQty,
+  catalogProduct,
+  catalogProducts,
+  catalogSizeInStock,
+} from "./catalog";
 import {
   changeSize,
   count,
@@ -100,14 +105,19 @@ function lineEl(item: CartItem) {
   select.setAttribute("aria-label", labels.cart.sizeOf(item.title));
   select.dataset.changeSize = item.id;
   select.dataset.fromSize = item.size;
+  const product = catalogProduct(item.id);
   for (const s of sizesFor(item.id)) {
-    const opt = el("option", undefined, s);
+    const inStock = product ? catalogSizeInStock(product, s) : false;
+    const label = inStock || s === item.size ? s : `${s} · ${labels.product.sizeOut}`;
+    const opt = el("option", undefined, label);
     opt.value = s;
     if (s === item.size) opt.selected = true;
+    if (!inStock && s !== item.size) opt.disabled = true;
     select.append(opt);
   }
   meta.append(select);
 
+  const max = product ? catalogMaxQty(product, item.size) : item.qty;
   const qty = el("div", "cart-qty");
   const minus = el("button", undefined, "−");
   minus.type = "button";
@@ -119,6 +129,7 @@ function lineEl(item: CartItem) {
   plus.type = "button";
   plus.setAttribute("aria-label", labels.cart.qtyUp);
   plus.dataset.qty = "1";
+  if (item.qty >= max) plus.disabled = true;
   qty.append(minus, n, plus);
   meta.append(qty);
 

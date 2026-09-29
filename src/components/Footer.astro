@@ -1,5 +1,6 @@
 ---
 import { site } from "../data/site";
+import { siteSettings } from "../data/settings";
 import PrivacyCheck from "./PrivacyCheck.astro";
 import FormHoney from "./FormHoney.astro";
 import { currentLocale, pageUrl, t } from "../i18n";
@@ -23,7 +24,7 @@ const copy = t(locale);
       <h2>Newsletter</h2>
       <form
         class="newsletter-form"
-        action={`https://formsubmit.co/${site.email}`}
+        action={`https://formsubmit.co/${siteSettings.shopEmail}`}
         method="POST"
       >
         <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />

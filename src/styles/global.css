@@ -943,6 +943,24 @@ body.cart-open {
   outline-offset: 2px;
 }
 
+.size-row label.is-oos {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  pointer-events: none;
+}
+
+.size-row label.is-oos:has(input:checked) {
+  background: transparent;
+  color: inherit;
+}
+
+.size-oos {
+  font-weight: 400;
+  font-size: 0.85em;
+  text-decoration: none;
+}
+
 .attrs {
   margin: 28px 0;
   padding: 0;

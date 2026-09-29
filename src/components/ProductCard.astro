@@ -1,6 +1,6 @@
 ---
 import type { Product } from "../data/products";
-import { artistName, formatPrice } from "../data/products";
+import { artistName, formatPrice, isInStock } from "../data/products";
 import { cardImageUrls } from "../lib/paths";
 import { currentLocale, pageUrl, t } from "../i18n";
 
@@ -9,8 +9,8 @@ const { product, eager = false } = Astro.props;
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const artist = artistName(product.artistId);
-const sold = product.status === "soldout";
-const preorder = product.status === "preorder";
+const sold = !isInStock(product);
+const preorder = product.status === "preorder" && !sold;
 const hasTitle = artist !== product.title;
 const alt = hasTitle ? `${artist}, ${product.title}` : artist;
 const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;

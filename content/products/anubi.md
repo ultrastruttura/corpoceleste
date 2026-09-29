@@ -12,6 +12,11 @@ sizes:
   - M
   - L
   - XL
+stock:
+  S: 5
+  M: 5
+  L: 5
+  XL: 5
 images:
   - /uploads/prints/corpo.jpg
   - /uploads/prints/corpo-dettaglio.jpg

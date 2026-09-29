@@ -13,8 +13,8 @@ export const site = {
   /** Email dell'account PayPal Business (gratis). Basta questa per accettare pagamenti. */
   paypalEmail: "baldellimtt@gmail.com",
   /**
-   * Consigliato: Client ID da developer.paypal.com (gratis).
-   * Se c’è, il bottone PayPal resta sulla pagina invece del form classico.
+   * Client ID da developer.paypal.com (gratis).
+   * Necessario per il bottone in-page e per lo sconto magazzino automatico (webhook Vercel).
    * Gli importi partono comunque dal catalogo buildato, non dai campi del browser.
    */
   paypalClientId: "",
