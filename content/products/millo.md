@@ -3,6 +3,7 @@ title: Millo
 artist: content/artists/millo.md
 price: 38
 status: soldout
+kind: shirt
 nuovo: false
 createdAt: 2017-05-14T00:00:00.000Z
 color: "#141414"

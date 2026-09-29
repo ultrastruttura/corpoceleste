@@ -1,8 +1,12 @@
 import matter from "gray-matter";
 import { artistName, artists } from "./artists";
+import { ui } from "../i18n/dict";
 import type { Locale } from "../i18n/locales";
 
 export type ProductStatus = "available" | "preorder" | "soldout";
+
+/** Forma dell’oggetto in vendita — guida alt immagine e (dopo) UI. */
+export type ProductKind = "shirt" | "print" | "edition";
 
 export type Localized = { it: string; en: string; de: string };
 
@@ -18,6 +22,7 @@ export type Product = {
   nuovo?: boolean;
   createdAt: string;
   status: ProductStatus;
+  kind: ProductKind;
   color: string;
   colorName: string;
   images: string[];
@@ -53,6 +58,11 @@ function parseStatus(raw: unknown): ProductStatus {
   if (raw === "soldout") return "soldout";
   if (raw === "preorder") return "preorder";
   return "available";
+}
+
+function parseKind(raw: unknown): ProductKind {
+  if (raw === "print" || raw === "edition") return raw;
+  return "shirt";
 }
 
 export function isPurchasable(status: ProductStatus) {
@@ -123,6 +133,7 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     nuovo: Boolean(data.nuovo),
     createdAt: created || "2017-01-01",
     status: parseStatus(data.status),
+    kind: parseKind(data.kind),
     color: String(data.color ?? "#141414"),
     colorName: String(data.colorName ?? "Nero"),
     images,
@@ -166,4 +177,10 @@ export function productSeoDescription(product: Product, locale: Locale) {
     product.seoDescription.it ||
     productDescription(product, locale)
   );
+}
+
+/** Alt immagine: tipo + titolo + artista + brand, senza keyword stuffing. */
+export function productImageAlt(product: Product, artistLabel: string, locale: Locale) {
+  const { imageAlt } = ui[locale].product;
+  return imageAlt(product.kind, product.title, artistLabel);
 }

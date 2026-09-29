@@ -1,6 +1,6 @@
 export const site = {
   name: "Corpoceleste",
-  tagline: "Maglie serigrafate",
+  tagline: "Serigrafia d’artista",
   email: "info@corpoceleste.com",
   instagram: "https://www.instagram.com/ultrastruttura/",
   facebook: "https://www.facebook.com/ultrastruttura",

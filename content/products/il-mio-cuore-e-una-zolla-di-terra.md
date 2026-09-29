@@ -3,6 +3,7 @@ title: Il mio cuore è una zolla di terra
 artist: content/artists/rocco-lombardi.md
 price: 38
 status: soldout
+kind: shirt
 nuovo: false
 createdAt: 2017-05-14T00:00:00.000Z
 color: '#141414'

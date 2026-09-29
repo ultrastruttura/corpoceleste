@@ -90,6 +90,19 @@ export default defineConfig({
               { value: "soldout", label: "Esaurita" },
             ],
           },
+          {
+            type: "string",
+            name: "kind",
+            label: "Tipo",
+            description:
+              "Per le didascalie immagine: maglia, stampa su carta, o edizione/pezzo d’artista.",
+            required: true,
+            options: [
+              { value: "shirt", label: "Maglia" },
+              { value: "print", label: "Stampa (foglio)" },
+              { value: "edition", label: "Edizione / pezzo" },
+            ],
+          },
           { type: "boolean", name: "nuovo", label: "Nuovo (in cima allo shop)" },
           { type: "datetime", name: "createdAt", label: "Data", required: true },
           { type: "string", name: "color", label: "Colore (hex)", required: true },

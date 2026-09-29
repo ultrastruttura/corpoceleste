@@ -3,6 +3,7 @@ title: Anubi
 artist: content/artists/angelini-taddei.md
 price: 38
 status: preorder
+kind: shirt
 nuovo: true
 createdAt: 2017-05-14T00:00:00.000Z
 color: '#141414'

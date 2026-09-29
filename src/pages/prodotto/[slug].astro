@@ -9,6 +9,7 @@ import {
   products,
   productDescription,
   productSeoDescription,
+  productImageAlt,
   isInStock,
   sizeInStock,
   stockOf,
@@ -34,7 +35,7 @@ const artist = artistName(product.artistId);
 const artistSlug = artistById(product.artistId)?.slug ?? "corpoceleste";
 const sold = !isInStock(product);
 const preorder = product.status === "preorder" && !sold;
-const alt = artist !== product.title ? `${artist}, ${product.title}` : product.title;
+const alt = productImageAlt(product, artist, locale);
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
 const defaultSize = inStockSizes.includes("M")

@@ -3,11 +3,11 @@ import type { Locale } from "./locales";
 const it = {
   meta: {
     description:
-      "Maglie serigrafate a un colore, stampate a mano a Bergamo. Edizioni d’artista, cotone, spedizione in Italia e in Europa.",
+      "Serigrafia d’artista a un colore, stampata a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand. Spedizione in Italia e in Europa.",
   },
   home: {
-    title: "Maglie serigrafate",
-    lede: "Edizioni d’artista stampate a mano nello studio di Bergamo. Un colore, cotone, non print-on-demand.",
+    title: "Serigrafia d’artista",
+    lede: "Edizioni stampate a mano nello studio di Bergamo. Un colore, non print-on-demand — maglie, stampe, pezzi numerati.",
   },
   nav: {
     main: "Principale",
@@ -45,6 +45,23 @@ const it = {
     galleryNext: "Foto successiva",
     shipLine: (itPrice: number, euPrice: number) =>
       `Spedizione Italia ${itPrice} €, Europa ${euPrice} €`,
+    /** Alt descrittiva: mezzo + opera + artista + studio. */
+    imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
+      const withArtist = artist && artist !== title;
+      if (kind === "print") {
+        return withArtist
+          ? `Stampa «${title}» di ${artist}, serigrafia Corpoceleste`
+          : `Stampa «${title}», serigrafia Corpoceleste`;
+      }
+      if (kind === "edition") {
+        return withArtist
+          ? `«${title}» di ${artist}, edizione serigrafica Corpoceleste`
+          : `«${title}», edizione serigrafica Corpoceleste`;
+      }
+      return withArtist
+        ? `Maglia «${title}» di ${artist}, serigrafia Corpoceleste`
+        : `Maglia «${title}», serigrafia Corpoceleste`;
+    },
     colors: {
       Nero: "Nero",
       Viola: "Viola",
@@ -119,7 +136,7 @@ const it = {
     city: "Città / sede",
     archive: "Archivio",
     since: "Dal 2014.",
-    studioAlt: "Studio",
+    studioAlt: "Studio di serigrafia Corpoceleste, Bergamo",
   },
   consulting: {
     title: "Consulenza",
@@ -248,11 +265,11 @@ const it = {
 const en: typeof it = {
   meta: {
     description:
-      "One-colour screen-printed shirts, hand-printed in Bergamo. Artist editions on cotton. Shipping in Italy and across Europe.",
+      "One-colour artist screen printing, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand. Shipping in Italy and across Europe.",
   },
   home: {
-    title: "Screen-printed shirts",
-    lede: "Artist editions hand-printed in the Bergamo studio. One colour, cotton — not print-on-demand.",
+    title: "Artist screen printing",
+    lede: "Editions hand-printed in the Bergamo studio. One colour, not print-on-demand — shirts, prints, numbered pieces.",
   },
   nav: {
     main: "Main",
@@ -290,6 +307,22 @@ const en: typeof it = {
     galleryNext: "Next photo",
     shipLine: (itPrice: number, euPrice: number) =>
       `Shipping Italy ${itPrice} €, Europe ${euPrice} €`,
+    imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
+      const withArtist = artist && artist !== title;
+      if (kind === "print") {
+        return withArtist
+          ? `Screen print “${title}” by ${artist}, Corpoceleste`
+          : `Screen print “${title}”, Corpoceleste`;
+      }
+      if (kind === "edition") {
+        return withArtist
+          ? `“${title}” by ${artist}, Corpoceleste serigraph edition`
+          : `“${title}”, Corpoceleste serigraph edition`;
+      }
+      return withArtist
+        ? `“${title}” shirt by ${artist}, Corpoceleste screen print`
+        : `“${title}” shirt, Corpoceleste screen print`;
+    },
     colors: {
       Nero: "Black",
       Viola: "Purple",
@@ -364,7 +397,7 @@ const en: typeof it = {
     city: "City / venue",
     archive: "Archive",
     since: "Since 2014.",
-    studioAlt: "Studio",
+    studioAlt: "Corpoceleste screen-printing studio, Bergamo",
   },
   consulting: {
     title: "Consulting",
@@ -493,11 +526,11 @@ const en: typeof it = {
 const de: typeof it = {
   meta: {
     description:
-      "Einfarbig siebgedruckte Shirts, handgedruckt in Bergamo. Künstlereditionen auf Baumwolle. Versand in Italien und Europa.",
+      "Einfarbiger Künstlersiebdruck, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand. Versand in Italien und Europa.",
   },
   home: {
-    title: "Siebgedruckte Shirts",
-    lede: "Künstlereditionen, handgedruckt im Atelier in Bergamo. Eine Farbe, Baumwolle — kein Print-on-Demand.",
+    title: "Künstlersiebdruck",
+    lede: "Editionen, handgedruckt im Atelier in Bergamo. Eine Farbe, kein Print-on-Demand — Shirts, Drucke, nummerierte Stücke.",
   },
   nav: {
     main: "Hauptnavigation",
@@ -535,6 +568,22 @@ const de: typeof it = {
     galleryNext: "Nächstes Foto",
     shipLine: (itPrice: number, euPrice: number) =>
       `Versand Italien ${itPrice} €, Europa ${euPrice} €`,
+    imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
+      const withArtist = artist && artist !== title;
+      if (kind === "print") {
+        return withArtist
+          ? `Siebdruck „${title}“ von ${artist}, Corpoceleste`
+          : `Siebdruck „${title}“, Corpoceleste`;
+      }
+      if (kind === "edition") {
+        return withArtist
+          ? `„${title}“ von ${artist}, Corpoceleste-Siebdruckedition`
+          : `„${title}“, Corpoceleste-Siebdruckedition`;
+      }
+      return withArtist
+        ? `Shirt „${title}“ von ${artist}, Corpoceleste-Siebdruck`
+        : `Shirt „${title}“, Corpoceleste-Siebdruck`;
+    },
     colors: {
       Nero: "Schwarz",
       Viola: "Violett",
@@ -609,7 +658,7 @@ const de: typeof it = {
     city: "Stadt / Ort",
     archive: "Archiv",
     since: "Seit 2014.",
-    studioAlt: "Atelier",
+    studioAlt: "Corpoceleste-Siebdruckatelier, Bergamo",
   },
   consulting: {
     title: "Beratung",
