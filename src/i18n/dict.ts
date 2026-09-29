@@ -115,7 +115,7 @@ const it = {
     paypalBack: "Torna a Corpoceleste",
     payTitle: "Scegli il pagamento",
     methodPaypal: "PayPal o carta",
-    paypalSoon: "Attivo appena collego l’account PayPal. Per ora usa il bonifico.",
+    paypalSoon: "PayPal non è ancora attivo. Per ora usa il bonifico.",
     bank: "Bonifico",
     bankNote:
       "Invia il modulo: ricevi l’IBAN via email. L’ordine è confermato quando arriva il pagamento; poi spedisco.",
@@ -199,61 +199,48 @@ const it = {
   },
   privacy: {
     title: "Privacy",
-    lede:
-      "Informativa sul trattamento dei dati e sull’uso di cookie e storage, art. 13 GDPR.",
+    lede: "Chi tratta i dati, perché, e a chi arrivano.",
     updated: "Ultimo aggiornamento: 1 ottobre 2026.",
     controller: "Titolare",
     controllerBody: (name: string, sede: string) =>
-      `${name}, in qualità di titolare del trattamento per il sito Corpoceleste. Sede: ${sede}.`,
+      `${name}, per il sito Corpoceleste. Sede: ${sede}.`,
     vat: (id: string) => `P. IVA ${id}.`,
     contact: "Contatto:",
     cookies: "Cookie e storage",
     cookiesP1:
-      "Questo sito non usa cookie di profilazione, analytics o pubblicità. Non c’è un banner di consenso perché, secondo le Linee guida del Garante (cookie e altri identificatori, 10 giugno 2021, ancora il riferimento in Italia nel 2026), il consenso serve solo per strumenti non tecnici.",
-    cookiesP2: "Strumenti di prima parte, tutti tecnici:",
-    cartStorage:
-      "contenuto del carrello, sul tuo browser. Serve a comprare. Resta finché lo svuoti o pulisci i dati del sito.",
-    orderStorage:
-      "riepilogo dell’ultimo ordine, solo per mostrarlo dopo il checkout. Fine sessione.",
+      "Niente cookie di profilazione, analytics o pubblicità. Per questo non c’è un banner.",
     cookiesP3:
-      "Nessun dato del carrello va su un server nostro: il sito è statico (GitHub Pages). Chiudi il browser o cancella i dati del sito per toglierli.",
+      "Il carrello sta solo sul tuo browser, non su un server nostro.",
     cookiesPaypal:
       "Se paghi con PayPal, il checkout carica lo script di PayPal su questa pagina: valgono cookie e informativa di PayPal",
     cookiesMore: "Dettaglio nella",
     cookiesMoreLink: "cookie policy",
     data: "Quali dati, perché",
-    dataIntro:
-      "Trattiamo solo ciò che ci scrivi tu, per queste finalità e basi giuridiche (art. 6 GDPR):",
+    dataIntro: "Trattiamo solo ciò che ci scrivi tu:",
     dataOrder:
-      "nome, email, telefono, indirizzo, contenuto dell’ordine. Base: contratto, art. 6.1.b. Conservazione: il tempo dell’ordine, della spedizione e degli obblighi contabili/fiscali.",
-    dataPaypal:
-      "l’importo e l’indirizzo li gestisce PayPal. Base: contratto, art. 6.1.b.",
-    dataForms:
-      "nome, email, messaggio. Base: misure precontrattuali o legittimo interesse a rispondere, art. 6.1.b o 6.1.f. Conservazione: finché serve a gestire la richiesta, poi cancellazione.",
+      "nome, email, telefono, indirizzo, ordine — per spedire e per i conti.",
+    dataPaypal: "importo e indirizzo li gestisce PayPal, se paghi così.",
+    dataForms: "nome, email, messaggio — per risponderti, poi li tolgo.",
     dataNewsletter: (email: string) =>
-      `solo l’email, e solo se spunti la casella. Base: consenso, art. 6.1.a. Puoi revocare in qualsiasi momento scrivendo a ${email}. Conservazione: fino alla revoca.`,
-    noProfiling: "Non facciamo profilazione, né decisioni automatizzate.",
+      `solo l’email, se spunti la casella. Revoca quando vuoi scrivendo a ${email}.`,
+    noProfiling: "Niente profilazione.",
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
-      "Hosting e alcune funzioni stanno negli Stati Uniti. Non uso l’art. 49.1.b come base ordinaria: quel comma è per trasferimenti occasionali, non per l’architettura del sito. Per GitHub, Vercel e Resend il trasferimento poggia su decisione di adeguatezza UE–USA (Data Privacy Framework) se il fornitore è certificato, altrimenti su clausole contrattuali standard (art. 46 GDPR). FormSubmit, finché resta sui moduli di contatto, è USA: stessa logica, e va sostituito quando le mail transazionali passano tutte da Vercel.",
+      "Pagine su GitHub (USA). Magazzino, webhook PayPal e mail di conferma su Vercel e Resend (USA). Moduli di contatto su FormSubmit (USA). Pagamenti su PayPal.",
     formsubmit:
-      "moduli di contatto, newsletter, corsi, consulenza, ristampe: gli arrivano e ci inoltra la mail. Società USA. Informativa:",
-    paypalRecv:
-      "se scegli PayPal. Titolare del pagamento: PayPal (Europe) S.à r.l. et Cie, S.C.A. (Lussemburgo); il gruppo ha società anche negli USA.",
-    github:
-      "GitHub, Inc. (USA / Microsoft) — hosting delle pagine pubbliche (GitHub Pages), non dei moduli. Informativa su github.com.",
-    vercel:
-      "Vercel Inc. (USA) — funzioni server: webhook PayPal, magazzino, e (quando configurato) invio delle conferme d’ordine e dell’avviso di recesso. Tratta dati dell’ordine, non i dati della carta.",
-    resend:
-      "Resend (USA) — invio delle email transazionali (conferma d’ordine e avviso di ricevimento del recesso) con mittente Corpoceleste. Non tratta i pagamenti.",
+      "contatti, newsletter, corsi, consulenza, ristampe: inoltra la mail. Società USA. Informativa:",
+    paypalRecv: "se paghi con PayPal (sede europea, gruppo anche USA).",
+    github: "hosting delle pagine pubbliche. Informativa su github.com.",
+    vercel: "webhook PayPal, magazzino, mail di conferma ordine e recesso. Dati d’ordine, non la carta.",
+    resend: "invio delle mail di conferma ordine e recesso, mittente Corpoceleste.",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
     rights: "Diritti",
     rightsBody:
       "Puoi chiedere accesso, rettifica, cancellazione, limitazione, opposizione e, dove applicabile, portabilità, scrivendo a",
     rightsTail:
-      "Puoi revocare il consenso alla newsletter senza pregiudicare quanto fatto prima. Reclamo: Garante per la protezione dei dati personali,",
+      "Revoca la newsletter quando vuoi. Reclamo: Garante privacy,",
     orderBank: "Ordine (bonifico)",
     payPaypal: "Pagamento PayPal",
     formsLabel: "Contatti, corsi, consulenza, richiesta ristampa",
@@ -261,45 +248,29 @@ const it = {
   },
   cookiePolicy: {
     title: "Cookie policy",
-    lede:
-      "Come usiamo cookie e storage sul sito Corpoceleste. Complemento dell’informativa privacy.",
-    updated: "Ultimo aggiornamento: 28 settembre 2026.",
-    what: "Cosa sono",
-    whatBody:
-      "I cookie sono piccoli file che un sito può salvare sul tuo dispositivo. Qui usiamo soprattutto storage del browser (localStorage / sessionStorage), non cookie HTTP di terze parti.",
-    noBanner: "Perché non c’è un banner",
-    noBannerBody:
-      "Non installiamo cookie di profilazione, analytics o pubblicità. Secondo le Linee guida del Garante (cookie e altri identificatori, 10 giugno 2021), il consenso preventivo serve solo per strumenti non strettamente necessari. Quelli elencati sotto sono tecnici: servono al carrello e al riepilogo ordine.",
-    table: "Strumenti sul sito",
-    name: "Nome",
-    type: "Tipo",
-    purpose: "Scopo",
-    duration: "Durata",
-    cartName: "corpoceleste-cart",
-    cartType: "localStorage (prima parte)",
-    cartPurpose: "Memorizzare maglie e quantità nel carrello.",
-    cartDuration: "Fino a svuotamento carrello o cancellazione dati del sito.",
-    orderName: "cc-last-order",
-    orderType: "sessionStorage (prima parte)",
-    orderPurpose: "Mostrare il riepilogo dopo il checkout.",
-    orderDuration: "Fine sessione del browser.",
+    lede: "Niente profilazione. Il carrello sta sul tuo browser. PayPal, se paghi così.",
+    updated: "Ultimo aggiornamento: 1 ottobre 2026.",
+    noBanner: "Niente banner",
+    noBannerBody: "Niente cookie di profilazione o pubblicità: per questo non c’è un banner.",
+    onSite: "Sul tuo browser",
+    onSiteBody:
+      "Il carrello e il riepilogo dopo il checkout restano sul tuo dispositivo, non su un server nostro.",
     third: "Terze parti",
     thirdBody:
-      "Il sito pubblico non carica script di analytics o pubblicità. Se paghi con PayPal, il checkout carica lo script di PayPal su questa pagina: valgono cookie e informativa di PayPal, non solo dopo che sei uscito dal dominio.",
-    manage: "Come gestirli",
-    manageBody:
-      "Puoi cancellare i dati del sito dalle impostazioni del browser (cronologia / dati dei siti). Svuotando il carrello da Corpoceleste rimuovi il contenuto di corpoceleste-cart.",
+      "Se paghi con PayPal, il checkout carica il suo script: valgono cookie e informativa di PayPal.",
+    manage: "Come toglierli",
+    manageBody: "Impostazioni del browser, dati del sito. Oppure svuota il carrello da qui.",
     privacyLink: "Informativa privacy completa",
     contact: "Contatto titolare:",
   },
   terms: {
     title: "Condizioni di vendita",
-    lede: "Chi vende, cosa compri, come si paga, come si recede. Vendita a distanza a consumatori ai sensi del Codice del consumo (d.lgs. 206/2005).",
+    lede: "Chi vende, cosa compri, come si paga, come si recede.",
     updated: "Ultimo aggiornamento: 1 ottobre 2026.",
     seller: "Venditore",
     vatLabel: "Partita IVA:",
     reaLabel: "REA:",
-    vatMissing: "Partita IVA: in corso di attribuzione. Contattami per i dati fiscali completi.",
+    vatMissing: "Partita IVA: la pubblico quando è attiva.",
     contactLabel: "Contatto:",
     scope: "Cosa regolano",
     scopeBody:
@@ -312,7 +283,7 @@ const it = {
       `I prezzi sono in euro e IVA inclusa, salvo diversa indicazione. La spedizione è a parte e viene mostrata prima del pagamento: ${italy} € in Italia, ${europe} € in Europa. Il totale da pagare, spedizione compresa, è quello che vedi in checkout.`,
     order: "Come si conclude l’ordine",
     orderBody:
-      "Le pagine prodotto sono un invito all’acquisto, non un’offerta vincolante. Il contratto si conclude quando premi il pulsante di pagamento in checkout, che riporta «ordine con obbligo di pagamento», e ricevi la conferma d’ordine via email. Se un pezzo non fosse più disponibile dopo il pagamento, ti avviso e ti rimborso per intero.",
+      "Il contratto si conclude in checkout, quando premi il pulsante di pagamento e ricevi la conferma via email. Se un pezzo non c’è più dopo il pagamento, ti avviso e ti rimborso.",
     payment: "Pagamenti",
     paymentBody:
       "PayPal (anche con carta, tramite PayPal) oppure bonifico bancario. Non tratto né conservo i dati della tua carta: se paghi con PayPal, il pagamento avviene sui sistemi di PayPal. Con bonifico l’ordine è confermato quando ricevo l’accredito; tengo il pezzo in riserva 5 giorni.",
@@ -336,9 +307,7 @@ const it = {
       "Per qualsiasi problema scrivimi prima a me: rispondo entro pochi giorni e nella pratica si risolve così. Non aderisco a un organismo ADR specifico. Se non troviamo un accordo, puoi comunque rivolgerti a un organismo iscritto all’elenco del Ministero delle imprese e del made in Italy. La piattaforma europea ODR è stata dismessa nel luglio 2025 e non è più utilizzabile.",
     law: "Legge applicabile",
     lawBody:
-      "Al contratto si applica la legge italiana. Restano ferme le tutele più favorevoli previste dalla legge del paese dell’Unione europea in cui risiedi come consumatore. Per le controversie è competente il foro del tuo luogo di residenza o domicilio.",
-    disclaimer:
-      "Testo informativo, non consulenza legale. Se hai dubbi sui tuoi diritti, scrivimi o rivolgiti a un’associazione di consumatori.",
+      "Legge italiana. Se vivi in un altro paese UE, restano le tutele più favorevoli di lì. Foro: dove abiti tu.",
   },
   withdrawal: {
     title: "Recesso",
@@ -481,7 +450,7 @@ const en: typeof it = {
     paypalBack: "Back to Corpoceleste",
     payTitle: "Choose how to pay",
     methodPaypal: "PayPal or card",
-    paypalSoon: "Active as soon as the PayPal account is connected. For now use the bank transfer.",
+    paypalSoon: "PayPal is not active yet. Use the bank transfer for now.",
     bank: "Bank transfer",
     bankNote:
       "Send the form: you’ll get the IBAN by email. The order is confirmed when payment arrives; then I ship.",
@@ -565,61 +534,48 @@ const en: typeof it = {
   },
   privacy: {
     title: "Privacy",
-    lede:
-      "Information on the processing of personal data and on cookies and storage, Art. 13 GDPR.",
+    lede: "Who processes the data, why, and who receives it.",
     updated: "Last updated: 1 October 2026.",
     controller: "Controller",
     controllerBody: (name: string, sede: string) =>
-      `${name}, controller of personal data for the Corpoceleste website. Address: ${sede}.`,
+      `${name}, for the Corpoceleste site. Address: ${sede}.`,
     vat: (id: string) => `VAT ${id}.`,
     contact: "Contact:",
     cookies: "Cookies and storage",
     cookiesP1:
-      "This site does not use profiling, analytics or advertising cookies. There is no consent banner because, under the Italian DPA guidelines (cookies and other identifiers, 10 June 2021, still the reference in Italy in 2026), consent is required only for non-essential tools.",
-    cookiesP2: "First-party tools, all strictly necessary:",
-    cartStorage:
-      "cart contents, in your browser. Needed to buy. It stays until you empty the cart or clear this site’s data.",
-    orderStorage:
-      "summary of the last order, only to show it after checkout. Ends with the session.",
+      "No profiling, analytics or advertising cookies. That is why there is no banner.",
     cookiesP3:
-      "No cart data is sent to a server of ours: the site is static (GitHub Pages). Close the browser or clear this site’s data to remove it.",
+      "The cart stays in your browser, not on a server of ours.",
     cookiesPaypal:
       "If you pay with PayPal, checkout loads PayPal’s script on this page; PayPal’s cookies and privacy notice then apply",
-    cookiesMore: "Full detail in the",
+    cookiesMore: "Detail in the",
     cookiesMoreLink: "cookie policy",
     data: "What data, and why",
-    dataIntro:
-      "We only process what you send us, for these purposes and legal bases (Art. 6 GDPR):",
+    dataIntro: "We only process what you send us:",
     dataOrder:
-      "name, email, phone, address, order contents. Basis: contract, Art. 6(1)(b). Kept for the order, the shipment, and accounting/tax duties.",
-    dataPaypal:
-      "the amount and the address are handled by PayPal. Basis: contract, Art. 6(1)(b).",
-    dataForms:
-      "name, email, message. Basis: steps prior to a contract, or legitimate interest in answering, Art. 6(1)(b) or 6(1)(f). Kept for as long as needed to handle the request, then deleted.",
+      "name, email, phone, address, order — to ship and for the accounts.",
+    dataPaypal: "amount and address are handled by PayPal, if you pay that way.",
+    dataForms: "name, email, message — to reply, then we delete them.",
     dataNewsletter: (email: string) =>
-      `email only, and only if you tick the box. Basis: consent, Art. 6(1)(a). You can withdraw at any time by writing to ${email}. Kept until withdrawal.`,
-    noProfiling: "No profiling, no automated decisions.",
+      `email only, if you tick the box. Withdraw whenever you want by writing to ${email}.`,
+    noProfiling: "No profiling.",
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
-      "Hosting and some functions are in the United States. I do not rely on Art. 49(1)(b) as the ordinary basis: that derogation is for occasional transfers, not for the site’s architecture. For GitHub, Vercel and Resend the transfer rests on the EU–US Data Privacy Framework adequacy decision if the provider is certified, otherwise on standard contractual clauses (Art. 46 GDPR). FormSubmit, for as long as it remains on contact forms, is US: same logic, and it will be replaced once all transactional mail goes through Vercel.",
+      "Pages on GitHub (USA). Stock, PayPal webhook and confirmation mail on Vercel and Resend (USA). Contact forms on FormSubmit (USA). Payments on PayPal.",
     formsubmit:
-      "contact, newsletter, workshop, consulting and reprint forms are sent there and forwarded to us by email. US company. Notice:",
-    paypalRecv:
-      "if you choose PayPal. Payment controller: PayPal (Europe) S.à r.l. et Cie, S.C.A. (Luxembourg); the group also has US companies.",
-    github:
-      "GitHub, Inc. (USA / Microsoft) — hosts the public pages (GitHub Pages), not the forms. Notice on github.com.",
-    vercel:
-      "Vercel Inc. (USA) — server functions: PayPal webhook, stock, and (once configured) sending of order confirmations and withdrawal acknowledgements. Handles order data, not card data.",
-    resend:
-      "Resend (USA) — sends transactional email (order confirmation and withdrawal acknowledgement) from the Corpoceleste address. Does not handle payments.",
+      "contact, newsletter, workshops, consulting, reprints: forwards the email. US company. Notice:",
+    paypalRecv: "if you pay with PayPal (European seat, group also in the USA).",
+    github: "hosts the public pages. Notice on github.com.",
+    vercel: "PayPal webhook, stock, order and withdrawal confirmation mail. Order data, not the card.",
+    resend: "sends order and withdrawal confirmation mail, from Corpoceleste.",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
     rights: "Rights",
     rightsBody:
       "You can ask for access, rectification, erasure, restriction, objection and, where it applies, portability, by writing to",
     rightsTail:
-      "You can withdraw newsletter consent without affecting anything done before. Complaint: Garante per la protezione dei dati personali,",
+      "Withdraw the newsletter whenever you want. Complaint: Garante privacy,",
     orderBank: "Order (bank transfer)",
     payPaypal: "PayPal payment",
     formsLabel: "Contact, workshops, consulting, reprint request",
@@ -627,45 +583,29 @@ const en: typeof it = {
   },
   cookiePolicy: {
     title: "Cookie policy",
-    lede:
-      "How we use cookies and storage on Corpoceleste. Complements the privacy notice.",
-    updated: "Last updated: 28 September 2026.",
-    what: "What they are",
-    whatBody:
-      "Cookies are small files a site may store on your device. Here we mainly use browser storage (localStorage / sessionStorage), not third-party HTTP cookies.",
-    noBanner: "Why there is no banner",
-    noBannerBody:
-      "We do not install profiling, analytics or advertising cookies. Under the Italian DPA guidelines (cookies and other identifiers, 10 June 2021), prior consent is required only for non-essential tools. Those listed below are strictly necessary: cart and order summary.",
-    table: "Tools on this site",
-    name: "Name",
-    type: "Type",
-    purpose: "Purpose",
-    duration: "Duration",
-    cartName: "corpoceleste-cart",
-    cartType: "localStorage (first-party)",
-    cartPurpose: "Store shirts and quantities in the cart.",
-    cartDuration: "Until you empty the cart or clear this site’s data.",
-    orderName: "cc-last-order",
-    orderType: "sessionStorage (first-party)",
-    orderPurpose: "Show the summary after checkout.",
-    orderDuration: "End of the browser session.",
+    lede: "No profiling. The cart stays in your browser. PayPal, if you pay that way.",
+    updated: "Last updated: 1 October 2026.",
+    noBanner: "No banner",
+    noBannerBody: "No profiling, analytics or advertising cookies: that is why there is no banner.",
+    onSite: "On your browser",
+    onSiteBody:
+      "The cart and the post-checkout summary stay on your device, not on a server of ours.",
     third: "Third parties",
     thirdBody:
-      "The public site does not load analytics or advertising scripts. If you pay with PayPal, checkout loads PayPal’s script on this page: PayPal’s cookies and notice apply, not only after you leave this domain.",
-    manage: "How to manage them",
-    manageBody:
-      "You can clear this site’s data in the browser settings (history / site data). Emptying the Corpoceleste cart removes corpoceleste-cart.",
+      "If you pay with PayPal, checkout loads its script: PayPal’s cookies and notice apply.",
+    manage: "How to remove them",
+    manageBody: "Browser settings, site data. Or empty the cart from here.",
     privacyLink: "Full privacy notice",
     contact: "Controller contact:",
   },
   terms: {
     title: "Terms of sale",
-    lede: "Who sells, what you buy, how you pay, how you withdraw. Distance selling to consumers under the Italian Consumer Code (d.lgs. 206/2005), which implements EU consumer law.",
+    lede: "Who sells, what you buy, how you pay, how you withdraw.",
     updated: "Last updated: 1 October 2026.",
     seller: "Seller",
     vatLabel: "VAT number:",
     reaLabel: "Business register:",
-    vatMissing: "VAT number: being assigned. Write to me for full tax details.",
+    vatMissing: "VAT number: I’ll publish it when it is active.",
     contactLabel: "Contact:",
     scope: "What these terms cover",
     scopeBody:
@@ -678,7 +618,7 @@ const en: typeof it = {
       `Prices are in euro and include VAT unless stated otherwise. Shipping is charged separately and shown before payment: €${italy} to Italy, €${europe} within Europe. The total you see at checkout, shipping included, is what you pay.`,
     order: "How the order is concluded",
     orderBody:
-      "Product pages are an invitation to buy, not a binding offer. The contract is concluded when you press the payment button at checkout, labelled “order with obligation to pay”, and receive the order confirmation by email. If a piece is no longer available after payment, I tell you and refund you in full.",
+      "The contract is concluded at checkout, when you press the payment button and receive the confirmation by email. If a piece is gone after payment, I tell you and refund you.",
     payment: "Payment",
     paymentBody:
       "PayPal (card payments also go through PayPal) or bank transfer. I never receive or store your card details: with PayPal the payment happens on PayPal’s systems. With bank transfer the order is confirmed when the money arrives; I hold the piece for 5 days.",
@@ -702,9 +642,7 @@ const en: typeof it = {
       "For any problem write to me first: I answer within a few days and in practice that settles it. I do not adhere to a specific ADR body. If we cannot agree, you can still turn to a body listed by the Italian Ministry of Enterprise. The European ODR platform was shut down in July 2025 and is no longer available.",
     law: "Applicable law",
     lawBody:
-      "Italian law applies to the contract. More favourable protections under the law of the EU country where you live as a consumer still apply. For disputes, the court of your place of residence or domicile has jurisdiction.",
-    disclaimer:
-      "Informative text, not legal advice. If you are unsure about your rights, write to me or contact a consumer association.",
+      "Italian law. If you live in another EU country, the more favourable protections there still apply. Court: where you live.",
   },
   withdrawal: {
     title: "Withdrawal",
@@ -847,7 +785,7 @@ const de: typeof it = {
     paypalBack: "Zurück zu Corpoceleste",
     payTitle: "Zahlung wählen",
     methodPaypal: "PayPal oder Karte",
-    paypalSoon: "Aktiv, sobald das PayPal-Konto verbunden ist. Zahle bis dahin per Überweisung.",
+    paypalSoon: "PayPal ist noch nicht aktiv. Bis dahin Überweisung.",
     bank: "Überweisung",
     bankNote:
       "Schick das Formular: du bekommst die IBAN per E-Mail. Die Bestellung gilt, wenn die Zahlung da ist; danach verschicke ich.",
@@ -931,61 +869,48 @@ const de: typeof it = {
   },
   privacy: {
     title: "Datenschutz",
-    lede:
-      "Informationen zur Verarbeitung personenbezogener Daten und zu Cookies und Speicher, Art. 13 DSGVO.",
+    lede: "Wer die Daten verarbeitet, wozu, und wer sie erhält.",
     updated: "Stand: 1. Oktober 2026.",
     controller: "Verantwortlicher",
     controllerBody: (name: string, sede: string) =>
-      `${name}, Verantwortlicher für die Verarbeitung auf der Website Corpoceleste. Sitz: ${sede}.`,
+      `${name}, für die Website Corpoceleste. Sitz: ${sede}.`,
     vat: (id: string) => `USt-IdNr. ${id}.`,
     contact: "Kontakt:",
     cookies: "Cookies und Speicher",
     cookiesP1:
-      "Diese Website verwendet keine Profiling-, Analyse- oder Werbe-Cookies. Es gibt kein Einwilligungsbanner, weil nach den Leitlinien der italienischen Datenschutzbehörde (Cookies und andere Kennungen, 10. Juni 2021, in Italien 2026 weiterhin maßgeblich) eine Einwilligung nur für nicht notwendige Werkzeuge nötig ist.",
-    cookiesP2: "First-Party-Werkzeuge, alle technisch erforderlich:",
-    cartStorage:
-      "Inhalt des Warenkorbs, in deinem Browser. Nötig zum Kaufen. Bleibt, bis du den Warenkorb leerst oder die Daten dieser Website löschst.",
-    orderStorage:
-      "Zusammenfassung der letzten Bestellung, nur zur Anzeige nach dem Checkout. Endet mit der Sitzung.",
+      "Keine Profiling-, Analyse- oder Werbe-Cookies. Deshalb gibt es kein Banner.",
     cookiesP3:
-      "Keine Warenkorbdaten gehen auf einen Server von uns: die Website ist statisch (GitHub Pages). Browser schließen oder die Daten dieser Website löschen, um sie zu entfernen.",
+      "Der Warenkorb bleibt in deinem Browser, nicht auf einem Server von uns.",
     cookiesPaypal:
       "Wenn du mit PayPal zahlst, lädt die Kasse das PayPal-Skript auf dieser Seite; es gelten Cookies und Hinweise von PayPal",
     cookiesMore: "Details in der",
     cookiesMoreLink: "Cookie-Richtlinie",
     data: "Welche Daten, wozu",
-    dataIntro:
-      "Wir verarbeiten nur, was du uns schreibst, zu diesen Zwecken und Rechtsgrundlagen (Art. 6 DSGVO):",
+    dataIntro: "Wir verarbeiten nur, was du uns schreibst:",
     dataOrder:
-      "Name, E-Mail, Telefon, Adresse, Bestellinhalt. Grundlage: Vertrag, Art. 6 Abs. 1 lit. b. Speicherung: für Bestellung, Versand und buchhalterische/steuerliche Pflichten.",
-    dataPaypal:
-      "Betrag und Adresse verarbeitet PayPal. Grundlage: Vertrag, Art. 6 Abs. 1 lit. b.",
-    dataForms:
-      "Name, E-Mail, Nachricht. Grundlage: vorvertragliche Schritte oder berechtigtes Interesse an einer Antwort, Art. 6 Abs. 1 lit. b oder f. Speicherung: solange die Anfrage es braucht, dann Löschung.",
+      "Name, E-Mail, Telefon, Adresse, Bestellung — zum Versand und für die Buchhaltung.",
+    dataPaypal: "Betrag und Adresse verarbeitet PayPal, wenn du so zahlst.",
+    dataForms: "Name, E-Mail, Nachricht — zum Antworten, dann löschen wir sie.",
     dataNewsletter: (email: string) =>
-      `nur die E-Mail, und nur wenn du das Kästchen ankreuzt. Grundlage: Einwilligung, Art. 6 Abs. 1 lit. a. Widerruf jederzeit an ${email}. Speicherung: bis zum Widerruf.`,
-    noProfiling: "Kein Profiling, keine automatisierten Entscheidungen.",
+      `nur die E-Mail, wenn du das Kästchen ankreuzt. Widerruf jederzeit an ${email}.`,
+    noProfiling: "Kein Profiling.",
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
-      "Hosting und einzelne Funktionen liegen in den USA. Ich stütze mich nicht auf Art. 49 Abs. 1 lit. b als Regelgrundlage: diese Ausnahme gilt für gelegentliche Übermittlungen, nicht für die Architektur der Website. Für GitHub, Vercel und Resend stützt sich die Übermittlung auf den Angemessenheitsbeschluss EU–USA (Data Privacy Framework), sofern der Anbieter zertifiziert ist, sonst auf Standardvertragsklauseln (Art. 46 DSGVO). FormSubmit, solange es für Kontaktformulare bleibt, ist USA: dieselbe Logik; es wird ersetzt, sobald alle transaktionalen Mails über Vercel laufen.",
+      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook und Bestätigungsmails auf Vercel und Resend (USA). Kontaktformulare auf FormSubmit (USA). Zahlungen auf PayPal.",
     formsubmit:
-      "Kontakt-, Newsletter-, Kurs-, Beratungs- und Nachdruckformulare kommen dort an und werden per Mail an uns weitergeleitet. US-Unternehmen. Hinweise:",
-    paypalRecv:
-      "wenn du PayPal wählst. Verantwortlicher der Zahlung: PayPal (Europe) S.à r.l. et Cie, S.C.A. (Luxemburg); die Gruppe hat auch Gesellschaften in den USA.",
-    github:
-      "GitHub, Inc. (USA / Microsoft) — hostet die öffentlichen Seiten (GitHub Pages), nicht die Formulare. Hinweise auf github.com.",
-    vercel:
-      "Vercel Inc. (USA) — Serverfunktionen: PayPal-Webhook, Bestand und (nach Einrichtung) Versand der Bestellbestätigung und der Widerrufs-Empfangsbestätigung. Verarbeitet Bestelldaten, keine Kartendaten.",
-    resend:
-      "Resend (USA) — Versand der transaktionalen E-Mails (Bestellbestätigung und Empfangsbestätigung des Widerrufs) mit Absender Corpoceleste. Verarbeitet keine Zahlungen.",
+      "Kontakt, Newsletter, Kurse, Beratung, Nachdruck: leitet die Mail weiter. US-Unternehmen. Hinweise:",
+    paypalRecv: "wenn du mit PayPal zahlst (Sitz in Europa, Gruppe auch in den USA).",
+    github: "hostet die öffentlichen Seiten. Hinweise auf github.com.",
+    vercel: "PayPal-Webhook, Bestand, Bestell- und Widerrufsbestätigung. Bestelldaten, keine Karte.",
+    resend: "versendet Bestell- und Widerrufsbestätigung, Absender Corpoceleste.",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
     rights: "Rechte",
     rightsBody:
       "Du kannst Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und, soweit es gilt, Datenübertragbarkeit verlangen, per Mail an",
     rightsTail:
-      "Die Einwilligung zum Newsletter kannst du widerrufen, ohne dass Früheres unwirksam wird. Beschwerde: Garante per la protezione dei dati personali,",
+      "Newsletter jederzeit widerrufen. Beschwerde: Garante privacy,",
     orderBank: "Bestellung (Überweisung)",
     payPaypal: "PayPal-Zahlung",
     formsLabel: "Kontakt, Kurse, Beratung, Nachdruck",
@@ -993,45 +918,29 @@ const de: typeof it = {
   },
   cookiePolicy: {
     title: "Cookie-Richtlinie",
-    lede:
-      "Wie wir Cookies und Speicher auf Corpoceleste nutzen. Ergänzung zum Datenschutzhinweis.",
-    updated: "Stand: 28. September 2026.",
-    what: "Was sie sind",
-    whatBody:
-      "Cookies sind kleine Dateien, die eine Website auf deinem Gerät speichern kann. Hier nutzen wir vor allem Browser-Speicher (localStorage / sessionStorage), keine HTTP-Cookies Dritter.",
-    noBanner: "Warum kein Banner",
-    noBannerBody:
-      "Wir installieren keine Profiling-, Analyse- oder Werbe-Cookies. Nach den Leitlinien der italienischen Datenschutzbehörde (Cookies und andere Kennungen, 10. Juni 2021) ist eine vorherige Einwilligung nur für nicht notwendige Werkzeuge nötig. Die unten genannten sind technisch erforderlich: Warenkorb und Bestellübersicht.",
-    table: "Werkzeuge auf dieser Website",
-    name: "Name",
-    type: "Typ",
-    purpose: "Zweck",
-    duration: "Dauer",
-    cartName: "corpoceleste-cart",
-    cartType: "localStorage (First-Party)",
-    cartPurpose: "Shirts und Mengen im Warenkorb speichern.",
-    cartDuration: "Bis du den Warenkorb leerst oder die Daten dieser Website löschst.",
-    orderName: "cc-last-order",
-    orderType: "sessionStorage (First-Party)",
-    orderPurpose: "Zusammenfassung nach dem Checkout anzeigen.",
-    orderDuration: "Ende der Browser-Sitzung.",
+    lede: "Kein Profiling. Der Warenkorb bleibt in deinem Browser. PayPal, wenn du so zahlst.",
+    updated: "Stand: 1. Oktober 2026.",
+    noBanner: "Kein Banner",
+    noBannerBody: "Keine Profiling-, Analyse- oder Werbe-Cookies: deshalb gibt es kein Banner.",
+    onSite: "In deinem Browser",
+    onSiteBody:
+      "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät, nicht auf einem Server von uns.",
     third: "Dritte",
     thirdBody:
-      "Die öffentliche Website lädt keine Analyse- oder Werbeskripte. Wenn du mit PayPal zahlst, lädt die Kasse das PayPal-Skript auf dieser Seite: es gelten Cookies und Hinweise von PayPal, nicht erst nach dem Verlassen der Domain.",
-    manage: "Verwaltung",
-    manageBody:
-      "Du kannst die Daten dieser Website in den Browser-Einstellungen löschen (Verlauf / Website-Daten). Wenn du den Corpoceleste-Warenkorb leerst, wird corpoceleste-cart entfernt.",
+      "Wenn du mit PayPal zahlst, lädt die Kasse sein Skript: es gelten Cookies und Hinweise von PayPal.",
+    manage: "Wie du sie entfernst",
+    manageBody: "Browser-Einstellungen, Website-Daten. Oder den Warenkorb hier leeren.",
     privacyLink: "Vollständiger Datenschutzhinweis",
     contact: "Kontakt Verantwortlicher:",
   },
   terms: {
     title: "Verkaufsbedingungen",
-    lede: "Wer verkauft, was du kaufst, wie bezahlt wird, wie du widerrufst. Fernabsatz an Verbraucher nach italienischem Verbrauchergesetzbuch (d.lgs. 206/2005), das EU-Verbraucherrecht umsetzt.",
+    lede: "Wer verkauft, was du kaufst, wie bezahlt wird, wie du widerrufst.",
     updated: "Stand: 1. Oktober 2026.",
     seller: "Verkäufer",
     vatLabel: "USt-IdNr.:",
     reaLabel: "Handelsregister:",
-    vatMissing: "USt-IdNr.: wird zugeteilt. Schreib mir für die vollständigen Steuerdaten.",
+    vatMissing: "USt-IdNr.: ich veröffentliche sie, sobald sie aktiv ist.",
     contactLabel: "Kontakt:",
     scope: "Geltungsbereich",
     scopeBody:
@@ -1044,7 +953,7 @@ const de: typeof it = {
       `Preise verstehen sich in Euro und inklusive MwSt., sofern nicht anders angegeben. Der Versand wird getrennt berechnet und vor der Zahlung angezeigt: ${italy} € nach Italien, ${europe} € innerhalb Europas. Der Gesamtbetrag an der Kasse, Versand inbegriffen, ist der Betrag, den du zahlst.`,
     order: "Zustandekommen der Bestellung",
     orderBody:
-      "Produktseiten sind eine Aufforderung zur Bestellung, kein bindendes Angebot. Der Vertrag kommt zustande, wenn du an der Kasse den Zahlungsbutton mit der Aufschrift «zahlungspflichtig bestellen» drückst und die Bestellbestätigung per E-Mail erhältst. Ist ein Stück nach der Zahlung nicht mehr verfügbar, melde ich mich und erstatte den vollen Betrag.",
+      "Der Vertrag kommt an der Kasse zustande, wenn du den Zahlungsbutton drückst und die Bestätigung per E-Mail erhältst. Ist ein Stück nach der Zahlung weg, melde ich mich und erstatte.",
     payment: "Zahlung",
     paymentBody:
       "PayPal (auch Kartenzahlung läuft über PayPal) oder Banküberweisung. Ich erhalte und speichere keine Kartendaten: bei PayPal läuft die Zahlung über die Systeme von PayPal. Bei Überweisung gilt die Bestellung als bestätigt, wenn das Geld eingeht; ich reserviere das Stück 5 Tage.",
@@ -1068,9 +977,7 @@ const de: typeof it = {
       "Bei Problemen schreib zuerst mir: ich antworte innerhalb weniger Tage, und in der Praxis erledigt sich das so. Ich bin keiner bestimmten AS-Stelle angeschlossen. Kommen wir nicht zusammen, kannst du dich trotzdem an eine beim italienischen Unternehmensministerium gelistete Stelle wenden. Die europäische OS-Plattform wurde im Juli 2025 abgeschaltet und steht nicht mehr zur Verfügung.",
     law: "Anwendbares Recht",
     lawBody:
-      "Auf den Vertrag ist italienisches Recht anwendbar. Günstigere Schutzvorschriften des EU-Landes, in dem du als Verbraucher wohnst, bleiben unberührt. Für Streitigkeiten ist das Gericht deines Wohnsitzes oder Aufenthalts zuständig.",
-    disclaimer:
-      "Informationstext, keine Rechtsberatung. Wenn du bei deinen Rechten unsicher bist, schreib mir oder wende dich an eine Verbraucherzentrale.",
+      "Italienisches Recht. Wohnst du in einem anderen EU-Land, bleiben die günstigeren Schutzvorschriften von dort. Gericht: wo du wohnst.",
   },
   withdrawal: {
     title: "Widerruf",

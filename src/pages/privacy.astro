@@ -27,15 +27,6 @@ const p = copy.privacy;
 
       <h2>{p.cookies}</h2>
       <p>{p.cookiesP1}</p>
-      <p>{p.cookiesP2}</p>
-      <ul>
-        <li>
-          <strong>localStorage <code>corpoceleste-cart</code></strong> — {p.cartStorage}
-        </li>
-        <li>
-          <strong>sessionStorage <code>cc-last-order</code></strong> — {p.orderStorage}
-        </li>
-      </ul>
       <p>{p.cookiesP3}</p>
       <p>
         {p.cookiesPaypal}
@@ -91,8 +82,7 @@ const p = copy.privacy;
 
       <h2>{p.rights}</h2>
       <p>
-        {p.rightsBody} <a href={`mailto:${site.email}`}>{site.email}</a>.
-        {p.rightsTail}
+        {p.rightsBody} <a href={`mailto:${site.email}`}>{site.email}</a>. {p.rightsTail}
         <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.
       </p>
     </div>

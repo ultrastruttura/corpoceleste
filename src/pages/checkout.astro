@@ -1,6 +1,5 @@
 ---
 import Base from "../layouts/Base.astro";
-import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { site, formEndpoint } from "../data/site";
 import { siteSettings } from "../data/settings";
@@ -132,7 +131,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
               <label for="o-note">{copy.checkout.notes}</label>
               <textarea id="o-note" name="note"></textarea>
             </div>
-            <PrivacyCheck id="o-privacy" />
+            <input type="hidden" name="privacy" value="presa visione" />
             <button class="btn" type="submit" data-bank-submit disabled>{copy.checkout.sendOrder}</button>
           </form>
         </div>

@@ -6,7 +6,6 @@ import { currentLocale, pageUrl, t } from "../i18n";
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const c = copy.cookiePolicy;
-const p = copy.privacy;
 ---
 
 <Base title={`${c.title} — Corpoceleste`}>
@@ -19,39 +18,11 @@ const p = copy.privacy;
     <div class="prose page-main--article">
       <p>{c.updated}</p>
 
-      <h2>{c.what}</h2>
-      <p>{c.whatBody}</p>
-
       <h2>{c.noBanner}</h2>
       <p>{c.noBannerBody}</p>
 
-      <h2>{c.table}</h2>
-      <div class="cookie-table-wrap">
-        <table class="cookie-table">
-          <thead>
-            <tr>
-              <th>{c.name}</th>
-              <th>{c.type}</th>
-              <th>{c.purpose}</th>
-              <th>{c.duration}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>{c.cartName}</code></td>
-              <td>{c.cartType}</td>
-              <td>{c.cartPurpose}</td>
-              <td>{c.cartDuration}</td>
-            </tr>
-            <tr>
-              <td><code>{c.orderName}</code></td>
-              <td>{c.orderType}</td>
-              <td>{c.orderPurpose}</td>
-              <td>{c.orderDuration}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <h2>{c.onSite}</h2>
+      <p>{c.onSiteBody}</p>
 
       <h2>{c.third}</h2>
       <p>
@@ -69,32 +40,6 @@ const p = copy.privacy;
         {c.contact} <a href={`mailto:${site.email}`}>{site.email}</a>
         ({site.intestatario}, {site.sede}).
       </p>
-      <p>
-        {p.rightsTail}
-        <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.
-      </p>
     </div>
   </div>
 </Base>
-
-<style>
-  .cookie-table-wrap {
-    overflow-x: auto;
-    margin: 1.25rem 0;
-  }
-  .cookie-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.92rem;
-    text-align: left;
-  }
-  .cookie-table th,
-  .cookie-table td {
-    border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-    padding: 0.55rem 0.65rem 0.55rem 0;
-    vertical-align: top;
-  }
-  .cookie-table th {
-    font-weight: 600;
-  }
-</style>
