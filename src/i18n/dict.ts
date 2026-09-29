@@ -27,6 +27,10 @@ const it = {
     subscribe: "Iscriviti",
     made: "Made in Bergamo.",
     social: "Social",
+    terms: "Condizioni",
+    withdrawal: "Recesso",
+    privacy: "Privacy",
+    cookies: "Cookie",
   },
   shop: {
     soldOut: "Esaurite",
@@ -364,6 +368,10 @@ const en: typeof it = {
     subscribe: "Subscribe",
     made: "Made in Bergamo.",
     social: "Social",
+    terms: "Terms",
+    withdrawal: "Withdrawal",
+    privacy: "Privacy",
+    cookies: "Cookies",
   },
   shop: {
     soldOut: "Sold out",
@@ -699,6 +707,10 @@ const de: typeof it = {
     subscribe: "Anmelden",
     made: "Made in Bergamo.",
     social: "Social",
+    terms: "AGB",
+    withdrawal: "Widerruf",
+    privacy: "Datenschutz",
+    cookies: "Cookies",
   },
   shop: {
     soldOut: "Ausverkauft",

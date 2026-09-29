@@ -74,10 +74,10 @@ const copy = t(locale);
     <div class="footer-made">
       <p>
         {copy.footer.made} {year} Corpoceleste
-        · <a href={pageUrl(locale, "vendita/")}>{copy.terms.title}</a>{" "}
-        · <a href={pageUrl(locale, "recesso/")}>{copy.withdrawal.entry}</a>{" "}
-        · <a href={pageUrl(locale, "privacy/")}>{copy.privacy.title}</a>{" "}
-        · <a href={pageUrl(locale, "cookie/")}>{copy.cookiePolicy.title}</a>
+        · <a href={pageUrl(locale, "vendita/")}>{copy.footer.terms}</a>{" "}
+        · <a href={pageUrl(locale, "recesso/")}>{copy.footer.withdrawal}</a>{" "}
+        · <a href={pageUrl(locale, "privacy/")}>{copy.footer.privacy}</a>{" "}
+        · <a href={pageUrl(locale, "cookie/")}>{copy.footer.cookies}</a>
       </p>
       <p class="footer-legal">
         {site.intestatario} — {site.indirizzo || site.sede}
