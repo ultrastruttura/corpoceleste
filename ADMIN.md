@@ -69,6 +69,20 @@ Le pagine **Condizioni di vendita** (`/vendita/`) e **Recesso** (`/recesso/`) pr
 
 I testi delle pagine legali stanno in `src/i18n/dict.ts` (`terms` e `withdrawal`, in IT/EN/DE). Sono bozze operative: falle validare da un legale prima di vendere.
 
+## Mail di conferma (non FormSubmit)
+
+Bonifico e recesso, più la conferma PayPal dal webhook, devono partire **da Vercel con Resend** (mittente `info@corpoceleste.com`), non in copia da FormSubmit.
+
+1. Account [Resend](https://resend.com) (piano free), verifica il dominio `corpoceleste.com`
+2. Su Vercel: `RESEND_API_KEY`, `MAIL_FROM`, `SHOP_EMAIL`, `SITE_URL`
+3. In `src/data/site.ts` imposta `formApi` sull’URL Vercel (es. `https://corpoceleste-xxxx.vercel.app`)
+
+Finché `formApi` è vuoto, bonifico e recesso restano su FormSubmit — solo per lo sviluppo. Le mail al cliente **non** sono una conferma legale finché Resend non è acceso.
+
+## Tabella taglie
+
+Le misure (cm, capo disteso) sono in `src/data/site.ts` → `sizeChart`. **Misura i blank veri** e correggi i numeri prima di vendere. La composizione in Tina deve coincidere con l’etichetta cucita.
+
 ## Flusso tipico: nuova maglia
 
 1. Admin → Maglie → **Create New**

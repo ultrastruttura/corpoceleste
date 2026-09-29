@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
-import { site } from "../data/site";
+import { site, formEndpoint } from "../data/site";
 import { siteSettings } from "../data/settings";
 import { currentLocale, pageUrl, paypalSdkLocale, t } from "../i18n";
 
@@ -10,6 +10,7 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const shopEmail = siteSettings.shopEmail;
 const paypalSdk = Boolean(site.paypalClientId);
+const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}`;
 ---
 
 <Base title={`${copy.checkout.title} — Corpoceleste`}>
@@ -101,9 +102,10 @@ const paypalSdk = Boolean(site.paypalClientId);
         <div data-method-panel="bonifico" hidden={paypalSdk}>
           <h3 class="checkout-bank-title">{copy.checkout.bank}</h3>
           <p>{copy.checkout.bankNote}</p>
-          <form class="form is-locked" action={`https://formsubmit.co/${shopEmail}`} method="POST" data-checkout-form>
+          <form class="form is-locked" action={orderAction} method="POST" data-checkout-form>
             <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
             <input type="hidden" name="_next" data-next-grazie="ordine" />
+            <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="ordine" data-order-field />
             <FormHoney />
             <div>

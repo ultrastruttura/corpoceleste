@@ -266,11 +266,46 @@ const jsonLd = {
 
       <ul class="attrs">
         <li>{color}</li>
-        {composition && <li>{composition}</li>}
+        {
+          composition && (
+            <li>
+              {composition}
+              <span class="attr-note"> — {copy.product.compositionLabel}</span>
+            </li>
+          )
+        }
         <li>{copy.product.printOne}</li>
         <li>{copy.product.shipLine(site.shippingItaly, site.shippingEU)}</li>
         <li>{copy.product.vatIncluded}</li>
       </ul>
+      {
+        product.kind === "shirt" && (
+          <details class="size-chart">
+            <summary>{copy.product.sizeChart} ({copy.product.sizeUnit})</summary>
+            <table>
+              <thead>
+                <tr>
+                  <th>{copy.product.size}</th>
+                  <th>{copy.product.sizeChest}</th>
+                  <th>{copy.product.sizeLength}</th>
+                  <th>{copy.product.sizeSleeve}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {site.sizeChart.map((row) => (
+                  <tr>
+                    <th scope="row">{row.size}</th>
+                    <td>{row.chest}</td>
+                    <td>{row.length}</td>
+                    <td>{row.sleeve}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p class="size-chart-note">{copy.product.sizeChartNote}</p>
+          </details>
+        )
+      }
     </div>
   </div>
 

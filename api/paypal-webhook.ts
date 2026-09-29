@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { applyStockDecrement, createLedger, ledgerExists } from "../server/github-stock.js";
-import { notifyShopOrder } from "../server/notify-shop.js";
-import { formatOrderEmail } from "../server/stock-patch.js";
+import { notifyOrder } from "../server/notify-shop.js";
+import { customerOrderText } from "../server/customer-mail.js";
+import { formatCustomerOrderLines, formatShopOrderEmail } from "../server/stock-patch.js";
 import { parseOrderLines } from "../src/lib/paypal-lines.js";
 import {
   fetchPayPalOrder,
@@ -109,21 +110,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const notes = await applyStockDecrement(lines);
     const bits = order ? orderEmailBits(order) : { labels: [] as string[], total: undefined };
     const oversell = notes.some((n) => n.startsWith("OVERSELL"));
-    const ordine = formatOrderEmail({
+    const shopBody = formatShopOrderEmail({
       captureId,
       lines,
       stockNotes: notes,
       itemLabels: bits.labels,
       total: bits.total,
     });
+    const customerBody = customerOrderText({
+      metodo: "PayPal",
+      ordine: formatCustomerOrderLines({
+        captureId,
+        lines,
+        itemLabels: bits.labels,
+        total: bits.total,
+      }),
+    });
 
-    await notifyShopOrder({
-      subject: oversell
+    await notifyOrder({
+      shopSubject: oversell
         ? "ATTENZIONE oversell — Ordine Corpoceleste (PayPal)"
         : "Ordine shop Corpoceleste (PayPal)",
-      ordine,
-      metodo: "PayPal",
-      copyTo: order?.payer?.email_address,
+      shopBody,
+      customerTo: order?.payer?.email_address,
+      customerSubject: "Conferma d’ordine — Corpoceleste",
+      customerBody,
     });
 
     return res.status(200).json({ ok: true, captureId, notes, emailed: true });

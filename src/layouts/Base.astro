@@ -90,8 +90,9 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     }
   </head>
   <body>
+    <a class="skip-link" href="#main">{copy.nav.skip}</a>
     <Header />
-    <main>
+    <main id="main" tabindex="-1">
       <slot />
     </main>
     <Footer />

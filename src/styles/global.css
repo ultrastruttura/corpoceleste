@@ -31,8 +31,24 @@ html {
 }
 
 :focus-visible {
-  outline: 1px solid var(--ink);
-  outline-offset: 2px;
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  z-index: 100;
+  padding: 8px 12px;
+  background: var(--ink);
+  color: var(--white);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
 }
 
 .visually-hidden {
@@ -1058,6 +1074,40 @@ body.cart-open {
 .attrs li {
   padding: 12px 0;
   border-bottom: 1px solid var(--ink);
+}
+
+.attr-note {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.size-chart {
+  margin: 0 0 28px;
+  font-size: 16px;
+}
+
+.size-chart summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.size-chart table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+}
+
+.size-chart th,
+.size-chart td {
+  padding: 8px 0;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.size-chart-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  opacity: 0.7;
 }
 
 .name-list {

@@ -20,6 +20,7 @@ const it = {
     cart: "Carrello",
     menu: "Menu",
     language: "Lingua",
+    skip: "Vai al contenuto",
   },
   footer: {
     studio: "Studio",
@@ -42,6 +43,14 @@ const it = {
     reprint: "Richiedi ristampa",
     printOne: "Serigrafia, un colore",
     vatIncluded: "Prezzo IVA inclusa",
+    compositionLabel: "Come da etichetta cucita sul capo.",
+    sizeChart: "Tabella taglie",
+    sizeChest: "½ petto",
+    sizeLength: "Lunghezza",
+    sizeSleeve: "Manica",
+    sizeUnit: "cm",
+    sizeChartNote:
+      "Misure del capo disteso, in centimetri. ½ petto = da cucitura a cucitura, non la circonferenza. Tolleranza di stampa circa ±1 cm. Confronta con una maglia che ti sta. Se l’etichetta cucita indica una composizione diversa da quella in pagina, vale l’etichetta.",
     galleryPrev: "Foto precedente",
     galleryNext: "Foto successiva",
     shipLine: (itPrice: number, euPrice: number) =>
@@ -209,7 +218,7 @@ const it = {
     cookiesP3:
       "Nessun dato del carrello va su un server nostro: il sito è statico (GitHub Pages). Chiudi il browser o cancella i dati del sito per toglierli.",
     cookiesPaypal:
-      "Se paghi con PayPal, lasci questo sito e valgono i cookie e l’informativa di PayPal",
+      "Se paghi con PayPal, il checkout carica lo script di PayPal su questa pagina: valgono cookie e informativa di PayPal",
     cookiesMore: "Dettaglio nella",
     cookiesMoreLink: "cookie policy",
     data: "Quali dati, perché",
@@ -225,13 +234,19 @@ const it = {
       `solo l’email, e solo se spunti la casella. Base: consenso, art. 6.1.a. Puoi revocare in qualsiasi momento scrivendo a ${email}. Conservazione: fino alla revoca.`,
     noProfiling: "Non facciamo profilazione, né decisioni automatizzate.",
     recipients: "Chi riceve i dati",
+    transfers: "Trasferimenti extra-UE",
+    transfersBody:
+      "Hosting e alcune funzioni stanno negli Stati Uniti. Non uso l’art. 49.1.b come base ordinaria: quel comma è per trasferimenti occasionali, non per l’architettura del sito. Per GitHub, Vercel e Resend il trasferimento poggia su decisione di adeguatezza UE–USA (Data Privacy Framework) se il fornitore è certificato, altrimenti su clausole contrattuali standard (art. 46 GDPR). FormSubmit, finché resta sui moduli di contatto, è USA: stessa logica, e va sostituito quando le mail transazionali passano tutte da Vercel.",
     formsubmit:
-      "i moduli del sito gli arrivano e ci inoltra la mail. Opera anche fuori UE; il trasferimento avviene perché hai inviato il form (art. 49.1.b GDPR). Informativa:",
-    paypalRecv: "se scegli PayPal.",
+      "moduli di contatto, newsletter, corsi, consulenza, ristampe: gli arrivano e ci inoltra la mail. Società USA. Informativa:",
+    paypalRecv:
+      "se scegli PayPal. Titolare del pagamento: PayPal (Europe) S.à r.l. et Cie, S.C.A. (Lussemburgo); il gruppo ha società anche negli USA.",
     github:
-      "hosting delle pagine pubbliche, non dei moduli. Informativa GitHub sul sito github.com.",
+      "GitHub, Inc. (USA / Microsoft) — hosting delle pagine pubbliche (GitHub Pages), non dei moduli. Informativa su github.com.",
     vercel:
-      "Vercel Inc. — funzione tecnica che, dopo un pagamento PayPal confermato, aggiorna il magazzino e inoltra il riepilogo dell’ordine. Tratta i dati dell’ordine, non i dati di pagamento.",
+      "Vercel Inc. (USA) — funzioni server: webhook PayPal, magazzino, e (quando configurato) invio delle conferme d’ordine e dell’avviso di recesso. Tratta dati dell’ordine, non i dati della carta.",
+    resend:
+      "Resend (USA) — invio delle email transazionali (conferma d’ordine e avviso di ricevimento del recesso) con mittente Corpoceleste. Non tratta i pagamenti.",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
     rights: "Diritti",
@@ -270,7 +285,7 @@ const it = {
     orderDuration: "Fine sessione del browser.",
     third: "Terze parti",
     thirdBody:
-      "Il sito pubblico non carica script di analytics o pubblicità. Se paghi con PayPal, esci da questo dominio: valgono cookie e informativa di PayPal.",
+      "Il sito pubblico non carica script di analytics o pubblicità. Se paghi con PayPal, il checkout carica lo script di PayPal su questa pagina: valgono cookie e informativa di PayPal, non solo dopo che sei uscito dal dominio.",
     manage: "Come gestirli",
     manageBody:
       "Puoi cancellare i dati del sito dalle impostazioni del browser (cronologia / dati dei siti). Svuotando il carrello da Corpoceleste rimuovi il contenuto di corpoceleste-cart.",
@@ -318,7 +333,7 @@ const it = {
       "Su tutto quello che vendo vale la garanzia legale di 2 anni dalla consegna (artt. 128 e seguenti Codice del consumo). Se il pezzo è difettoso o diverso da quanto descritto, hai diritto a riparazione o sostituzione senza spese e, se non sono possibili o non risolvono, a riduzione del prezzo o risoluzione del contratto con rimborso. Scrivimi con foto e numero d’ordine: le spese di reso per difetto di conformità sono a mio carico. La garanzia legale è distinta dal recesso e vale anche dopo i 14 giorni.",
     complaints: "Reclami e controversie",
     complaintsBody:
-      "Per qualsiasi problema scrivimi prima a me: rispondo entro pochi giorni e nella pratica si risolve così. Se non troviamo un accordo, puoi rivolgerti a un organismo ADR iscritto all’elenco del Ministero delle imprese e del made in Italy per la risoluzione alternativa delle controversie di consumo. La piattaforma europea ODR è stata dismessa nel luglio 2025 e non è più utilizzabile.",
+      "Per qualsiasi problema scrivimi prima a me: rispondo entro pochi giorni e nella pratica si risolve così. Non aderisco a un organismo ADR specifico. Se non troviamo un accordo, puoi comunque rivolgerti a un organismo iscritto all’elenco del Ministero delle imprese e del made in Italy. La piattaforma europea ODR è stata dismessa nel luglio 2025 e non è più utilizzabile.",
     law: "Legge applicabile",
     lawBody:
       "Al contratto si applica la legge italiana. Restano ferme le tutele più favorevoli previste dalla legge del paese dell’Unione europea in cui risiedi come consumatore. Per le controversie è competente il foro del tuo luogo di residenza o domicilio.",
@@ -373,6 +388,7 @@ const en: typeof it = {
     cart: "Cart",
     menu: "Menu",
     language: "Language",
+    skip: "Skip to content",
   },
   footer: {
     studio: "Studio",
@@ -395,6 +411,14 @@ const en: typeof it = {
     reprint: "Request a reprint",
     printOne: "Screen print, one colour",
     vatIncluded: "Price includes VAT",
+    compositionLabel: "As on the sewn-in label.",
+    sizeChart: "Size chart",
+    sizeChest: "½ chest",
+    sizeLength: "Length",
+    sizeSleeve: "Sleeve",
+    sizeUnit: "cm",
+    sizeChartNote:
+      "Garment laid flat, in centimetres. ½ chest is seam to seam, not circumference. Print tolerance about ±1 cm. Compare with a shirt that fits you. If the sewn-in label states a different fibre composition, the label prevails.",
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
     shipLine: (itPrice: number, euPrice: number) =>
@@ -560,7 +584,7 @@ const en: typeof it = {
     cookiesP3:
       "No cart data is sent to a server of ours: the site is static (GitHub Pages). Close the browser or clear this site’s data to remove it.",
     cookiesPaypal:
-      "If you pay with PayPal, you leave this site; PayPal’s cookies and privacy notice then apply",
+      "If you pay with PayPal, checkout loads PayPal’s script on this page; PayPal’s cookies and privacy notice then apply",
     cookiesMore: "Full detail in the",
     cookiesMoreLink: "cookie policy",
     data: "What data, and why",
@@ -576,13 +600,19 @@ const en: typeof it = {
       `email only, and only if you tick the box. Basis: consent, Art. 6(1)(a). You can withdraw at any time by writing to ${email}. Kept until withdrawal.`,
     noProfiling: "No profiling, no automated decisions.",
     recipients: "Who receives the data",
+    transfers: "Transfers outside the EU",
+    transfersBody:
+      "Hosting and some functions are in the United States. I do not rely on Art. 49(1)(b) as the ordinary basis: that derogation is for occasional transfers, not for the site’s architecture. For GitHub, Vercel and Resend the transfer rests on the EU–US Data Privacy Framework adequacy decision if the provider is certified, otherwise on standard contractual clauses (Art. 46 GDPR). FormSubmit, for as long as it remains on contact forms, is US: same logic, and it will be replaced once all transactional mail goes through Vercel.",
     formsubmit:
-      "site forms are sent there, and it forwards the email to us. It also operates outside the EU; the transfer takes place because you submitted the form (Art. 49(1)(b) GDPR). Notice:",
-    paypalRecv: "if you choose PayPal.",
+      "contact, newsletter, workshop, consulting and reprint forms are sent there and forwarded to us by email. US company. Notice:",
+    paypalRecv:
+      "if you choose PayPal. Payment controller: PayPal (Europe) S.à r.l. et Cie, S.C.A. (Luxembourg); the group also has US companies.",
     github:
-      "hosts the public pages, not the forms. GitHub’s notice is on github.com.",
+      "GitHub, Inc. (USA / Microsoft) — hosts the public pages (GitHub Pages), not the forms. Notice on github.com.",
     vercel:
-      "Vercel Inc. — technical function that updates stock and forwards the order summary after a confirmed PayPal payment. It handles order data, not payment data.",
+      "Vercel Inc. (USA) — server functions: PayPal webhook, stock, and (once configured) sending of order confirmations and withdrawal acknowledgements. Handles order data, not card data.",
+    resend:
+      "Resend (USA) — sends transactional email (order confirmation and withdrawal acknowledgement) from the Corpoceleste address. Does not handle payments.",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
     rights: "Rights",
@@ -621,7 +651,7 @@ const en: typeof it = {
     orderDuration: "End of the browser session.",
     third: "Third parties",
     thirdBody:
-      "The public site does not load analytics or advertising scripts. If you pay with PayPal, you leave this domain; PayPal’s cookies and notice then apply.",
+      "The public site does not load analytics or advertising scripts. If you pay with PayPal, checkout loads PayPal’s script on this page: PayPal’s cookies and notice apply, not only after you leave this domain.",
     manage: "How to manage them",
     manageBody:
       "You can clear this site’s data in the browser settings (history / site data). Emptying the Corpoceleste cart removes corpoceleste-cart.",
@@ -669,7 +699,7 @@ const en: typeof it = {
       "Everything I sell carries the 2-year legal guarantee from delivery (arts. 128 ff. Consumer Code). If a piece is faulty or not as described, you are entitled to free repair or replacement and, if those are impossible or fail, to a price reduction or to cancel the contract with a refund. Write to me with photos and your order number: return costs for a conformity defect are on me. The legal guarantee is separate from withdrawal and applies well beyond the 14 days.",
     complaints: "Complaints and disputes",
     complaintsBody:
-      "For any problem write to me first: I answer within a few days and in practice that settles it. If we cannot agree, you can turn to an ADR body listed by the Italian Ministry of Enterprise for alternative dispute resolution in consumer matters. The European ODR platform was shut down in July 2025 and is no longer available.",
+      "For any problem write to me first: I answer within a few days and in practice that settles it. I do not adhere to a specific ADR body. If we cannot agree, you can still turn to a body listed by the Italian Ministry of Enterprise. The European ODR platform was shut down in July 2025 and is no longer available.",
     law: "Applicable law",
     lawBody:
       "Italian law applies to the contract. More favourable protections under the law of the EU country where you live as a consumer still apply. For disputes, the court of your place of residence or domicile has jurisdiction.",
@@ -724,6 +754,7 @@ const de: typeof it = {
     cart: "Warenkorb",
     menu: "Menü",
     language: "Sprache",
+    skip: "Zum Inhalt",
   },
   footer: {
     studio: "Atelier",
@@ -746,6 +777,14 @@ const de: typeof it = {
     reprint: "Nachdruck anfragen",
     printOne: "Siebdruck, eine Farbe",
     vatIncluded: "Preis inkl. MwSt.",
+    compositionLabel: "Wie auf dem eingenähten Etikett.",
+    sizeChart: "Größentabelle",
+    sizeChest: "½ Brust",
+    sizeLength: "Länge",
+    sizeSleeve: "Ärmel",
+    sizeUnit: "cm",
+    sizeChartNote:
+      "Maß des flach liegenden Kleidungsstücks, in Zentimetern. ½ Brust ist Naht zu Naht, nicht der Umfang. Drucktoleranz etwa ±1 cm. Vergleich mit einem Shirt, das dir passt. Steht auf dem eingenähten Etikett eine andere Faserzusammensetzung, gilt das Etikett.",
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
     shipLine: (itPrice: number, euPrice: number) =>
@@ -911,7 +950,7 @@ const de: typeof it = {
     cookiesP3:
       "Keine Warenkorbdaten gehen auf einen Server von uns: die Website ist statisch (GitHub Pages). Browser schließen oder die Daten dieser Website löschen, um sie zu entfernen.",
     cookiesPaypal:
-      "Wenn du mit PayPal zahlst, verlässt du diese Website; es gelten dann Cookies und Hinweise von PayPal",
+      "Wenn du mit PayPal zahlst, lädt die Kasse das PayPal-Skript auf dieser Seite; es gelten Cookies und Hinweise von PayPal",
     cookiesMore: "Details in der",
     cookiesMoreLink: "Cookie-Richtlinie",
     data: "Welche Daten, wozu",
@@ -927,13 +966,19 @@ const de: typeof it = {
       `nur die E-Mail, und nur wenn du das Kästchen ankreuzt. Grundlage: Einwilligung, Art. 6 Abs. 1 lit. a. Widerruf jederzeit an ${email}. Speicherung: bis zum Widerruf.`,
     noProfiling: "Kein Profiling, keine automatisierten Entscheidungen.",
     recipients: "Wer die Daten erhält",
+    transfers: "Übermittlungen außerhalb der EU",
+    transfersBody:
+      "Hosting und einzelne Funktionen liegen in den USA. Ich stütze mich nicht auf Art. 49 Abs. 1 lit. b als Regelgrundlage: diese Ausnahme gilt für gelegentliche Übermittlungen, nicht für die Architektur der Website. Für GitHub, Vercel und Resend stützt sich die Übermittlung auf den Angemessenheitsbeschluss EU–USA (Data Privacy Framework), sofern der Anbieter zertifiziert ist, sonst auf Standardvertragsklauseln (Art. 46 DSGVO). FormSubmit, solange es für Kontaktformulare bleibt, ist USA: dieselbe Logik; es wird ersetzt, sobald alle transaktionalen Mails über Vercel laufen.",
     formsubmit:
-      "die Formulare der Website kommen dort an und werden per Mail an uns weitergeleitet. Der Dienst arbeitet auch außerhalb der EU; die Übermittlung erfolgt, weil du das Formular abgeschickt hast (Art. 49 Abs. 1 lit. b DSGVO). Hinweise:",
-    paypalRecv: "wenn du PayPal wählst.",
+      "Kontakt-, Newsletter-, Kurs-, Beratungs- und Nachdruckformulare kommen dort an und werden per Mail an uns weitergeleitet. US-Unternehmen. Hinweise:",
+    paypalRecv:
+      "wenn du PayPal wählst. Verantwortlicher der Zahlung: PayPal (Europe) S.à r.l. et Cie, S.C.A. (Luxemburg); die Gruppe hat auch Gesellschaften in den USA.",
     github:
-      "hostet die öffentlichen Seiten, nicht die Formulare. Hinweise von GitHub auf github.com.",
+      "GitHub, Inc. (USA / Microsoft) — hostet die öffentlichen Seiten (GitHub Pages), nicht die Formulare. Hinweise auf github.com.",
     vercel:
-      "Vercel Inc. — technische Funktion, die nach bestätigter PayPal-Zahlung den Bestand aktualisiert und die Bestellübersicht weiterleitet. Verarbeitet Bestelldaten, keine Zahlungsdaten.",
+      "Vercel Inc. (USA) — Serverfunktionen: PayPal-Webhook, Bestand und (nach Einrichtung) Versand der Bestellbestätigung und der Widerrufs-Empfangsbestätigung. Verarbeitet Bestelldaten, keine Kartendaten.",
+    resend:
+      "Resend (USA) — Versand der transaktionalen E-Mails (Bestellbestätigung und Empfangsbestätigung des Widerrufs) mit Absender Corpoceleste. Verarbeitet keine Zahlungen.",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
     rights: "Rechte",
@@ -972,7 +1017,7 @@ const de: typeof it = {
     orderDuration: "Ende der Browser-Sitzung.",
     third: "Dritte",
     thirdBody:
-      "Die öffentliche Website lädt keine Analyse- oder Werbeskripte. Wenn du mit PayPal zahlst, verlässt du diese Domain; es gelten dann Cookies und Hinweise von PayPal.",
+      "Die öffentliche Website lädt keine Analyse- oder Werbeskripte. Wenn du mit PayPal zahlst, lädt die Kasse das PayPal-Skript auf dieser Seite: es gelten Cookies und Hinweise von PayPal, nicht erst nach dem Verlassen der Domain.",
     manage: "Verwaltung",
     manageBody:
       "Du kannst die Daten dieser Website in den Browser-Einstellungen löschen (Verlauf / Website-Daten). Wenn du den Corpoceleste-Warenkorb leerst, wird corpoceleste-cart entfernt.",
@@ -1020,7 +1065,7 @@ const de: typeof it = {
       "Für alles, was ich verkaufe, gilt die gesetzliche Gewährleistung von 2 Jahren ab Lieferung (Art. 128 ff. Verbrauchergesetzbuch). Ist ein Stück mangelhaft oder nicht wie beschrieben, hast du Anspruch auf kostenlose Nachbesserung oder Ersatz und, wenn das unmöglich ist oder nicht hilft, auf Minderung oder Vertragsauflösung mit Erstattung. Schreib mir mit Fotos und Bestellnummer: Rücksendekosten bei Mangel trage ich. Die Gewährleistung ist etwas anderes als der Widerruf und gilt weit über die 14 Tage hinaus.",
     complaints: "Beschwerden und Streitigkeiten",
     complaintsBody:
-      "Bei Problemen schreib zuerst mir: ich antworte innerhalb weniger Tage, und in der Praxis erledigt sich das so. Kommen wir nicht zusammen, kannst du dich an eine beim italienischen Unternehmensministerium gelistete AS-Stelle für Verbraucherstreitigkeiten wenden. Die europäische OS-Plattform wurde im Juli 2025 abgeschaltet und steht nicht mehr zur Verfügung.",
+      "Bei Problemen schreib zuerst mir: ich antworte innerhalb weniger Tage, und in der Praxis erledigt sich das so. Ich bin keiner bestimmten AS-Stelle angeschlossen. Kommen wir nicht zusammen, kannst du dich trotzdem an eine beim italienischen Unternehmensministerium gelistete Stelle wenden. Die europäische OS-Plattform wurde im Juli 2025 abgeschaltet und steht nicht mehr zur Verfügung.",
     law: "Anwendbares Recht",
     lawBody:
       "Auf den Vertrag ist italienisches Recht anwendbar. Günstigere Schutzvorschriften des EU-Landes, in dem du als Verbraucher wohnst, bleiben unberührt. Für Streitigkeiten ist das Gericht deines Wohnsitzes oder Aufenthalts zuständig.",

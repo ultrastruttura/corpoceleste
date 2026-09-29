@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import FormHoney from "../components/FormHoney.astro";
+import { formEndpoint } from "../data/site";
 import { siteSettings } from "../data/settings";
 import { currentLocale, pageUrl, t } from "../i18n";
 
@@ -8,6 +9,7 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const w = copy.withdrawal;
 const shopEmail = siteSettings.shopEmail;
+const withdrawAction = formEndpoint("withdrawal") || `https://formsubmit.co/${shopEmail}`;
 ---
 
 <Base title={`${w.entry} — Corpoceleste`}>
@@ -20,16 +22,14 @@ const shopEmail = siteSettings.shopEmail;
     <div class="split">
       <form
         class="form"
-        action={`https://formsubmit.co/${shopEmail}`}
+        action={withdrawAction}
         method="POST"
         data-withdraw-form
       >
         <input type="hidden" name="_subject" value="Recesso — Corpoceleste" />
         <input type="hidden" name="_next" data-next-grazie="recesso" />
-        <input type="hidden" name="_autoresponse" value={`${w.declaration} ${w.after}`} />
-        <input type="hidden" name="_cc" data-withdraw-cc />
+        <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="dichiarazione" value={w.declaration} />
-        <input type="hidden" name="trasmissione" data-withdraw-sent />
         <FormHoney />
 
         <fieldset class="withdraw-step" data-withdraw-step>
@@ -98,8 +98,6 @@ const shopEmail = siteSettings.shopEmail;
     const step = form?.querySelector<HTMLElement>("[data-withdraw-step]");
     const review = form?.querySelector<HTMLElement>("[data-withdraw-review]");
     const recap = form?.querySelector<HTMLElement>("[data-withdraw-recap]");
-    const cc = form?.querySelector<HTMLInputElement>("[data-withdraw-cc]");
-    const sent = form?.querySelector<HTMLInputElement>("[data-withdraw-sent]");
 
     if (form && step && review && recap) {
       const fields = Array.from(
@@ -125,12 +123,6 @@ const shopEmail = siteSettings.shopEmail;
       form.querySelector("[data-withdraw-edit]")?.addEventListener("click", () => {
         review.hidden = true;
         step.hidden = false;
-      });
-
-      form.addEventListener("submit", () => {
-        const email = form.querySelector<HTMLInputElement>("#wd-email");
-        if (cc && email) cc.value = email.value.trim();
-        if (sent) sent.value = new Date().toLocaleString(document.documentElement.lang || "it");
       });
     }
   </script>

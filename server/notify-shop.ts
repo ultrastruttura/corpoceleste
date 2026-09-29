@@ -1,40 +1,29 @@
-/** Server-side shop email via FormSubmit (PayPal webhook). */
-export async function notifyShopOrder(opts: {
-  subject: string;
-  ordine: string;
-  metodo?: string;
-  /** Copia al cliente: conferma d'ordine su supporto durevole. */
-  copyTo?: string;
-}): Promise<boolean> {
-  const email = (process.env.SHOP_EMAIL || "").trim();
-  if (!email) {
-    console.warn("SHOP_EMAIL not set — skip order notify");
-    return false;
-  }
+import { sendMail } from "./mail.js";
 
-  try {
-    const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        _subject: opts.subject,
-        _captcha: "false",
-        _template: "table",
-        ...(opts.copyTo ? { _cc: opts.copyTo } : {}),
-        metodo: opts.metodo || "PayPal",
-        ordine: opts.ordine,
-      }),
-    });
-    if (!res.ok) {
-      console.error("FormSubmit notify failed", res.status, await res.text());
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error("FormSubmit notify error", err);
-    return false;
+/** Shop + customer transactional mail. Resend only — no FormSubmit copy to the buyer. */
+export async function notifyOrder(opts: {
+  shopSubject: string;
+  shopBody: string;
+  customerTo?: string;
+  customerSubject: string;
+  customerBody: string;
+}): Promise<boolean> {
+  const shop = (process.env.SHOP_EMAIL || "").trim();
+  let ok = true;
+  if (shop) {
+    ok = (await sendMail({ to: shop, subject: opts.shopSubject, text: opts.shopBody })) && ok;
+  } else {
+    console.warn("SHOP_EMAIL not set — skip shop notify");
+    ok = false;
   }
+  const customer = (opts.customerTo || "").trim();
+  if (customer) {
+    ok =
+      (await sendMail({
+        to: customer,
+        subject: opts.customerSubject,
+        text: opts.customerBody,
+      })) && ok;
+  }
+  return ok;
 }

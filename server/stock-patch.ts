@@ -30,7 +30,7 @@ export function patchStockQty(
   return { content, before };
 }
 
-export function formatOrderEmail(opts: {
+export function formatShopOrderEmail(opts: {
   captureId: string;
   lines: OrderLine[];
   stockNotes: string[];
@@ -41,23 +41,35 @@ export function formatOrderEmail(opts: {
     opts.itemLabels?.length
       ? opts.itemLabels
       : opts.lines.map((l) => `${l.id} · ${l.size} · ×${l.qty}`);
-  const site = (process.env.SITE_URL || "https://ultrastruttura.github.io/corpoceleste").replace(/\/$/, "");
-  const parts = [
-    "Conferma d'ordine — Corpoceleste",
-    `Data e ora: ${new Date().toLocaleString("it-IT", { timeZone: "Europe/Rome" })}`,
-    "",
+  return [
     ...rows,
     "",
     `Capture: ${opts.captureId}`,
     opts.total ? `Totale PayPal: ${opts.total}` : "",
     "",
-    "Hai 14 giorni dalla consegna per recedere senza motivo.",
-    `Recesso online: ${site}/recesso/`,
-    `Condizioni di vendita, resi e garanzia legale di 2 anni: ${site}/vendita/`,
-    "",
-    "— interno —",
     "Magazzino:",
     ...(opts.stockNotes.length ? opts.stockNotes : ["(nessuna variazione)"]),
-  ].filter((x) => x !== "");
-  return parts.join("\n");
+  ]
+    .filter((x) => x !== "")
+    .join("\n");
+}
+
+export function formatCustomerOrderLines(opts: {
+  captureId: string;
+  lines: OrderLine[];
+  itemLabels?: string[];
+  total?: string;
+}): string {
+  const rows =
+    opts.itemLabels?.length
+      ? opts.itemLabels
+      : opts.lines.map((l) => `${l.id} · ${l.size} · ×${l.qty}`);
+  return [
+    ...rows,
+    "",
+    opts.total ? `Totale PayPal: ${opts.total}` : "",
+    `Riferimento pagamento: ${opts.captureId}`,
+  ]
+    .filter((x) => x !== "")
+    .join("\n");
 }
