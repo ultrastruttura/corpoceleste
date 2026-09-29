@@ -739,15 +739,24 @@ body.cart-open {
 
 @media (min-width: 900px) {
   .product-layout {
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 60px;
+    grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+    gap: 48px;
     align-items: start;
   }
 }
 
 .product-stage {
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
   background: var(--white);
   overflow: hidden;
+}
+
+@media (min-width: 900px) {
+  .product-stage {
+    margin-inline: 0;
+  }
 }
 
 .product-stage-frame {
