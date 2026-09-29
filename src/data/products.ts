@@ -25,6 +25,8 @@ export type Product = {
   kind: ProductKind;
   color: string;
   colorName: string;
+  /** Composizione fibrosa, obbligatoria sui tessili (reg. UE 1007/2011). */
+  composition: string;
   images: string[];
   /** First image path — kept for cart line thumbs */
   print: string;
@@ -136,6 +138,7 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     kind: parseKind(data.kind),
     color: String(data.color ?? "#141414"),
     colorName: String(data.colorName ?? "Nero"),
+    composition: String(data.composition ?? ""),
     images,
     print: images[0] ?? "",
     sizes: resolvedSizes,

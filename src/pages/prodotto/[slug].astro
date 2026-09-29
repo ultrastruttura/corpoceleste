@@ -42,6 +42,9 @@ const defaultSize = inStockSizes.includes("M")
   ? "M"
   : inStockSizes[0] ?? sizes[0];
 const color = copy.product.colors[product.colorName] ?? product.colorName;
+const composition = product.composition
+  ? copy.product.compositions[product.composition] ?? product.composition
+  : "";
 const description = productDescription(product, locale);
 const seoDescription = metaSnippet(productSeoDescription(product, locale) || copy.meta.description);
 const imageSet = product.images.map((src) => ({
@@ -263,6 +266,7 @@ const jsonLd = {
 
       <ul class="attrs">
         <li>{color}</li>
+        {composition && <li>{composition}</li>}
         <li>{copy.product.printOne}</li>
         <li>{copy.product.shipLine(site.shippingItaly, site.shippingEU)}</li>
         <li>{copy.product.vatIncluded}</li>

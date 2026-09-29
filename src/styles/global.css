@@ -653,6 +653,16 @@ body.cart-open {
   font-size: 18px;
 }
 
+.pay-methods {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.pay-methods .checkout-vat {
+  margin-bottom: 2px;
+}
+
 @media (max-width: 899px) {
   .checkout-step + .checkout-step {
     margin-top: 28px;

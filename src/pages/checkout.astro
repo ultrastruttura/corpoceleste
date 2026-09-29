@@ -52,52 +52,72 @@ const paypalSdk = Boolean(site.paypalClientId);
         </label>
       </section>
 
-      {
-        paypalSdk && (
-          <section class="checkout-step checkout-step--pay">
-            <p class="checkout-obligation">{copy.checkout.payObligation}</p>
-            <div class="pay-box is-locked" data-pay-box>
-              <div id="paypal-buttons"></div>
-            </div>
-          </section>
-        )
-      }
+      <section class="checkout-step checkout-step--pay">
+        <h2 class="checkout-bank-title">{copy.checkout.payTitle}</h2>
 
-      <section class="checkout-step checkout-step--bank">
-        <h2 class="checkout-bank-title">{copy.checkout.bank}</h2>
-        <p>{copy.checkout.bankNote}</p>
-        <form class="form is-locked" action={`https://formsubmit.co/${shopEmail}`} method="POST" data-checkout-form>
-          <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
-          <input type="hidden" name="_next" data-next-grazie="ordine" />
-          <input type="hidden" name="ordine" data-order-field />
-          <FormHoney />
-          <div>
-            <label for="o-name">{copy.checkout.name}</label>
-            <input id="o-name" name="nome" required />
-          </div>
-          <div>
-            <label for="o-email">{copy.checkout.email}</label>
-            <input id="o-email" type="email" name="email" required />
-          </div>
-          <div>
-            <label for="o-tel">{copy.checkout.phone}</label>
-            <input id="o-tel" name="telefono" required />
-          </div>
-          <div>
-            <label for="o-addr">{copy.checkout.address}</label>
-            <input id="o-addr" name="indirizzo" required />
-          </div>
-          <div>
-            <label for="o-cap">{copy.checkout.city}</label>
-            <input id="o-cap" name="citta" required />
-          </div>
-          <div>
-            <label for="o-note">{copy.checkout.notes}</label>
-            <textarea id="o-note" name="note"></textarea>
-          </div>
-          <PrivacyCheck id="o-privacy" />
-          <button class="btn" type="submit" data-bank-submit disabled>{copy.checkout.sendOrder}</button>
-        </form>
+        {
+          paypalSdk && (
+            <div class="pay-methods">
+              <p class="checkout-vat">{copy.checkout.payChoose}</p>
+              <label class="check">
+                <input type="radio" name="metodo-pagamento" value="paypal" checked data-method />
+                <span>{copy.checkout.methodPaypal}</span>
+              </label>
+              <label class="check">
+                <input type="radio" name="metodo-pagamento" value="bonifico" data-method />
+                <span>{copy.checkout.bank}</span>
+              </label>
+            </div>
+          )
+        }
+
+        {
+          paypalSdk && (
+            <div data-method-panel="paypal">
+              <p class="checkout-obligation">{copy.checkout.payObligation}</p>
+              <div class="pay-box is-locked" data-pay-box>
+                <div id="paypal-buttons"></div>
+              </div>
+            </div>
+          )
+        }
+
+        <div data-method-panel="bonifico" hidden={paypalSdk}>
+          <h3 class="checkout-bank-title">{copy.checkout.bank}</h3>
+          <p>{copy.checkout.bankNote}</p>
+          <form class="form is-locked" action={`https://formsubmit.co/${shopEmail}`} method="POST" data-checkout-form>
+            <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
+            <input type="hidden" name="_next" data-next-grazie="ordine" />
+            <input type="hidden" name="ordine" data-order-field />
+            <FormHoney />
+            <div>
+              <label for="o-name">{copy.checkout.name}</label>
+              <input id="o-name" name="nome" required />
+            </div>
+            <div>
+              <label for="o-email">{copy.checkout.email}</label>
+              <input id="o-email" type="email" name="email" required />
+            </div>
+            <div>
+              <label for="o-tel">{copy.checkout.phone}</label>
+              <input id="o-tel" name="telefono" required />
+            </div>
+            <div>
+              <label for="o-addr">{copy.checkout.address}</label>
+              <input id="o-addr" name="indirizzo" required />
+            </div>
+            <div>
+              <label for="o-cap">{copy.checkout.city}</label>
+              <input id="o-cap" name="citta" required />
+            </div>
+            <div>
+              <label for="o-note">{copy.checkout.notes}</label>
+              <textarea id="o-note" name="note"></textarea>
+            </div>
+            <PrivacyCheck id="o-privacy" />
+            <button class="btn" type="submit" data-bank-submit disabled>{copy.checkout.sendOrder}</button>
+          </form>
+        </div>
       </section>
     </div>
   </div>
@@ -131,6 +151,8 @@ const paypalSdk = Boolean(site.paypalClientId);
     const bankForm = document.querySelector<HTMLFormElement>("[data-checkout-form]");
     const bankSubmit = document.querySelector<HTMLButtonElement>("[data-bank-submit]");
     const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
+    const methods = document.querySelectorAll<HTMLInputElement>("[data-method]");
+    const panels = document.querySelectorAll<HTMLElement>("[data-method-panel]");
 
     function shipping() {
       return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
@@ -174,6 +196,17 @@ const paypalSdk = Boolean(site.paypalClientId);
       syncLock();
       page?.classList.add("is-ready");
     }
+
+    function syncMethod() {
+      const chosen = [...methods].find((r) => r.checked)?.value;
+      if (!chosen) return;
+      panels.forEach((panel) => {
+        panel.hidden = panel.dataset.methodPanel !== chosen;
+      });
+    }
+
+    methods.forEach((radio) => radio.addEventListener("change", syncMethod));
+    syncMethod();
 
     shipSel?.addEventListener("change", syncPage);
     disclaimer?.addEventListener("change", syncLock);

@@ -118,6 +118,13 @@ export default defineConfig({
           },
           {
             type: "string",
+            name: "composition",
+            label: "Composizione tessile",
+            description:
+              "Obbligatoria sui tessili (reg. UE 1007/2011). Scrivila in italiano, es. «100% cotone»: viene tradotta in EN/DE se la stringa è nota. Lascia vuoto per stampe su carta.",
+          },
+          {
+            type: "string",
             name: "sizes",
             label: "Taglie",
             list: true,

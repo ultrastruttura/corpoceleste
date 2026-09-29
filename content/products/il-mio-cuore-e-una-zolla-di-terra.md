@@ -8,6 +8,7 @@ nuovo: false
 createdAt: 2017-05-14T00:00:00.000Z
 color: '#141414'
 colorName: Nero
+composition: 100% cotone
 sizes:
   - S
   - M

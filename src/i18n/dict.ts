@@ -67,6 +67,11 @@ const it = {
       Nero: "Nero",
       Viola: "Viola",
     } as Record<string, string>,
+    /** Composizione fibrosa (reg. UE 1007/2011): chiave in italiano, resa per lingua. */
+    compositions: {
+      "100% cotone": "100% cotone",
+      "100% cotone biologico": "100% cotone biologico",
+    } as Record<string, string>,
   },
   cart: {
     title: "Carrello",
@@ -99,6 +104,9 @@ const it = {
     europe: (n: number) => `Europa — ${n} €`,
     paypal: "Paga con PayPal",
     paypalBack: "Torna a Corpoceleste",
+    payTitle: "Pagamento",
+    payChoose: "Scegli un metodo: paghi una volta sola.",
+    methodPaypal: "PayPal o carta",
     bank: "Bonifico",
     bankNote:
       "Invia il modulo: ricevi l’IBAN via email. L’ordine è confermato quando arriva il pagamento; poi spedisco.",
@@ -411,6 +419,10 @@ const en: typeof it = {
       Nero: "Black",
       Viola: "Purple",
     },
+    compositions: {
+      "100% cotone": "100% cotton",
+      "100% cotone biologico": "100% organic cotton",
+    },
   },
   cart: {
     title: "Cart",
@@ -443,6 +455,9 @@ const en: typeof it = {
     europe: (n: number) => `Europe — ${n} €`,
     paypal: "Pay with PayPal",
     paypalBack: "Back to Corpoceleste",
+    payTitle: "Payment",
+    payChoose: "Pick one method: you pay only once.",
+    methodPaypal: "PayPal or card",
     bank: "Bank transfer",
     bankNote:
       "Send the form: you’ll get the IBAN by email. The order is confirmed when payment arrives; then I ship.",
@@ -755,6 +770,10 @@ const de: typeof it = {
       Nero: "Schwarz",
       Viola: "Violett",
     },
+    compositions: {
+      "100% cotone": "100% Baumwolle",
+      "100% cotone biologico": "100% Bio-Baumwolle",
+    },
   },
   cart: {
     title: "Warenkorb",
@@ -787,6 +806,9 @@ const de: typeof it = {
     europe: (n: number) => `Europa — ${n} €`,
     paypal: "Mit PayPal bezahlen",
     paypalBack: "Zurück zu Corpoceleste",
+    payTitle: "Zahlung",
+    payChoose: "Wähle eine Methode: du zahlst nur einmal.",
+    methodPaypal: "PayPal oder Karte",
     bank: "Überweisung",
     bankNote:
       "Schick das Formular: du bekommst die IBAN per E-Mail. Die Bestellung gilt, wenn die Zahlung da ist; danach verschicke ich.",
