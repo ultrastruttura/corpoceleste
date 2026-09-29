@@ -3,16 +3,35 @@ import { parseOrderLines, parseSku, type OrderLine } from "../src/lib/paypal-lin
 export type { OrderLine };
 
 type PayPalItem = {
+  name?: string;
   sku?: string;
   quantity?: string;
+  unit_amount?: { value?: string; currency_code?: string };
 };
 
-type PayPalOrder = {
+export type PayPalOrder = {
+  id?: string;
   purchase_units?: Array<{
     custom_id?: string;
+    amount?: { value?: string; currency_code?: string };
     items?: PayPalItem[];
   }>;
 };
+
+export function orderEmailBits(order: PayPalOrder): { labels: string[]; total?: string } {
+  const unit = order.purchase_units?.[0];
+  const labels: string[] = [];
+  for (const item of unit?.items ?? []) {
+    const name = (item.name || item.sku || "?").trim();
+    const qty = item.quantity || "1";
+    const price = item.unit_amount?.value;
+    labels.push(price ? `${name} · ×${qty} · ${price}€` : `${name} · ×${qty}`);
+  }
+  const total = unit?.amount?.value
+    ? `${unit.amount.value} ${unit.amount.currency_code || "EUR"}`
+    : undefined;
+  return { labels, total };
+}
 
 export function linesFromOrder(order: PayPalOrder): OrderLine[] {
   const unit = order.purchase_units?.[0];

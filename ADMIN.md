@@ -50,11 +50,10 @@ Senza questi secret (o senza un nuovo deploy dopo averli messi) l’admin online
 
 In ogni maglia imposta i pezzi per taglia (S/M/L/XL). Taglia a 0 = non acquistabile.
 
-Se è attivo il **webhook PayPal** (vedi README), dopo un pagamento con il bottone PayPal lo stock si abbassa da solo.  
-**Bonifico** e form PayPal “classico”: aggiorna i numeri a mano qui dopo l’ordine.
+Se è attivo il **webhook PayPal** (vedi README), dopo un pagamento PayPal lo stock si abbassa da solo e arriva una mail ordine (FormSubmit dal server Vercel).  
+**Bonifico:** aggiorna i numeri a mano qui dopo il pagamento; la mail parte dal form del sito.
 
-Email allo shop: in **SEO e home** → *Email shop (ordini e form)*. Va a FormSubmit per **bonifico**, **PayPal SDK** (dopo capture), contatti, newsletter e altri form.  
-Il form PayPal HTML “classico” non manda email automatica (nessun backend al ritorno da PayPal).
+Email shop (form + fallback): **SEO e home** → *Email shop (ordini e form)*. Per le mail PayPal dal webhook imposta anche `SHOP_EMAIL` su Vercel.
 
 ## Flusso tipico: nuova maglia
 

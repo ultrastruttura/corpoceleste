@@ -10,12 +10,13 @@ export const site = {
   shippingEU: 16,
   iban: "",
   intestatario: "Andrea Baldelli",
-  /** Email dell'account PayPal Business (gratis). Basta questa per accettare pagamenti. */
+  /**
+   * Email conto PayPal Business (riferimento). Il checkout usa solo il Client ID (SDK).
+   */
   paypalEmail: "baldellimtt@gmail.com",
   /**
    * Client ID da developer.paypal.com (gratis).
-   * Necessario per il bottone in-page e per lo sconto magazzino automatico (webhook Vercel).
-   * Gli importi partono comunque dal catalogo buildato, non dai campi del browser.
+   * Obbligatorio per mostrare PayPal in checkout e per magazzino/mail via webhook Vercel.
    */
   paypalClientId: "",
   sede: "Bergamo (BG), Italia",

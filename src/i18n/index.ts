@@ -9,7 +9,6 @@ export {
   localeNames,
   localePrefix,
   locales,
-  paypalLc,
   paypalSdkLocale,
   type Locale,
 } from "./locales";

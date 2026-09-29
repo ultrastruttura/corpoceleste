@@ -1,7 +1,15 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { applyStockDecrement, createLedger, ledgerExists } from "../server/github-stock.js";
+import { notifyShopOrder } from "../server/notify-shop.js";
+import { formatOrderEmail } from "../server/stock-patch.js";
 import { parseOrderLines } from "../src/lib/paypal-lines.js";
-import { fetchPayPalOrder, linesFromOrder, verifyPayPalWebhook } from "../server/paypal.js";
+import {
+  fetchPayPalOrder,
+  linesFromOrder,
+  orderEmailBits,
+  verifyPayPalWebhook,
+  type PayPalOrder,
+} from "../server/paypal.js";
 
 export const config = {
   api: {
@@ -30,14 +38,13 @@ async function readRawBody(req: VercelRequest): Promise<string> {
   }
   if (chunks.length) return Buffer.concat(chunks).toString("utf8");
 
-  // Fallback if platform already parsed JSON (may break signature verify).
   return JSON.stringify(req.body ?? {});
 }
 
 /**
  * PayPal → Vercel webhook.
  * Event: PAYMENT.CAPTURE.COMPLETED
- * Decrements content/products/*.md stock via GitHub API.
+ * Decrements stock + emails shop (FormSubmit server-side).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
@@ -80,7 +87,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const orderId = event.resource?.supplementary_data?.related_ids?.order_id;
-    let lines = orderId ? linesFromOrder(await fetchPayPalOrder(orderId)) : [];
+    let order: PayPalOrder | null = null;
+    let lines = [] as ReturnType<typeof linesFromOrder>;
+    if (orderId) {
+      order = await fetchPayPalOrder(orderId);
+      lines = linesFromOrder(order);
+    }
 
     if (!lines.length && event.resource?.custom_id) {
       lines = parseOrderLines(event.resource.custom_id);
@@ -95,7 +107,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!claimed) return res.status(200).json({ ok: true, duplicate: true });
 
     const notes = await applyStockDecrement(lines);
-    return res.status(200).json({ ok: true, captureId, notes });
+    const bits = order ? orderEmailBits(order) : { labels: [] as string[], total: undefined };
+    const oversell = notes.some((n) => n.startsWith("OVERSELL"));
+    const ordine = formatOrderEmail({
+      captureId,
+      lines,
+      stockNotes: notes,
+      itemLabels: bits.labels,
+      total: bits.total,
+    });
+
+    await notifyShopOrder({
+      subject: oversell
+        ? "ATTENZIONE oversell — Ordine Corpoceleste (PayPal)"
+        : "Ordine shop Corpoceleste (PayPal)",
+      ordine,
+      metodo: "PayPal",
+    });
+
+    return res.status(200).json({ ok: true, captureId, notes, emailed: true });
   } catch (err) {
     console.error("stock update failed", err);
     return res.status(500).json({ error: "Stock update failed" });

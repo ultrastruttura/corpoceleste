@@ -4,15 +4,16 @@ import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { site } from "../data/site";
 import { siteSettings } from "../data/settings";
-import { currentLocale, pageUrl, paypalLc, paypalSdkLocale, t } from "../i18n";
+import { currentLocale, pageUrl, paypalSdkLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const shopEmail = siteSettings.shopEmail;
+const paypalSdk = Boolean(site.paypalClientId);
 ---
 
 <Base title={`${copy.checkout.title} — Corpoceleste`}>
-  <div class="wrap page-main page-main--narrow checkout-page" data-shop-email={shopEmail}>
+  <div class="wrap page-main page-main--narrow checkout-page">
     <h1>{copy.checkout.title}</h1>
 
     <p class="empty" data-checkout-empty hidden>
@@ -49,30 +50,10 @@ const shopEmail = siteSettings.shopEmail;
       </section>
 
       {
-        (site.paypalClientId || site.paypalEmail) && (
+        paypalSdk && (
           <section class="checkout-step checkout-step--pay">
             <div class="pay-box is-locked" data-pay-box>
-              {site.paypalClientId ? (
-                <div id="paypal-buttons"></div>
-              ) : (
-                <form data-paypal-form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-                  <input type="hidden" name="cmd" value="_cart" />
-                  <input type="hidden" name="upload" value="1" />
-                  <input type="hidden" name="business" value={site.paypalEmail} />
-                  <input type="hidden" name="currency_code" value="EUR" />
-                  <input type="hidden" name="lc" value={paypalLc[locale]} />
-                  <input type="hidden" name="charset" value="utf-8" />
-                  <input type="hidden" name="no_shipping" value="2" />
-                  <input type="hidden" name="rm" value="1" />
-                  <input type="hidden" name="cbt" value={copy.checkout.paypalBack} />
-                  <input type="hidden" name="return" data-paypal-return />
-                  <input type="hidden" name="cancel_return" data-paypal-cancel />
-                  <div data-paypal-items></div>
-                  <button class="btn btn--full" type="submit" data-paypal-submit>
-                    {copy.checkout.paypal}
-                  </button>
-                </form>
-              )}
+              <div id="paypal-buttons"></div>
             </div>
           </section>
         )
@@ -118,7 +99,7 @@ const shopEmail = siteSettings.shopEmail;
   </div>
 
   {
-    site.paypalClientId && (
+    paypalSdk && (
       <script define:vars={{ clientId: site.paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
         s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=${sdkLocale}`;
@@ -146,13 +127,6 @@ const shopEmail = siteSettings.shopEmail;
     const bankForm = document.querySelector<HTMLFormElement>("[data-checkout-form]");
     const bankSubmit = document.querySelector<HTMLButtonElement>("[data-bank-submit]");
     const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
-    const paypalItems = document.querySelector("[data-paypal-items]");
-    const paypalForm = document.querySelector<HTMLFormElement>("[data-paypal-form]");
-    const ret = document.querySelector<HTMLInputElement>("[data-paypal-return]");
-    const cancel = document.querySelector<HTMLInputElement>("[data-paypal-cancel]");
-
-    if (ret) ret.value = `${location.origin}${base}${prefix}grazie/?from=paypal`;
-    if (cancel) cancel.value = `${location.origin}${base}${prefix}checkout/`;
 
     function shipping() {
       return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
@@ -162,29 +136,6 @@ const shopEmail = siteSettings.shopEmail;
       return n.toFixed(2);
     }
 
-    function hidden(name: string, value: string) {
-      const i = document.createElement("input");
-      i.type = "hidden";
-      i.name = name;
-      i.value = value;
-      return i;
-    }
-
-    function fillPaypal() {
-      if (!paypalItems) return;
-      const items = sanitizeCart();
-      const ship = shipping();
-      paypalItems.replaceChildren();
-      items.forEach((item, idx) => {
-        const n = idx + 1;
-        paypalItems.append(hidden(`item_name_${n}`, `${lineName(item)} (${item.size})`));
-        paypalItems.append(hidden(`amount_${n}`, money(item.price)));
-        paypalItems.append(hidden(`quantity_${n}`, String(item.qty)));
-      });
-      paypalItems.append(hidden("handling_cart", money(ship)));
-    }
-
-    /** Same line format as the bank FormSubmit `ordine` field. */
     function orderText() {
       const items = sanitizeCart();
       const ship = shipping();
@@ -193,35 +144,6 @@ const shopEmail = siteSettings.shopEmail;
         `Spedizione ${ship}€`,
         `Totale ${total() + ship}€`,
       ].join("\n");
-    }
-
-    /** Notify shop via FormSubmit after PayPal capture (SDK path only). */
-    async function notifyPaypalOrder(ordine: string) {
-      const email = page?.getAttribute("data-shop-email")?.trim();
-      if (!email) return;
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 4000);
-      try {
-        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            _subject: "Ordine shop Corpoceleste (PayPal)",
-            _captcha: "false",
-            _honey: "",
-            metodo: "PayPal",
-            ordine,
-          }),
-          signal: ctrl.signal,
-        });
-      } catch {
-        /* checkout still completes */
-      } finally {
-        clearTimeout(timer);
-      }
     }
 
     function unlocked() {
@@ -243,7 +165,6 @@ const shopEmail = siteSettings.shopEmail;
       if (!empty && recap) {
         const ship = shipping();
         renderRecap(recap, items, ship);
-        fillPaypal();
         if (orderField) orderField.value = orderText();
       }
       syncLock();
@@ -254,16 +175,6 @@ const shopEmail = siteSettings.shopEmail;
     disclaimer?.addEventListener("change", syncLock);
     privacy?.addEventListener("change", syncLock);
     window.addEventListener("cart:change", syncPage);
-
-    paypalForm?.addEventListener("submit", (e) => {
-      sanitizeCart();
-      fillPaypal();
-      if (!unlocked()) {
-        e.preventDefault();
-        return;
-      }
-      saveOrderSnapshot(shipping());
-    });
 
     bankForm?.addEventListener("submit", (e) => {
       sanitizeCart();
@@ -322,10 +233,8 @@ const shopEmail = siteSettings.shopEmail;
           });
         },
         onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
-          const ordine = orderText();
           saveOrderSnapshot(shipping());
           await actions.order.capture();
-          await notifyPaypalOrder(ordine);
           clearCart();
           location.href = `${base}${prefix}grazie/?from=paypal`;
         },

@@ -27,9 +27,3 @@ export const paypalSdkLocale: Record<Locale, string> = {
   en: "en_US",
   de: "de_DE",
 };
-
-export const paypalLc: Record<Locale, string> = {
-  it: "IT",
-  en: "US",
-  de: "DE",
-};

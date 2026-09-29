@@ -1,5 +1,5 @@
-import matter from "gray-matter";
 import type { OrderLine } from "./paypal.js";
+import { patchStockQty } from "./stock-patch.js";
 
 type GhFile = {
   content: string;
@@ -87,25 +87,31 @@ async function decrementProduct(line: OrderLine): Promise<string | null> {
     return `missing product ${line.id}`;
   }
 
-  const parsed = matter(file.content);
-  const stock =
-    parsed.data.stock && typeof parsed.data.stock === "object"
-      ? { ...(parsed.data.stock as Record<string, number>) }
-      : {};
-  const before = Math.max(0, Math.floor(Number(stock[line.size]) || 0));
-  const after = Math.max(0, before - line.qty);
-  stock[line.size] = after;
-  parsed.data.stock = stock;
-
-  const next = matter.stringify(parsed.content, parsed.data);
-  if (next === file.content) return null;
-
-  await putFile(
-    filePath,
-    file.sha,
-    next,
-    `stock: ${line.id} ${line.size} ${before}→${after} (−${line.qty})`,
+  const sizeEsc = line.size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const currentMatch = file.content.match(
+    new RegExp(`^([ \\t]+${sizeEsc}:\\s*)(\\d+)\\s*$`, "m"),
   );
+  if (!currentMatch) {
+    return `no stock line ${line.id} ${line.size}`;
+  }
+  const before = Math.max(0, Math.floor(Number(currentMatch[2])));
+  const after = Math.max(0, before - line.qty);
+  const patched = patchStockQty(file.content, line.size, after);
+  if (!patched) {
+    return `patch failed ${line.id} ${line.size}`;
+  }
+  if (patched.content !== file.content) {
+    await putFile(
+      filePath,
+      file.sha,
+      patched.content,
+      `stock: ${line.id} ${line.size} ${before}→${after} (−${line.qty})`,
+    );
+  }
+
+  if (before < line.qty) {
+    return `OVERSELL ${line.id} ${line.size}: aveva ${before}, ordine ×${line.qty} → ${after}`;
+  }
   return `${line.id} ${line.size} ${before}→${after}`;
 }
 

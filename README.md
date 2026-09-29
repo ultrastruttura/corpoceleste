@@ -31,16 +31,24 @@ Se usi un dominio (es. corpoceleste.com): in `astro.config.mjs` metti `base: "/"
 PayPal non ha canone mensile: solo commissione sull’ordine (in Italia circa 3% + 0,35 €).
 
 1. Account **PayPal Business** (gratis).
-2. In `src/data/site.ts` metti `paypalEmail` (l’email del conto).
-3. **Consigliato per magazzino automatico:** [developer.paypal.com](https://developer.paypal.com/) → crea un’app → copia il **Client ID** in `paypalClientId`.
+2. [developer.paypal.com](https://developer.paypal.com/) → crea un’app → copia il **Client ID** in `src/data/site.ts` → `paypalClientId`.
+3. Senza Client ID il checkout mostra **solo bonifico** (niente form PayPal classico).
 
-### Magazzino automatico (Vercel + webhook PayPal)
+### Magazzino + mail ordine (Vercel webhook)
 
-Dopo un pagamento PayPal SDK riuscito, un webhook su Vercel abbassa i pezzi in `content/products/*.md` (commit su GitHub → Pages si ricostruisce).
+Dopo `PAYMENT.CAPTURE.COMPLETED` il webhook:
+- abbassa lo stock nei markdown (patch solo delle righe `stock:`)
+- manda email allo shop via FormSubmit (**server-side**, non dal browser)
 
-**Non vale per:** bonifico, form PayPal classico. Quelli restano manuali in Tina.
+**Bonifico:** stock a mano in Tina; email già dal form FormSubmit.
 
-**Email ordine allo shop:** bonifico e PayPal SDK (FormSubmit → `shopEmail` in Tina *SEO e home*, fallback `site.email`). Il form PayPal classico no.
+Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora “oversell”; in quel caso la mail ha oggetto `ATTENZIONE oversell`.
+
+#### Env Vercel (oltre a PayPal/GitHub)
+
+- `SHOP_EMAIL` — stessa inbox di Tina *Email shop* (es. `info@corpoceleste.com`)
+- vedi `.env.example` per l’elenco completo
+
 
 #### 1. GitHub token
 
@@ -58,6 +66,7 @@ Dopo un pagamento PayPal SDK riuscito, un webhook su Vercel abbassa i pezzi in `
    - `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` (stessa app PayPal del sito)
    - `PAYPAL_WEBHOOK_ID` (dopo lo step 3)
    - `PAYPAL_MODE=live` (o `sandbox` per prove)
+   - `SHOP_EMAIL` (inbox ordini, es. info@corpoceleste.com)
    - `GITHUB_TOKEN`
    - `GITHUB_REPO=ultrastruttura/corpoceleste`
    - `GITHUB_BRANCH=main`
@@ -78,3 +87,4 @@ Metti lo stesso **Client ID** Live in `src/data/site.ts` → `paypalClientId`, p
 Dopo un ordine di prova (sandbox o 1€), in repo dovresti vedere:
 - un file in `stock-ledger/`
 - stock aggiornato nel markdown del prodotto
+- email a `SHOP_EMAIL` (FormSubmit)
