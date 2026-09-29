@@ -79,7 +79,7 @@ const it = {
     paypalBack: "Torna a Corpoceleste",
     bank: "Bonifico",
     bankNote:
-      "Dopo l’invio ti scrivo io con l’IBAN. L’ordine è confermato solo quando ricevo il pagamento.",
+      "Invia il modulo: ricevi l’IBAN via email. L’ordine è confermato quando arriva il pagamento; poi spedisco.",
     name: "Nome e cognome",
     email: "Email",
     phone: "Telefono",
@@ -324,7 +324,7 @@ const en: typeof it = {
     paypalBack: "Back to Corpoceleste",
     bank: "Bank transfer",
     bankNote:
-      "After you send the order I’ll email the IBAN. The order is confirmed only when payment arrives.",
+      "Send the form: you’ll get the IBAN by email. The order is confirmed when payment arrives; then I ship.",
     name: "Full name",
     email: "Email",
     phone: "Phone",
@@ -569,7 +569,7 @@ const de: typeof it = {
     paypalBack: "Zurück zu Corpoceleste",
     bank: "Überweisung",
     bankNote:
-      "Nach dem Absenden schreibe ich dir die IBAN. Die Bestellung gilt erst, wenn die Zahlung da ist.",
+      "Schick das Formular: du bekommst die IBAN per E-Mail. Die Bestellung gilt, wenn die Zahlung da ist; danach verschicke ich.",
     name: "Vor- und Nachname",
     email: "E-Mail",
     phone: "Telefon",

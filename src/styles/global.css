@@ -158,14 +158,14 @@ p:last-child {
 }
 
 .logo-mark {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   object-fit: contain;
 }
 
 .logo-word {
-  height: 16px;
+  height: 18px;
   width: auto;
   max-width: 100%;
   min-width: 0;
@@ -210,6 +210,10 @@ p:last-child {
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.header-tools > .lang {
+  display: none;
 }
 
 .lang a,
@@ -318,6 +322,10 @@ p:last-child {
     justify-self: end;
   }
 
+  .header-tools > .lang {
+    display: flex;
+  }
+
   .menu-toggle {
     display: none;
   }
@@ -342,7 +350,7 @@ p:last-child {
   display: block;
 }
 
-.mobile-nav a {
+.mobile-nav > a {
   display: flex;
   align-items: center;
   min-height: 48px;
@@ -352,13 +360,28 @@ p:last-child {
   border-bottom: 1px solid var(--line);
 }
 
-.mobile-nav a:last-child {
+.mobile-nav > a:last-of-type {
   border-bottom: 0;
 }
 
-.mobile-nav a:hover,
-.mobile-nav a.is-active {
+.mobile-nav > a:hover,
+.mobile-nav > a.is-active {
   text-decoration: underline;
+}
+
+.mobile-nav .lang {
+  height: auto;
+  margin: 28px 0 0;
+  padding-top: 8px;
+  gap: 0;
+  font-size: 12px;
+}
+
+.mobile-nav .lang a,
+.mobile-nav .lang span {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
 }
 
 body.nav-open,
@@ -395,17 +418,17 @@ body.cart-open {
     flex: 1;
     min-width: 0;
     flex-shrink: 1;
-    gap: 6px;
+    gap: 8px;
   }
 
   .logo-mark {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
   }
 
   .logo-word {
-    height: 11px;
+    height: 15px;
     max-width: 100%;
     object-fit: contain;
     object-position: left center;
