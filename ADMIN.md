@@ -50,10 +50,24 @@ Senza questi secret (o senza un nuovo deploy dopo averli messi) l’admin online
 
 In ogni maglia imposta i pezzi per taglia (S/M/L/XL). Taglia a 0 = non acquistabile.
 
-Se è attivo il **webhook PayPal** (vedi README), dopo un pagamento PayPal lo stock si abbassa da solo e arriva una mail ordine (FormSubmit dal server Vercel).  
+Se è attivo il **webhook PayPal** (guida: [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)), dopo un pagamento PayPal lo stock si abbassa da solo e arriva una mail ordine (FormSubmit dal server Vercel).  
 **Bonifico:** aggiorna i numeri a mano qui dopo il pagamento; la mail parte dal form del sito.
 
 Email shop (form + fallback): **SEO e home** → *Email shop (ordini e form)*. Per le mail PayPal dal webhook imposta anche `SHOP_EMAIL` su Vercel.
+
+## Dati legali (da compilare)
+
+Le pagine **Condizioni di vendita** (`/vendita/`) e **Recesso** (`/recesso/`) prendono i dati del venditore da `src/data/site.ts`:
+
+| Campo | Cosa metterci |
+|-------|---------------|
+| `vatId` | Partita IVA. Finché è vuoto la pagina scrive «in corso di attribuzione» |
+| `indirizzo` | Indirizzo completo della sede (obbligatorio nelle info precontrattuali) |
+| `rea` | Numero REA / Registro imprese, se c’è |
+| `telefono` | Telefono di contatto, se lo pubblichi |
+| `shippingDays` | Giorni lavorativi indicativi per la spedizione |
+
+I testi delle pagine legali stanno in `src/i18n/dict.ts` (`terms` e `withdrawal`, in IT/EN/DE). Sono bozze operative: falle validare da un legale prima di vendere.
 
 ## Flusso tipico: nuova maglia
 

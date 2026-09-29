@@ -71,10 +71,18 @@ const copy = t(locale);
         </svg>
       </a>
     </nav>
-    <p class="footer-made">
-      {copy.footer.made} {year} Corpoceleste
-      · <a href={pageUrl(locale, "privacy/")}>{copy.privacy.title}</a>
-      · <a href={pageUrl(locale, "cookie/")}>{copy.cookiePolicy.title}</a>
-    </p>
+    <div class="footer-made">
+      <p>
+        {copy.footer.made} {year} Corpoceleste
+        · <a href={pageUrl(locale, "vendita/")}>{copy.terms.title}</a>{" "}
+        · <a href={pageUrl(locale, "recesso/")}>{copy.withdrawal.entry}</a>{" "}
+        · <a href={pageUrl(locale, "privacy/")}>{copy.privacy.title}</a>{" "}
+        · <a href={pageUrl(locale, "cookie/")}>{copy.cookiePolicy.title}</a>
+      </p>
+      <p class="footer-legal">
+        {site.intestatario} — {site.indirizzo || site.sede}
+        {site.vatId && ` · ${copy.terms.vatLabel} ${site.vatId}`}
+      </p>
+    </div>
   </div>
 </footer>

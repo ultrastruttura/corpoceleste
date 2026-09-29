@@ -18,6 +18,7 @@ export function thanksMessage(locale: Locale, from: string) {
     consulenza: { title: copy.received, body: copy.contact },
     corsi: { title: copy.received, body: copy.waitlist },
     workshop: { title: copy.received, body: copy.contact },
+    recesso: { title: copy.received, body: copy.withdrawal },
     ordine: { title: copy.order, body: copy.bank, order: true },
     paypal: { title: copy.order, body: copy.paypal, order: true },
     form: { title: copy.received, body: "" },

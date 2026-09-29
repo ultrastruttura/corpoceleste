@@ -123,6 +123,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         : "Ordine shop Corpoceleste (PayPal)",
       ordine,
       metodo: "PayPal",
+      copyTo: order?.payer?.email_address,
     });
 
     return res.status(200).json({ ok: true, captureId, notes, emailed: true });

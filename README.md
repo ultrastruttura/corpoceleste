@@ -36,6 +36,8 @@ PayPal non ha canone mensile: solo commissione sull’ordine (in Italia circa 3%
 
 ### Magazzino + mail ordine (Vercel webhook)
 
+Guida completa passo-passo: **[MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)**.
+
 Dopo `PAYMENT.CAPTURE.COMPLETED` il webhook:
 - abbassa lo stock nei markdown (patch solo delle righe `stock:`)
 - manda email allo shop via FormSubmit (**server-side**, non dal browser)

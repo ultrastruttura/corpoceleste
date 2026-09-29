@@ -1,0 +1,137 @@
+---
+import Base from "../layouts/Base.astro";
+import FormHoney from "../components/FormHoney.astro";
+import { siteSettings } from "../data/settings";
+import { currentLocale, pageUrl, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const w = copy.withdrawal;
+const shopEmail = siteSettings.shopEmail;
+---
+
+<Base title={`${w.entry} — Corpoceleste`}>
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>{w.entry}</h1>
+      <p class="lede">{w.lede}</p>
+    </header>
+
+    <div class="split">
+      <form
+        class="form"
+        action={`https://formsubmit.co/${shopEmail}`}
+        method="POST"
+        data-withdraw-form
+      >
+        <input type="hidden" name="_subject" value="Recesso — Corpoceleste" />
+        <input type="hidden" name="_next" data-next-grazie="recesso" />
+        <input type="hidden" name="_autoresponse" value={`${w.declaration} ${w.after}`} />
+        <input type="hidden" name="_cc" data-withdraw-cc />
+        <input type="hidden" name="dichiarazione" value={w.declaration} />
+        <input type="hidden" name="trasmissione" data-withdraw-sent />
+        <FormHoney />
+
+        <fieldset class="withdraw-step" data-withdraw-step>
+          <legend>{w.legend}</legend>
+          <p>{w.declaration}</p>
+
+          <div>
+            <label for="wd-name">{w.name}</label>
+            <input id="wd-name" name="nome" required data-withdraw-field={w.name} />
+          </div>
+          <div>
+            <label for="wd-email">{w.email}</label>
+            <input id="wd-email" type="email" name="email" required data-withdraw-field={w.email} />
+          </div>
+          <div>
+            <label for="wd-order">{w.orderRef}</label>
+            <textarea id="wd-order" name="ordine" required aria-describedby="wd-order-help" data-withdraw-field={w.orderRef}></textarea>
+            <p class="field-help" id="wd-order-help">{w.orderRefHelp}</p>
+          </div>
+          <div>
+            <label for="wd-received">{w.received}</label>
+            <input id="wd-received" type="date" name="consegna" data-withdraw-field={w.received} />
+          </div>
+          <div>
+            <label for="wd-note">{w.note}</label>
+            <textarea id="wd-note" name="note" aria-describedby="wd-note-help" data-withdraw-field={w.note}></textarea>
+            <p class="field-help" id="wd-note-help">{w.noteHelp}</p>
+          </div>
+
+          <button class="btn" type="button" data-withdraw-continue>{w.continue}</button>
+        </fieldset>
+
+        <div class="withdraw-step" data-withdraw-review hidden>
+          <h2>{w.reviewTitle}</h2>
+          <dl class="withdraw-recap" data-withdraw-recap></dl>
+          <div class="withdraw-actions">
+            <button class="btn" type="submit">{w.confirm}</button>
+            <button class="btn btn--ghost" type="button" data-withdraw-edit>{w.edit}</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="prose">
+        <p>{w.intro}</p>
+        <p>{w.after}</p>
+        <p>
+          {w.termsLead}<a href={pageUrl(locale, "vendita/")}>{w.termsLink}</a>.
+        </p>
+        <p>
+          {w.alt} <a href={`mailto:${shopEmail}`}>{shopEmail}</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <style is:inline>
+      [data-withdraw-continue] { display: none; }
+      .withdraw-step[data-withdraw-review][hidden] { display: grid; }
+      [data-withdraw-review] h2, [data-withdraw-recap], [data-withdraw-edit] { display: none; }
+    </style>
+  </noscript>
+
+  <script>
+    const form = document.querySelector<HTMLFormElement>("[data-withdraw-form]");
+    const step = form?.querySelector<HTMLElement>("[data-withdraw-step]");
+    const review = form?.querySelector<HTMLElement>("[data-withdraw-review]");
+    const recap = form?.querySelector<HTMLElement>("[data-withdraw-recap]");
+    const cc = form?.querySelector<HTMLInputElement>("[data-withdraw-cc]");
+    const sent = form?.querySelector<HTMLInputElement>("[data-withdraw-sent]");
+
+    if (form && step && review && recap) {
+      const fields = Array.from(
+        form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("[data-withdraw-field]"),
+      );
+
+      form.querySelector("[data-withdraw-continue]")?.addEventListener("click", () => {
+        if (!form.reportValidity()) return;
+        recap.textContent = "";
+        for (const field of fields) {
+          if (!field.value.trim()) continue;
+          const dt = document.createElement("dt");
+          dt.textContent = field.getAttribute("data-withdraw-field") || field.name;
+          const dd = document.createElement("dd");
+          dd.textContent = field.value.trim();
+          recap.append(dt, dd);
+        }
+        step.hidden = true;
+        review.hidden = false;
+        review.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
+
+      form.querySelector("[data-withdraw-edit]")?.addEventListener("click", () => {
+        review.hidden = true;
+        step.hidden = false;
+      });
+
+      form.addEventListener("submit", () => {
+        const email = form.querySelector<HTMLInputElement>("#wd-email");
+        if (cc && email) cc.value = email.value.trim();
+        if (sent) sent.value = new Date().toLocaleString(document.documentElement.lang || "it");
+      });
+    }
+  </script>
+</Base>

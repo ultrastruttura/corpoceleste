@@ -1,0 +1,73 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+import { siteSettings } from "../data/settings";
+import { currentLocale, pageUrl, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const v = copy.terms;
+const shopEmail = siteSettings.shopEmail;
+---
+
+<Base title={`${v.title} — Corpoceleste`}>
+  <div class="wrap">
+    <header class="page-hero">
+      <h1>{v.title}</h1>
+      <p class="lede">{v.lede}</p>
+    </header>
+
+    <div class="prose page-main--article">
+      <p>{v.updated}</p>
+
+      <h2>{v.seller}</h2>
+      <p>
+        {site.intestatario}<br />
+        {site.indirizzo || site.sede}<br />
+        {site.vatId ? <>{v.vatLabel} {site.vatId}<br /></> : <>{v.vatMissing}<br /></>}
+        {site.rea && <>{v.reaLabel} {site.rea}<br /></>}
+        {site.telefono && <>{site.telefono}<br /></>}
+        {v.contactLabel} <a href={`mailto:${shopEmail}`}>{shopEmail}</a>
+      </p>
+
+      <h2>{v.scope}</h2>
+      <p>{v.scopeBody}</p>
+
+      <h2>{v.products}</h2>
+      <p>{v.productsBody}</p>
+
+      <h2>{v.prices}</h2>
+      <p>{v.pricesBody(site.shippingItaly, site.shippingEU)}</p>
+
+      <h2>{v.order}</h2>
+      <p>{v.orderBody}</p>
+
+      <h2>{v.payment}</h2>
+      <p>{v.paymentBody}</p>
+
+      <h2>{v.shipping}</h2>
+      <p>{v.shippingBody(site.shippingDays)}</p>
+
+      <h2 id="recesso">{v.withdrawal}</h2>
+      <p>{v.withdrawalBody}</p>
+      <p>
+        {v.withdrawalHow}
+        {" "}
+        <a href={pageUrl(locale, "recesso/")}>{v.withdrawalLink}</a>.
+      </p>
+      <p>{v.withdrawalEffects}</p>
+      <p>{v.withdrawalExceptions}</p>
+
+      <h2>{v.warranty}</h2>
+      <p>{v.warrantyBody}</p>
+
+      <h2>{v.complaints}</h2>
+      <p>{v.complaintsBody}</p>
+
+      <h2>{v.law}</h2>
+      <p>{v.lawBody}</p>
+
+      <p><small>{v.disclaimer}</small></p>
+    </div>
+  </div>
+</Base>

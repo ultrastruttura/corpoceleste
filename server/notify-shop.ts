@@ -3,6 +3,8 @@ export async function notifyShopOrder(opts: {
   subject: string;
   ordine: string;
   metodo?: string;
+  /** Copia al cliente: conferma d'ordine su supporto durevole. */
+  copyTo?: string;
 }): Promise<boolean> {
   const email = (process.env.SHOP_EMAIL || "").trim();
   if (!email) {
@@ -21,6 +23,7 @@ export async function notifyShopOrder(opts: {
         _subject: opts.subject,
         _captcha: "false",
         _template: "table",
+        ...(opts.copyTo ? { _cc: opts.copyTo } : {}),
         metodo: opts.metodo || "PayPal",
         ordine: opts.ordine,
       }),

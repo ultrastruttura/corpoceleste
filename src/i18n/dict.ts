@@ -41,6 +41,7 @@ const it = {
     preorder: "Pre-order. Spedizione quando la stampa è pronta.",
     reprint: "Richiedi ristampa",
     printOne: "Serigrafia, un colore",
+    vatIncluded: "Prezzo IVA inclusa",
     galleryPrev: "Foto precedente",
     galleryNext: "Foto successiva",
     shipLine: (itPrice: number, euPrice: number) =>
@@ -86,7 +87,11 @@ const it = {
     shippingTitle: "Spedizioni",
     shippingBody:
       "Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.",
-    readShipping: "Ho letto i tempi di spedizione.",
+    termsLead: "Ho letto i tempi di spedizione e le ",
+    termsLink: "condizioni di vendita",
+    termsTail: ", recesso e garanzia inclusi.",
+    vatIncluded: "Prezzi in euro, IVA inclusa. La spedizione è quella scelta qui sopra.",
+    payObligation: "Premendo il pulsante concludi un ordine con obbligo di pagamento.",
     readPrivacy: (privacy: string) => `Ho letto l’${privacy}.`,
     privacyLink: "informativa privacy",
     shipTo: "Spedizione",
@@ -103,7 +108,7 @@ const it = {
     address: "Indirizzo",
     city: "CAP e città",
     notes: "Note",
-    sendOrder: "Invia ordine",
+    sendOrder: "Ordine con obbligo di pagamento",
   },
   forms: {
     name: "Nome",
@@ -168,6 +173,8 @@ const it = {
     bank: "Ti scrivo per il bonifico. L’ordine vale quando arriva il pagamento.",
     paypal:
       "Se PayPal ha confermato il pagamento, ti scrivo per la spedizione. Questa pagina da sola non è una ricevuta.",
+    withdrawal:
+      "Recesso registrato. Ricevi via email l’avviso di ricevimento con contenuto, data e ora; poi ti scrivo come rimandare indietro l’articolo.",
   },
   notFound: {
     title: "Pagina non trovata",
@@ -177,7 +184,7 @@ const it = {
     title: "Privacy",
     lede:
       "Informativa sul trattamento dei dati e sull’uso di cookie e storage, art. 13 GDPR.",
-    updated: "Ultimo aggiornamento: 14 agosto 2026.",
+    updated: "Ultimo aggiornamento: 1 ottobre 2026.",
     controller: "Titolare",
     controllerBody: (name: string, sede: string) =>
       `${name}, in qualità di titolare del trattamento per il sito Corpoceleste. Sede: ${sede}.`,
@@ -215,6 +222,8 @@ const it = {
     paypalRecv: "se scegli PayPal.",
     github:
       "hosting delle pagine pubbliche, non dei moduli. Informativa GitHub sul sito github.com.",
+    vercel:
+      "Vercel Inc. — funzione tecnica che, dopo un pagamento PayPal confermato, aggiorna il magazzino e inoltra il riepilogo dell’ordine. Tratta i dati dell’ordine, non i dati di pagamento.",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
     rights: "Diritti",
@@ -260,6 +269,80 @@ const it = {
     privacyLink: "Informativa privacy completa",
     contact: "Contatto titolare:",
   },
+  terms: {
+    title: "Condizioni di vendita",
+    lede: "Chi vende, cosa compri, come si paga, come si recede. Vendita a distanza a consumatori ai sensi del Codice del consumo (d.lgs. 206/2005).",
+    updated: "Ultimo aggiornamento: 1 ottobre 2026.",
+    seller: "Venditore",
+    vatLabel: "Partita IVA:",
+    reaLabel: "REA:",
+    vatMissing: "Partita IVA: in corso di attribuzione. Contattami per i dati fiscali completi.",
+    contactLabel: "Contatto:",
+    scope: "Cosa regolano",
+    scopeBody:
+      "Queste condizioni valgono per gli acquisti fatti su questo sito. Sono scritte per chi compra come consumatore, cioè fuori da attività d’impresa o professione. Comprando accetti queste condizioni nella versione pubblicata al momento dell’ordine.",
+    products: "Cosa vendo",
+    productsBody:
+      "Serigrafie stampate a mano, una per volta, in tiratura limitata: maglie, stampe su carta, pezzi numerati. Essendo stampa manuale, piccole differenze di registro, inchiostro e posizione fanno parte del pezzo e non sono difetti. Le foto sono indicative: colore e resa possono variare leggermente da schermo a schermo.",
+    prices: "Prezzi",
+    pricesBody: (italy: number, europe: number) =>
+      `I prezzi sono in euro e IVA inclusa, salvo diversa indicazione. La spedizione è a parte e viene mostrata prima del pagamento: ${italy} € in Italia, ${europe} € in Europa. Il totale da pagare, spedizione compresa, è quello che vedi in checkout.`,
+    order: "Come si conclude l’ordine",
+    orderBody:
+      "Le pagine prodotto sono un invito all’acquisto, non un’offerta vincolante. Il contratto si conclude quando premi il pulsante di pagamento in checkout, che riporta «ordine con obbligo di pagamento», e ricevi la conferma d’ordine via email. Se un pezzo non fosse più disponibile dopo il pagamento, ti avviso e ti rimborso per intero.",
+    payment: "Pagamenti",
+    paymentBody:
+      "PayPal (anche con carta, tramite PayPal) oppure bonifico bancario. Non tratto né conservo i dati della tua carta: se paghi con PayPal, il pagamento avviene sui sistemi di PayPal. Con bonifico l’ordine è confermato quando ricevo l’accredito; tengo il pezzo in riserva 5 giorni.",
+    shipping: "Spedizione e consegna",
+    shippingBody: (days: string) =>
+      `Imballo e spedisco io dallo studio, di norma entro ${days} giorni lavorativi dalla conferma del pagamento. In ogni caso consegno entro 30 giorni dalla conclusione del contratto, salvo diverso accordo scritto. Il rischio di perdita o danno passa a te alla consegna del pacco. Se il pacco arriva visibilmente danneggiato, accetta con riserva e scrivimi.`,
+    withdrawal: "Diritto di recesso: 14 giorni",
+    withdrawalBody:
+      "Hai 14 giorni per recedere senza dover dare motivazioni. Il termine parte dal giorno in cui tu (o una persona da te indicata) ricevi fisicamente il pacco; se l’ordine contiene più pezzi consegnati separatamente, dall’ultimo.",
+    withdrawalHow: "Per recedere puoi usare la funzione online, oppure scrivermi via email una dichiarazione esplicita:",
+    withdrawalLink: "recedere dal contratto qui",
+    withdrawalEffects:
+      "Dopo la comunicazione hai 14 giorni per rispedire il pezzo. Rimborso tutto quello che hai pagato, spedizione standard di andata compresa, entro 14 giorni dal momento in cui ricevo il reso o la prova della spedizione, con lo stesso mezzo di pagamento che hai usato. Il costo della restituzione è a tuo carico. Rispondi della diminuzione di valore se hai usato il pezzo oltre quanto serve a verificarne natura e caratteristiche: provalo come faresti in negozio.",
+    withdrawalExceptions:
+      "Il recesso non si applica ai pezzi realizzati su tua misura o chiaramente personalizzati su tua richiesta (art. 59 Codice del consumo). Su ogni pezzo personalizzato lo segnalo prima dell’acquisto.",
+    warranty: "Garanzia legale di conformità",
+    warrantyBody:
+      "Su tutto quello che vendo vale la garanzia legale di 2 anni dalla consegna (artt. 128 e seguenti Codice del consumo). Se il pezzo è difettoso o diverso da quanto descritto, hai diritto a riparazione o sostituzione senza spese e, se non sono possibili o non risolvono, a riduzione del prezzo o risoluzione del contratto con rimborso. Scrivimi con foto e numero d’ordine: le spese di reso per difetto di conformità sono a mio carico. La garanzia legale è distinta dal recesso e vale anche dopo i 14 giorni.",
+    complaints: "Reclami e controversie",
+    complaintsBody:
+      "Per qualsiasi problema scrivimi prima a me: rispondo entro pochi giorni e nella pratica si risolve così. Se non troviamo un accordo, puoi rivolgerti a un organismo ADR iscritto all’elenco del Ministero delle imprese e del made in Italy per la risoluzione alternativa delle controversie di consumo. La piattaforma europea ODR è stata dismessa nel luglio 2025 e non è più utilizzabile.",
+    law: "Legge applicabile",
+    lawBody:
+      "Al contratto si applica la legge italiana. Restano ferme le tutele più favorevoli previste dalla legge del paese dell’Unione europea in cui risiedi come consumatore. Per le controversie è competente il foro del tuo luogo di residenza o domicilio.",
+    disclaimer:
+      "Testo informativo, non consulenza legale. Se hai dubbi sui tuoi diritti, scrivimi o rivolgiti a un’associazione di consumatori.",
+  },
+  withdrawal: {
+    title: "Recesso",
+    entry: "Recedere dal contratto qui",
+    lede: "Modulo online per comunicare il recesso da un ordine fatto su questo sito. Hai 14 giorni dalla consegna.",
+    intro:
+      "Compila i dati, rileggi il riepilogo e conferma. Dopo la conferma ricevi via email l’avviso di ricevimento con il contenuto della dichiarazione, la data e l’ora di trasmissione.",
+    legend: "Dichiarazione di recesso",
+    declaration:
+      "Con la presente comunico il recesso dal contratto di vendita dei beni sotto indicati, ai sensi dell’art. 52 del Codice del consumo.",
+    name: "Nome e cognome",
+    email: "Email per l’avviso di ricevimento",
+    orderRef: "Ordine da cui receda",
+    orderRefHelp: "Numero d’ordine se ce l’hai, oppure data d’acquisto e pezzi ordinati.",
+    received: "Data di consegna (se la ricordi)",
+    note: "Note",
+    noteHelp: "Facoltative. Non devi motivare il recesso.",
+    continue: "Continua",
+    reviewTitle: "Rileggi e conferma",
+    edit: "Modifica",
+    confirm: "Conferma recesso",
+    after:
+      "Dopo la conferma ti scrivo entro pochi giorni con l’indirizzo per la restituzione. Hai 14 giorni dalla comunicazione per rispedire il pezzo; il costo del reso è a tuo carico.",
+    termsLead: "Costi, tempi di rimborso ed eccezioni sono nelle ",
+    termsLink: "condizioni di vendita",
+    alt: "In alternativa puoi scrivere una dichiarazione esplicita via email a",
+  },
 };
 
 const en: typeof it = {
@@ -303,6 +386,7 @@ const en: typeof it = {
     preorder: "Pre-order. Ships when the print is ready.",
     reprint: "Request a reprint",
     printOne: "Screen print, one colour",
+    vatIncluded: "Price includes VAT",
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
     shipLine: (itPrice: number, euPrice: number) =>
@@ -347,7 +431,11 @@ const en: typeof it = {
     shippingTitle: "Shipping",
     shippingBody:
       "One-person studio: I print and pack the shirts myself. I ship twice a week. If you need them by a given date, write before you order.",
-    readShipping: "I have read the shipping times.",
+    termsLead: "I have read the shipping times and the ",
+    termsLink: "terms of sale",
+    termsTail: ", including withdrawal and legal guarantee.",
+    vatIncluded: "Prices in euro, VAT included. Shipping is the option selected above.",
+    payObligation: "Pressing the button places an order with an obligation to pay.",
     readPrivacy: (privacy: string) => `I have read the ${privacy}.`,
     privacyLink: "privacy notice",
     shipTo: "Shipping",
@@ -364,7 +452,7 @@ const en: typeof it = {
     address: "Address",
     city: "Postcode and city",
     notes: "Notes",
-    sendOrder: "Place order",
+    sendOrder: "Order with obligation to pay",
   },
   forms: {
     name: "Name",
@@ -429,6 +517,8 @@ const en: typeof it = {
     bank: "I’ll write with the transfer details. The order stands when payment arrives.",
     paypal:
       "If PayPal confirmed the payment, I’ll write about shipping. This page alone is not a receipt.",
+    withdrawal:
+      "Withdrawal registered. You’ll get an acknowledgement by email with its content, date and time; then I’ll write about sending the item back.",
   },
   notFound: {
     title: "Page not found",
@@ -438,7 +528,7 @@ const en: typeof it = {
     title: "Privacy",
     lede:
       "Information on the processing of personal data and on cookies and storage, Art. 13 GDPR.",
-    updated: "Last updated: 14 August 2026.",
+    updated: "Last updated: 1 October 2026.",
     controller: "Controller",
     controllerBody: (name: string, sede: string) =>
       `${name}, controller of personal data for the Corpoceleste website. Address: ${sede}.`,
@@ -476,6 +566,8 @@ const en: typeof it = {
     paypalRecv: "if you choose PayPal.",
     github:
       "hosts the public pages, not the forms. GitHub’s notice is on github.com.",
+    vercel:
+      "Vercel Inc. — technical function that updates stock and forwards the order summary after a confirmed PayPal payment. It handles order data, not payment data.",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
     rights: "Rights",
@@ -521,6 +613,80 @@ const en: typeof it = {
     privacyLink: "Full privacy notice",
     contact: "Controller contact:",
   },
+  terms: {
+    title: "Terms of sale",
+    lede: "Who sells, what you buy, how you pay, how you withdraw. Distance selling to consumers under the Italian Consumer Code (d.lgs. 206/2005), which implements EU consumer law.",
+    updated: "Last updated: 1 October 2026.",
+    seller: "Seller",
+    vatLabel: "VAT number:",
+    reaLabel: "Business register:",
+    vatMissing: "VAT number: being assigned. Write to me for full tax details.",
+    contactLabel: "Contact:",
+    scope: "What these terms cover",
+    scopeBody:
+      "These terms apply to purchases made on this site. They are written for people buying as consumers, that is outside a business or profession. By ordering you accept the version published at the time of your order.",
+    products: "What I sell",
+    productsBody:
+      "Hand-pulled screen prints in limited runs: shirts, prints on paper, numbered pieces. Because printing is manual, small differences in registration, ink and placement are part of the piece and are not defects. Photos are indicative: colour can vary slightly from screen to screen.",
+    prices: "Prices",
+    pricesBody: (italy: number, europe: number) =>
+      `Prices are in euro and include VAT unless stated otherwise. Shipping is charged separately and shown before payment: €${italy} to Italy, €${europe} within Europe. The total you see at checkout, shipping included, is what you pay.`,
+    order: "How the order is concluded",
+    orderBody:
+      "Product pages are an invitation to buy, not a binding offer. The contract is concluded when you press the payment button at checkout, labelled “order with obligation to pay”, and receive the order confirmation by email. If a piece is no longer available after payment, I tell you and refund you in full.",
+    payment: "Payment",
+    paymentBody:
+      "PayPal (card payments also go through PayPal) or bank transfer. I never receive or store your card details: with PayPal the payment happens on PayPal’s systems. With bank transfer the order is confirmed when the money arrives; I hold the piece for 5 days.",
+    shipping: "Shipping and delivery",
+    shippingBody: (days: string) =>
+      `I pack and ship from the studio myself, normally within ${days} working days of confirmed payment. In any case I deliver within 30 days of the contract, unless we agree otherwise in writing. Risk of loss or damage passes to you on delivery of the parcel. If a parcel arrives visibly damaged, accept it with reservation and write to me.`,
+    withdrawal: "Right of withdrawal: 14 days",
+    withdrawalBody:
+      "You have 14 days to withdraw without giving any reason. The period starts the day you (or someone you nominate) physically receive the parcel; if the order contains several pieces delivered separately, from the last one.",
+    withdrawalHow: "To withdraw you can use the online function, or send me an explicit statement by email:",
+    withdrawalLink: "withdraw from the contract here",
+    withdrawalEffects:
+      "After notifying me you have 14 days to send the piece back. I refund everything you paid, including standard outbound shipping, within 14 days of receiving the return or proof that you sent it, using the same payment method you used. Return shipping is at your cost. You are liable for any diminished value if you handled the piece beyond what is needed to establish its nature and characteristics: try it as you would in a shop.",
+    withdrawalExceptions:
+      "Withdrawal does not apply to pieces made to your measurements or clearly personalised at your request (art. 59 Consumer Code). I flag any personalised piece before purchase.",
+    warranty: "Legal guarantee of conformity",
+    warrantyBody:
+      "Everything I sell carries the 2-year legal guarantee from delivery (arts. 128 ff. Consumer Code). If a piece is faulty or not as described, you are entitled to free repair or replacement and, if those are impossible or fail, to a price reduction or to cancel the contract with a refund. Write to me with photos and your order number: return costs for a conformity defect are on me. The legal guarantee is separate from withdrawal and applies well beyond the 14 days.",
+    complaints: "Complaints and disputes",
+    complaintsBody:
+      "For any problem write to me first: I answer within a few days and in practice that settles it. If we cannot agree, you can turn to an ADR body listed by the Italian Ministry of Enterprise for alternative dispute resolution in consumer matters. The European ODR platform was shut down in July 2025 and is no longer available.",
+    law: "Applicable law",
+    lawBody:
+      "Italian law applies to the contract. More favourable protections under the law of the EU country where you live as a consumer still apply. For disputes, the court of your place of residence or domicile has jurisdiction.",
+    disclaimer:
+      "Informative text, not legal advice. If you are unsure about your rights, write to me or contact a consumer association.",
+  },
+  withdrawal: {
+    title: "Withdrawal",
+    entry: "Withdraw from the contract here",
+    lede: "Online form to declare withdrawal from an order placed on this site. You have 14 days from delivery.",
+    intro:
+      "Fill in the details, read the summary and confirm. After confirming you receive an acknowledgement by email with the content of the declaration and the date and time it was sent.",
+    legend: "Declaration of withdrawal",
+    declaration:
+      "I hereby give notice of withdrawal from the contract of sale of the goods indicated below, under art. 52 of the Italian Consumer Code.",
+    name: "Full name",
+    email: "Email for the acknowledgement",
+    orderRef: "Order you are withdrawing from",
+    orderRefHelp: "Order number if you have it, otherwise purchase date and items ordered.",
+    received: "Delivery date (if you remember it)",
+    note: "Notes",
+    noteHelp: "Optional. You do not have to give a reason.",
+    continue: "Continue",
+    reviewTitle: "Read and confirm",
+    edit: "Edit",
+    confirm: "Confirm withdrawal",
+    after:
+      "After you confirm I write within a few days with the return address. You have 14 days from the notice to send the piece back; return shipping is at your cost.",
+    termsLead: "Costs, refund times and exceptions are in the ",
+    termsLink: "terms of sale",
+    alt: "Alternatively you can send an explicit statement by email to",
+  },
 };
 
 const de: typeof it = {
@@ -564,6 +730,7 @@ const de: typeof it = {
     preorder: "Pre-order. Versand, sobald der Druck fertig ist.",
     reprint: "Nachdruck anfragen",
     printOne: "Siebdruck, eine Farbe",
+    vatIncluded: "Preis inkl. MwSt.",
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
     shipLine: (itPrice: number, euPrice: number) =>
@@ -608,7 +775,11 @@ const de: typeof it = {
     shippingTitle: "Versand",
     shippingBody:
       "Ein-Personen-Atelier: ich drucke und packe selbst. Ich schicke zweimal die Woche. Wenn du die Shirts zu einem bestimmten Datum brauchst, schreib vor der Bestellung.",
-    readShipping: "Ich habe die Versandzeiten gelesen.",
+    termsLead: "Ich habe die Versandzeiten und die ",
+    termsLink: "Verkaufsbedingungen",
+    termsTail: " gelesen, inklusive Widerruf und Gewährleistung.",
+    vatIncluded: "Preise in Euro, inklusive MwSt. Versand wie oben gewählt.",
+    payObligation: "Mit dem Button gibst du eine zahlungspflichtige Bestellung ab.",
     readPrivacy: (privacy: string) => `Ich habe die ${privacy} gelesen.`,
     privacyLink: "Datenschutzhinweise",
     shipTo: "Versand",
@@ -625,7 +796,7 @@ const de: typeof it = {
     address: "Adresse",
     city: "PLZ und Ort",
     notes: "Anmerkungen",
-    sendOrder: "Bestellung senden",
+    sendOrder: "Zahlungspflichtig bestellen",
   },
   forms: {
     name: "Name",
@@ -690,6 +861,8 @@ const de: typeof it = {
     bank: "Ich schreibe wegen der Überweisung. Die Bestellung gilt, wenn die Zahlung da ist.",
     paypal:
       "Wenn PayPal die Zahlung bestätigt hat, schreibe ich zum Versand. Diese Seite allein ist keine Quittung.",
+    withdrawal:
+      "Widerruf erfasst. Du erhältst per E-Mail eine Empfangsbestätigung mit Inhalt, Datum und Uhrzeit; danach schreibe ich zur Rücksendung.",
   },
   notFound: {
     title: "Seite nicht gefunden",
@@ -699,7 +872,7 @@ const de: typeof it = {
     title: "Datenschutz",
     lede:
       "Informationen zur Verarbeitung personenbezogener Daten und zu Cookies und Speicher, Art. 13 DSGVO.",
-    updated: "Stand: 14. August 2026.",
+    updated: "Stand: 1. Oktober 2026.",
     controller: "Verantwortlicher",
     controllerBody: (name: string, sede: string) =>
       `${name}, Verantwortlicher für die Verarbeitung auf der Website Corpoceleste. Sitz: ${sede}.`,
@@ -737,6 +910,8 @@ const de: typeof it = {
     paypalRecv: "wenn du PayPal wählst.",
     github:
       "hostet die öffentlichen Seiten, nicht die Formulare. Hinweise von GitHub auf github.com.",
+    vercel:
+      "Vercel Inc. — technische Funktion, die nach bestätigter PayPal-Zahlung den Bestand aktualisiert und die Bestellübersicht weiterleitet. Verarbeitet Bestelldaten, keine Zahlungsdaten.",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
     rights: "Rechte",
@@ -781,6 +956,80 @@ const de: typeof it = {
       "Du kannst die Daten dieser Website in den Browser-Einstellungen löschen (Verlauf / Website-Daten). Wenn du den Corpoceleste-Warenkorb leerst, wird corpoceleste-cart entfernt.",
     privacyLink: "Vollständiger Datenschutzhinweis",
     contact: "Kontakt Verantwortlicher:",
+  },
+  terms: {
+    title: "Verkaufsbedingungen",
+    lede: "Wer verkauft, was du kaufst, wie bezahlt wird, wie du widerrufst. Fernabsatz an Verbraucher nach italienischem Verbrauchergesetzbuch (d.lgs. 206/2005), das EU-Verbraucherrecht umsetzt.",
+    updated: "Stand: 1. Oktober 2026.",
+    seller: "Verkäufer",
+    vatLabel: "USt-IdNr.:",
+    reaLabel: "Handelsregister:",
+    vatMissing: "USt-IdNr.: wird zugeteilt. Schreib mir für die vollständigen Steuerdaten.",
+    contactLabel: "Kontakt:",
+    scope: "Geltungsbereich",
+    scopeBody:
+      "Diese Bedingungen gelten für Käufe auf dieser Website. Sie sind für Verbraucher geschrieben, also für Käufe außerhalb einer gewerblichen oder beruflichen Tätigkeit. Mit der Bestellung akzeptierst du die zum Zeitpunkt der Bestellung veröffentlichte Fassung.",
+    products: "Was ich verkaufe",
+    productsBody:
+      "Von Hand gedruckte Siebdrucke in limitierter Auflage: Shirts, Papierdrucke, nummerierte Stücke. Weil von Hand gedruckt wird, gehören kleine Abweichungen bei Register, Farbe und Position zum Stück und sind keine Mängel. Fotos sind Anhaltspunkte: Farben können je nach Bildschirm leicht abweichen.",
+    prices: "Preise",
+    pricesBody: (italy: number, europe: number) =>
+      `Preise verstehen sich in Euro und inklusive MwSt., sofern nicht anders angegeben. Der Versand wird getrennt berechnet und vor der Zahlung angezeigt: ${italy} € nach Italien, ${europe} € innerhalb Europas. Der Gesamtbetrag an der Kasse, Versand inbegriffen, ist der Betrag, den du zahlst.`,
+    order: "Zustandekommen der Bestellung",
+    orderBody:
+      "Produktseiten sind eine Aufforderung zur Bestellung, kein bindendes Angebot. Der Vertrag kommt zustande, wenn du an der Kasse den Zahlungsbutton mit der Aufschrift «zahlungspflichtig bestellen» drückst und die Bestellbestätigung per E-Mail erhältst. Ist ein Stück nach der Zahlung nicht mehr verfügbar, melde ich mich und erstatte den vollen Betrag.",
+    payment: "Zahlung",
+    paymentBody:
+      "PayPal (auch Kartenzahlung läuft über PayPal) oder Banküberweisung. Ich erhalte und speichere keine Kartendaten: bei PayPal läuft die Zahlung über die Systeme von PayPal. Bei Überweisung gilt die Bestellung als bestätigt, wenn das Geld eingeht; ich reserviere das Stück 5 Tage.",
+    shipping: "Versand und Lieferung",
+    shippingBody: (days: string) =>
+      `Ich packe und verschicke selbst aus dem Atelier, in der Regel innerhalb von ${days} Werktagen nach bestätigter Zahlung. In jedem Fall liefere ich innerhalb von 30 Tagen nach Vertragsschluss, sofern nichts anderes schriftlich vereinbart ist. Die Gefahr von Verlust oder Beschädigung geht bei Übergabe des Pakets auf dich über. Kommt ein Paket sichtbar beschädigt an, nimm es unter Vorbehalt an und schreib mir.`,
+    withdrawal: "Widerrufsrecht: 14 Tage",
+    withdrawalBody:
+      "Du hast 14 Tage Zeit, ohne Angabe von Gründen zu widerrufen. Die Frist beginnt an dem Tag, an dem du (oder eine von dir benannte Person) das Paket in Besitz nimmst; bei mehreren getrennt gelieferten Stücken ab dem letzten.",
+    withdrawalHow: "Zum Widerruf kannst du die Online-Funktion nutzen oder mir eine eindeutige Erklärung per E-Mail schicken:",
+    withdrawalLink: "hier vom Vertrag zurücktreten",
+    withdrawalEffects:
+      "Nach der Mitteilung hast du 14 Tage, um das Stück zurückzuschicken. Ich erstatte alles, was du gezahlt hast, inklusive Standardversand hin, innerhalb von 14 Tagen nach Erhalt der Rücksendung oder des Sendungsnachweises, über dasselbe Zahlungsmittel. Die Rücksendekosten trägst du. Für einen Wertverlust haftest du, wenn du das Stück über das hinaus benutzt hast, was zur Prüfung von Beschaffenheit und Eigenschaften nötig ist: probier es wie im Laden.",
+    withdrawalExceptions:
+      "Kein Widerrufsrecht besteht bei Stücken, die nach deinen Maßen gefertigt oder eindeutig auf deine Wünsche zugeschnitten sind (Art. 59 Verbrauchergesetzbuch). Personalisierte Stücke kennzeichne ich vor dem Kauf.",
+    warranty: "Gesetzliche Gewährleistung",
+    warrantyBody:
+      "Für alles, was ich verkaufe, gilt die gesetzliche Gewährleistung von 2 Jahren ab Lieferung (Art. 128 ff. Verbrauchergesetzbuch). Ist ein Stück mangelhaft oder nicht wie beschrieben, hast du Anspruch auf kostenlose Nachbesserung oder Ersatz und, wenn das unmöglich ist oder nicht hilft, auf Minderung oder Vertragsauflösung mit Erstattung. Schreib mir mit Fotos und Bestellnummer: Rücksendekosten bei Mangel trage ich. Die Gewährleistung ist etwas anderes als der Widerruf und gilt weit über die 14 Tage hinaus.",
+    complaints: "Beschwerden und Streitigkeiten",
+    complaintsBody:
+      "Bei Problemen schreib zuerst mir: ich antworte innerhalb weniger Tage, und in der Praxis erledigt sich das so. Kommen wir nicht zusammen, kannst du dich an eine beim italienischen Unternehmensministerium gelistete AS-Stelle für Verbraucherstreitigkeiten wenden. Die europäische OS-Plattform wurde im Juli 2025 abgeschaltet und steht nicht mehr zur Verfügung.",
+    law: "Anwendbares Recht",
+    lawBody:
+      "Auf den Vertrag ist italienisches Recht anwendbar. Günstigere Schutzvorschriften des EU-Landes, in dem du als Verbraucher wohnst, bleiben unberührt. Für Streitigkeiten ist das Gericht deines Wohnsitzes oder Aufenthalts zuständig.",
+    disclaimer:
+      "Informationstext, keine Rechtsberatung. Wenn du bei deinen Rechten unsicher bist, schreib mir oder wende dich an eine Verbraucherzentrale.",
+  },
+  withdrawal: {
+    title: "Widerruf",
+    entry: "Hier vom Vertrag zurücktreten",
+    lede: "Online-Formular, um den Widerruf einer auf dieser Website getätigten Bestellung zu erklären. Du hast 14 Tage ab Lieferung.",
+    intro:
+      "Daten ausfüllen, Zusammenfassung lesen, bestätigen. Nach der Bestätigung bekommst du per E-Mail eine Empfangsbestätigung mit dem Inhalt der Erklärung sowie Datum und Uhrzeit der Übermittlung.",
+    legend: "Widerrufserklärung",
+    declaration:
+      "Hiermit widerrufe ich den Kaufvertrag über die unten angegebenen Waren gemäß Art. 52 des italienischen Verbrauchergesetzbuchs.",
+    name: "Vor- und Nachname",
+    email: "E-Mail für die Empfangsbestätigung",
+    orderRef: "Betroffene Bestellung",
+    orderRefHelp: "Bestellnummer, falls vorhanden, sonst Kaufdatum und bestellte Stücke.",
+    received: "Lieferdatum (falls bekannt)",
+    note: "Anmerkungen",
+    noteHelp: "Freiwillig. Eine Begründung ist nicht nötig.",
+    continue: "Weiter",
+    reviewTitle: "Lesen und bestätigen",
+    edit: "Ändern",
+    confirm: "Widerruf bestätigen",
+    after:
+      "Nach der Bestätigung schreibe ich dir innerhalb weniger Tage die Rücksendeadresse. Du hast 14 Tage ab der Mitteilung, um das Stück zurückzuschicken; die Rücksendekosten trägst du.",
+    termsLead: "Kosten, Erstattungsfristen und Ausnahmen stehen in den ",
+    termsLink: "Verkaufsbedingungen",
+    alt: "Alternativ kannst du eine eindeutige Erklärung per E-Mail schicken an",
   },
 };
 

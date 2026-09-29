@@ -11,6 +11,7 @@ type PayPalItem = {
 
 export type PayPalOrder = {
   id?: string;
+  payer?: { email_address?: string };
   purchase_units?: Array<{
     custom_id?: string;
     amount?: { value?: string; currency_code?: string };
