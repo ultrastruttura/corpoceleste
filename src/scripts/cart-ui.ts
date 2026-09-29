@@ -133,10 +133,13 @@ function lineEl(item: CartItem) {
   qty.append(minus, n, plus);
   meta.append(qty);
 
-  const remove = el("button", "cart-remove", labels.cart.remove);
+  const remove = el("button", "cart-remove");
   remove.type = "button";
+  remove.setAttribute("aria-label", labels.cart.remove);
   remove.dataset.remove = item.id;
   remove.dataset.size = item.size;
+  remove.innerHTML =
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 7h14"/><path d="M10 7V5h4v2"/><path d="M8 7l1 13h6l1-13"/></svg>';
   meta.append(remove);
   row.append(meta);
 

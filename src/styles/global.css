@@ -814,24 +814,21 @@ body.cart-open {
 
 @media (min-width: 900px) {
   .product-layout {
-    grid-template-columns: minmax(0, 500px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
     gap: 48px;
     align-items: start;
+  }
+
+  .product-info {
+    position: sticky;
+    top: calc(var(--header) + 24px);
   }
 }
 
 .product-stage {
   width: 100%;
-  max-width: 500px;
-  margin-inline: auto;
   background: var(--white);
   overflow: hidden;
-}
-
-@media (min-width: 900px) {
-  .product-stage {
-    margin-inline: 0;
-  }
 }
 
 .product-stage-frame {
@@ -994,10 +991,6 @@ body.cart-open {
     align-items: center;
     justify-content: center;
   }
-
-  .attrs {
-    margin-top: 20px;
-  }
 }
 
 .size-fieldset {
@@ -1064,16 +1057,16 @@ body.cart-open {
 }
 
 .attrs {
-  margin: 28px 0;
+  margin: 20px 0 0;
   padding: 0;
   list-style: none;
-  font-size: 16px;
-  border-top: 1px solid var(--ink);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .attrs li {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--ink);
+  padding: 2px 0;
 }
 
 .attr-note {
@@ -1203,19 +1196,9 @@ body.cart-open {
 }
 
 .footer {
-  padding: 0 0 calc(30px + env(safe-area-inset-bottom, 0px));
+  padding: 48px 0 calc(30px + env(safe-area-inset-bottom, 0px));
   background: var(--white);
-}
-
-.footer-rule {
-  height: 20px;
-  margin-bottom: 40px;
-}
-
-.footer-rule svg {
-  display: block;
-  width: 100%;
-  height: 20px;
+  border-top: 1px solid var(--line);
 }
 
 .footer-grid {
@@ -1442,10 +1425,21 @@ body.cart-open {
   background: none;
   border: 0;
   padding: 0;
-  font-size: 12px;
-  text-decoration: underline;
+  margin-top: 8px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
-  color: var(--muted);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+}
+
+.cart-remove:hover {
+  opacity: 0.6;
+}
+
+.cart-remove svg {
+  display: block;
 }
 
 .cart-size {
@@ -1516,11 +1510,6 @@ body.cart-open {
   .shop-home-hero {
     margin-bottom: 18px;
     padding-top: 4px;
-  }
-
-  .shop-home-hero .card-artist {
-    margin-bottom: 4px;
-    font-size: 13px;
   }
 
   .shop-home-hero h1 {
