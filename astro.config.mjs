@@ -25,7 +25,8 @@ export default defineConfig({
         !page.includes("/grazie") &&
         !page.includes("/carrello") &&
         !page.includes("/checkout") &&
-        !page.includes("/admin"),
+        !page.includes("/admin") &&
+        !page.includes("/account"),
     }),
   ],
   i18n: {

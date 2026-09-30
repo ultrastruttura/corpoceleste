@@ -1,0 +1,21 @@
+---
+import Base from "../../layouts/Base.astro";
+import { apiBase } from "../../data/site";
+
+const api = apiBase();
+---
+
+<Base title="Accesso — Corpoceleste">
+  <div
+    class="wrap page-main page-main--narrow account-page"
+    data-account-auth
+    data-api={api}
+  >
+    <h1>Accesso</h1>
+    <p class="lede" data-auth-status>Verifica del link in corso…</p>
+  </div>
+
+  <script>
+    import "../../scripts/account-auth.ts";
+  </script>
+</Base>

@@ -137,7 +137,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       customerBody,
     });
 
-    return res.status(200).json({ ok: true, captureId, notes, emailed: true });
+    let artistSales: string[] = [];
+    try {
+      const { portalConfigured } = await import("../server/portal/db.js");
+      if (portalConfigured()) {
+        const { recordSalesFromOrder } = await import("../server/portal/deals.js");
+        artistSales = await recordSalesFromOrder({
+          captureId,
+          source: "paypal",
+          lines,
+        });
+      }
+    } catch (err) {
+      console.error("artist sales ledger failed", err);
+    }
+
+    return res.status(200).json({ ok: true, captureId, notes, emailed: true, artistSales });
   } catch (err) {
     console.error("stock update failed", err);
     return res.status(500).json({ error: "Stock update failed" });

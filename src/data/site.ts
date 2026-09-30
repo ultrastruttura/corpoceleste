@@ -25,7 +25,7 @@ export const site = {
    * URL del progetto Vercel (senza slash finale), es. https://corpoceleste-xxxx.vercel.app
    * Se vuoto, bonifico e recesso restano su FormSubmit. Con URL: mail transazionali da Vercel.
    */
-  formApi: "",
+  formApi: "https://corpoceleste.vercel.app",
   sede: "Bergamo (BG), Italia",
   /** Indirizzo completo della sede: obbligatorio nelle info precontrattuali. */
   indirizzo: "",
@@ -51,6 +51,17 @@ export const site = {
 export function formEndpoint(kind: "order" | "withdrawal") {
   const base = site.formApi.replace(/\/$/, "");
   return base ? `${base}/api/${kind}` : "";
+}
+
+/** Base URL for Vercel APIs (orders, portal). Empty = not configured. */
+export function apiBase() {
+  return site.formApi.replace(/\/$/, "");
+}
+
+export function accountApi(path: string) {
+  const base = apiBase();
+  if (!base) return "";
+  return `${base}/api/account/${path.replace(/^\//, "")}`;
 }
 
 export type Site = typeof site;

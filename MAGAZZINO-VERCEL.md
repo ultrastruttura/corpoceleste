@@ -5,6 +5,7 @@ Il sito resta su **GitHub Pages**.
 
 1. abbassare i pezzi in Tina / markdown (`stock` per taglia)
 2. mandarti una mail d’ordine
+3. (se configurato il portal artisti) scrivere la vendita sul deal in Turso — vedi [PORTAL.md](PORTAL.md)
 
 **Gratis** (piano Hobby Vercel + PayPal senza canone, solo commissioni sull’ordine).
 

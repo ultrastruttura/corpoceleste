@@ -1,0 +1,31 @@
+---
+import Base from "../../layouts/Base.astro";
+import { apiBase } from "../../data/site";
+
+const api = apiBase();
+---
+
+<Base title="Area personale — Corpoceleste">
+  <div class="wrap page-main page-main--narrow account-page" data-account-root data-api={api}>
+    <h1>Area personale</h1>
+    {
+      !api ? (
+        <p class="lede">
+          Portal non configurato: imposta <code>formApi</code> (URL Vercel) e il database Turso.
+        </p>
+      ) : (
+        <div data-account-app>
+          <p class="lede">Caricamento…</p>
+        </div>
+      )
+    }
+  </div>
+
+  {
+    api && (
+      <script>
+        import "../../scripts/account-app.ts";
+      </script>
+    )
+  }
+</Base>
