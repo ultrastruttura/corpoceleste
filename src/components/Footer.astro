@@ -1,5 +1,5 @@
 ---
-import { site } from "../data/site";
+import { site, publicFormAction } from "../data/site";
 import { siteSettings } from "../data/settings";
 import PrivacyCheck from "./PrivacyCheck.astro";
 import FormHoney from "./FormHoney.astro";
@@ -8,6 +8,7 @@ import { currentLocale, pageUrl, t } from "../i18n";
 const year = new Date().getFullYear();
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
+const formAction = publicFormAction(siteSettings.shopEmail);
 ---
 
 <footer class="footer">
@@ -16,7 +17,7 @@ const copy = t(locale);
       <h2>Newsletter</h2>
       <form
         class="newsletter-form"
-        action={`https://formsubmit.co/${siteSettings.shopEmail}`}
+        action={formAction}
         method="POST"
       >
         <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />

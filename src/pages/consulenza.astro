@@ -4,6 +4,7 @@ import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { asset } from "../lib/paths";
 import { metaSnippet } from "../lib/seo";
+import { publicFormAction } from "../data/site";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { currentLocale, t } from "../i18n";
 
@@ -12,7 +13,7 @@ const copy = t(locale);
 const andreaName = siteSettings.andreaName;
 const andreaBio = localizedSetting("andreaBio", locale);
 const description = metaSnippet(andreaBio || copy.meta.description);
-const shopEmail = siteSettings.shopEmail;
+const formAction = publicFormAction(siteSettings.shopEmail);
 ---
 
 <Base title={`${copy.consulting.title} — Corpoceleste`} description={description} image="images/photos/andrea.jpg">
@@ -48,7 +49,7 @@ const shopEmail = siteSettings.shopEmail;
         <h2>{copy.consulting.live}</h2>
         <p>{copy.consulting.liveBody}</p>
       </div>
-      <form class="form" action={`https://formsubmit.co/${shopEmail}`} method="POST">
+      <form class="form" action={formAction} method="POST">
         <input type="hidden" name="_subject" value="Richiesta consulenza / stampa dal vivo" />
         <input type="hidden" name="_next" data-next-grazie="consulenza" />
         <FormHoney />

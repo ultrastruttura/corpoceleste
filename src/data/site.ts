@@ -48,9 +48,14 @@ export const site = {
   ] as const,
 };
 
-export function formEndpoint(kind: "order" | "withdrawal") {
+export function formEndpoint(kind: "order" | "withdrawal" | "form") {
   const base = site.formApi.replace(/\/$/, "");
   return base ? `${base}/api/${kind}` : "";
+}
+
+/** Contact / newsletter / workshops / consulting / reprint. Falls back to FormSubmit. */
+export function publicFormAction(shopEmail: string) {
+  return formEndpoint("form") || `https://formsubmit.co/${shopEmail}`;
 }
 
 /** Base URL for Vercel APIs (orders, portal). Empty = not configured. */

@@ -6,6 +6,7 @@
     "api/paypal-webhook.ts": { "memory": 256, "maxDuration": 30 },
     "api/order.ts": { "memory": 256, "maxDuration": 15 },
     "api/withdrawal.ts": { "memory": 256, "maxDuration": 15 },
+    "api/form.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/auth.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/users.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/deals.ts": { "memory": 256, "maxDuration": 15 },

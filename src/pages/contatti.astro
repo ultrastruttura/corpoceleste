@@ -2,13 +2,13 @@
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
-import { site } from "../data/site";
+import { publicFormAction, site } from "../data/site";
 import { siteSettings } from "../data/settings";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
-const shopEmail = siteSettings.shopEmail;
+const formAction = publicFormAction(siteSettings.shopEmail);
 ---
 
 <Base title={`${copy.contact.title} — Corpoceleste`}>
@@ -18,7 +18,7 @@ const shopEmail = siteSettings.shopEmail;
     </header>
 
     <div class="split">
-      <form class="form" action={`https://formsubmit.co/${shopEmail}`} method="POST">
+      <form class="form" action={formAction} method="POST">
         <input type="hidden" name="_subject" value="Contatto dal sito Corpoceleste" />
         <input type="hidden" name="_next" data-next-grazie="contatto" />
         <FormHoney />
@@ -39,7 +39,7 @@ const shopEmail = siteSettings.shopEmail;
       </form>
       <div>
         <h2>Newsletter</h2>
-        <form class="newsletter-form newsletter-form--block" action={`https://formsubmit.co/${shopEmail}`} method="POST">
+        <form class="newsletter-form newsletter-form--block" action={formAction} method="POST">
           <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
           <input type="hidden" name="_next" data-next-grazie="newsletter" />
           <FormHoney />

@@ -15,7 +15,7 @@ import {
   stockOf,
 } from "../../data/products";
 import { artistById } from "../../data/artists";
-import { site } from "../../data/site";
+import { site, publicFormAction } from "../../data/site";
 import { siteSettings } from "../../data/settings";
 import { cardImageUrls, largeImageUrls } from "../../lib/paths";
 import { absoluteUrl, metaSnippet } from "../../lib/seo";
@@ -38,6 +38,7 @@ const preorder = product.status === "preorder" && !sold;
 const alt = productImageAlt(product, artist, locale);
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
+const formAction = publicFormAction(siteSettings.shopEmail);
 const defaultSize = inStockSizes.includes("M")
   ? "M"
   : inStockSizes[0] ?? sizes[0];
@@ -192,7 +193,7 @@ const jsonLd = {
       <div class="product-buy">
         {
           sold ? (
-            <form class="form" action={`https://formsubmit.co/${siteSettings.shopEmail}`} method="POST">
+            <form class="form" action={formAction} method="POST">
               <input type="hidden" name="_subject" value={`Ristampa: ${product.title}`} />
               <input type="hidden" name="_next" data-next-grazie="ristampa" />
               <input type="hidden" name="prodotto" value={product.title} />

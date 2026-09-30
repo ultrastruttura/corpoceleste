@@ -6,6 +6,7 @@ import { currentLocale, pageUrl, t } from "../i18n";
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const p = copy.privacy;
+const formSubmitFallback = !site.formApi;
 ---
 
 <Base title={`${p.title} — Corpoceleste`}>
@@ -58,10 +59,14 @@ const p = copy.privacy;
 
       <h2>{p.recipients}</h2>
       <ul>
-        <li>
-          <strong>FormSubmit.co</strong> — {p.formsubmit}
-          <a href="https://formsubmit.co/" rel="noopener noreferrer">formsubmit.co</a>.
-        </li>
+        {
+          formSubmitFallback && (
+            <li>
+              <strong>FormSubmit.co</strong> — {p.formsubmit}
+              <a href="https://formsubmit.co/" rel="noopener noreferrer">formsubmit.co</a>.
+            </li>
+          )
+        }
         <li>
           <strong>PayPal (Europe) S.à r.l. et Cie, S.C.A.</strong> — {p.paypalRecv}
         </li>
