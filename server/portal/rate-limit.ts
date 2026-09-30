@@ -48,10 +48,11 @@ export async function rateLimit(opts: {
   }
 }
 
-export function clientIp(req: { headers: Record<string, string | string[] | undefined> }) {
-  const xf = req.headers["x-forwarded-for"];
+export function clientIp(headers: Record<string, string | string[] | undefined> | undefined) {
+  const h = headers || {};
+  const xf = h["x-forwarded-for"];
   const raw = Array.isArray(xf) ? xf[0] : xf;
   if (raw) return raw.split(",")[0]?.trim() || "unknown";
-  const real = req.headers["x-real-ip"];
+  const real = h["x-real-ip"];
   return (Array.isArray(real) ? real[0] : real) || "unknown";
 }
