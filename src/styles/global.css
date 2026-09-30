@@ -1690,6 +1690,28 @@ body.cart-open {
   color: var(--black);
 }
 
+.account-login {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 28rem;
+}
+
+.account-login .account-login-field {
+  margin-bottom: 0;
+}
+
+.account-login .btn {
+  margin-top: 0;
+  width: 100%;
+  max-width: 28rem;
+  justify-self: start;
+}
+
+.account-login .btn:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+
 .account-msg {
   margin-top: 0.75rem;
   font-size: 0.9rem;

@@ -93,21 +93,29 @@ if (!root || !app) {
 
   function renderLogin() {
     app!.innerHTML = "";
-    app!.append(el("p", "lede", "Inserisci l’email con cui sei stato invitato. Riceverai un link di accesso."));
-    const form = el("form", "account-form");
+    app!.append(
+      el(
+        "p",
+        "lede",
+        "Inserisci l’email con cui sei stato invitato. Riceverai un link di accesso.",
+      ),
+    );
+    const form = el("form", "account-form account-login");
     form.innerHTML = `
-      <label>
+      <label class="account-login-field">
         <span>Email</span>
-        <input type="email" name="email" required autocomplete="email" />
+        <input type="email" name="email" required autocomplete="email" placeholder="nome@email.com" />
       </label>
-      <button type="submit">Invia link</button>
+      <button class="btn" type="submit">Invia</button>
       <p class="account-msg" data-msg hidden></p>
     `;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const msg = form.querySelector<HTMLElement>("[data-msg]")!;
+      const btn = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
       msg.hidden = false;
       msg.textContent = "Invio…";
+      btn.disabled = true;
       const email = new FormData(form).get("email") as string;
       try {
         const data = (await apiFetch(base, "auth", {
@@ -130,6 +138,8 @@ if (!root || !app) {
               ? err.message
               : "Errore";
         setMsg(msg, text);
+      } finally {
+        btn.disabled = false;
       }
     });
     app!.append(form);
