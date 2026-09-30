@@ -22,7 +22,12 @@ export function getDb(): Client {
 export async function ensureSchema() {
   if (migrated) return;
   const db = getDb();
-  await db.executeMultiple(PORTAL_SCHEMA);
+  const statements = PORTAL_SCHEMA.split(";")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  for (const sql of statements) {
+    await db.execute(sql);
+  }
   migrated = true;
 }
 

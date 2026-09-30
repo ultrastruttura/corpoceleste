@@ -1,5 +1,7 @@
 {
+  "framework": null,
   "buildCommand": "",
+  "installCommand": "npm install --omit=dev",
   "functions": {
     "api/paypal-webhook.ts": { "memory": 256, "maxDuration": 30 },
     "api/order.ts": { "memory": 256, "maxDuration": 15 },

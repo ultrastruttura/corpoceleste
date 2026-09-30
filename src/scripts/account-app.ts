@@ -123,7 +123,13 @@ if (!root || !app) {
           setMsg(msg, data.message || "Controlla la posta: ti abbiamo inviato il link.");
         }
       } catch (err) {
-        setMsg(msg, err instanceof Error ? err.message : "Errore");
+        const text =
+          err instanceof TypeError && /fetch/i.test(String(err.message))
+            ? "Connessione all’API fallita (spesso deploy in corso o crash server). Riprova tra un minuto."
+            : err instanceof Error
+              ? err.message
+              : "Errore";
+        setMsg(msg, text);
       }
     });
     app!.append(form);

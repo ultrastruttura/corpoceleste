@@ -26,30 +26,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   cors(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
 
-  if (!portalConfigured()) {
-    return json(res, 503, { error: "Portal DB not configured (TURSO_DATABASE_URL)" });
-  }
-
-  await ensureAdmin();
-
-  if (req.method === "GET") {
-    const user = await sessionUser(bearer(req));
-    return json(res, 200, { user, configured: true });
-  }
-
-  if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
-
-  const body = await readJson<{
-    action?: string;
-    email?: string;
-    name?: string;
-    artist_slug?: string;
-    token?: string;
-  }>(req);
-  const action = String(body.action || "");
-  const ip = clientIp(req.headers as Record<string, string | string[] | undefined>);
-
   try {
+    if (!portalConfigured()) {
+      return json(res, 503, { error: "Portal DB not configured (TURSO_DATABASE_URL)" });
+    }
+
+    await ensureAdmin();
+
+    if (req.method === "GET") {
+      const user = await sessionUser(bearer(req));
+      return json(res, 200, { user, configured: true });
+    }
+
+    if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
+
+    const body = await readJson<{
+      action?: string;
+      email?: string;
+      name?: string;
+      artist_slug?: string;
+      token?: string;
+    }>(req);
+    const action = String(body.action || "");
+    const ip = clientIp(req.headers as Record<string, string | string[] | undefined>);
+
     if (action === "login") {
       const email = String(body.email || "").trim().toLowerCase();
       const rl = await rateLimit({
@@ -63,7 +63,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           retryAfterSec: rl.retryAfterSec,
         });
       }
-      // Same response whether user exists (no email enumeration).
       const user = email.includes("@") ? await getUserByEmail(email) : null;
       if (user) {
         const token = await issueMagicLink(user.id);
@@ -142,6 +141,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return json(res, 400, { error: "Unknown action" });
   } catch (err) {
     console.error("account auth", err);
+    cors(req, res);
     return json(res, 500, { error: err instanceof Error ? err.message : "Server error" });
   }
 }

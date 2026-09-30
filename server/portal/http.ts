@@ -43,7 +43,16 @@ export function bearer(req: VercelRequest) {
 }
 
 export async function readJson<T = Record<string, unknown>>(req: VercelRequest): Promise<T> {
-  if (req.body && typeof req.body === "object" && !Buffer.isBuffer(req.body)) {
+  if (Buffer.isBuffer(req.body)) {
+    const raw = req.body.toString("utf8").trim();
+    if (!raw) return {} as T;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return {} as T;
+    }
+  }
+  if (req.body && typeof req.body === "object") {
     return req.body as T;
   }
   if (typeof req.body === "string") {
@@ -54,9 +63,13 @@ export async function readJson<T = Record<string, unknown>>(req: VercelRequest):
     }
   }
   const chunks: Buffer[] = [];
-  const stream = req as unknown as AsyncIterable<Buffer | string>;
-  for await (const chunk of stream) {
-    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  try {
+    const stream = req as unknown as AsyncIterable<Buffer | string>;
+    for await (const chunk of stream) {
+      chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+    }
+  } catch {
+    return {} as T;
   }
   if (!chunks.length) return {} as T;
   try {
