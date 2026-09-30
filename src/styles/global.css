@@ -1622,7 +1622,7 @@ body.cart-open {
   gap: 0.75rem;
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--black);
+  border-bottom: 1px solid var(--ink);
 }
 
 .account-who {
@@ -1664,9 +1664,10 @@ body.cart-open {
 .account-form textarea,
 .account-inline-form input {
   font: inherit;
-  padding: 0.45rem 0.55rem;
-  border: 1px solid var(--black);
-  background: var(--white);
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
   width: 100%;
   max-width: 28rem;
 }
@@ -1677,8 +1678,8 @@ body.cart-open {
   margin-top: 0.5rem;
   font: inherit;
   padding: 0.5rem 1rem;
-  border: 1px solid var(--black);
-  background: var(--black);
+  border: 1px solid var(--ink);
+  background: var(--ink);
   color: var(--white);
   cursor: pointer;
 }
@@ -1687,7 +1688,7 @@ body.cart-open {
 .account-actions > button:hover,
 .account-inline-form button:hover {
   background: transparent;
-  color: var(--black);
+  color: var(--ink);
 }
 
 .account-login {
