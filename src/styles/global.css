@@ -1494,20 +1494,20 @@ body.cart-open {
   border: 0;
   padding: 0;
   margin-top: 8px;
-  width: 28px;
-  height: 28px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  text-decoration: underline;
   cursor: pointer;
-  color: var(--ink);
-  display: grid;
-  place-items: center;
+  width: auto;
+  height: auto;
+  display: inline;
 }
 
 .cart-remove:hover {
-  opacity: 0.6;
-}
-
-.cart-remove svg {
-  display: block;
+  color: var(--ink);
+  opacity: 1;
 }
 
 .cart-size {
