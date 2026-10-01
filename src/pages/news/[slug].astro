@@ -1,10 +1,22 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { news, newsBySlug, newsField } from "../../data/news";
+import { mediaUrl } from "../../lib/paths";
 import { currentLocale, formatDate, pageUrl } from "../../i18n";
 
 export function getStaticPaths() {
   return news.map((n) => ({ params: { slug: n.slug } }));
+}
+
+function linkify(text: string) {
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return escaped.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    '<a href="$2" rel="noopener noreferrer">$1</a>',
+  );
 }
 
 const locale = currentLocale(Astro.currentLocale);
@@ -12,17 +24,29 @@ const item = newsBySlug(Astro.params.slug!);
 if (!item) return Astro.redirect(pageUrl(locale, "news/"));
 const title = newsField(item, locale, "title");
 const excerpt = newsField(item, locale, "excerpt");
-const paras = newsField(item, locale, "body").split("\n\n");
+const paras = newsField(item, locale, "body").split(/\n\n+/).filter(Boolean);
+const cover = item.cover ? mediaUrl(item.cover) : "";
+const gallery = item.images.map(mediaUrl).filter(Boolean);
 ---
 
-<Base title={`${title} — Corpoceleste`} description={excerpt}>
+<Base title={`${title} — Corpoceleste`} description={excerpt} image={item.cover || undefined}>
   <div class="wrap page-main page-main--article">
     <header class="page-hero">
       <p class="card-artist"><a href={pageUrl(locale, "news/")}>News</a> · {formatDate(item.date, locale)}</p>
       <h1>{title}</h1>
     </header>
+    {cover && (
+      <img class="news-cover" src={cover} alt="" width="1200" height="800" loading="eager" decoding="async" />
+    )}
     <div class="prose">
-      {paras.map((p) => <p>{p}</p>)}
+      {paras.map((p) => <p set:html={linkify(p)} />)}
     </div>
+    {gallery.length > 0 && (
+      <div class="news-gallery">
+        {gallery.map((src) => (
+          <img src={src} alt="" loading="lazy" decoding="async" />
+        ))}
+      </div>
+    )}
   </div>
 </Base>

@@ -11,17 +11,31 @@ import { currentLocale, t } from "../i18n";
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const formAction = publicFormAction(siteSettings.shopEmail);
+const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
 ---
 
 <Base title={`${copy.workshops.title} — Corpoceleste`}>
-  <div class="wrap">
-    <header class="page-hero">
-      <h1>{copy.workshops.title}</h1>
-    </header>
-    <img class="page-photo" src={asset("images/photos/studio.jpg")} alt={copy.workshops.studioAlt} width="1080" height="1350" loading="lazy" decoding="async" />
+  <div class="wrap page-pad">
+    <h1 class="visually-hidden">{copy.workshops.title}</h1>
 
-    <div class="split">
-      <div>
+    <section class="workshops-intro">
+      <img
+        class="page-photo"
+        src={asset("images/photos/studio.jpg")}
+        alt={copy.workshops.studioAlt}
+        width="1080"
+        height="1350"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="workshops-intro__text">
+        <h2>{copy.workshops.introTitle}</h2>
+        {introParas.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    <section class="workshop-slots">
+      <div class="workshop-slot">
         <h2>{copy.workshops.waitlist}</h2>
         <p>{copy.workshops.waitlistBody}</p>
         <form class="form" action={formAction} method="POST">
@@ -41,10 +55,10 @@ const formAction = publicFormAction(siteSettings.shopEmail);
             <textarea id="ws-note" name="note"></textarea>
           </div>
           <PrivacyCheck id="ws-privacy" />
-            <button class="btn" type="submit">{copy.forms.subscribe}</button>
+          <button class="btn" type="submit">{copy.forms.subscribe}</button>
         </form>
       </div>
-      <div>
+      <div class="workshop-slot">
         <h2>{copy.workshops.onSite}</h2>
         <p>{copy.workshops.onSiteBody}</p>
         <form class="form" action={formAction} method="POST">
@@ -68,26 +82,28 @@ const formAction = publicFormAction(siteSettings.shopEmail);
             <textarea id="sp-note" name="messaggio" required></textarea>
           </div>
           <PrivacyCheck id="sp-privacy" />
-            <button class="btn" type="submit">{copy.forms.send}</button>
+          <button class="btn" type="submit">{copy.forms.send}</button>
         </form>
       </div>
-    </div>
+    </section>
 
-    <div class="section-head">
-      <h2>{copy.workshops.archive}</h2>
-    </div>
-    <p class="archive-note">{copy.workshops.since}</p>
-    {
-      pastWorkshops.map((block) => (
-        <section class="year-block">
-          <h3>{block.year}</h3>
-          <ul>
-            {block.items.map((item) => (
-              <li>{item}</li>
-            ))}
-          </ul>
-        </section>
-      ))
-    }
+    <section class="workshops-archive">
+      <div class="section-head">
+        <h2>{copy.workshops.archive}</h2>
+      </div>
+      <p class="archive-note">{copy.workshops.since}</p>
+      {
+        pastWorkshops.map((block) => (
+          <section class="year-block">
+            <h3>{block.year}</h3>
+            <ul>
+              {block.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </section>
   </div>
 </Base>

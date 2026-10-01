@@ -174,14 +174,14 @@ p:last-child {
 }
 
 .logo-mark {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   object-fit: contain;
 }
 
 .logo-word {
-  height: 18px;
+  height: 14px;
   width: auto;
   max-width: 100%;
   min-width: 0;
@@ -194,7 +194,7 @@ p:last-child {
   display: none;
   align-items: center;
   gap: 28px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 400;
 }
 
@@ -202,9 +202,15 @@ p:last-child {
   text-decoration: none;
 }
 
-.nav a:hover,
+.nav a:hover {
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
 .nav a.is-active {
-  text-decoration: underline;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .header-tools {
@@ -380,9 +386,15 @@ p:last-child {
   border-bottom: 0;
 }
 
-.mobile-nav > a:hover,
+.mobile-nav > a:hover {
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
 .mobile-nav > a.is-active {
-  text-decoration: underline;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .mobile-nav .lang {
@@ -438,13 +450,13 @@ body.cart-open {
   }
 
   .logo-mark {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
   }
 
   .logo-word {
-    height: 15px;
+    height: 12px;
     max-width: 100%;
     object-fit: contain;
     object-position: left center;
@@ -497,8 +509,8 @@ body.cart-open {
 }
 
 .card-meta {
-  padding: 22px 4px 8px;
-  text-align: center;
+  padding: 12px 2px 4px;
+  text-align: left;
 }
 
 .card-artist {
@@ -1105,17 +1117,18 @@ body.cart-open {
 
 .name-list {
   list-style: none;
-  margin: 0 0 80px;
+  margin: 0 0 48px;
   padding: 0;
 }
 
 .name-list li {
-  padding: 12px 0;
+  padding: 6px 0;
   border-top: 1px solid var(--line);
 }
 
 .name-list a {
   text-decoration: none;
+  font-size: 15px;
 }
 
 .name-list a:hover {
@@ -1126,6 +1139,23 @@ body.cart-open {
   display: block;
   font-size: 13px;
   color: var(--muted);
+}
+
+.artist-letter {
+  margin: 1.5rem 0 0.35rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--quiet);
+  font-weight: 700;
+}
+
+.artist-letter:first-child {
+  margin-top: 0;
+}
+
+.artist-block .name-list {
+  margin-bottom: 0;
 }
 
 .news-list {
@@ -1164,11 +1194,53 @@ body.cart-open {
   color: var(--muted);
 }
 
+.news-list__row {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .news-list__row {
+    grid-template-columns: 140px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.news-list__thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.news-cover {
+  width: min(100%, 720px);
+  height: auto;
+  display: block;
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--line);
+}
+
+.news-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 1.5rem 0 0;
+}
+
+.news-gallery img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--line);
+}
+
 /* Workshops archive */
 .year-block {
   display: grid;
-  gap: 12px;
-  padding: 28px 0;
+  gap: 4px;
+  padding: 12px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -1179,8 +1251,9 @@ body.cart-open {
 }
 
 .year-block h3 {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .year-block ul {
@@ -1190,9 +1263,10 @@ body.cart-open {
 }
 
 .year-block li {
-  font-size: 16px;
-  padding: 4px 0;
-  color: var(--ink);
+  font-size: 13px;
+  padding: 2px 0;
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .footer {
@@ -1485,49 +1559,82 @@ body.cart-open {
 }
 
 .shop-home {
-  padding-top: 28px;
+  padding-top: 16px;
 }
 
 .shop-home-hero {
-  margin-bottom: 28px;
+  margin-bottom: 16px;
+  padding-top: 8px;
+  padding-bottom: 0;
+}
+
+.shop-home-hero h1 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin-bottom: 6px;
 }
 
 .shop-home-hero .lede {
-  max-width: 36rem;
+  max-width: 34rem;
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 0;
+}
+
+.shop-home .grid {
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.shop-home .card-frame {
+  aspect-ratio: 0.92;
+}
+
+.shop-home .card-meta {
+  padding: 10px 2px 2px;
+}
+
+.shop-home .card-artist {
+  font-size: 12px;
+}
+
+.shop-home .card-title {
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.shop-home .card-price {
+  font-size: 13px;
 }
 
 @media (max-width: 899px) {
   .shop-home {
-    padding-top: 12px;
+    padding-top: 8px;
   }
 
   .shop-home-hero {
-    margin-bottom: 18px;
-    padding-top: 4px;
+    margin-bottom: 12px;
+    padding-top: 0;
   }
 
   .shop-home-hero h1 {
-    font-size: 1.35rem;
-    line-height: 1.25;
-    margin-bottom: 6px;
+    font-size: 1.15rem;
   }
 
   .shop-home-hero .lede {
-    font-size: 14px;
-    line-height: 1.45;
+    font-size: 13px;
     max-width: 34ch;
-    margin-bottom: 0;
   }
 
   .shop-home .grid {
-    gap: 12px;
-    margin-bottom: 56px;
+    gap: 10px;
+    margin-bottom: 24px;
   }
 }
 
 @media (max-width: 419px) {
   .shop-home .grid {
-    gap: 20px;
+    gap: 16px;
   }
 }
 
@@ -1539,9 +1646,177 @@ body.cart-open {
 }
 
 .archive-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+.workshops-intro {
+  display: grid;
+  gap: 28px;
+  padding: 8px 0 36px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .workshops-intro {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 48px;
+  }
+
+  .workshops-intro .page-photo {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+.workshops-intro__text h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.workshops-intro__text p {
+  margin: 0 0 0.85rem;
+  max-width: 48ch;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.workshop-slots {
+  display: grid;
+  gap: 20px;
+  padding: 0 0 48px;
+}
+
+@media (min-width: 900px) {
+  .workshop-slots {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+}
+
+.workshop-slot {
+  border: 1px solid var(--ink);
+  padding: 1.25rem 1.25rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.workshop-slot h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.workshop-slot > p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.workshop-slot .form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.75rem;
+  max-width: none;
+  height: 100%;
+}
+
+.workshop-slot .form .btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.workshops-archive {
+  padding-bottom: 48px;
+}
+
+.workshops-archive .section-head {
+  margin: 24px 0 8px;
+}
+
+.workshops-archive .section-head h2 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.contact-board {
+  display: grid;
+  gap: 32px;
+  padding: 8px 0 64px;
+}
+
+@media (min-width: 900px) {
+  .contact-board {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 56px;
+  }
+}
+
+.contact-photo {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--line);
+}
+
+.contact-bio h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.contact-bio p {
+  margin: 0 0 0.85rem;
+  max-width: 48ch;
   font-size: 15px;
   color: var(--muted);
-  margin: 0 0 8px;
+}
+
+.contact-aside h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.contact-aside h3 {
+  margin: 1.35rem 0 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.contact-aside p,
+.contact-aside ul {
+  margin: 0 0 0.65rem;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 42ch;
+}
+
+.contact-aside ul {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-aside li {
+  padding: 0.2rem 0;
+}
+
+.contact-aside a {
+  text-decoration: underline;
+}
+
+.page-pad {
+  padding-top: 12px;
 }
 
 .recap {

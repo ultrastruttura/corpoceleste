@@ -10,28 +10,28 @@ homeTitle:
   en: Artist screen printing
   de: Künstlersiebdruck
 homeLede:
-  it: Edizioni stampate a mano nello studio di Bergamo. Un colore, non print-on-demand — maglie, stampe, pezzi numerati.
-  en: Editions hand-printed in the Bergamo studio. One colour, not print-on-demand — shirts, prints, numbered pieces.
-  de: Editionen, handgedruckt im Atelier in Bergamo. Eine Farbe, kein Print-on-Demand — Shirts, Drucke, nummerierte Stücke.
+  it: Un colore, stampato a mano a Bergamo. Maglie, stampe, edizioni.
+  en: One colour, hand-printed in Bergamo. Shirts, prints, editions.
+  de: Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke, Editionen.
 ogImage: /uploads/prints/stella.jpg
 andreaName: Andrea Baldelli
 andreaBio:
   it: |-
-    Serigrafo a Bergamo. Stampo e imballo le edizioni Corpoceleste io: un colore, non print-on-demand — maglie, stampe, pezzi d’artista.
+    Serigrafo a Bergamo. Stampo e imballo le edizioni Corpoceleste: un colore, non print-on-demand — maglie, stampe, pezzi d’artista. Lo shop è qui sul sito.
 
-    Dal 2014 tengo corsi e workshop. Faccio consulenza su impianti, inchiostri e flussi di lavoro; ho formato personale Za.Er. ad Asmara (in studio e in Eritrea) e sono stato responsabile R&D in Quaglia. Stampo anche dal vivo a eventi, con i telai in sede.
+    Dal 2014 tengo corsi e workshop in studio e presso terzi. Stampo anche dal vivo a eventi, con i telai in sede. Su consulenza (impianti, inchiostri, flussi di lavoro, formazione) scrivimi: la presento caso per caso.
 
     Prima di Corpoceleste: lo shop Corpoc (2012–2019). Dipingo come Ultrastruttura.
   en: |-
-    Screen printer in Bergamo. I print and pack the Corpoceleste editions myself: one colour, not print-on-demand — shirts, prints, artist pieces.
+    Screen printer in Bergamo. I print and pack the Corpoceleste editions: one colour, not print-on-demand — shirts, prints, artist pieces. The shop is on this site.
 
-    I’ve run courses and workshops since 2014. I consult on setups, inks and workflow; I trained Za.Er. staff in Asmara (in the studio and in Eritrea) and was head of R&D at Quaglia. I also print live at events, with the screens on site.
+    I’ve run courses and workshops since 2014, in the studio and on location. I also print live at events. For consulting (setups, inks, workflow, training), write to me — I present it case by case.
 
     Before Corpoceleste: the Corpoc shop (2012–2019). I paint as Ultrastruttura.
   de: |-
-    Siebdrucker in Bergamo. Ich drucke und verpacke die Corpoceleste-Editionen selbst: eine Farbe, kein Print-on-Demand — Shirts, Drucke, Künstlerstücke.
+    Siebdrucker in Bergamo. Ich drucke und verpacke die Corpoceleste-Editionen: eine Farbe, kein Print-on-Demand — Shirts, Drucke, Künstlerstücke. Der Shop ist auf dieser Website.
 
-    Seit 2014 gebe ich Kurse und Workshops. Ich berate zu Anlagen, Farben und Abläufen; ich habe Personal von Za.Er. in Asmara ausgebildet (im Atelier und in Eritrea) und war R&D-Leiter bei Quaglia. Ich drucke auch live auf Events, mit den Rahmen vor Ort.
+    Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events. Für Beratung (Anlagen, Farben, Abläufe, Schulung) schreib mir — Fall für Fall.
 
     Vor Corpoceleste: der Shop Corpoc (2012–2019). Ich male als Ultrastruttura.
 ---

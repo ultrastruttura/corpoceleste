@@ -3,21 +3,38 @@ import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { publicFormAction, site } from "../data/site";
-import { siteSettings } from "../data/settings";
+import { localizedSetting, siteSettings } from "../data/settings";
+import { asset } from "../lib/paths";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const formAction = publicFormAction(siteSettings.shopEmail);
+const name = siteSettings.andreaName || "Andrea Baldelli";
+const bio = localizedSetting("andreaBio", locale);
+const bioParas = bio.split(/\n\n+/).filter(Boolean);
 ---
 
 <Base title={`${copy.contact.title} — Corpoceleste`}>
-  <div class="wrap">
-    <header class="page-hero">
-      <h1>{copy.contact.title}</h1>
-    </header>
+  <div class="wrap page-pad">
+    <h1 class="visually-hidden">{copy.contact.title}</h1>
 
-    <div class="split">
+    <div class="contact-board">
+      <img
+        class="contact-photo"
+        src={asset("images/photos/andrea.jpg")}
+        alt={name}
+        width="900"
+        height="1125"
+        loading="lazy"
+        decoding="async"
+      />
+
+      <div class="contact-bio">
+        <h2>{name}</h2>
+        {bioParas.map((p) => <p>{p}</p>)}
+      </div>
+
       <form class="form" action={formAction} method="POST">
         <input type="hidden" name="_subject" value="Contatto dal sito Corpoceleste" />
         <input type="hidden" name="_next" data-next-grazie="contatto" />
@@ -37,35 +54,75 @@ const formAction = publicFormAction(siteSettings.shopEmail);
         <PrivacyCheck id="ct-privacy" />
         <button class="btn" type="submit">{copy.forms.send}</button>
       </form>
-      <div>
+
+      <aside class="contact-aside">
         <h2>Newsletter</h2>
         <form class="newsletter-form newsletter-form--block" action={formAction} method="POST">
           <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
           <input type="hidden" name="_next" data-next-grazie="newsletter" />
           <FormHoney />
           <div class="newsletter-row">
-            <input type="email" name="email" required placeholder={copy.forms.email} aria-label={copy.forms.newsletterEmail} />
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder={copy.forms.email}
+              aria-label={copy.forms.newsletterEmail}
+            />
             <button type="submit">{copy.forms.subscribe}</button>
           </div>
           <PrivacyCheck id="ct-nl-privacy" newsletter />
         </form>
-        <h2>{copy.footer.studio}</h2>
-        <p>
-          <a href={`mailto:${site.email}`}>{site.email}</a><br />
-          <a href={site.instagram} rel="noopener noreferrer">Instagram</a><br />
-          <a href={site.facebook} rel="noopener noreferrer">Facebook</a>
-        </p>
-        <h2>Corpoc</h2>
-        <p>
-          {copy.contact.previousShop}<br />
-          <a href={site.corpoc} rel="noopener noreferrer">ccoorrppoocc.wordpress.com</a>
-        </p>
-        <h2>Ultrastruttura</h2>
-        <p>
-          {copy.contact.paintings}<br />
-          <a href={site.ultrastruttura} rel="noopener noreferrer">ultrastruttura.com</a>
-        </p>
-      </div>
+
+        <h3>{copy.contact.linksTitle}</h3>
+        <ul>
+          <li>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </li>
+          <li>
+            <a href={site.instagram} rel="noopener noreferrer" target="_blank">Instagram</a>
+          </li>
+          <li>
+            <a href={site.facebook} rel="noopener noreferrer" target="_blank">Facebook</a>
+            <span> — {copy.contact.facebookNote}</span>
+          </li>
+        </ul>
+
+        <h3>Ultrastruttura</h3>
+        <p>{copy.contact.paintings}</p>
+        <ul>
+          <li>
+            <a href={site.ultrastruttura} rel="noopener noreferrer" target="_blank">ultrastruttura.com</a>
+          </li>
+          <li>
+            <a href={site.instagram} rel="noopener noreferrer" target="_blank">Instagram</a>
+          </li>
+        </ul>
+
+        <h3>{copy.contact.pastTitle}</h3>
+        <ul>
+          <li>
+            Corpoc (2012–2019) —
+            <a href={site.corpoc} rel="noopener noreferrer" target="_blank">sito</a>
+          </li>
+          {
+            site.satellite && (
+              <li>
+                Satellite Press —
+                <a href={site.satellite} rel="noopener noreferrer" target="_blank">archivio</a>
+              </li>
+            )
+          }
+          {
+            site.tddDiscogs && (
+              <li>
+                TDD —
+                <a href={site.tddDiscogs} rel="noopener noreferrer" target="_blank">Discogs</a>
+              </li>
+            )
+          }
+        </ul>
+      </aside>
     </div>
   </div>
 </Base>

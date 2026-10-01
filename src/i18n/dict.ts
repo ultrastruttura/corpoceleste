@@ -7,7 +7,7 @@ const it = {
   },
   home: {
     title: "Serigrafia d’artista",
-    lede: "Edizioni stampate a mano nello studio di Bergamo. Un colore, non print-on-demand — maglie, stampe, pezzi numerati.",
+    lede: "Un colore, stampato a mano a Bergamo. Maglie, stampe, edizioni.",
   },
   nav: {
     main: "Principale",
@@ -150,18 +150,26 @@ const it = {
   contact: {
     title: "Contatti",
     previousShop: "Shop precedente, 2012–2019.",
-    paintings: "Quadri.",
+    paintings: "Pittura e progetti paralleli di Andrea Baldelli.",
+    linksTitle: "Contatti e social",
+    facebookNote: "pagina dedicata, utile se pubblichi eventi",
+    pastTitle: "Vecchi progetti",
   },
   workshops: {
     title: "Corsi",
+    introTitle: "Workshop di serigrafia",
+    intro:
+      "Corsi pratici in studio a Bergamo: un colore, telaio, carta o tessuto. Spiego impianti, inchiostri e il flusso di lavoro che uso per le edizioni Corpoceleste.\n\nPuoi entrare in lista d’attesa per una data in studio, oppure proporre un workshop nella tua sede (scuola, spazio, evento). Scrivi tu i dettagli quando sei pronto: intanto i form sotto raccolgono le richieste.",
     waitlist: "Lista d’attesa",
-    waitlistBody: "Quando si raggiunge un minimo di iscritti, fisso la data.",
+    waitlistBody:
+      "Workshop in studio. Quando c’è un gruppo minimo fisso la data e avviso chi è in lista.",
     onSite: "Workshop presso di voi",
-    onSiteBody: "Corso nella vostra sede.",
+    onSiteBody:
+      "Porto i telai nella vostra sede. Scrivete spazio, città e cosa vi serve.",
     spaceName: "Nome e spazio",
     city: "Città / sede",
     archive: "Archivio",
-    since: "Dal 2014.",
+    since: "Workshop di stampa tenuti in passato.",
     studioAlt: "Studio di serigrafia Corpoceleste, Bergamo",
   },
   consulting: {
@@ -180,6 +188,7 @@ const it = {
   },
   news: {
     title: "News",
+    empty: "Nessun post ancora.",
   },
   artists: {
     title: "Artisti",
@@ -348,7 +357,7 @@ const en: typeof it = {
   },
   home: {
     title: "Artist screen printing",
-    lede: "Editions hand-printed in the Bergamo studio. One colour, not print-on-demand — shirts, prints, numbered pieces.",
+    lede: "One colour, hand-printed in Bergamo. Shirts, prints, editions.",
   },
   nav: {
     main: "Main",
@@ -489,18 +498,25 @@ const en: typeof it = {
   contact: {
     title: "Contact",
     previousShop: "Previous shop, 2012–2019.",
-    paintings: "Paintings.",
+    paintings: "Painting and parallel projects by Andrea Baldelli.",
+    linksTitle: "Contact and social",
+    facebookNote: "dedicated page — useful if you post events",
+    pastTitle: "Past projects",
   },
   workshops: {
     title: "Workshops",
+    introTitle: "Screen-printing workshops",
+    intro:
+      "Hands-on workshops in the Bergamo studio: one colour, screen, paper or fabric. I cover setups, inks and the workflow I use for Corpoceleste editions.\n\nJoin the waiting list for a studio date, or propose a workshop at your venue (school, space, event). The forms below collect requests.",
     waitlist: "Waiting list",
-    waitlistBody: "When enough people have signed up, I set the date.",
+    waitlistBody:
+      "Studio workshop. When a minimum group is ready I set the date and write to the list.",
     onSite: "Workshop at your space",
-    onSiteBody: "A course at your studio or venue.",
+    onSiteBody: "I bring the screens to your venue. Tell me the space, city and what you need.",
     spaceName: "Name and space",
     city: "City / venue",
     archive: "Archive",
-    since: "Since 2014.",
+    since: "Past screen-printing workshops.",
     studioAlt: "Corpoceleste screen-printing studio, Bergamo",
   },
   consulting: {
@@ -519,6 +535,7 @@ const en: typeof it = {
   },
   news: {
     title: "News",
+    empty: "No posts yet.",
   },
   artists: {
     title: "Artists",
@@ -687,7 +704,7 @@ const de: typeof it = {
   },
   home: {
     title: "Künstlersiebdruck",
-    lede: "Editionen, handgedruckt im Atelier in Bergamo. Eine Farbe, kein Print-on-Demand — Shirts, Drucke, nummerierte Stücke.",
+    lede: "Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke, Editionen.",
   },
   nav: {
     main: "Hauptnavigation",
@@ -828,18 +845,25 @@ const de: typeof it = {
   contact: {
     title: "Kontakt",
     previousShop: "Vorheriger Shop, 2012–2019.",
-    paintings: "Bilder.",
+    paintings: "Malerei und parallele Projekte von Andrea Baldelli.",
+    linksTitle: "Kontakt und Social",
+    facebookNote: "eigene Seite — sinnvoll für Events",
+    pastTitle: "Frühere Projekte",
   },
   workshops: {
     title: "Kurse",
+    introTitle: "Siebdruck-Workshops",
+    intro:
+      "Praxisworkshops im Atelier in Bergamo: eine Farbe, Sieb, Papier oder Stoff. Ich erkläre Anlagen, Farben und den Ablauf, den ich für Corpoceleste-Editionen nutze.\n\nAuf die Warteliste für einen Termin im Atelier, oder Workshop bei euch vorschlagen (Schule, Raum, Event). Die Formulare unten nehmen Anfragen auf.",
     waitlist: "Warteliste",
-    waitlistBody: "Wenn genug Anmeldungen da sind, lege ich den Termin fest.",
+    waitlistBody:
+      "Workshop im Atelier. Wenn eine Mindestgruppe da ist, lege ich den Termin fest und schreibe der Liste.",
     onSite: "Workshop bei euch",
-    onSiteBody: "Ein Kurs in eurem Atelier oder Raum.",
+    onSiteBody: "Ich bringe die Siebe zu euch. Schreibt Ort, Stadt und was ihr braucht.",
     spaceName: "Name und Ort",
     city: "Stadt / Ort",
     archive: "Archiv",
-    since: "Seit 2014.",
+    since: "Frühere Siebdruck-Workshops.",
     studioAlt: "Corpoceleste-Siebdruckatelier, Bergamo",
   },
   consulting: {
@@ -858,6 +882,7 @@ const de: typeof it = {
   },
   news: {
     title: "News",
+    empty: "Noch keine Beiträge.",
   },
   artists: {
     title: "Künstler",

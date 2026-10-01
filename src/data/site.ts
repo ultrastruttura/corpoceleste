@@ -6,6 +6,9 @@ export const site = {
   facebook: "https://www.facebook.com/ultrastruttura",
   corpoc: "https://ccoorrppoocc.wordpress.com/",
   ultrastruttura: "https://ultrastruttura.com/",
+  /** Vecchi progetti (pagina Contatti). */
+  satellite: "https://web.archive.org/web/20161107120751/http://satellitepress.it/",
+  tddDiscogs: "https://www.discogs.com/search/?q=TDD&type=label",
   shippingItaly: 8,
   shippingEU: 16,
   /** Giorni lavorativi indicativi per la spedizione (info precontrattuale). */

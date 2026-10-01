@@ -9,6 +9,8 @@ export type NewsItem = {
   title: Localized;
   excerpt: Localized;
   body: Localized;
+  cover: string;
+  images: string[];
 };
 
 const files = import.meta.glob("../../content/news/*.md", {
@@ -16,6 +18,11 @@ const files = import.meta.glob("../../content/news/*.md", {
   query: "?raw",
   import: "default",
 }) as Record<string, string>;
+
+function asImages(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((v) => String(v || "").trim()).filter(Boolean);
+}
 
 export const news: NewsItem[] = Object.entries(files)
   .map(([path, raw]) => {
@@ -43,6 +50,8 @@ export const news: NewsItem[] = Object.entries(files)
         en: String(data.body_en ?? ""),
         de: String(data.body_de ?? ""),
       },
+      cover: String(data.cover ?? "").trim(),
+      images: asImages(data.images),
     };
   })
   .sort((a, b) => b.date.localeCompare(a.date));
