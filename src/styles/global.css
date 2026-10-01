@@ -1659,19 +1659,19 @@ body.cart-open {
 }
 
 .workshops-intro .page-photo {
-  width: min(100%, 200px);
+  width: min(100%, 300px);
   margin: 0 0 8px;
 }
 
 @media (min-width: 900px) {
   .workshops-intro {
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns: 300px minmax(0, 1fr);
     gap: 40px;
   }
 
   .workshops-intro .page-photo {
     margin: 0;
-    width: 200px;
+    width: 300px;
   }
 }
 
