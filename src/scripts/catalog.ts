@@ -7,6 +7,7 @@ export type CatalogProduct = {
   price: number;
   status: "available" | "preorder" | "soldout";
   print: string;
+  imageAlt: string;
 };
 
 declare global {

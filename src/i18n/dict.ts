@@ -21,6 +21,8 @@ const it = {
     menu: "Menu",
     language: "Lingua",
     skip: "Vai al contenuto",
+    brandMark: "Corpoceleste — serigrafia d'artista e maglie stampate a mano a Bergamo",
+    brandWord: "Corpoceleste, shop di maglie serigrafate e stampe d'artista",
   },
   footer: {
     studio: "Studio",
@@ -59,23 +61,24 @@ const it = {
     galleryNext: "Foto successiva",
     shipLine: (itPrice: number, euPrice: number) =>
       `Spedizione Italia ${itPrice} €, Europa ${euPrice} €`,
-    /** Alt descrittiva: mezzo + opera + artista + studio. */
+    /** Alt SEO commerciale: tipo + opera + artista + keyword vendita. */
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
         return withArtist
-          ? `Stampa «${title}» di ${artist}, serigrafia Corpoceleste`
-          : `Stampa «${title}», serigrafia Corpoceleste`;
+          ? `Stampa d'artista «${title}» di ${artist}, edizione limitata Corpoceleste Bergamo`
+          : `Stampa d'artista «${title}», edizione limitata Corpoceleste Bergamo`;
       }
       if (kind === "edition") {
         return withArtist
-          ? `«${title}» di ${artist}, edizione serigrafica Corpoceleste`
-          : `«${title}», edizione serigrafica Corpoceleste`;
+          ? `Edizione d'artista «${title}» di ${artist}, serigrafia a mano Corpoceleste Bergamo`
+          : `Edizione d'artista «${title}», serigrafia a mano Corpoceleste Bergamo`;
       }
       return withArtist
-        ? `Maglia «${title}» di ${artist}, serigrafia Corpoceleste`
-        : `Maglia «${title}», serigrafia Corpoceleste`;
+        ? `Maglia serigrafata «${title}» di ${artist}, arte indossabile cotone stampata a mano a Bergamo — Corpoceleste`
+        : `Maglia serigrafata «${title}», arte indossabile cotone stampata a mano a Bergamo — Corpoceleste`;
     },
+    imageAltDetail: (base: string, n: number) => `${base} — dettaglio ${n}`,
     colors: {
       Nero: "Nero",
       Viola: "Viola",
@@ -155,6 +158,8 @@ const it = {
     paintings: "Pittura e progetti paralleli di Andrea Baldelli.",
     linksTitle: "Contatti e social",
     pastTitle: "Vecchi progetti",
+    photoAlt: (name: string) =>
+      `${name}, serigrafo Corpoceleste — studio di serigrafia artistica e maglie stampate a mano a Bergamo`,
   },
   workshops: {
     title: "Corsi",
@@ -176,7 +181,8 @@ const it = {
     upcomingEmpty: "Nessuna data pubblica in programma. Usa la lista d’attesa sopra, oppure proponi un workshop presso di voi.",
     organizedBy: "Organizzato da",
     signup: "Iscriviti",
-    studioAlt: "Workshop di serigrafia, stampa dal vivo",
+    studioAlt:
+      "Corso di serigrafia artistica Corpoceleste a Bergamo — workshop di stampa a mano su telaio, maglie e carta",
   },
   consulting: {
     title: "Consulenza",
@@ -195,6 +201,10 @@ const it = {
   news: {
     title: "News",
     empty: "Nessun post ancora.",
+    imageAlt: (title: string) =>
+      `${title} — news Corpoceleste, maglie serigrafate e stampe d'artista Bergamo`,
+    imageAltGallery: (title: string, n: number) =>
+      `${title} — galleria Corpoceleste, serigrafia artistica e arte indossabile (${n})`,
   },
   artists: {
     title: "Artisti",
@@ -377,6 +387,8 @@ const en: typeof it = {
     menu: "Menu",
     language: "Language",
     skip: "Skip to content",
+    brandMark: "Corpoceleste — artist screen printing and hand-printed shirts in Bergamo",
+    brandWord: "Corpoceleste, shop for screen-printed shirts and artist prints",
   },
   footer: {
     studio: "Studio",
@@ -419,18 +431,19 @@ const en: typeof it = {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
         return withArtist
-          ? `Screen print “${title}” by ${artist}, Corpoceleste`
-          : `Screen print “${title}”, Corpoceleste`;
+          ? `Artist print “${title}” by ${artist}, limited edition Corpoceleste Bergamo`
+          : `Artist print “${title}”, limited edition Corpoceleste Bergamo`;
       }
       if (kind === "edition") {
         return withArtist
-          ? `“${title}” by ${artist}, Corpoceleste serigraph edition`
-          : `“${title}”, Corpoceleste serigraph edition`;
+          ? `Artist edition “${title}” by ${artist}, hand screen print Corpoceleste Bergamo`
+          : `Artist edition “${title}”, hand screen print Corpoceleste Bergamo`;
       }
       return withArtist
-        ? `“${title}” shirt by ${artist}, Corpoceleste screen print`
-        : `“${title}” shirt, Corpoceleste screen print`;
+        ? `Screen-printed shirt “${title}” by ${artist}, wearable art cotton hand-printed in Bergamo — Corpoceleste`
+        : `Screen-printed shirt “${title}”, wearable art cotton hand-printed in Bergamo — Corpoceleste`;
     },
+    imageAltDetail: (base: string, n: number) => `${base} — detail ${n}`,
     colors: {
       Nero: "Black",
       Viola: "Purple",
@@ -509,6 +522,8 @@ const en: typeof it = {
     paintings: "Painting and parallel projects by Andrea Baldelli.",
     linksTitle: "Contact and social",
     pastTitle: "Past projects",
+    photoAlt: (name: string) =>
+      `${name}, Corpoceleste screen printer — artist screen-printing studio and hand-printed shirts in Bergamo`,
   },
   workshops: {
     title: "Workshops",
@@ -529,7 +544,8 @@ const en: typeof it = {
     upcomingEmpty: "No public dates right now. Use the waiting list above, or propose a workshop at your space.",
     organizedBy: "Organised by",
     signup: "Sign up",
-    studioAlt: "Screen-printing workshop, live printing",
+    studioAlt:
+      "Corpoceleste artist screen-printing workshop in Bergamo — hand-printing class on shirts and paper",
   },
   consulting: {
     title: "Consulting",
@@ -548,6 +564,10 @@ const en: typeof it = {
   news: {
     title: "News",
     empty: "No posts yet.",
+    imageAlt: (title: string) =>
+      `${title} — Corpoceleste news, screen-printed shirts and artist prints Bergamo`,
+    imageAltGallery: (title: string, n: number) =>
+      `${title} — Corpoceleste gallery, artist screen printing and wearable art (${n})`,
   },
   artists: {
     title: "Artists",
@@ -730,6 +750,8 @@ const de: typeof it = {
     menu: "Menü",
     language: "Sprache",
     skip: "Zum Inhalt",
+    brandMark: "Corpoceleste — künstlerischer Siebdruck und handgedruckte Shirts in Bergamo",
+    brandWord: "Corpoceleste, Shop für siebgedruckte Shirts und Künstlerdrucke",
   },
   footer: {
     studio: "Atelier",
@@ -772,18 +794,19 @@ const de: typeof it = {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
         return withArtist
-          ? `Siebdruck „${title}“ von ${artist}, Corpoceleste`
-          : `Siebdruck „${title}“, Corpoceleste`;
+          ? `Künstlerdruck „${title}“ von ${artist}, limitierte Edition Corpoceleste Bergamo`
+          : `Künstlerdruck „${title}“, limitierte Edition Corpoceleste Bergamo`;
       }
       if (kind === "edition") {
         return withArtist
-          ? `„${title}“ von ${artist}, Corpoceleste-Siebdruckedition`
-          : `„${title}“, Corpoceleste-Siebdruckedition`;
+          ? `Künstleredition „${title}“ von ${artist}, handgemachter Siebdruck Corpoceleste Bergamo`
+          : `Künstleredition „${title}“, handgemachter Siebdruck Corpoceleste Bergamo`;
       }
       return withArtist
-        ? `Shirt „${title}“ von ${artist}, Corpoceleste-Siebdruck`
-        : `Shirt „${title}“, Corpoceleste-Siebdruck`;
+        ? `Siebgedrucktes Shirt „${title}“ von ${artist}, Wearable Art Baumwolle handgedruckt in Bergamo — Corpoceleste`
+        : `Siebgedrucktes Shirt „${title}“, Wearable Art Baumwolle handgedruckt in Bergamo — Corpoceleste`;
     },
+    imageAltDetail: (base: string, n: number) => `${base} — Detail ${n}`,
     colors: {
       Nero: "Schwarz",
       Viola: "Violett",
@@ -862,6 +885,8 @@ const de: typeof it = {
     paintings: "Malerei und parallele Projekte von Andrea Baldelli.",
     linksTitle: "Kontakt und Social",
     pastTitle: "Frühere Projekte",
+    photoAlt: (name: string) =>
+      `${name}, Siebdrucker Corpoceleste — Atelier für künstlerischen Siebdruck und handgedruckte Shirts in Bergamo`,
   },
   workshops: {
     title: "Kurse",
@@ -882,7 +907,8 @@ const de: typeof it = {
     upcomingEmpty: "Keine öffentlichen Termine. Nutze die Warteliste oben, oder schlage einen Workshop bei euch vor.",
     organizedBy: "Organisiert von",
     signup: "Anmelden",
-    studioAlt: "Siebdruck-Workshop, Live-Druck",
+    studioAlt:
+      "Corpoceleste Siebdruck-Workshop in Bergamo — Kurs für Handdruck auf Shirts und Papier",
   },
   consulting: {
     title: "Beratung",
@@ -901,6 +927,10 @@ const de: typeof it = {
   news: {
     title: "News",
     empty: "Noch keine Beiträge.",
+    imageAlt: (title: string) =>
+      `${title} — Corpoceleste News, siebgedruckte Shirts und Künstlerdrucke Bergamo`,
+    imageAltGallery: (title: string, n: number) =>
+      `${title} — Corpoceleste Galerie, künstlerischer Siebdruck und Wearable Art (${n})`,
   },
   artists: {
     title: "Künstler",

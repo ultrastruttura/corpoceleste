@@ -29,7 +29,8 @@ description:
 
     Präsentationsfoto des Blattes mit breitem Rand. Eine Satellite-Press-Edition, jetzt bei Corpoceleste.
 seoDescription:
-  it: Once di Gaia Alari — giclée 50×70 cm, edizione di 20, firmata e numerata (Satellite Press / Corpoceleste).
-  en: Once by Gaia Alari — 50×70 cm giclée, edition of 20, signed and numbered (Satellite Press / Corpoceleste).
-  de: Once von Gaia Alari — Giclée 50×70 cm, Auflage 20, signiert und nummeriert (Satellite Press / Corpoceleste).
+  it: "Once di Gaia Alari — stampa d'artista giclée 50×70 cm, edizione limitata di 20 firmata e numerata (Satellite Press / Corpoceleste)."
+  en: "Once by Gaia Alari — artist giclée print 50×70 cm, limited edition of 20 signed and numbered (Satellite Press / Corpoceleste)."
+  de: "Once von Gaia Alari — Künstler-Giclée 50×70 cm, limitierte Auflage 20, signiert und nummeriert (Satellite Press / Corpoceleste)."
+
 ---

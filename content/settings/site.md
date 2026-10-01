@@ -1,6 +1,6 @@
 ---
 title: SEO e home
-shopEmail: info@corpoceleste.com
+shopEmail: info@corpoceleste.eu
 metaDescription:
   it: Serigrafia d’artista a un colore, stampata a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand. Spedizione in Italia e in Europa.
   en: One-colour artist screen printing, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand. Shipping in Italy and across Europe.

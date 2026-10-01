@@ -16,7 +16,7 @@ npm run dev
 3. Il workflow in `.github/workflows/deploy.yml` pubblica a ogni push su `main`.
 4. URL: `https://ultrastruttura.github.io/corpoceleste/`
 
-Se usi un dominio (es. corpoceleste.com): in `astro.config.mjs` metti `base: "/"` e `site: "https://corpoceleste.com"`, e togli `GITHUB_PAGES: "true"` dal workflow.
+Se usi un dominio (es. corpoceleste.eu): in `astro.config.mjs` metti `base: "/"` e `site: "https://www.corpoceleste.eu"`, e togli `GITHUB_PAGES: "true"` dal workflow.
 
 ## Contenuti da cambiare
 
@@ -48,7 +48,7 @@ Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora 
 
 #### Env Vercel (oltre a PayPal/GitHub)
 
-- `SHOP_EMAIL` — stessa inbox di Tina *Email shop* (es. `info@corpoceleste.com`)
+- `SHOP_EMAIL` — stessa inbox di Tina *Email shop* (es. `info@corpoceleste.eu`)
 - vedi `.env.example` per l’elenco completo
 
 
@@ -68,7 +68,7 @@ Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora 
    - `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` (stessa app PayPal del sito)
    - `PAYPAL_WEBHOOK_ID` (dopo lo step 3)
    - `PAYPAL_MODE=live` (o `sandbox` per prove)
-   - `SHOP_EMAIL` (inbox ordini, es. info@corpoceleste.com)
+   - `SHOP_EMAIL` (inbox ordini, es. info@corpoceleste.eu)
    - `GITHUB_TOKEN`
    - `GITHUB_REPO=ultrastruttura/corpoceleste`
    - `GITHUB_BRANCH=main`

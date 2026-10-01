@@ -90,7 +90,7 @@ function lineEl(item: CartItem) {
   if (src) {
     const img = el("img");
     img.src = src;
-    img.alt = "";
+    img.alt = catalogProduct(item.id)?.imageAlt || item.title;
     img.width = 72;
     img.height = 72;
     thumb.append(img);

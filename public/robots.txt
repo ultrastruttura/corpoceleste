@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /corpoceleste/admin/
-Disallow: /admin/
-
-Sitemap: https://ultrastruttura.github.io/corpoceleste/sitemap-index.xml

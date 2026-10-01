@@ -22,9 +22,10 @@ stock:
 images:
   - /uploads/prints/polarita.jpg
 seoDescription:
-  it: Internet si romperà di Ratigher — maglia serigrafata a un colore, cotone, edizione Corpoceleste (Bergamo).
-  en: Internet si romperà by Ratigher — one-colour screen-printed cotton shirt, Corpoceleste edition (Bergamo).
-  de: Internet si romperà von Ratigher — einfarbig siebgedrucktes Baumwollshirt, Corpoceleste-Edition (Bergamo).
+  it: "Internet si romperà di Ratigher — maglia serigrafata a un colore, arte indossabile da fumetto italiano, edizione Corpoceleste Bergamo."
+  en: "Internet si romperà by Ratigher — one-colour screen-printed shirt, Italian comics wearable art, Corpoceleste Bergamo edition."
+  de: "Internet si romperà von Ratigher — einfarbig siebgedrucktes Shirt, italienische Comic-Wearable-Art, Corpoceleste Bergamo."
+
 description:
   it: |-
     Disegno di Ratigher. Serigrafia a un colore su maglia di cotone, stampata a mano nello studio Corpoceleste a Bergamo.

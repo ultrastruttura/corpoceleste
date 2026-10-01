@@ -22,9 +22,10 @@ stock:
 images:
   - /uploads/prints/meridiana.jpg
 seoDescription:
-  it: Maglia Ruco — serigrafia a un colore su cotone, stampata a mano a Bergamo da Corpoceleste.
-  en: Ruco shirt — one-colour screen print on cotton, hand-printed in Bergamo by Corpoceleste.
-  de: Shirt Ruco — einfarbiger Siebdruck auf Baumwolle, handgedruckt in Bergamo von Corpoceleste.
+  it: "Maglia Ruco — serigrafia artistica a un colore su cotone, arte indossabile stampata a mano a Bergamo da Corpoceleste."
+  en: "Ruco shirt — one-colour artist screen print on cotton, wearable art hand-printed in Bergamo by Corpoceleste."
+  de: "Shirt Ruco — einfarbiger künstlerischer Siebdruck auf Baumwolle, Wearable Art handgedruckt in Bergamo von Corpoceleste."
+
 description:
   it: |-
     Disegno di Ruco. Serigrafia a un colore su maglia di cotone, stampata a mano da Corpoceleste a Bergamo.

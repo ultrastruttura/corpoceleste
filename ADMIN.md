@@ -71,9 +71,9 @@ I testi delle pagine legali stanno in `src/i18n/dict.ts` (`terms` e `withdrawal`
 
 ## Mail di conferma (non FormSubmit)
 
-Bonifico e recesso, più la conferma PayPal dal webhook, devono partire **da Vercel con Resend** (mittente `info@corpoceleste.com`), non in copia da FormSubmit.
+Bonifico e recesso, più la conferma PayPal dal webhook, devono partire **da Vercel con Resend** (mittente `info@corpoceleste.eu`), non in copia da FormSubmit.
 
-1. Account [Resend](https://resend.com) (piano free), verifica il dominio `corpoceleste.com`
+1. Account [Resend](https://resend.com) (piano free), verifica il dominio `corpoceleste.eu`
 2. Su Vercel: `RESEND_API_KEY`, `MAIL_FROM`, `SHOP_EMAIL`, `SITE_URL`
 3. In `src/data/site.ts` imposta `formApi` sull’URL Vercel (es. `https://corpoceleste-xxxx.vercel.app`)
 

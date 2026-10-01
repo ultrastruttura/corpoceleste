@@ -182,8 +182,24 @@ export function productSeoDescription(product: Product, locale: Locale) {
   );
 }
 
-/** Alt immagine: tipo + titolo + artista + brand, senza keyword stuffing. */
-export function productImageAlt(product: Product, artistLabel: string, locale: Locale) {
-  const { imageAlt } = ui[locale].product;
-  return imageAlt(product.kind, product.title, artistLabel);
+/**
+ * Alt immagine prodotto (SEO + accessibilità):
+ * preferisce seoDescription CMS; altrimenti template per tipo.
+ * `index` > 0 = foto secondaria / miniatura galleria.
+ */
+export function productImageAlt(
+  product: Product,
+  artistLabel: string,
+  locale: Locale,
+  options?: { index?: number },
+) {
+  const { imageAlt, imageAltDetail } = ui[locale].product;
+  const seo = productSeoDescription(product, locale)
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[.。]+$/, "");
+  const base = seo || imageAlt(product.kind, product.title, artistLabel);
+  const index = options?.index ?? 0;
+  if (index > 0) return imageAltDetail(base, index + 1);
+  return base;
 }

@@ -23,7 +23,7 @@ const bioParas = bio.split(/\n\n+/).filter(Boolean);
       <img
         class="contact-photo"
         src={asset("images/photos/andrea.jpg")}
-        alt={name}
+        alt={copy.contact.photoAlt(name)}
         width="900"
         height="1125"
         loading="lazy"

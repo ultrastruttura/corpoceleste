@@ -22,9 +22,10 @@ stock:
 images:
   - /uploads/prints/eclisse.jpg
 seoDescription:
-  it: Maglia Millo — serigrafia a un colore Corpoceleste, cotone, Bergamo (esaurita; richiesta ristampa).
-  en: Millo shirt — Corpoceleste one-colour screen print on cotton, Bergamo (sold out; reprint request).
-  de: Shirt Millo — Corpoceleste-Einfarbensiebdruck auf Baumwolle, Bergamo (ausverkauft; Nachdruck anfragbar).
+  it: "Maglia Millo — serigrafia artistica a un colore Corpoceleste, arte indossabile in cotone stampata a mano a Bergamo (esaurita)."
+  en: "Millo shirt — Corpoceleste one-colour artist screen print, wearable cotton art hand-printed in Bergamo (sold out)."
+  de: "Shirt Millo — Corpoceleste-Einfarbensiebdruck, Wearable Art auf Baumwolle handgedruckt in Bergamo (ausverkauft)."
+
 description:
   it: |-
     Disegno di Millo. Serigrafia a un colore su maglia di cotone, stampata a mano nello studio di Bergamo.

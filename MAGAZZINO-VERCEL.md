@@ -110,10 +110,10 @@ Aggiungi queste (Environment: **Production**, e anche Preview se vuoi testare i 
 | `PAYPAL_CLIENT_SECRET` | Secret dell’app PayPal |
 | `PAYPAL_MODE` | `live` oppure `sandbox` (deve coincidere con l’app) |
 | `PAYPAL_WEBHOOK_ID` | *(lo metti al passo 5, dopo aver creato il webhook)* |
-| `SHOP_EMAIL` | es. `info@corpoceleste.com` (stessa inbox di Tina *Email shop*) |
-| `SITE_URL` | URL pubblico del sito, es. `https://ultrastruttura.github.io/corpoceleste` |
+| `SHOP_EMAIL` | es. `info@corpoceleste.eu` (stessa inbox di Tina *Email shop*) |
+| `SITE_URL` | URL pubblico del sito, es. `https://www.corpoceleste.eu` |
 | `RESEND_API_KEY` | chiave da [resend.com](https://resend.com) (mail di conferma al cliente) |
-| `MAIL_FROM` | es. `Corpoceleste <info@corpoceleste.com>` (dominio verificato su Resend) |
+| `MAIL_FROM` | es. `Corpoceleste <info@corpoceleste.eu>` (dominio verificato su Resend) |
 | `GITHUB_TOKEN` | il fine-grained token |
 | `GITHUB_REPO` | `ultrastruttura/corpoceleste` |
 | `GITHUB_BRANCH` | `main` |

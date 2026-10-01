@@ -22,9 +22,10 @@ stock:
 images:
   - /uploads/prints/stella.jpg
 seoDescription:
-  it: Maglia Daniele De Batté — serigrafia a un colore su cotone, edizione Corpoceleste stampata a mano a Bergamo.
-  en: Daniele De Batté shirt — one-colour screen print on cotton, Corpoceleste edition hand-printed in Bergamo.
-  de: Shirt Daniele De Batté — einfarbiger Siebdruck auf Baumwolle, Corpoceleste-Edition handgedruckt in Bergamo.
+  it: "Maglia Daniele De Batté — serigrafia artistica a un colore su cotone, edizione Corpoceleste stampata a mano a Bergamo."
+  en: "Daniele De Batté shirt — one-colour artist screen print on cotton, Corpoceleste edition hand-printed in Bergamo."
+  de: "Shirt Daniele De Batté — einfarbiger künstlerischer Siebdruck auf Baumwolle, Corpoceleste-Edition handgedruckt in Bergamo."
+
 description:
   it: |-
     Disegno di Daniele De Batté. Serigrafia a un colore su maglia di cotone, stampata a mano a Bergamo.

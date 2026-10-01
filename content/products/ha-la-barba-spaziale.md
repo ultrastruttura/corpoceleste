@@ -22,9 +22,10 @@ stock:
 images:
   - /uploads/prints/orbite.jpg
 seoDescription:
-  it: Ha la barba spaziale di Dr. Pira — maglia viola serigrafata a un colore, cotone, stampata a mano a Bergamo.
-  en: Ha la barba spaziale by Dr. Pira — violet one-colour screen-printed cotton shirt, hand-printed in Bergamo.
-  de: Ha la barba spaziale von Dr. Pira — violettes einfarbig siebgedrucktes Baumwollshirt, handgedruckt in Bergamo.
+  it: "Ha la barba spaziale di Dr. Pira — maglia viola serigrafata a un colore, arte indossabile da fumetto stampata a mano a Bergamo."
+  en: "Ha la barba spaziale by Dr. Pira — violet one-colour screen-printed shirt, wearable comic art hand-printed in Bergamo."
+  de: "Ha la barba spaziale von Dr. Pira — violettes einfarbig siebgedrucktes Shirt, Comic-Wearable-Art handgedruckt in Bergamo."
+
 description:
   it: |-
     Disegno di Dr. Pira su maglia viola. Serigrafia a un colore, cotone, stampata a mano nello studio di Bergamo.

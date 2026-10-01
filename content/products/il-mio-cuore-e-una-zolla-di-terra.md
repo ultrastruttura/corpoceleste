@@ -35,8 +35,9 @@ description:
 
     Langer Titel, klarer Druck: eine Farbe, keine digitalen Effekte. Größen S–XL.
 seoDescription:
-  it: 'Il mio cuore è una zolla di terra di Rocco Lombardi — maglia serigrafata a mano a Bergamo, cotone, un colore.'
-  en: 'Il mio cuore è una zolla di terra by Rocco Lombardi — cotton shirt screen-printed by hand in Bergamo, one colour.'
-  de: 'Il mio cuore è una zolla di terra von Rocco Lombardi — Baumwollshirt handgedruckt in Bergamo, eine Farbe.'
+  it: "Il mio cuore è una zolla di terra di Rocco Lombardi — maglia serigrafata a mano a Bergamo, cotone, un colore, Corpoceleste."
+  en: "Il mio cuore è una zolla di terra by Rocco Lombardi — cotton shirt hand screen-printed in Bergamo, one colour, Corpoceleste."
+  de: "Il mio cuore è una zolla di terra von Rocco Lombardi — Baumwollshirt handgedruckt in Bergamo, eine Farbe, Corpoceleste."
+
 ---
 

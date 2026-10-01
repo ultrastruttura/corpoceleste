@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { news, newsBySlug, newsField } from "../../data/news";
 import { mediaUrl } from "../../lib/paths";
-import { currentLocale, formatDate, pageUrl } from "../../i18n";
+import { currentLocale, formatDate, pageUrl, t } from "../../i18n";
 
 export function getStaticPaths() {
   return news.map((n) => ({ params: { slug: n.slug } }));
@@ -20,6 +20,7 @@ function linkify(text: string) {
 }
 
 const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 const item = newsBySlug(Astro.params.slug!);
 if (!item) return Astro.redirect(pageUrl(locale, "news/"));
 const title = newsField(item, locale, "title");
@@ -36,15 +37,15 @@ const gallery = item.images.map(mediaUrl).filter(Boolean);
       <h1>{title}</h1>
     </header>
     {cover && (
-      <img class="news-cover" src={cover} alt="" width="1200" height="800" loading="eager" decoding="async" />
+      <img class="news-cover" src={cover} alt={copy.news.imageAlt(title)} width="1200" height="800" loading="eager" decoding="async" />
     )}
     <div class="prose">
       {paras.map((p) => <p set:html={linkify(p)} />)}
     </div>
     {gallery.length > 0 && (
       <div class="news-gallery">
-        {gallery.map((src) => (
-          <img src={src} alt="" loading="lazy" decoding="async" />
+        {gallery.map((src, i) => (
+          <img src={src} alt={copy.news.imageAltGallery(title, i + 1)} loading="lazy" decoding="async" />
         ))}
       </div>
     )}

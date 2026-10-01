@@ -3,7 +3,8 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { asset } from "../lib/paths";
 import { absoluteUrl } from "../lib/seo";
-import { products, artistName } from "../data/products";
+import { llmsTxtUrl } from "../lib/llms";
+import { products, artistName, productImageAlt } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { currentLocale, innerPath, localePrefix, locales, pageAbs, pageUrl, t } from "../i18n";
 import "../styles/global.css";
@@ -45,9 +46,11 @@ const catalog = {
     price: p.price,
     status: p.status,
     print: p.print,
+    imageAlt: productImageAlt(p, artistName(p.artistId), locale),
   })),
 };
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const llmsHref = llmsTxtUrl(locale === "en" ? "en" : "it");
 ---
 
 <!doctype html>
@@ -83,6 +86,7 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       )
     }
     <link rel="icon" href={asset("brand/favicon.png")} type="image/png" />
+    <link rel="describedby" href={llmsHref} type="text/plain" title="llms.txt" />
     {
       jsonLdBlocks.map((block) => (
         <script type="application/ld+json" set:html={JSON.stringify(block)} />

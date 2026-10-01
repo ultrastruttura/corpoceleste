@@ -29,7 +29,8 @@ description:
 
     Limitierte Satellite-Press-Edition, jetzt bei Corpoceleste. Blattformat wie abgebildet.
 seoDescription:
-  it: Pana di Marco Mazzoni — stampa d’artista in edizione limitata (Satellite Press / Corpoceleste).
-  en: Pana by Marco Mazzoni — limited artist print (Satellite Press / Corpoceleste).
-  de: Pana von Marco Mazzoni — limitierter Künstlerdruck (Satellite Press / Corpoceleste).
+  it: "Pana di Marco Mazzoni — stampa d'artista acquaforte in edizione limitata, collezionabile (Satellite Press / Corpoceleste Bergamo)."
+  en: "Pana by Marco Mazzoni — limited-edition artist etching print, collectible (Satellite Press / Corpoceleste Bergamo)."
+  de: "Pana von Marco Mazzoni — limitierter Künstlerdruck (Radierung), Sammlerstück (Satellite Press / Corpoceleste Bergamo)."
+
 ---

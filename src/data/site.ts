@@ -1,7 +1,7 @@
 export const site = {
   name: "Corpoceleste",
   tagline: "Serigrafia d’artista",
-  email: "info@corpoceleste.com",
+  email: "info@corpoceleste.eu",
   instagram: "https://www.instagram.com/ultrastruttura/",
   facebook: "https://www.facebook.com/ultrastruttura",
   corpoc: "https://ccoorrppoocc.wordpress.com/",

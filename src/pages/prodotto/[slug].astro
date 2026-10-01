@@ -161,12 +161,13 @@ const jsonLd = {
                 data-index={i}
                 data-jpg={img.jpg}
                 data-webp={img.webp}
+                data-alt={productImageAlt(product, artist, locale, { index: i })}
                 aria-selected={i === 0 ? "true" : "false"}
                 aria-label={`${product.title} ${i + 1}`}
               >
                 <img
                   src={img.thumb.jpg}
-                  alt=""
+                  alt={productImageAlt(product, artist, locale, { index: i })}
                   width="160"
                   height="160"
                   loading="lazy"
@@ -330,6 +331,7 @@ const jsonLd = {
         if (!jpg) return;
         main.src = jpg;
         if (mainWebp && webp) mainWebp.srcset = webp;
+        if (btn.dataset.alt) main.alt = btn.dataset.alt;
         thumbs.forEach((t, n) => {
           const on = n === i;
           t.classList.toggle("is-active", on);

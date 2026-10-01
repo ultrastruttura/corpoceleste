@@ -24,7 +24,7 @@ const copy = t(locale);
                       <img
                         class="news-list__thumb"
                         src={cover}
-                        alt=""
+                        alt={copy.news.imageAlt(newsField(n, locale, "title"))}
                         width="280"
                         height="280"
                         loading="lazy"
