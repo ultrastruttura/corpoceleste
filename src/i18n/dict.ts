@@ -154,7 +154,6 @@ const it = {
     previousShop: "Shop precedente, 2012–2019.",
     paintings: "Pittura e progetti paralleli di Andrea Baldelli.",
     linksTitle: "Contatti e social",
-    facebookNote: "pagina dedicata, utile se pubblichi eventi",
     pastTitle: "Vecchi progetti",
   },
   workshops: {
@@ -509,7 +508,6 @@ const en: typeof it = {
     previousShop: "Previous shop, 2012–2019.",
     paintings: "Painting and parallel projects by Andrea Baldelli.",
     linksTitle: "Contact and social",
-    facebookNote: "dedicated page — useful if you post events",
     pastTitle: "Past projects",
   },
   workshops: {
@@ -863,7 +861,6 @@ const de: typeof it = {
     previousShop: "Vorheriger Shop, 2012–2019.",
     paintings: "Malerei und parallele Projekte von Andrea Baldelli.",
     linksTitle: "Kontakt und Social",
-    facebookNote: "eigene Seite — sinnvoll für Events",
     pastTitle: "Frühere Projekte",
   },
   workshops: {
