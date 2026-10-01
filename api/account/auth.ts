@@ -64,16 +64,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
       const user = email.includes("@") ? await getUserByEmail(email) : null;
-      if (user) {
-        const token = await issueMagicLink(user.id);
-        const sent = await sendMagicLinkEmail(user, token);
-        if (!sent.ok && allowDevMagicLinks()) {
-          console.info("[portal] magic link (dev only)", sent.link);
-          return json(res, 200, { ok: true, message: LOGIN_MSG, devLink: sent.link });
-        }
-        if (!sent.ok) console.warn("[portal] magic link email failed for", user.email);
+      if (!user) {
+        console.info("[portal] login: no user for that email");
+        return json(res, 200, { ok: true, message: LOGIN_MSG });
       }
-      return json(res, 200, { ok: true, message: LOGIN_MSG });
+      const token = await issueMagicLink(user.id);
+      const sent = await sendMagicLinkEmail(user, token);
+      if (!sent.ok && allowDevMagicLinks()) {
+        console.info("[portal] magic link (dev only)", sent.link);
+        return json(res, 200, { ok: true, message: LOGIN_MSG, emailed: false, devLink: sent.link });
+      }
+      if (!sent.ok) {
+        console.warn("[portal] magic link email failed for", user.email);
+        return json(res, 200, {
+          ok: true,
+          emailed: false,
+          message: "Non siamo riusciti a inviare l’email di accesso. Riprova tra un minuto.",
+        });
+      }
+      console.info("[portal] magic link emailed to", user.email);
+      return json(res, 200, { ok: true, emailed: true, message: LOGIN_MSG });
     }
 
     if (action === "invite") {

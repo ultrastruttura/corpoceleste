@@ -127,6 +127,12 @@ if (!root || !app) {
             href: data.devLink,
             label: "Apri link",
           });
+        } else if (data.emailed === false) {
+          setMsg(
+            msg,
+            data.message ||
+              "Invio mail fallito. Su Vercel controlla RESEND_API_KEY e MAIL_FROM (dominio verificato su Resend).",
+          );
         } else {
           setMsg(msg, data.message || "Controlla la posta: ti abbiamo inviato il link.");
         }

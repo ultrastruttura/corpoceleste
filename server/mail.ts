@@ -15,7 +15,10 @@ export async function sendMail(opts: {
   const from = fromAddress();
   const to = opts.to.trim();
   if (!key || !from || !to) {
-    console.warn("sendMail skipped: missing RESEND_API_KEY, MAIL_FROM/SHOP_EMAIL, or recipient");
+    console.warn(
+      "sendMail skipped:",
+      !key ? "missing RESEND_API_KEY" : !from ? "missing MAIL_FROM/SHOP_EMAIL" : "missing recipient",
+    );
     return false;
   }
 
@@ -37,6 +40,7 @@ export async function sendMail(opts: {
       console.error("Resend failed", res.status, await res.text());
       return false;
     }
+    console.info("sendMail ok →", to);
     return true;
   } catch (err) {
     console.error("Resend error", err);
