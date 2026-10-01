@@ -84,7 +84,13 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
               <>
                 <p class="checkout-obligation">{copy.checkout.payObligation}</p>
                 <div class="pay-box is-locked" data-pay-box>
-                  <div id="paypal-buttons"></div>
+                  <div class="pay-buttons">
+                    <div id="paypal-button" class="pay-buttons__slot"></div>
+                    <div id="applepay-button" class="pay-buttons__slot" hidden data-applepay-slot></div>
+                  </div>
+                  <p class="checkout-vat" data-applepay-hint hidden>
+                    {copy.checkout.applePayHint}
+                  </p>
                 </div>
               </>
             ) : (
@@ -143,7 +149,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     paypalSdk && (
       <script define:vars={{ clientId: site.paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
-        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=${sdkLocale}`;
+        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=${sdkLocale}&enable-funding=applepay&disable-funding=card,credit,paylater,venmo`;
         document.head.append(s);
       </script>
     )
@@ -243,11 +249,19 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     syncPage();
 
     function mountButtons() {
-      const paypal = (window as unknown as { paypal?: { Buttons: (o: object) => { render: (s: string) => void } } })
-        .paypal;
-      const node = document.querySelector("#paypal-buttons");
-      if (!paypal || !node || !sanitizeCart().length) return;
-      paypal.Buttons({
+      type Funding = { PAYPAL: string; APPLEPAY: string };
+      type ButtonsFactory = (o: object) => {
+        render: (s: string) => Promise<void> | void;
+        isEligible?: () => boolean;
+      };
+      const paypal = (
+        window as unknown as {
+          paypal?: { Buttons: ButtonsFactory; FUNDING: Funding };
+        }
+      ).paypal;
+      if (!paypal?.Buttons || !paypal.FUNDING || !sanitizeCart().length) return;
+
+      const shared = {
         onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
           if (!unlocked()) return actions.reject();
           return actions.resolve();
@@ -292,7 +306,28 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
           clearCart();
           location.href = `${base}${prefix}grazie/?from=paypal`;
         },
-      }).render("#paypal-buttons");
+      };
+
+      const paypalNode = document.querySelector("#paypal-button");
+      if (paypalNode && !paypalNode.hasChildNodes()) {
+        paypal
+          .Buttons({ ...shared, fundingSource: paypal.FUNDING.PAYPAL })
+          .render("#paypal-button");
+      }
+
+      const appleSlot = document.querySelector<HTMLElement>("[data-applepay-slot]");
+      const appleHint = document.querySelector<HTMLElement>("[data-applepay-hint]");
+      const appleBtn = paypal.Buttons({
+        ...shared,
+        fundingSource: paypal.FUNDING.APPLEPAY,
+      });
+      if (appleSlot && appleBtn.isEligible?.() && !appleSlot.hasChildNodes()) {
+        appleSlot.hidden = false;
+        if (appleHint) appleHint.hidden = true;
+        void appleBtn.render("#applepay-button");
+      } else if (appleHint) {
+        appleHint.hidden = false;
+      }
     }
 
     if (site.paypalClientId) {

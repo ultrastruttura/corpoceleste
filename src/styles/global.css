@@ -1915,9 +1915,20 @@ body.cart-open {
   pointer-events: none;
 }
 
-#paypal-buttons {
+#paypal-buttons,
+#paypal-button,
+#applepay-button {
   min-height: 48px;
   margin-top: 12px;
+}
+
+.pay-buttons {
+  display: grid;
+  gap: 10px;
+}
+
+.pay-buttons__slot:first-child {
+  margin-top: 0;
 }
 
 /* Account / artist portal */
