@@ -1736,6 +1736,69 @@ body.cart-open {
   padding-bottom: 48px;
 }
 
+.workshops-upcoming {
+  padding: 8px 0 32px;
+  border-top: 1px solid var(--ink);
+}
+
+.workshops-upcoming .section-head,
+.workshops-archive .section-head {
+  margin: 24px 0 8px;
+}
+
+.workshops-upcoming .section-head h2,
+.workshops-archive .section-head h2 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.upcoming-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.upcoming-item {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+  align-items: start;
+}
+
+@media (min-width: 700px) {
+  .upcoming-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.upcoming-item__when {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+}
+
+.upcoming-item__where,
+.upcoming-item__org,
+.upcoming-item__note {
+  margin: 0.15rem 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.upcoming-item__btn {
+  justify-self: start;
+}
+
+.upcoming-empty {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 48ch;
+}
+
 .workshops-archive .section-head {
   margin: 24px 0 8px;
 }

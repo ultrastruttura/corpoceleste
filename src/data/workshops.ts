@@ -3,6 +3,23 @@ export type PastWorkshop = {
   items: string[];
 };
 
+/** Workshop aperti all’iscrizione (link all’organizzatore). */
+export type UpcomingWorkshop = {
+  when: string;
+  where: string;
+  organizer: string;
+  /** URL iscrizione / pagina evento dell’organizzatore */
+  signupUrl: string;
+  note?: string;
+};
+
+/**
+ * Prossimi workshop con link di iscrizione esterno.
+ * Esempio:
+ * { when: "12 ottobre 2026", where: "Bergamo, …", organizer: "Nome spazio", signupUrl: "https://…" }
+ */
+export const upcomingWorkshops: UpcomingWorkshop[] = [];
+
 export const pastWorkshops: PastWorkshop[] = [
   {
     year: 2026,

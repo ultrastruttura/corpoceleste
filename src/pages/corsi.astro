@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
-import { pastWorkshops } from "../data/workshops";
+import { pastWorkshops, upcomingWorkshops } from "../data/workshops";
 import { publicFormAction } from "../data/site";
 import { siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
@@ -85,6 +85,41 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
           <button class="btn" type="submit">{copy.forms.send}</button>
         </form>
       </div>
+    </section>
+
+    <section class="workshops-upcoming">
+      <div class="section-head">
+        <h2>{copy.workshops.upcoming}</h2>
+      </div>
+      <p class="archive-note">{copy.workshops.upcomingLead}</p>
+      {
+        upcomingWorkshops.length > 0 ? (
+          <ul class="upcoming-list">
+            {upcomingWorkshops.map((w) => (
+              <li class="upcoming-item">
+                <div class="upcoming-item__main">
+                  <p class="upcoming-item__when">{w.when}</p>
+                  <p class="upcoming-item__where">{w.where}</p>
+                  <p class="upcoming-item__org">
+                    {copy.workshops.organizedBy} {w.organizer}
+                  </p>
+                  {w.note && <p class="upcoming-item__note">{w.note}</p>}
+                </div>
+                <a
+                  class="btn upcoming-item__btn"
+                  href={w.signupUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {copy.workshops.signup}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="upcoming-empty">{copy.workshops.upcomingEmpty}</p>
+        )
+      }
     </section>
 
     <section class="workshops-archive">
