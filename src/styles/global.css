@@ -1306,17 +1306,11 @@ body.cart-open {
 
 .footer-made {
   margin: 0;
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .footer-made p {
   margin: 0;
-}
-
-.footer-legal {
-  margin-top: 4px;
-  font-size: 13px;
-  opacity: 0.7;
 }
 
 /* Cart drawer */
