@@ -14,6 +14,8 @@ homeLede:
   en: One colour, hand-printed in Bergamo. Shirts, prints, editions.
   de: Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke, Editionen.
 ogImage: /uploads/prints/stella.jpg
+# Token da Cloudflare → Analytics → Web Analytics → Add site (visibile nel beacon JS)
+cloudflareAnalyticsToken: ""
 andreaName: Andrea Baldelli
 andreaBio:
   it: |-

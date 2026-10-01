@@ -35,6 +35,8 @@ export const siteSettings = {
   homeTitle: asLocalized(data.homeTitle),
   homeLede: asLocalized(data.homeLede),
   ogImage: data.ogImage ? String(data.ogImage) : "",
+  /** Cloudflare Web Analytics beacon token (public; empty = script off). */
+  cloudflareAnalyticsToken: String(data.cloudflareAnalyticsToken ?? "").trim(),
   andreaName: String(data.andreaName ?? "Andrea Baldelli"),
   andreaBio: asLocalized(data.andreaBio),
 };

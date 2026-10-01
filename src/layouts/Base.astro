@@ -51,6 +51,8 @@ const catalog = {
 };
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 const llmsHref = llmsTxtUrl(locale === "en" ? "en" : "it");
+const cfToken = siteSettings.cloudflareAnalyticsToken;
+const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
 ---
 
 <!doctype html>
@@ -132,5 +134,15 @@ const llmsHref = llmsTxtUrl(locale === "en" ? "en" : "it");
     <script>
       import "../scripts/shop.ts";
     </script>
+    {
+      cfBeacon && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={cfBeacon}
+        />
+      )
+    }
   </body>
 </html>

@@ -237,7 +237,7 @@ const it = {
     contact: "Contatto:",
     cookies: "Cookie e storage",
     cookiesP1:
-      "Niente cookie di profilazione, analytics o pubblicità. Per questo non c’è un banner.",
+      "Niente cookie di profilazione o pubblicità. Per le visite usiamo Cloudflare Web Analytics, senza cookie sul tuo dispositivo: per questo non c’è un banner.",
     cookiesP3:
       "Il carrello sta solo sul tuo browser, non su un server nostro.",
     cookiesPaypal:
@@ -252,17 +252,19 @@ const it = {
     dataForms: "nome, email, messaggio — per risponderti, poi li tolgo.",
     dataNewsletter: (email: string) =>
       `solo l’email, se spunti la casella. Revoca quando vuoi scrivendo a ${email}.`,
-    noProfiling: "Niente profilazione.",
+    noProfiling: "Niente profilazione a fini pubblicitari.",
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
-      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
+      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Misurazione visite su Cloudflare (USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
     formsubmit:
       "fallback dei form se Vercel non è configurato. Società USA. Informativa:",
     paypalRecv: "se paghi con PayPal (sede europea, gruppo anche USA).",
     github: "hosting delle pagine pubbliche. Informativa su github.com.",
     vercel: "webhook PayPal, magazzino, form del sito, area artisti, mail di conferma. Dati d’ordine, non la carta.",
     resend: "invio delle mail (ordini, recesso, contatti, newsletter, corsi), mittente Corpoceleste.",
+    cloudflare:
+      "Web Analytics: conteggio pagine e referrer in forma aggregata, senza cookie di profilazione. Informativa:",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
     rights: "Diritti",
@@ -280,13 +282,13 @@ const it = {
     lede: "Niente profilazione. Il carrello sta sul tuo browser. PayPal, se paghi così.",
     updated: "Ultimo aggiornamento: 1 ottobre 2026.",
     noBanner: "Niente banner",
-    noBannerBody: "Niente cookie di profilazione o pubblicità: per questo non c’è un banner.",
+    noBannerBody: "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Le visite si misurano con Cloudflare Web Analytics senza cookie sul dispositivo.",
     onSite: "Sul tuo browser",
     onSiteBody:
       "Il carrello e il riepilogo dopo il checkout restano sul tuo dispositivo, non su un server nostro.",
     third: "Terze parti",
     thirdBody:
-      "Se paghi con PayPal, il checkout carica il suo script: valgono cookie e informativa di PayPal.",
+      "Cloudflare riceve segnali di pagina aggregati (senza cookie di analytics). Se paghi con PayPal, il checkout carica il suo script: valgono cookie e informativa di PayPal.",
     manage: "Come toglierli",
     manageBody: "Impostazioni del browser, dati del sito. Oppure svuota il carrello da qui.",
     privacyLink: "Informativa privacy completa",
@@ -600,7 +602,7 @@ const en: typeof it = {
     contact: "Contact:",
     cookies: "Cookies and storage",
     cookiesP1:
-      "No profiling, analytics or advertising cookies. That is why there is no banner.",
+      "No profiling or advertising cookies. For visits we use Cloudflare Web Analytics, without cookies on your device: that is why there is no banner.",
     cookiesP3:
       "The cart stays in your browser, not on a server of ours.",
     cookiesPaypal:
@@ -615,17 +617,19 @@ const en: typeof it = {
     dataForms: "name, email, message — to reply, then we delete them.",
     dataNewsletter: (email: string) =>
       `email only, if you tick the box. Withdraw whenever you want by writing to ${email}.`,
-    noProfiling: "No profiling.",
+    noProfiling: "No advertising profiling.",
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
-      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
+      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Visit measurement on Cloudflare (USA). Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
     formsubmit:
       "form fallback if Vercel is not configured. US company. Notice:",
     paypalRecv: "if you pay with PayPal (European seat, group also in the USA).",
     github: "hosts the public pages. Notice on github.com.",
     vercel: "PayPal webhook, stock, site forms, artist area, confirmation mail. Order data, not the card.",
     resend: "sends mail (orders, withdrawal, contact, newsletter, workshops), from Corpoceleste.",
+    cloudflare:
+      "Web Analytics: aggregated page and referrer counts, without profiling cookies. Notice:",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
     rights: "Rights",
@@ -643,13 +647,13 @@ const en: typeof it = {
     lede: "No profiling. The cart stays in your browser. PayPal, if you pay that way.",
     updated: "Last updated: 1 October 2026.",
     noBanner: "No banner",
-    noBannerBody: "No profiling, analytics or advertising cookies: that is why there is no banner.",
+    noBannerBody: "No profiling or advertising cookies: that is why there is no banner. Visits are measured with Cloudflare Web Analytics without cookies on the device.",
     onSite: "On your browser",
     onSiteBody:
       "The cart and the post-checkout summary stay on your device, not on a server of ours.",
     third: "Third parties",
     thirdBody:
-      "If you pay with PayPal, checkout loads its script: PayPal’s cookies and notice apply.",
+      "Cloudflare receives aggregated page signals (no analytics cookies). If you pay with PayPal, checkout loads its script: PayPal’s cookies and notice apply.",
     manage: "How to remove them",
     manageBody: "Browser settings, site data. Or empty the cart from here.",
     privacyLink: "Full privacy notice",
@@ -963,7 +967,7 @@ const de: typeof it = {
     contact: "Kontakt:",
     cookies: "Cookies und Speicher",
     cookiesP1:
-      "Keine Profiling-, Analyse- oder Werbe-Cookies. Deshalb gibt es kein Banner.",
+      "Keine Profiling- oder Werbe-Cookies. Für Besuche nutzen wir Cloudflare Web Analytics ohne Cookies auf deinem Gerät: deshalb gibt es kein Banner.",
     cookiesP3:
       "Der Warenkorb bleibt in deinem Browser, nicht auf einem Server von uns.",
     cookiesPaypal:
@@ -978,17 +982,19 @@ const de: typeof it = {
     dataForms: "Name, E-Mail, Nachricht — zum Antworten, dann löschen wir sie.",
     dataNewsletter: (email: string) =>
       `nur die E-Mail, wenn du das Kästchen ankreuzt. Widerruf jederzeit an ${email}.`,
-    noProfiling: "Kein Profiling.",
+    noProfiling: "Kein Profiling für Werbung.",
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
-      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
+      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Besuchsmessung auf Cloudflare (USA). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
     formsubmit:
       "Formular-Fallback, wenn Vercel nicht konfiguriert ist. US-Unternehmen. Hinweise:",
     paypalRecv: "wenn du mit PayPal zahlst (Sitz in Europa, Gruppe auch in den USA).",
     github: "hostet die öffentlichen Seiten. Hinweise auf github.com.",
     vercel: "PayPal-Webhook, Bestand, Formulare, Künstlerbereich, Bestätigungsmails. Bestelldaten, keine Karte.",
     resend: "versendet Mails (Bestellung, Widerruf, Kontakt, Newsletter, Kurse), Absender Corpoceleste.",
+    cloudflare:
+      "Web Analytics: aggregierte Seiten- und Referrer-Zahlen, ohne Profiling-Cookies. Hinweise:",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
     rights: "Rechte",
@@ -1006,13 +1012,13 @@ const de: typeof it = {
     lede: "Kein Profiling. Der Warenkorb bleibt in deinem Browser. PayPal, wenn du so zahlst.",
     updated: "Stand: 1. Oktober 2026.",
     noBanner: "Kein Banner",
-    noBannerBody: "Keine Profiling-, Analyse- oder Werbe-Cookies: deshalb gibt es kein Banner.",
+    noBannerBody: "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Besuche werden mit Cloudflare Web Analytics ohne Cookies auf dem Gerät gemessen.",
     onSite: "In deinem Browser",
     onSiteBody:
       "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät, nicht auf einem Server von uns.",
     third: "Dritte",
     thirdBody:
-      "Wenn du mit PayPal zahlst, lädt die Kasse sein Skript: es gelten Cookies und Hinweise von PayPal.",
+      "Cloudflare erhält aggregierte Seitensignale (keine Analytics-Cookies). Wenn du mit PayPal zahlst, lädt die Kasse sein Skript: es gelten Cookies und Hinweise von PayPal.",
     manage: "Wie du sie entfernst",
     manageBody: "Browser-Einstellungen, Website-Daten. Oder den Warenkorb hier leeren.",
     privacyLink: "Vollständiger Datenschutzhinweis",

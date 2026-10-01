@@ -248,6 +248,13 @@ export default defineConfig({
             name: "ogImage",
             label: "Immagine Open Graph (condivisione social)",
           },
+          {
+            type: "string",
+            name: "cloudflareAnalyticsToken",
+            label: "Cloudflare Web Analytics — token",
+            description:
+              "Da dash.cloudflare.com → Analytics & logs → Web Analytics → Add a site. Incolla solo il token (non tutto lo script). Vuoto = analytics spente.",
+          },
           { type: "string", name: "andreaName", label: "Nome (bio studio)" },
           localizedText("andreaBio", "Bio Andrea"),
         ],

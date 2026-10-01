@@ -9,7 +9,7 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 | **Maglie** | Aggiungere / togliere prodotti, prezzo, stato, taglie, **magazzino (pezzi per taglia)**, **2–3 foto**, descrizione IT/EN/DE, **meta SEO** |
 | **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO** |
 | **News** | Aggiungere / togliere / modificare articoli |
-| **SEO e home** | Meta description, H1 home, immagine Open Graph, **bio Andrea**, **email shop** (ordini e form FormSubmit) |
+| **SEO e home** | Meta description, H1 home, immagine Open Graph, **bio Andrea**, **email shop**, **token Cloudflare Web Analytics** |
 
 Le foto vanno caricate dal pannello (finiscono in `public/uploads/`).
 
@@ -54,6 +54,15 @@ Se è attivo il **webhook PayPal** (guida: [MAGAZZINO-VERCEL.md](./MAGAZZINO-VER
 **Bonifico:** aggiorna i numeri a mano qui dopo il pagamento; la mail parte dal form del sito.
 
 Email shop (form + fallback): **SEO e home** → *Email shop (ordini e form)*. Per le mail PayPal dal webhook imposta anche `SHOP_EMAIL` su Vercel.
+
+### Cloudflare Web Analytics (gratis)
+
+1. Account gratis su [dash.cloudflare.com](https://dash.cloudflare.com) (non serve spostare il DNS).
+2. **Analytics & logs** → **Web Analytics** → **Add a site** → hostname del sito (es. `ultrastruttura.github.io` o poi `www.corpoceleste.eu`).
+3. Copia il **token** dallo snippet JS (`token: "…"`).
+4. In Tina → **SEO e home** → *Cloudflare Web Analytics — token*, incolla e salva → push / publish.
+
+Senza token lo script non parte. Dashboard visitatori: stessa sezione Web Analytics su Cloudflare.
 
 ## Dati legali (da compilare)
 
