@@ -1927,6 +1927,10 @@ body.cart-open {
   gap: 10px;
 }
 
+.pay-buttons .btn + .btn--ghost {
+  margin-left: 0;
+}
+
 .pay-buttons__slot:first-child {
   margin-top: 0;
 }

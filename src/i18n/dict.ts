@@ -121,6 +121,7 @@ const it = {
     methodPaypal: "PayPal / Apple Pay",
     paypalSoon: "PayPal non è ancora attivo. Per ora usa il bonifico.",
     applePayHint: "Apple Pay compare su Safari / dispositivi Apple quando PayPal lo abilita sul dominio.",
+    applePay: "Apple Pay",
     bank: "Bonifico",
     bankNote:
       "Invia il modulo: ricevi l’IBAN via email. L’ordine è confermato quando arriva il pagamento; poi spedisco.",
@@ -475,6 +476,7 @@ const en: typeof it = {
     methodPaypal: "PayPal / Apple Pay",
     paypalSoon: "PayPal is not active yet. Use the bank transfer for now.",
     applePayHint: "Apple Pay shows on Safari / Apple devices once PayPal enables it for the domain.",
+    applePay: "Apple Pay",
     bank: "Bank transfer",
     bankNote:
       "Send the form: you’ll get the IBAN by email. The order is confirmed when payment arrives; then I ship.",
@@ -828,6 +830,7 @@ const de: typeof it = {
     methodPaypal: "PayPal / Apple Pay",
     paypalSoon: "PayPal ist noch nicht aktiv. Bis dahin Überweisung.",
     applePayHint: "Apple Pay erscheint in Safari / auf Apple-Geräten, sobald PayPal es für die Domain freischaltet.",
+    applePay: "Apple Pay",
     bank: "Überweisung",
     bankNote:
       "Schick das Formular: du bekommst die IBAN per E-Mail. Die Bestellung gilt, wenn die Zahlung da ist; danach verschicke ich.",
