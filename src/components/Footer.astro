@@ -5,7 +5,6 @@ import PrivacyCheck from "./PrivacyCheck.astro";
 import FormHoney from "./FormHoney.astro";
 import { currentLocale, pageUrl, t } from "../i18n";
 
-const year = new Date().getFullYear();
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const formAction = publicFormAction(siteSettings.shopEmail);
@@ -66,8 +65,7 @@ const formAction = publicFormAction(siteSettings.shopEmail);
     </nav>
     <div class="footer-made">
       <p>
-        {copy.footer.made} {year}
-        {" · "}<a href={pageUrl(locale, "vendita/")}>{copy.footer.terms}</a>
+        <a href={pageUrl(locale, "vendita/")}>{copy.footer.terms}</a>
         {" · "}<a href={pageUrl(locale, "recesso/")}>{copy.footer.withdrawal}</a>
         {" · "}<a href={pageUrl(locale, "privacy/")}>{copy.footer.privacy}</a>
         {" · "}<a href={pageUrl(locale, "cookie/")}>{copy.footer.cookies}</a>
