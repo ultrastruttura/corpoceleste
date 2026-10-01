@@ -177,7 +177,7 @@ const it = {
     upcomingEmpty: "Nessuna data pubblica in programma. Usa la lista d’attesa sopra, oppure proponi un workshop presso di voi.",
     organizedBy: "Organizzato da",
     signup: "Iscriviti",
-    studioAlt: "Studio di serigrafia Corpoceleste, Bergamo",
+    studioAlt: "Workshop di serigrafia, stampa dal vivo",
   },
   consulting: {
     title: "Consulenza",
@@ -531,7 +531,7 @@ const en: typeof it = {
     upcomingEmpty: "No public dates right now. Use the waiting list above, or propose a workshop at your space.",
     organizedBy: "Organised by",
     signup: "Sign up",
-    studioAlt: "Corpoceleste screen-printing studio, Bergamo",
+    studioAlt: "Screen-printing workshop, live printing",
   },
   consulting: {
     title: "Consulting",
@@ -885,7 +885,7 @@ const de: typeof it = {
     upcomingEmpty: "Keine öffentlichen Termine. Nutze die Warteliste oben, oder schlage einen Workshop bei euch vor.",
     organizedBy: "Organisiert von",
     signup: "Anmelden",
-    studioAlt: "Corpoceleste-Siebdruckatelier, Bergamo",
+    studioAlt: "Siebdruck-Workshop, Live-Druck",
   },
   consulting: {
     title: "Beratung",

@@ -1658,15 +1658,20 @@ body.cart-open {
   align-items: start;
 }
 
+.workshops-intro .page-photo {
+  width: min(100%, 200px);
+  margin: 0 0 8px;
+}
+
 @media (min-width: 900px) {
   .workshops-intro {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 48px;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 40px;
   }
 
   .workshops-intro .page-photo {
     margin: 0;
-    width: 100%;
+    width: 200px;
   }
 }
 
