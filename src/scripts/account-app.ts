@@ -105,7 +105,7 @@ if (!root || !app) {
       el(
         "p",
         "lede",
-        "Inserisci l’email con cui sei stato invitato. Riceverai un link di accesso.",
+        "Inserisci l’email con cui sei stato invitato. Riceverai un link monouso (scade in circa 30 minuti).",
       ),
     );
     const form = el("form", "account-form account-login");

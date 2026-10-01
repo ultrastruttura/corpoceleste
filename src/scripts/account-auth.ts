@@ -15,12 +15,23 @@ function scrubUrl() {
   history.replaceState(null, "", url.pathname + url.search);
 }
 
+function showStatus(status: Element | null, text: string, homeHref: string) {
+  if (!status) return;
+  status.textContent = "";
+  status.append(document.createTextNode(text + " "));
+  const a = document.createElement("a");
+  a.href = homeHref;
+  a.textContent = "Area personale";
+  status.append(a);
+}
+
 const root = document.querySelector<HTMLElement>("[data-account-auth]");
 if (root) {
   const base = apiRoot(root);
   const status = root.querySelector("[data-auth-status]");
   const prefix = document.documentElement.dataset.localePrefix || "";
   const home = `${import.meta.env.BASE_URL}${prefix}account/`.replace(/\/{2,}/g, "/");
+  const homeHref = home.endsWith("/") ? home : `${home}/`;
   const token = readMagicToken();
   scrubUrl();
 
@@ -30,7 +41,7 @@ if (root) {
       return;
     }
     if (!token) {
-      if (status) status.textContent = "Link mancante.";
+      showStatus(status, "Link mancante.", homeHref);
       return;
     }
     try {
@@ -41,13 +52,12 @@ if (root) {
       if (!data.session) throw new Error("Sessione non creata");
       setSession(data.session);
       if (status) status.textContent = "Accesso riuscito. Reindirizzo…";
-      location.replace(home.endsWith("/") ? home : `${home}/`);
+      location.replace(homeHref);
     } catch (err) {
       clearSession();
-      if (status) {
-        status.textContent =
-          err instanceof Error ? err.message : "Link non valido o scaduto.";
-      }
+      const text =
+        err instanceof Error ? err.message : "Link non valido. Richiedi un nuovo accesso.";
+      showStatus(status, text, homeHref);
     }
   })();
 }

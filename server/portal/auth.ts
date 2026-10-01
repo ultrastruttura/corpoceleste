@@ -133,13 +133,15 @@ export async function issueMagicLink(userId: string) {
 export async function sendMagicLinkEmail(user: PortalUser, token: string) {
   // Hash fragment: not sent in Referer / server logs of the landing request.
   const link = `${siteBase()}/account/auth/#t=${encodeURIComponent(token)}`;
+  const mins = magicMinutes();
   const result = await sendMail({
     to: user.email,
     subject: "Accesso area Corpoceleste",
     text: [
       `Ciao${user.name ? ` ${user.name}` : ""},`,
       "",
-      "Usa questo link per entrare nell’area personale Corpoceleste (valido poco):",
+      "Usa questo link per entrare nell’area personale Corpoceleste.",
+      `È monouso e scade dopo circa ${mins} minuti:`,
       link,
       "",
       "Se non l’hai chiesto tu, ignora questa mail.",
@@ -155,22 +157,31 @@ export function allowDevMagicLinks() {
   return process.env.PORTAL_DEV_LINKS === "1" || process.env.VERCEL_ENV === "development";
 }
 
-export async function consumeMagicLink(token: string) {
+export type MagicConsumeResult =
+  | { ok: true; user: PortalUser }
+  | { ok: false; reason: "missing" | "used" | "expired" };
+
+export async function consumeMagicLink(token: string): Promise<MagicConsumeResult> {
   await ensureSchema();
+  if (!token) return { ok: false, reason: "missing" };
   const db = getDb();
   const res = await db.execute({
     sql: "SELECT token, user_id, expires_at, used_at FROM magic_links WHERE token = ?",
     args: [token],
   });
   const row = res.rows[0];
-  if (!row) return null;
-  if (row.used_at) return null;
-  if (new Date(String(row.expires_at)).getTime() < Date.now()) return null;
+  if (!row) return { ok: false, reason: "missing" };
+  if (row.used_at) return { ok: false, reason: "used" };
+  if (new Date(String(row.expires_at)).getTime() < Date.now()) {
+    return { ok: false, reason: "expired" };
+  }
   await db.execute({
     sql: "UPDATE magic_links SET used_at = datetime('now') WHERE token = ?",
     args: [token],
   });
-  return getUserById(String(row.user_id));
+  const user = await getUserById(String(row.user_id));
+  if (!user) return { ok: false, reason: "missing" };
+  return { ok: true, user };
 }
 
 export async function createSession(userId: string) {
