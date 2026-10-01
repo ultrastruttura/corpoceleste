@@ -1824,7 +1824,7 @@ body.cart-open {
 }
 
 .contact-photo {
-  width: 100%;
+  width: min(100%, 320px);
   height: auto;
   display: block;
   border: 1px solid var(--line);
