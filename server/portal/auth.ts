@@ -133,7 +133,7 @@ export async function issueMagicLink(userId: string) {
 export async function sendMagicLinkEmail(user: PortalUser, token: string) {
   // Hash fragment: not sent in Referer / server logs of the landing request.
   const link = `${siteBase()}/account/auth/#t=${encodeURIComponent(token)}`;
-  const ok = await sendMail({
+  const result = await sendMail({
     to: user.email,
     subject: "Accesso area Corpoceleste",
     text: [
@@ -145,7 +145,7 @@ export async function sendMagicLinkEmail(user: PortalUser, token: string) {
       "Se non l’hai chiesto tu, ignora questa mail.",
     ].join("\n"),
   });
-  return { ok, link };
+  return { ok: result.ok, link, error: result.ok ? undefined : result.error };
 }
 
 /** Expose magic links in API only for local/dev opt-in — never on Vercel production. */

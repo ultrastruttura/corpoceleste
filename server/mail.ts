@@ -1,5 +1,7 @@
 /** Transactional mail from Vercel (Resend). No FormSubmit. */
 
+export type SendMailResult = { ok: true } | { ok: false; error: string };
+
 function fromAddress() {
   const raw = (process.env.MAIL_FROM || process.env.SHOP_EMAIL || "").trim();
   if (!raw) return "";
@@ -10,16 +12,21 @@ export async function sendMail(opts: {
   to: string;
   subject: string;
   text: string;
-}): Promise<boolean> {
+}): Promise<SendMailResult> {
   const key = (process.env.RESEND_API_KEY || "").trim();
   const from = fromAddress();
   const to = opts.to.trim();
-  if (!key || !from || !to) {
-    console.warn(
-      "sendMail skipped:",
-      !key ? "missing RESEND_API_KEY" : !from ? "missing MAIL_FROM/SHOP_EMAIL" : "missing recipient",
-    );
-    return false;
+  if (!key) {
+    console.warn("sendMail skipped: missing RESEND_API_KEY");
+    return { ok: false, error: "RESEND_API_KEY mancante su Vercel" };
+  }
+  if (!from) {
+    console.warn("sendMail skipped: missing MAIL_FROM/SHOP_EMAIL");
+    return { ok: false, error: "MAIL_FROM o SHOP_EMAIL mancante su Vercel" };
+  }
+  if (!to) {
+    console.warn("sendMail skipped: missing recipient");
+    return { ok: false, error: "Destinatario mancante" };
   }
 
   try {
@@ -37,15 +44,27 @@ export async function sendMail(opts: {
       }),
     });
     if (!res.ok) {
-      console.error("Resend failed", res.status, await res.text());
-      return false;
+      const body = await res.text();
+      console.error("Resend failed", res.status, body);
+      return {
+        ok: false,
+        error: `Resend ${res.status}: ${body.slice(0, 240) || res.statusText}`,
+      };
     }
     console.info("sendMail ok →", to);
-    return true;
+    return { ok: true };
   } catch (err) {
     console.error("Resend error", err);
-    return false;
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Errore di rete verso Resend",
+    };
   }
+}
+
+/** True if env looks ready (does not prove domain is verified). */
+export function mailConfigured() {
+  return Boolean((process.env.RESEND_API_KEY || "").trim() && fromAddress());
 }
 
 export function siteBase() {

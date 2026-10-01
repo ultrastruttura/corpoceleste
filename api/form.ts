@@ -41,8 +41,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     subject,
     text: lines.join("\n"),
   });
-  if (!ok) {
-    console.error("form: Resend failed for", subject);
+  if (!ok.ok) {
+    console.error("form: Resend failed for", subject, ok.error);
     return res.status(502).send("Mail failed");
   }
 

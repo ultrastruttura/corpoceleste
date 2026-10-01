@@ -12,6 +12,7 @@ import {
   sessionUser,
 } from "../../server/portal/auth.js";
 import { portalConfigured } from "../../server/portal/db.js";
+import { mailConfigured } from "../../server/mail.js";
 import { bearer, cors, json, readJson, requireUser } from "../../server/portal/http.js";
 import { clientIp, rateLimit } from "../../server/portal/rate-limit.js";
 
@@ -75,11 +76,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return json(res, 200, { ok: true, message: LOGIN_MSG, emailed: false, devLink: sent.link });
       }
       if (!sent.ok) {
-        console.warn("[portal] magic link email failed for", user.email);
+        console.warn("[portal] magic link email failed for", user.email, sent.error);
         return json(res, 200, {
           ok: true,
           emailed: false,
-          message: "Non siamo riusciti a inviare l’email di accesso. Riprova tra un minuto.",
+          message: `Non siamo riusciti a inviare l’email di accesso. ${sent.error || "Controlla Resend su Vercel."}`,
         });
       }
       console.info("[portal] magic link emailed to", user.email);
@@ -107,12 +108,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ok: true,
         user,
         emailed: sent.ok,
-        message: sent.ok ? "Invito inviato." : "Utente creato; email non inviata.",
+        message: sent.ok
+          ? "Invito inviato."
+          : `Utente creato, ma email non inviata. ${sent.error || "Controlla RESEND_API_KEY e MAIL_FROM su Vercel."}`,
       };
       if (!sent.ok && allowDevMagicLinks()) {
         console.info("[portal] invite magic link (dev only)", sent.link);
         payload.devLink = sent.link;
       }
+      if (!sent.ok) console.warn("[portal] invite email failed", user.email, sent.error);
       return json(res, 200, payload);
     }
 
@@ -145,7 +149,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (action === "me") {
       const user = await sessionUser(bearer(req));
-      return json(res, user ? 200 : 401, { user });
+      return json(res, user ? 200 : 401, {
+        user,
+        mailConfigured: user?.role === "admin" ? mailConfigured() : undefined,
+      });
     }
 
     return json(res, 400, { error: "Unknown action" });

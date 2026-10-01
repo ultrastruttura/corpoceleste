@@ -55,6 +55,11 @@ type Dashboard = {
   outstanding: number;
 };
 
+type AdminRoute =
+  | { name: "artists" }
+  | { name: "artist"; id: string }
+  | { name: "settings" };
+
 const root = document.querySelector<HTMLElement>("[data-account-root]");
 const app = document.querySelector<HTMLElement>("[data-account-app]");
 if (!root || !app) {
@@ -92,6 +97,9 @@ if (!root || !app) {
   }
 
   function renderLogin() {
+    root!.classList.remove("account-page--admin");
+    const title = document.querySelector(".account-page > h1");
+    if (title) title.textContent = "Area personale";
     app!.innerHTML = "";
     app!.append(
       el(
@@ -153,7 +161,11 @@ if (!root || !app) {
 
   function toolbar(user: User) {
     const bar = el("div", "account-toolbar");
-    const who = el("p", "account-who", `${user.name || user.email} · ${user.role === "admin" ? "admin" : "artista"}`);
+    const who = el(
+      "p",
+      "account-who",
+      `${user.name || user.email} · ${user.role === "admin" ? "admin" : "artista"}`,
+    );
     const out = el("button", "account-linkish", "Esci") as HTMLButtonElement;
     out.type = "button";
     out.addEventListener("click", async () => {
@@ -186,7 +198,7 @@ if (!root || !app) {
       el(
         "p",
         "account-meta",
-        `${s.soldQty}/${s.deal.planned_qty} pezzi · ${s.deal.artist_share_pct}% artista · IVA ${s.deal.vat_rate_pct}%`,
+        `${s.soldQty}/${s.deal.planned_qty} pezzi · ${s.deal.artist_share_pct}% artista · IVA ${s.deal.vat_rate_pct}% · ${money(s.deal.unit_price)}`,
       ),
     );
     const rows: Array<[string, string]> = [
@@ -227,12 +239,13 @@ if (!root || !app) {
           ),
         );
       }
-      box.append(el("h4", "", "Vendite"), ul);
+      box.append(el("h4", "", "Ordini / vendite"), ul);
     }
     return box;
   }
 
   async function renderArtist(user: User) {
+    root!.classList.remove("account-page--admin");
     app!.innerHTML = "";
     app!.append(toolbar(user), el("h2", "", "Il tuo prospetto"));
     const dash = (await apiFetch(base, "settle?dashboard=1")) as Dashboard;
@@ -260,21 +273,300 @@ if (!root || !app) {
     }
   }
 
+  function parseAdminRoute(): AdminRoute {
+    const raw = (location.hash || "").replace(/^#/, "").replace(/^\//, "");
+    if (raw.startsWith("artista/")) {
+      const id = decodeURIComponent(raw.slice("artista/".length));
+      if (id) return { name: "artist", id };
+    }
+    if (raw === "impostazioni") return { name: "settings" };
+    return { name: "artists" };
+  }
+
+  function setAdminRoute(route: AdminRoute) {
+    const next =
+      route.name === "artists"
+        ? "#artisti"
+        : route.name === "settings"
+          ? "#impostazioni"
+          : `#artista/${encodeURIComponent(route.id)}`;
+    if (location.hash === next) return;
+    location.hash = next;
+  }
+
+  let adminHashBound = false;
+
   async function renderAdmin(user: User) {
-    app!.innerHTML = "";
-    app!.append(toolbar(user), el("h2", "", "Gestione"));
+    root!.classList.add("account-page--admin");
+    if (!adminHashBound) {
+      adminHashBound = true;
+      window.addEventListener("hashchange", () => {
+        void renderAdmin(user);
+      });
+    }
+    if (!location.hash || location.hash === "#") {
+      history.replaceState(null, "", "#artisti");
+    }
+    const route = parseAdminRoute();
 
     const usersData = (await apiFetch(base, "users")) as { users: User[] };
     const dealsData = (await apiFetch(base, "deals")) as { deals: DealSummary[] };
+    const meData = (await apiFetch(base, "auth", {
+      method: "POST",
+      body: JSON.stringify({ action: "me" }),
+    })) as { mailConfigured?: boolean };
     const artists = usersData.users.filter((u) => u.role === "artist");
 
-    // Invite
-    const invite = el("form", "account-form account-panel");
+    app!.innerHTML = "";
+    app!.append(toolbar(user));
+    const title = document.querySelector(".account-page > h1");
+    if (title) title.textContent = "Studio";
+
+    if (meData.mailConfigured === false) {
+      app!.append(
+        el(
+          "p",
+          "account-banner account-banner--warn",
+          "Mail non configurata su Vercel: manca RESEND_API_KEY oppure MAIL_FROM/SHOP_EMAIL. Finché non li imposti (Production) e fai Redeploy, login e inviti non partono da Resend.",
+        ),
+      );
+    }
+
+    const shell = el("div", "account-shell");
+    const nav = el("nav", "account-subnav");
+    nav.setAttribute("aria-label", "Sezioni admin");
+
+    const mkTab = (label: string, active: boolean, onClick: () => void) => {
+      const btn = el(
+        "button",
+        `account-subnav__tab${active ? " is-active" : ""}`,
+        label,
+      ) as HTMLButtonElement;
+      btn.type = "button";
+      btn.addEventListener("click", onClick);
+      return btn;
+    };
+
+    nav.append(
+      mkTab("Artisti", route.name === "artists" || route.name === "artist", () => {
+        setAdminRoute({ name: "artists" });
+      }),
+      mkTab("Impostazioni", route.name === "settings", () => {
+        setAdminRoute({ name: "settings" });
+      }),
+    );
+    shell.append(nav);
+
+    const main = el("div", "account-shell__main");
+    if (route.name === "artists") await renderAdminArtists(main, user, artists, dealsData.deals);
+    else if (route.name === "artist") {
+      const artist = artists.find((a) => a.id === route.id);
+      if (!artist) {
+        history.replaceState(null, "", "#artisti");
+        await renderAdminArtists(main, user, artists, dealsData.deals);
+      } else {
+        await renderAdminArtistDetail(main, user, artist, dealsData.deals);
+      }
+    } else {
+      await renderAdminSettings(main, user, artists, dealsData.deals);
+    }
+
+    shell.append(main);
+    app!.append(shell);
+  }
+
+  async function renderAdminArtists(
+    mount: HTMLElement,
+    user: User,
+    artists: User[],
+    deals: DealSummary[],
+  ) {
+    mount.append(
+      el("h2", "account-section-title", "Artisti attivi"),
+      el("p", "account-lede", "Apri un artista per ordini, saldi e conti."),
+    );
+
+    if (!artists.length) {
+      mount.append(el("p", "lede", "Nessun artista ancora. Vai in Impostazioni per invitarne uno."));
+      return;
+    }
+
+    const table = el("div", "account-table");
+    const head = el("div", "account-table__head");
+    head.innerHTML = `<span>Artista</span><span>Deal</span><span>Dovuto</span><span>Residuo</span>`;
+    table.append(head);
+
+    for (const a of artists) {
+      const dash = (await apiFetch(
+        base,
+        `settle?dashboard=1&user_id=${encodeURIComponent(a.id)}`,
+      )) as Dashboard;
+      const dealCount = deals.filter((d) => d.deal.user_id === a.id).length;
+      const row = el("button", "account-table__row") as HTMLButtonElement;
+      row.type = "button";
+      row.innerHTML = `
+        <span class="account-table__primary">
+          <strong>${escapeHtml(a.name || a.email)}</strong>
+          <small>${escapeHtml(a.email)}${a.artist_slug ? ` · ${escapeHtml(a.artist_slug)}` : ""}</small>
+        </span>
+        <span>${dealCount}</span>
+        <span>${money(dash.artistDueTotal)}</span>
+        <span class="account-table__emphasis">${money(dash.outstanding)}</span>
+      `;
+      row.addEventListener("click", () => {
+        setAdminRoute({ name: "artist", id: a.id });
+      });
+      table.append(row);
+    }
+    mount.append(table);
+  }
+
+  async function renderAdminArtistDetail(
+    mount: HTMLElement,
+    user: User,
+    artist: User,
+    allDeals: DealSummary[],
+  ) {
+    const back = el("button", "account-back", "← Artisti") as HTMLButtonElement;
+    back.type = "button";
+    back.addEventListener("click", () => {
+      setAdminRoute({ name: "artists" });
+    });
+    mount.append(back);
+
+    mount.append(
+      el("h2", "account-section-title", artist.name || artist.email),
+      el(
+        "p",
+        "account-lede",
+        `${artist.email}${artist.artist_slug ? ` · slug ${artist.artist_slug}` : ""}`,
+      ),
+    );
+
+    const dash = (await apiFetch(
+      base,
+      `settle?dashboard=1&user_id=${encodeURIComponent(artist.id)}`,
+    )) as Dashboard;
+
+    const summary = el("section", "account-card");
+    summary.append(
+      el("h3", "", "Riepilogo conti"),
+      metrics([
+        ["Lordo da fatturare", money(dash.artistDueTotal)],
+        ["Già saldato", money(dash.paidTotal)],
+        ["Residuo", money(dash.outstanding)],
+      ]),
+    );
+    mount.append(summary);
+
+    const deals = allDeals.filter((d) => d.deal.user_id === artist.id);
+    const orders = el("section", "account-card");
+    orders.append(el("h3", "", "Ordini e deal"));
+    if (!deals.length) {
+      orders.append(el("p", "account-lede", "Nessun deal. Creane uno in Impostazioni."));
+    } else {
+      for (const s of deals) {
+        const wrap = el("div", "account-deal-wrap");
+        wrap.append(dealBlock(s));
+
+        const bank = el("form", "account-inline-form");
+        bank.innerHTML = `
+          <span>Conferma bonifico</span>
+          <input name="qty" type="number" min="1" value="1" required />
+          <input name="size" placeholder="taglia" />
+          <button type="submit">Registra</button>
+        `;
+        bank.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const fd = new FormData(bank);
+          await apiFetch(base, "sales", {
+            method: "POST",
+            body: JSON.stringify({
+              deal_id: s.deal.id,
+              qty: Number(fd.get("qty")),
+              size: fd.get("size") || "",
+              source: "bank",
+            }),
+          });
+          await renderAdmin(user);
+        });
+        wrap.append(bank);
+        orders.append(wrap);
+      }
+    }
+    mount.append(orders);
+
+    const conti = el("section", "account-card");
+    conti.append(el("h3", "", "Saldi mensili"));
+    const now = new Date();
+    const period = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const settle = el("form", "account-inline-form account-inline-form--stack");
+    settle.innerHTML = `
+      <span>Segna saldato</span>
+      <input name="period" value="${period}" required pattern="\\d{4}-\\d{2}" title="YYYY-MM" />
+      <input name="amount" type="number" step="0.01" value="${Math.max(0, dash.outstanding).toFixed(2)}" required />
+      <button type="submit">Salva</button>
+    `;
+    settle.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(settle);
+      await apiFetch(base, "settle", {
+        method: "POST",
+        body: JSON.stringify({
+          user_id: artist.id,
+          period: fd.get("period"),
+          amount: Number(fd.get("amount")),
+          note: "saldo mensile",
+        }),
+      });
+      await renderAdmin(user);
+    });
+    conti.append(settle);
+
+    if (dash.settlements.length) {
+      const ul = el("ul", "account-list");
+      for (const st of dash.settlements) {
+        const li = el("li", "account-row");
+        li.append(
+          document.createTextNode(`${st.period}: ${money(st.amount)} · ${st.note || "saldato"}`),
+        );
+        const undo = el("button", "account-linkish", "Annulla") as HTMLButtonElement;
+        undo.type = "button";
+        undo.addEventListener("click", async () => {
+          await apiFetch(base, `settle?id=${encodeURIComponent(st.id)}`, { method: "DELETE" });
+          await renderAdmin(user);
+        });
+        li.append(undo);
+        ul.append(li);
+      }
+      conti.append(ul);
+    } else {
+      conti.append(el("p", "account-lede", "Nessun saldo registrato."));
+    }
+    mount.append(conti);
+  }
+
+  async function renderAdminSettings(
+    mount: HTMLElement,
+    user: User,
+    artists: User[],
+    deals: DealSummary[],
+  ) {
+    mount.append(
+      el("h2", "account-section-title", "Impostazioni"),
+      el("p", "account-lede", "Inviti, anagrafica artisti e deal di edizione."),
+    );
+
+    const invite = el("form", "account-form account-card");
     invite.innerHTML = `
       <h3>Invita artista</h3>
       <label><span>Nome</span><input name="name" required /></label>
       <label><span>Email</span><input type="email" name="email" required /></label>
-      <label><span>Slug Tina (opz.)</span><input name="artist_slug" placeholder="es. nome-artista" /></label>
+      <label>
+        <span>Slug artista sul sito (opz.)</span>
+        <input name="artist_slug" placeholder="es. ruco" />
+      </label>
+      <p class="account-hint">Stesso slug della cartella artista in Tina (opzionale, si può aggiungere dopo).</p>
       <button type="submit">Invia invito</button>
       <p class="account-msg" data-msg hidden></p>
     `;
@@ -299,24 +591,35 @@ if (!root || !app) {
             href: data.devLink,
             label: "Apri link",
           });
+        } else if (data.emailed === false) {
+          setMsg(
+            msg,
+            data.message ||
+              "Utente creato, ma email non inviata. Controlla RESEND_API_KEY e MAIL_FROM su Vercel (Production) e fai Redeploy.",
+          );
         } else {
-          setMsg(msg, data.message || (data.emailed ? "Invito inviato." : "Utente creato."));
+          setMsg(msg, data.message || "Invito inviato.");
         }
         await renderAdmin(user);
       } catch (err) {
         setMsg(msg, err instanceof Error ? err.message : "Errore");
       }
     });
-    app!.append(invite);
+    mount.append(invite);
 
-    // Users list
-    if (artists.length) {
-      const sec = el("section", "account-panel");
-      sec.append(el("h3", "", "Artisti"));
+    const roster = el("section", "account-card");
+    roster.append(el("h3", "", "Elenco artisti"));
+    if (!artists.length) {
+      roster.append(el("p", "account-lede", "Nessun artista."));
+    } else {
       const ul = el("ul", "account-list");
       for (const a of artists) {
         const li = el("li", "account-row");
-        li.append(document.createTextNode(`${a.name} <${a.email}>`));
+        li.append(
+          document.createTextNode(
+            `${a.name || a.email} <${a.email}>${a.artist_slug ? ` · ${a.artist_slug}` : ""}`,
+          ),
+        );
         const del = el("button", "account-linkish", "Rimuovi") as HTMLButtonElement;
         del.type = "button";
         del.addEventListener("click", async () => {
@@ -327,28 +630,29 @@ if (!root || !app) {
         li.append(del);
         ul.append(li);
       }
-      sec.append(ul);
-      app!.append(sec);
+      roster.append(ul);
     }
+    mount.append(roster);
 
-    // New / edit deal
-    const dealForm = el("form", "account-form account-panel");
     const artistOpts = artists
-      .map((a) => `<option value="${a.id}">${a.name || a.email}</option>`)
+      .map((a) => `<option value="${a.id}">${escapeHtml(a.name || a.email)}</option>`)
       .join("");
+
+    const dealForm = el("form", "account-form account-card");
     dealForm.innerHTML = `
       <h3>Deal edizione</h3>
+      <p class="account-hint">Prezzo al cliente, costi per pezzo/fissi, percentuale artista.</p>
       <label><span>Artista</span><select name="user_id" required>${artistOpts}</select></label>
       <label><span>Product id (Tina)</span><input name="product_id" required placeholder="slug prodotto" /></label>
       <label><span>Titolo</span><input name="product_title" /></label>
-      <label><span>Prezzo unitario €</span><input name="unit_price" type="number" step="0.01" min="0" required /></label>
+      <label><span>Prezzo al cliente €</span><input name="unit_price" type="number" step="0.01" min="0" required /></label>
       <label><span>Pezzi previsti</span><input name="planned_qty" type="number" min="1" value="50" required /></label>
       <label><span>% artista</span><input name="artist_share_pct" type="number" min="0" max="100" value="40" required /></label>
       <label><span>IVA %</span><input name="vat_rate_pct" type="number" min="0" value="22" required /></label>
       <label><span>Note</span><input name="notes" /></label>
       <fieldset class="account-costs">
         <legend>Costi (label|importo|fisso o pezzo)</legend>
-        <p class="account-hint">Una riga per costo, es. <code>Maglie|8.5|pezzo</code> oppure <code>Affitto|120|fisso</code></p>
+        <p class="account-hint">Es. <code>Maglie|8.5|pezzo</code> oppure <code>Affitto|120|fisso</code></p>
         <textarea name="costs" rows="4" placeholder="Maglie|8.5|pezzo&#10;Telaio|40|fisso"></textarea>
       </fieldset>
       <input type="hidden" name="id" value="" />
@@ -396,143 +700,65 @@ if (!root || !app) {
         msg.textContent = err instanceof Error ? err.message : "Errore";
       }
     });
-    app!.append(dealForm);
+    mount.append(dealForm);
 
-    // Deals list + actions
-    for (const s of dealsData.deals) {
-      const wrap = el("section", "account-panel");
-      wrap.append(dealBlock(s));
-      const actions = el("div", "account-actions");
-
-      const editBtn = el("button", "", "Modifica") as HTMLButtonElement;
-      editBtn.type = "button";
-      editBtn.addEventListener("click", () => {
-        (dealForm.elements.namedItem("id") as HTMLInputElement).value = s.deal.id;
-        (dealForm.elements.namedItem("user_id") as HTMLSelectElement).value = s.deal.user_id;
-        (dealForm.elements.namedItem("product_id") as HTMLInputElement).value = s.deal.product_id;
-        (dealForm.elements.namedItem("product_title") as HTMLInputElement).value =
-          s.deal.product_title;
-        (dealForm.elements.namedItem("unit_price") as HTMLInputElement).value = String(
-          s.deal.unit_price,
+    if (deals.length) {
+      const list = el("section", "account-card");
+      list.append(el("h3", "", "Deal esistenti"));
+      for (const s of deals) {
+        const artist = artists.find((a) => a.id === s.deal.user_id);
+        const wrap = el("div", "account-deal-wrap");
+        wrap.append(
+          el("p", "account-meta", `Artista: ${artist?.name || artist?.email || s.deal.user_id}`),
+          dealBlock(s),
         );
-        (dealForm.elements.namedItem("planned_qty") as HTMLInputElement).value = String(
-          s.deal.planned_qty,
-        );
-        (dealForm.elements.namedItem("artist_share_pct") as HTMLInputElement).value = String(
-          s.deal.artist_share_pct,
-        );
-        (dealForm.elements.namedItem("vat_rate_pct") as HTMLInputElement).value = String(
-          s.deal.vat_rate_pct,
-        );
-        (dealForm.elements.namedItem("notes") as HTMLInputElement).value = s.deal.notes || "";
-        (dealForm.elements.namedItem("costs") as HTMLTextAreaElement).value = s.deal.costs
-          .map((c) => `${c.label}|${c.amount}|${c.per_unit ? "pezzo" : "fisso"}`)
-          .join("\n");
-        dealForm.scrollIntoView({ behavior: "smooth" });
-      });
-
-      const bank = el("form", "account-inline-form");
-      bank.innerHTML = `
-        <span>Conferma bonifico</span>
-        <input name="qty" type="number" min="1" value="1" required style="width:4rem" />
-        <input name="size" placeholder="taglia" style="width:5rem" />
-        <button type="submit">Registra</button>
-      `;
-      bank.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const fd = new FormData(bank);
-        await apiFetch(base, "sales", {
-          method: "POST",
-          body: JSON.stringify({
-            deal_id: s.deal.id,
-            qty: Number(fd.get("qty")),
-            size: fd.get("size") || "",
-            source: "bank",
-          }),
+        const actions = el("div", "account-actions");
+        const editBtn = el("button", "", "Modifica") as HTMLButtonElement;
+        editBtn.type = "button";
+        editBtn.addEventListener("click", () => {
+          (dealForm.elements.namedItem("id") as HTMLInputElement).value = s.deal.id;
+          (dealForm.elements.namedItem("user_id") as HTMLSelectElement).value = s.deal.user_id;
+          (dealForm.elements.namedItem("product_id") as HTMLInputElement).value = s.deal.product_id;
+          (dealForm.elements.namedItem("product_title") as HTMLInputElement).value =
+            s.deal.product_title;
+          (dealForm.elements.namedItem("unit_price") as HTMLInputElement).value = String(
+            s.deal.unit_price,
+          );
+          (dealForm.elements.namedItem("planned_qty") as HTMLInputElement).value = String(
+            s.deal.planned_qty,
+          );
+          (dealForm.elements.namedItem("artist_share_pct") as HTMLInputElement).value = String(
+            s.deal.artist_share_pct,
+          );
+          (dealForm.elements.namedItem("vat_rate_pct") as HTMLInputElement).value = String(
+            s.deal.vat_rate_pct,
+          );
+          (dealForm.elements.namedItem("notes") as HTMLInputElement).value = s.deal.notes || "";
+          (dealForm.elements.namedItem("costs") as HTMLTextAreaElement).value = s.deal.costs
+            .map((c) => `${c.label}|${c.amount}|${c.per_unit ? "pezzo" : "fisso"}`)
+            .join("\n");
+          dealForm.scrollIntoView({ behavior: "smooth" });
         });
-        await renderAdmin(user);
-      });
-
-      const delDeal = el("button", "account-linkish", "Elimina deal") as HTMLButtonElement;
-      delDeal.type = "button";
-      delDeal.addEventListener("click", async () => {
-        if (!confirm("Eliminare questo deal?")) return;
-        await apiFetch(base, `deals?id=${encodeURIComponent(s.deal.id)}`, { method: "DELETE" });
-        await renderAdmin(user);
-      });
-
-      actions.append(editBtn, bank, delDeal);
-      wrap.append(actions);
-      app!.append(wrap);
-    }
-
-    // Settlements overview per artist
-    if (artists.length) {
-      const sec = el("section", "account-panel");
-      sec.append(el("h3", "", "Saldi per artista"));
-      for (const a of artists) {
-        const dash = (await apiFetch(
-          base,
-          `settle?dashboard=1&user_id=${encodeURIComponent(a.id)}`,
-        )) as Dashboard;
-        const block = el("div", "account-settle-block");
-        block.append(
-          el("h4", "", a.name || a.email),
-          metrics([
-            ["Dovuto", money(dash.artistDueTotal)],
-            ["Saldato", money(dash.paidTotal)],
-            ["Residuo", money(dash.outstanding)],
-          ]),
-        );
-        const now = new Date();
-        const period = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-        const settle = el("form", "account-inline-form");
-        settle.innerHTML = `
-          <span>Salda mese</span>
-          <input name="period" value="${period}" required pattern="\\d{4}-\\d{2}" style="width:6rem" />
-          <input name="amount" type="number" step="0.01" value="${Math.max(0, dash.outstanding).toFixed(2)}" required style="width:6rem" />
-          <button type="submit">Segna saldato</button>
-        `;
-        settle.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const fd = new FormData(settle);
-          await apiFetch(base, "settle", {
-            method: "POST",
-            body: JSON.stringify({
-              user_id: a.id,
-              period: fd.get("period"),
-              amount: Number(fd.get("amount")),
-              note: "saldo mensile",
-            }),
-          });
+        const delDeal = el("button", "account-linkish", "Elimina") as HTMLButtonElement;
+        delDeal.type = "button";
+        delDeal.addEventListener("click", async () => {
+          if (!confirm("Eliminare questo deal?")) return;
+          await apiFetch(base, `deals?id=${encodeURIComponent(s.deal.id)}`, { method: "DELETE" });
           await renderAdmin(user);
         });
-        block.append(settle);
-        if (dash.settlements.length) {
-          const ul = el("ul", "account-list");
-          for (const st of dash.settlements) {
-            const li = el("li", "account-row");
-            li.append(
-              document.createTextNode(
-                `${st.period}: ${money(st.amount)} · ${st.note || ""}`,
-              ),
-            );
-            const undo = el("button", "account-linkish", "Annulla") as HTMLButtonElement;
-            undo.type = "button";
-            undo.addEventListener("click", async () => {
-              await apiFetch(base, `settle?id=${encodeURIComponent(st.id)}`, {
-                method: "DELETE",
-              });
-              await renderAdmin(user);
-            });
-            li.append(undo);
-            ul.append(li);
-          }
-          block.append(ul);
-        }
-        sec.append(block);
+        actions.append(editBtn, delDeal);
+        wrap.append(actions);
+        list.append(wrap);
       }
-      app!.append(sec);
+      mount.append(list);
     }
+  }
+
+  function escapeHtml(s: string) {
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 }

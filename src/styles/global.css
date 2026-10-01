@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --ink: #131313;
   --muted: #656565;
   --quiet: #899090;
@@ -1587,6 +1587,24 @@ body.cart-open {
   margin-bottom: 8px;
 }
 
+.account-page--admin {
+  max-width: 960px;
+}
+
+.account-banner {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+
+.account-banner--warn {
+  border-color: var(--danger);
+  background: #fff6f6;
+}
+
 .account-page h2 {
   margin-top: 2.5rem;
   margin-bottom: 0.75rem;
@@ -1634,11 +1652,178 @@ body.cart-open {
   color: inherit;
 }
 
+.account-shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.account-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-subnav__tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.account-subnav__tab:hover {
+  color: var(--ink);
+}
+
+.account-subnav__tab.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.account-section-title {
+  margin-top: 0 !important;
+  margin-bottom: 0.35rem !important;
+}
+
+.account-lede {
+  margin: 0 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.account-back {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0 0 1rem;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.account-back:hover {
+  color: var(--ink);
+}
+
+.account-card {
+  margin: 0 0 1.5rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.account-card:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.account-table {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--ink);
+}
+
+.account-table__head,
+.account-table__row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) 4rem minmax(5rem, 1fr) minmax(5rem, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: center;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.account-table__head {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--quiet);
+}
+
+.account-table__row {
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.account-table__row:hover {
+  background: var(--paper);
+}
+
+.account-table__primary {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.account-table__primary strong {
+  font-weight: 500;
+}
+
+.account-table__primary small {
+  color: var(--muted);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-table__emphasis {
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .account-table__head {
+    display: none;
+  }
+
+  .account-table__row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .account-table__row > :nth-child(1) {
+    grid-column: 1 / -1;
+  }
+}
+
+.account-deal-wrap {
+  margin: 1rem 0 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-deal-wrap:last-child {
+  border-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 .account-form,
 .account-panel {
   margin: 1.5rem 0;
   padding: 1.25rem 0;
   border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.account-form.account-card {
+  margin: 0 0 1.5rem;
+  border-top: 1px solid var(--line);
 }
 
 .account-form label {
@@ -1733,20 +1918,22 @@ body.cart-open {
 
 .account-metrics {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.35rem 1.5rem;
-  margin: 0.75rem 0 1rem;
-  max-width: 22rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem 1.25rem;
+  margin: 0.75rem 0 0;
 }
 
 .account-metrics dt {
   margin: 0;
-  opacity: 0.7;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--quiet);
 }
 
 .account-metrics dd {
-  margin: 0;
-  text-align: right;
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1757,8 +1944,8 @@ body.cart-open {
 }
 
 .account-list li {
-  padding: 0.35rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--line);
   font-size: 0.95rem;
 }
 
@@ -1771,40 +1958,41 @@ body.cart-open {
 }
 
 .account-deal {
-  margin-bottom: 0.5rem;
+  margin: 0;
 }
 
 .account-meta {
-  margin: 0.25rem 0 0.5rem;
+  margin: 0.25rem 0 0.75rem;
+  color: var(--muted);
   font-size: 0.9rem;
-  opacity: 0.75;
 }
 
 .account-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  align-items: flex-end;
-  margin-top: 1rem;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  margin-top: 0.75rem;
 }
 
 .account-inline-form {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
-  margin: 0;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .account-inline-form span {
   font-size: 0.8rem;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  color: var(--muted);
 }
 
 .account-inline-form input {
   width: auto;
-  max-width: none;
+  max-width: 8rem;
 }
 
 .account-inline-form button {
@@ -1812,8 +2000,5 @@ body.cart-open {
 }
 
 .account-settle-block {
-  margin: 1.25rem 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
 }
-

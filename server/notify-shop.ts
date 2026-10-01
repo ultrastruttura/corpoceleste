@@ -11,7 +11,7 @@ export async function notifyOrder(opts: {
   const shop = (process.env.SHOP_EMAIL || "").trim();
   let ok = true;
   if (shop) {
-    ok = (await sendMail({ to: shop, subject: opts.shopSubject, text: opts.shopBody })) && ok;
+    ok = (await sendMail({ to: shop, subject: opts.shopSubject, text: opts.shopBody })).ok && ok;
   } else {
     console.warn("SHOP_EMAIL not set — skip shop notify");
     ok = false;
@@ -19,11 +19,13 @@ export async function notifyOrder(opts: {
   const customer = (opts.customerTo || "").trim();
   if (customer) {
     ok =
-      (await sendMail({
-        to: customer,
-        subject: opts.customerSubject,
-        text: opts.customerBody,
-      })) && ok;
+      (
+        await sendMail({
+          to: customer,
+          subject: opts.customerSubject,
+          text: opts.customerBody,
+        })
+      ).ok && ok;
   }
   return ok;
 }
