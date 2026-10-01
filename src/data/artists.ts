@@ -26,6 +26,19 @@ function asLocalized(value: unknown): Localized {
   };
 }
 
+/** Cognome (o mononimo) per ordine alfabetico in elenco artisti. */
+export function artistSortKey(name: string) {
+  let n = name.trim();
+  if (/\s&\s/.test(n)) n = n.split(/\s&\s/)[0].trim();
+  const parts = n.split(/\s+/).filter((p) => !/^dr\.?$/i.test(p));
+  if (parts.length <= 1) return parts[0] || name;
+  const particle = /^(de|di|da|del|della|dei|van|von|le|la)$/i;
+  if (parts.length >= 2 && particle.test(parts[parts.length - 2])) {
+    return parts.slice(-2).join(" ");
+  }
+  return parts[parts.length - 1];
+}
+
 const files = import.meta.glob("../../content/artists/*.md", {
   eager: true,
   query: "?raw",
@@ -45,7 +58,9 @@ export const artists: Artist[] = Object.entries(files)
       instagram: data.instagram ? String(data.instagram) : undefined,
     };
   })
-  .sort((a, b) => a.name.localeCompare(b.name, "it"));
+  .sort((a, b) =>
+    artistSortKey(a.name).localeCompare(artistSortKey(b.name), "it", { sensitivity: "base" }),
+  );
 
 export function artistById(id: string) {
   return artists.find((a) => a.id === id);

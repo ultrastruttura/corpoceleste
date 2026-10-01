@@ -1142,12 +1142,13 @@ body.cart-open {
 }
 
 .artist-letter {
-  margin: 1.5rem 0 0.35rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  margin: 1.75rem 0 0.45rem;
+  font-size: 1.75rem;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--quiet);
+  color: var(--ink);
   font-weight: 700;
+  line-height: 1;
 }
 
 .artist-letter:first-child {
