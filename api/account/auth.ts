@@ -7,6 +7,7 @@ import {
   ensureAdmin,
   getUserByEmail,
   issueMagicLink,
+  portalAdminEmail,
   sendMagicLinkEmail,
   consumeMagicLink,
   sessionUser,
@@ -64,17 +65,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           retryAfterSec: rl.retryAfterSec,
         });
       }
-      const user = email.includes("@") ? await getUserByEmail(email) : null;
+      let user = email.includes("@") ? await getUserByEmail(email) : null;
+      // Dev: if they type the configured admin email, ensure the row exists then continue.
+      if (!user && allowDevMagicLinks() && email && email === portalAdminEmail()) {
+        user = await ensureAdmin();
+      }
       if (!user) {
-        console.info("[portal] login: no user for that email");
+        console.info(
+          "[portal] login: no user for that email; admin env is",
+          portalAdminEmail() || "(empty)",
+        );
+        if (allowDevMagicLinks()) {
+          const admin = portalAdminEmail();
+          return json(res, 200, {
+            ok: true,
+            emailed: false,
+            message: admin
+              ? `Nessun utente per questa email. In locale usa esattamente: ${admin}`
+              : "Nessun utente. Imposta PORTAL_ADMIN_EMAIL nel .env e riavvia vercel dev.",
+          });
+        }
         return json(res, 200, { ok: true, message: LOGIN_MSG });
+      }
+      // Local/dev only: skip magic link, open session immediately.
+      if (allowDevMagicLinks()) {
+        const session = await createSession(user.id);
+        console.info("[portal] login instant (dev)", user.email);
+        return json(res, 200, {
+          ok: true,
+          emailed: false,
+          instant: true,
+          user,
+          session: session.token,
+          expires_at: session.expires_at,
+          message: "Accesso locale (dev): sessione aperta.",
+        });
       }
       const token = await issueMagicLink(user.id);
       const sent = await sendMagicLinkEmail(user, token);
-      if (!sent.ok && allowDevMagicLinks()) {
-        console.info("[portal] magic link (dev only)", sent.link);
-        return json(res, 200, { ok: true, message: LOGIN_MSG, emailed: false, devLink: sent.link });
-      }
       if (!sent.ok) {
         console.warn("[portal] magic link email failed for", user.email, sent.error);
         return json(res, 200, {

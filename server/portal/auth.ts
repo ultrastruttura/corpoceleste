@@ -9,6 +9,11 @@ export type PortalUser = {
   artist_slug: string | null;
 };
 
+/** Email that becomes admin on first API call. Prefer PORTAL_ADMIN_EMAIL over SHOP_EMAIL. */
+export function portalAdminEmail() {
+  return (process.env.PORTAL_ADMIN_EMAIL || process.env.SHOP_EMAIL || "").trim().toLowerCase();
+}
+
 function sessionDays() {
   return Number(process.env.PORTAL_SESSION_DAYS || 14);
 }
@@ -19,7 +24,7 @@ function magicMinutes() {
 
 export async function ensureAdmin() {
   await ensureSchema();
-  const email = (process.env.PORTAL_ADMIN_EMAIL || process.env.SHOP_EMAIL || "").trim().toLowerCase();
+  const email = portalAdminEmail();
   if (!email) return null;
   const db = getDb();
   const existing = await db.execute({

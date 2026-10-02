@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --ink: #131313;
   --muted: #656565;
   --quiet: #899090;
@@ -2095,7 +2095,7 @@ body.cart-open {
 .account-table__head,
 .account-table__row {
   display: grid;
-  grid-template-columns: minmax(0, 2.2fr) 4rem minmax(5rem, 1fr) minmax(5rem, 1fr);
+  grid-template-columns: minmax(0, 2.2fr) 4.5rem minmax(5.5rem, 1fr) minmax(5.5rem, 1fr);
   gap: 0.75rem 1rem;
   align-items: center;
   padding: 0.9rem 0;
@@ -2105,9 +2105,22 @@ body.cart-open {
 
 .account-table__head {
   font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--quiet);
+  color: var(--ink);
+}
+
+.account-table__head > :nth-child(n + 2),
+.account-table__row > :nth-child(n + 2) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  justify-self: stretch;
+}
+
+.account-table__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .account-table__row {
@@ -2142,6 +2155,101 @@ body.cart-open {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.account-table--roster .account-table__head,
+.account-table--roster .account-table__row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.account-table--roster .account-table__head > :nth-child(n + 2),
+.account-table--roster .account-table__row > :nth-child(n + 2) {
+  text-align: right;
+}
+
+.account-table__row--roster {
+  cursor: default;
+}
+
+.account-table__row--roster:hover {
+  background: var(--paper);
+}
+
+.account-table__open {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-stack-form {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 36rem;
+  margin: 0;
+}
+
+.account-stack-form__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.account-stack-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0;
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.account-stack-form__field span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--quiet);
+  line-height: 1;
+}
+
+.account-stack-form__field input,
+.account-stack-form__field textarea,
+.account-stack-form__field select {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0 0.65rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.3;
+}
+
+.account-stack-form__field input,
+.account-stack-form__field select {
+  height: 2.5rem;
+}
+
+.account-stack-form__field textarea {
+  padding: 0.55rem 0.65rem;
+  resize: vertical;
+}
+
+.account-stack-form .account-action-form__btn {
+  justify-self: start;
+}
+
+.account-stack-form .account-lede {
+  margin: 0;
 }
 
 .account-table__emphasis {
@@ -2213,19 +2321,19 @@ body.cart-open {
 
 .account-form button,
 .account-actions > button,
-.account-inline-form button {
+.account-inline-form button:not(.account-linkish) {
   margin-top: 0.5rem;
   font: inherit;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.1rem;
   border: 1px solid var(--ink);
   background: var(--ink);
-  color: var(--white);
+  color: var(--paper);
   cursor: pointer;
 }
 
 .account-form button:hover,
 .account-actions > button:hover,
-.account-inline-form button:hover {
+.account-inline-form button:not(.account-linkish):hover {
   background: transparent;
   color: var(--ink);
 }
@@ -2278,23 +2386,234 @@ body.cart-open {
 
 .account-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.75rem 1.25rem;
+  gap: 0.55rem 0;
   margin: 0.75rem 0 0;
+  max-width: 28rem;
 }
 
-.account-metrics dt {
+.account-metric {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem 1.25rem;
+  align-items: baseline;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-metric:last-child {
+  border-bottom: 0;
+}
+
+.account-metric__label {
   margin: 0;
   font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--quiet);
 }
 
-.account-metrics dd {
-  margin: 0.15rem 0 0;
+.account-metric__value {
+  margin: 0;
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
+  text-align: right;
+  justify-self: end;
+}
+
+.account-period-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem 0.75rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.account-period-filter label {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--quiet);
+}
+
+.account-period-filter input[type="month"],
+.account-period-filter input[type="date"] {
+  min-width: 9.5rem;
+  max-width: 11rem;
+}
+
+.account-period-filter .account-linkish {
+  align-self: center;
+  margin-bottom: 0.15rem;
+}
+
+.account-action-form {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  max-width: 36rem;
+}
+
+.account-action-form__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.account-action-form__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.account-action-form__field,
+.account-action-form__submit {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.3rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.account-action-form__field span,
+.account-action-form__ghost {
+  display: block;
+  height: 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--quiet);
+  line-height: 0.85rem;
+}
+
+.account-action-form__ghost {
+  visibility: hidden;
+  user-select: none;
+}
+
+.account-action-form__field--qty {
+  width: 4.75rem;
+  flex: 0 0 4.75rem;
+}
+
+.account-action-form__field--size {
+  width: 8rem;
+  flex: 0 0 8rem;
+}
+
+.account-action-form__field--month {
+  width: 12.5rem;
+  flex: 0 0 12.5rem;
+}
+
+.account-action-form__field--amount {
+  width: 7.5rem;
+  flex: 0 0 7.5rem;
+}
+
+.account-action-form__field input,
+.account-action-form__btn {
+  box-sizing: border-box;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  max-height: 2.5rem;
+  margin: 0;
+  border: 1px solid var(--ink);
+  font: inherit;
+  line-height: 1;
+}
+
+.account-action-form__field input {
+  width: 100%;
+  max-width: none;
+  padding: 0 0.65rem;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.account-action-form__field input[type="month"] {
+  padding-right: 0.4rem;
+}
+
+.account-action-form__submit {
+  flex: 0 0 auto;
+}
+
+.account-action-form__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 0 1.15rem;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.account-action-form__btn:hover {
+  background: transparent;
+  color: var(--ink);
+}
+
+.account-action-form__today {
+  justify-self: start;
+  width: fit-content;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.account-action-form__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+@media (max-width: 520px) {
+  .account-action-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .account-action-form__field--qty,
+  .account-action-form__field--size,
+  .account-action-form__field--month,
+  .account-action-form__field--amount {
+    width: auto;
+    flex: none;
+  }
+
+  .account-action-form__submit {
+    grid-column: 1 / -1;
+  }
+
+  .account-action-form__btn {
+    width: 100%;
+  }
 }
 
 .account-list {
@@ -2319,6 +2638,78 @@ body.cart-open {
 
 .account-deal {
   margin: 0;
+}
+
+.account-settlements {
+  margin-top: 0.85rem;
+}
+
+.account-settlements__month {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.85rem 0 0.25rem;
+}
+
+.account-settlements__month h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.account-settlements__total {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.account-sales {
+  margin: 0.85rem 0 1rem;
+}
+
+.account-sales h4 {
+  margin: 0 0 0.45rem;
+  font-size: 0.85rem;
+}
+
+.account-sales-table .account-table__head,
+.account-sales-table .account-table__row {
+  grid-template-columns: 6.75rem minmax(4.5rem, 1.1fr) 3rem 4rem 5.5rem 5rem;
+  padding: 0.55rem 0;
+  font-size: 0.9rem;
+}
+
+.account-sales-table .account-table__head > :nth-child(3),
+.account-sales-table .account-table__row > :nth-child(3),
+.account-sales-table .account-table__head > :nth-child(4),
+.account-sales-table .account-table__row > :nth-child(4) {
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .account-sales-table .account-table__head {
+    display: none;
+  }
+
+  .account-sales-table .account-table__row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem 0.75rem;
+  }
+
+  .account-sales-table .account-table__row > :nth-child(1) {
+    grid-column: 1;
+  }
+
+  .account-sales-table .account-table__row > :nth-child(2) {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .account-sales-table .account-table__row > :nth-child(n + 3) {
+    text-align: left;
+  }
 }
 
 .account-meta {

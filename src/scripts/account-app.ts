@@ -6,6 +6,7 @@ import {
   getSession,
   money,
   setMsg,
+  setSession,
 } from "./account-api";
 
 type User = {
@@ -36,6 +37,7 @@ type DealSummary = {
     unit_price: number;
     size: string;
     source: string;
+    external_id?: string | null;
     sold_at: string;
   }>;
   soldQty: number;
@@ -54,6 +56,104 @@ type Dashboard = {
   paidTotal: number;
   outstanding: number;
 };
+
+type PeriodFilter = { month?: string; from?: string; to?: string };
+
+function euroLocal(n: number) {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
+}
+
+function currentMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function todayISO() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+/** Month key YYYY-MM from settlement (supports legacy period=YYYY-MM). */
+function settlementMonth(s: { period: string; paid_at: string }) {
+  if (/^\d{4}-\d{2}-\d{2}/.test(s.period)) return s.period.slice(0, 7);
+  if (/^\d{4}-\d{2}$/.test(s.period)) return s.period;
+  return s.paid_at.slice(0, 7);
+}
+
+function settlementDay(s: { period: string; paid_at: string }) {
+  if (/^\d{4}-\d{2}-\d{2}/.test(s.period)) return s.period.slice(0, 10);
+  return s.paid_at.slice(0, 10);
+}
+
+function formatMonthLabel(yyyyMm: string) {
+  const [y, m] = yyyyMm.split("-").map(Number);
+  if (!y || !m) return yyyyMm;
+  return new Date(y, m - 1, 1).toLocaleDateString("it-IT", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function formatDayLabel(isoDay: string) {
+  const [y, m, d] = isoDay.split("-").map(Number);
+  if (!y || !m || !d) return isoDay;
+  return new Date(y, m - 1, d).toLocaleDateString("it-IT", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function inRange(isoDay: string, filter: PeriodFilter) {
+  const day = isoDay.slice(0, 10);
+  if (filter.month) return day.startsWith(filter.month);
+  if (filter.from && day < filter.from) return false;
+  if (filter.to && day > filter.to) return false;
+  return true;
+}
+
+function shareFromSales(deal: DealSummary["deal"], sales: DealSummary["sales"]) {
+  const planned = Math.max(1, Math.floor(deal.planned_qty));
+  const soldQty = sales.reduce((s, x) => s + x.qty, 0);
+  const gross = euroLocal(sales.reduce((s, x) => s + x.qty * x.unit_price, 0));
+  const vatFactor = deal.vat_rate_pct / (100 + deal.vat_rate_pct);
+  const vat = euroLocal(gross * vatFactor);
+  let variable = 0;
+  let fixedTotal = 0;
+  for (const c of deal.costs) {
+    if (c.per_unit) variable += c.amount * soldQty;
+    else fixedTotal += c.amount;
+  }
+  variable = euroLocal(variable);
+  fixedTotal = euroLocal(fixedTotal);
+  const fixedAllocated = euroLocal((fixedTotal / planned) * soldQty);
+  const costsTotal = euroLocal(variable + fixedAllocated);
+  const profit = euroLocal(gross - vat - costsTotal);
+  const artistDue = euroLocal((profit * deal.artist_share_pct) / 100);
+  const studioShare = euroLocal(profit - artistDue);
+  return { soldQty, gross, vat, costsTotal, profit, artistDue, studioShare };
+}
+
+function filterDashboard(dash: Dashboard, filter: PeriodFilter): Dashboard {
+  if (!filter.month && !filter.from && !filter.to) return dash;
+  const deals = dash.deals.map((d) => {
+    const sales = d.sales.filter((s) => inRange(s.sold_at, filter));
+    return { ...d, sales, ...shareFromSales(d.deal, sales) };
+  });
+  const settlements = dash.settlements.filter((s) => {
+    if (filter.month) return settlementMonth(s) === filter.month;
+    return inRange(settlementDay(s), filter);
+  });
+  const artistDueTotal = euroLocal(deals.reduce((s, x) => s + x.artistDue, 0));
+  const paidTotal = euroLocal(settlements.reduce((s, x) => s + x.amount, 0));
+  return {
+    deals,
+    settlements,
+    artistDueTotal,
+    paidTotal,
+    outstanding: euroLocal(artistDueTotal - paidTotal),
+  };
+}
 
 type AdminRoute =
   | { name: "artists" }
@@ -105,7 +205,7 @@ if (!root || !app) {
       el(
         "p",
         "lede",
-        "Inserisci l’email con cui sei stato invitato. Riceverai un link monouso (scade in circa 30 minuti).",
+        "Inserisci l’email con cui sei stato invitato. In produzione ricevi un link monouso; in locale (vercel dev) entri subito.",
       ),
     );
     const form = el("form", "account-form account-login");
@@ -114,7 +214,7 @@ if (!root || !app) {
         <span>Email</span>
         <input type="email" name="email" required autocomplete="email" placeholder="nome@email.com" />
       </label>
-      <button class="btn" type="submit">Invia</button>
+      <button class="btn" type="submit">Entra</button>
       <p class="account-msg" data-msg hidden></p>
     `;
     form.addEventListener("submit", async (e) => {
@@ -122,14 +222,27 @@ if (!root || !app) {
       const msg = form.querySelector<HTMLElement>("[data-msg]")!;
       const btn = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
       msg.hidden = false;
-      msg.textContent = "Invio…";
+      msg.textContent = "Accesso…";
       btn.disabled = true;
       const email = new FormData(form).get("email") as string;
       try {
         const data = (await apiFetch(base, "auth", {
           method: "POST",
           body: JSON.stringify({ action: "login", email }),
-        })) as { message?: string; emailed?: boolean; devLink?: string };
+        })) as {
+          message?: string;
+          emailed?: boolean;
+          instant?: boolean;
+          session?: string;
+          user?: User;
+          devLink?: string;
+        };
+        if (data.instant && data.session && data.user) {
+          setSession(data.session);
+          if (data.user.role === "admin") await renderAdmin(data.user);
+          else await renderArtist(data.user);
+          return;
+        }
         if (data.devLink) {
           setMsg(msg, data.message || "Mail non inviata (dev).", {
             href: data.devLink,
@@ -182,13 +295,126 @@ if (!root || !app) {
   }
 
   function metrics(rows: Array<[string, string]>) {
-    const dl = el("dl", "account-metrics");
+    const box = el("div", "account-metrics");
     for (const [k, v] of rows) {
-      const dt = el("dt", "", k);
-      const dd = el("dd", "", v);
-      dl.append(dt, dd);
+      const row = el("div", "account-metric");
+      row.append(el("span", "account-metric__label", k), el("span", "account-metric__value", v));
+      box.append(row);
     }
-    return dl;
+    return box;
+  }
+
+  function settlementsByMonth(
+    list: Dashboard["settlements"],
+    opts?: { onUndo?: (id: string) => void },
+  ) {
+    const host = el("div", "account-settlements");
+    const groups = new Map<string, Dashboard["settlements"]>();
+    for (const s of list) {
+      const key = settlementMonth(s);
+      const arr = groups.get(key) || [];
+      arr.push(s);
+      groups.set(key, arr);
+    }
+    const months = [...groups.keys()].sort((a, b) => b.localeCompare(a));
+    for (const month of months) {
+      const items = (groups.get(month) || []).slice().sort((a, b) =>
+        settlementDay(b).localeCompare(settlementDay(a)),
+      );
+      const monthTotal = euroLocal(items.reduce((sum, x) => sum + x.amount, 0));
+      const head = el("div", "account-settlements__month");
+      head.append(
+        el("h4", "", formatMonthLabel(month)),
+        el("span", "account-settlements__total", money(monthTotal)),
+      );
+      host.append(head);
+      const ul = el("ul", "account-list");
+      for (const s of items) {
+        const li = el("li", "account-row");
+        li.append(
+          document.createTextNode(
+            `${formatDayLabel(settlementDay(s))} · ${money(s.amount)}${s.note ? ` · ${s.note}` : ""}`,
+          ),
+        );
+        if (opts?.onUndo) {
+          const undo = el("button", "account-linkish", "Annulla") as HTMLButtonElement;
+          undo.type = "button";
+          undo.addEventListener("click", () => opts.onUndo!(s.id));
+          li.append(undo);
+        }
+        ul.append(li);
+      }
+      host.append(ul);
+    }
+    return host;
+  }
+
+  function periodFilterBar(initial: PeriodFilter, onChange: (next: PeriodFilter) => void) {
+    const bar = el("div", "account-period-filter");
+    bar.innerHTML = `
+      <label>Mese
+        <input type="month" name="month" value="${initial.month || ""}" />
+      </label>
+      <label>Da
+        <input type="date" name="from" value="${initial.from || ""}" />
+      </label>
+      <label>A
+        <input type="date" name="to" value="${initial.to || ""}" />
+      </label>
+      <button type="button" class="btn" data-apply>Applica</button>
+      <button type="button" class="account-linkish" data-clear>Tutto</button>
+      <button type="button" class="account-linkish" data-today>Mese corrente</button>
+    `;
+    const month = () => bar.querySelector<HTMLInputElement>('[name="month"]')!;
+    const from = () => bar.querySelector<HTMLInputElement>('[name="from"]')!;
+    const to = () => bar.querySelector<HTMLInputElement>('[name="to"]')!;
+    month().addEventListener("change", () => {
+      if (month().value) {
+        from().value = "";
+        to().value = "";
+      }
+    });
+    const clearMonthIfRange = () => {
+      if (from().value || to().value) month().value = "";
+    };
+    from().addEventListener("change", clearMonthIfRange);
+    to().addEventListener("change", clearMonthIfRange);
+    bar.querySelector("[data-apply]")!.addEventListener("click", () => {
+      onChange({
+        month: month().value || undefined,
+        from: from().value || undefined,
+        to: to().value || undefined,
+      });
+    });
+    bar.querySelector("[data-clear]")!.addEventListener("click", () => {
+      month().value = "";
+      from().value = "";
+      to().value = "";
+      onChange({});
+    });
+    bar.querySelector("[data-today]")!.addEventListener("click", () => {
+      const m = currentMonth();
+      month().value = m;
+      from().value = "";
+      to().value = "";
+      onChange({ month: m });
+    });
+    return bar;
+  }
+
+  function orderRef(sale: DealSummary["sales"][number]) {
+    if (sale.external_id) {
+      const head = sale.external_id.split(":")[0];
+      return head.length > 14 ? `${head.slice(0, 12)}…` : head;
+    }
+    return sale.id.replace(/^sale_/, "").slice(0, 10);
+  }
+
+  function sourceLabel(source: string) {
+    if (source === "paypal") return "PayPal";
+    if (source === "bank") return "Bonifico";
+    if (source === "manual") return "Manuale";
+    return source;
   }
 
   function dealBlock(s: DealSummary, showArtist = true) {
@@ -201,45 +427,63 @@ if (!root || !app) {
         `${s.soldQty}/${s.deal.planned_qty} pezzi · ${s.deal.artist_share_pct}% artista · IVA ${s.deal.vat_rate_pct}% · ${money(s.deal.unit_price)}`,
       ),
     );
-    const rows: Array<[string, string]> = [
-      ["Ricavi lordi", money(s.gross)],
-      ["IVA", money(s.vat)],
-      ["Costi", money(s.costsTotal)],
-      ["Utile", money(s.profit)],
-    ];
-    if (showArtist) {
-      rows.push(["Quota artista", money(s.artistDue)]);
-      rows.push(["Quota studio", money(s.studioShare)]);
-    }
-    box.append(metrics(rows));
+    void showArtist;
 
-    if (s.deal.costs.length) {
-      const ul = el("ul", "account-list");
-      for (const c of s.deal.costs) {
-        ul.append(
-          el(
-            "li",
-            "",
-            `${c.label}: ${money(c.amount)}${c.per_unit ? " / pezzo" : " (fisso)"}`,
-          ),
-        );
+    const orders = el("div", "account-sales");
+    orders.append(el("h4", "", "Ordini"));
+    if (!s.sales.length) {
+      orders.append(
+        el(
+          "p",
+          "account-lede",
+          "Nessun ordine ancora. PayPal entra da solo; i bonifici si registrano con «Registra» qui sotto.",
+        ),
+      );
+    } else {
+      const table = el("div", "account-table account-sales-table");
+      const head = el("div", "account-table__head");
+      for (const label of ["Data", "N°", "Qtà", "Taglia", "Totale", "Fonte"]) {
+        head.append(el("span", "", label));
       }
-      box.append(el("h4", "", "Costi edizione"), ul);
+      table.append(head);
+      for (const sale of s.sales.slice(0, 80)) {
+        const row = el("div", "account-table__row");
+        const total = euroLocal(sale.qty * sale.unit_price);
+        const ref = el("span", "account-table__num", orderRef(sale));
+        ref.title = sale.external_id || sale.id;
+        row.append(
+          el("span", "", sale.sold_at.slice(0, 10)),
+          ref,
+          el("span", "account-table__num", String(sale.qty)),
+          el("span", "", sale.size || "—"),
+          el("span", "account-table__num", money(total)),
+          el("span", "", sourceLabel(sale.source)),
+        );
+        table.append(row);
+      }
+      orders.append(table);
     }
+    box.append(orders);
 
     if (s.sales.length) {
-      const ul = el("ul", "account-list");
-      for (const sale of s.sales.slice(0, 40)) {
-        const day = sale.sold_at.slice(0, 10);
-        ul.append(
-          el(
-            "li",
-            "",
-            `${day} · ${sale.qty}× ${sale.size || "—"} · ${money(sale.unit_price)} · ${sale.source}`,
-          ),
-        );
+      const rows: Array<[string, string]> = [
+        ["Ricavi lordi", money(s.gross)],
+        ["IVA", money(s.vat)],
+        ["Costi", money(s.costsTotal)],
+        ["Utile", money(s.profit)],
+        ["Quota artista", money(s.artistDue)],
+        ["Quota studio", money(s.studioShare)],
+      ];
+      box.append(metrics(rows));
+    }
+
+    if (s.deal.costs.length) {
+      const perUnit = s.deal.costs
+        .filter((c) => c.per_unit)
+        .reduce((sum, c) => sum + c.amount, 0);
+      if (perUnit > 0) {
+        box.append(el("p", "account-meta", `Costo per pezzo: ${money(perUnit)}`));
       }
-      box.append(el("h4", "", "Ordini / vendite"), ul);
     }
     return box;
   }
@@ -248,29 +492,39 @@ if (!root || !app) {
     root!.classList.remove("account-page--admin");
     app!.innerHTML = "";
     app!.append(toolbar(user), el("h2", "", "Il tuo prospetto"));
-    const dash = (await apiFetch(base, "settle?dashboard=1")) as Dashboard;
-    app!.append(
-      metrics([
-        ["Lordo da fatturare (totale)", money(dash.artistDueTotal)],
-        ["Già saldato", money(dash.paidTotal)],
-        ["Ancora dovuto", money(dash.outstanding)],
-      ]),
-    );
-    if (!dash.deals.length) {
-      app!.append(el("p", "lede", "Nessun deal collegato ancora."));
-    }
-    for (const d of dash.deals) app!.append(dealBlock(d));
-
-    if (dash.settlements.length) {
-      app!.append(el("h2", "", "Saldi"));
-      const ul = el("ul", "account-list");
-      for (const s of dash.settlements) {
-        ul.append(
-          el("li", "", `${s.period}: ${money(s.amount)} · ${s.note || "saldato"} · ${s.paid_at.slice(0, 10)}`),
-        );
+    const dashFull = (await apiFetch(base, "settle?dashboard=1")) as Dashboard;
+    let filter: PeriodFilter = {};
+    const summaryHost = el("div", "");
+    const dealsHost = el("div", "");
+    const paint = () => {
+      const dash = filterDashboard(dashFull, filter);
+      summaryHost.replaceChildren(
+        metrics([
+          ["Lordo da fatturare", money(dash.artistDueTotal)],
+          ["Già saldato", money(dash.paidTotal)],
+          ["Ancora dovuto", money(dash.outstanding)],
+        ]),
+      );
+      dealsHost.replaceChildren();
+      if (!dash.deals.length) {
+        dealsHost.append(el("p", "lede", "Nessun deal collegato ancora."));
+      } else {
+        for (const d of dash.deals) dealsHost.append(dealBlock(d, false));
       }
-      app!.append(ul);
-    }
+      if (dash.settlements.length) {
+        dealsHost.append(el("h2", "", "Saldi"));
+        dealsHost.append(settlementsByMonth(dash.settlements));
+      }
+    };
+    app!.append(
+      periodFilterBar(filter, (next) => {
+        filter = next;
+        paint();
+      }),
+      summaryHost,
+      dealsHost,
+    );
+    paint();
   }
 
   function parseAdminRoute(): AdminRoute {
@@ -409,9 +663,9 @@ if (!root || !app) {
           <strong>${escapeHtml(a.name || a.email)}</strong>
           <small>${escapeHtml(a.email)}${a.artist_slug ? ` · ${escapeHtml(a.artist_slug)}` : ""}</small>
         </span>
-        <span>${dealCount}</span>
-        <span>${money(dash.artistDueTotal)}</span>
-        <span class="account-table__emphasis">${money(dash.outstanding)}</span>
+        <span class="account-table__num">${dealCount}</span>
+        <span class="account-table__num">${money(dash.artistDueTotal)}</span>
+        <span class="account-table__num account-table__emphasis">${money(dash.outstanding)}</span>
       `;
       row.addEventListener("click", () => {
         setAdminRoute({ name: "artist", id: a.id });
@@ -443,38 +697,64 @@ if (!root || !app) {
       ),
     );
 
-    const dash = (await apiFetch(
+    const dashFull = (await apiFetch(
       base,
       `settle?dashboard=1&user_id=${encodeURIComponent(artist.id)}`,
     )) as Dashboard;
 
+    let filter: PeriodFilter = {};
     const summary = el("section", "account-card");
+    summary.append(el("h3", "", "Riepilogo conti"));
+    const summaryBody = el("div", "");
     summary.append(
-      el("h3", "", "Riepilogo conti"),
-      metrics([
-        ["Lordo da fatturare", money(dash.artistDueTotal)],
-        ["Già saldato", money(dash.paidTotal)],
-        ["Residuo", money(dash.outstanding)],
-      ]),
+      periodFilterBar(filter, (next) => {
+        filter = next;
+        paintSummary();
+      }),
+      summaryBody,
     );
     mount.append(summary);
+
+    const paintSummary = () => {
+      const dash = filterDashboard(dashFull, filter);
+      summaryBody.replaceChildren(
+        metrics([
+          ["Lordo da fatturare", money(dash.artistDueTotal)],
+          ["Già saldato", money(dash.paidTotal)],
+          ["Residuo", money(dash.outstanding)],
+        ]),
+      );
+    };
+    paintSummary();
 
     const deals = allDeals.filter((d) => d.deal.user_id === artist.id);
     const orders = el("section", "account-card");
     orders.append(el("h3", "", "Ordini e deal"));
     if (!deals.length) {
-      orders.append(el("p", "account-lede", "Nessun deal. Creane uno in Impostazioni."));
+      orders.append(el("p", "account-lede", "Nessun deal ancora. Creane uno sotto in Deal."));
     } else {
       for (const s of deals) {
         const wrap = el("div", "account-deal-wrap");
-        wrap.append(dealBlock(s));
+        wrap.append(dealBlock(s, false));
 
-        const bank = el("form", "account-inline-form");
+        const bank = el("form", "account-action-form");
         bank.innerHTML = `
-          <span>Conferma bonifico</span>
-          <input name="qty" type="number" min="1" value="1" required />
-          <input name="size" placeholder="taglia" />
-          <button type="submit">Registra</button>
+          <p class="account-action-form__title">Conferma bonifico</p>
+          <div class="account-action-form__row">
+            <label class="account-action-form__field account-action-form__field--qty">
+              <span>Pezzi</span>
+              <input name="qty" type="number" min="1" value="1" required />
+            </label>
+            <label class="account-action-form__field account-action-form__field--size">
+              <span>Taglia</span>
+              <input name="size" placeholder="S / M / L / XL" list="cc-sizes" />
+            </label>
+            <div class="account-action-form__submit">
+              <span class="account-action-form__ghost" aria-hidden="true">Salva</span>
+              <button class="account-action-form__btn" type="submit">Registra</button>
+            </div>
+          </div>
+          <p class="account-action-form__hint">Vendita pagata con bonifico (non PayPal). Taglia opzionale per lo storico (S–XL).</p>
         `;
         bank.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -484,29 +764,108 @@ if (!root || !app) {
             body: JSON.stringify({
               deal_id: s.deal.id,
               qty: Number(fd.get("qty")),
-              size: fd.get("size") || "",
+              size: String(fd.get("size") || "").trim(),
               source: "bank",
+              external_id: `bank-${Date.now()}`,
             }),
           });
           await renderAdmin(user);
         });
         wrap.append(bank);
+
+        const actions = el("div", "account-actions");
+        const editBtn = el("button", "account-linkish", "Modifica deal") as HTMLButtonElement;
+        editBtn.type = "button";
+        editBtn.addEventListener("click", () => {
+          fillDealForm(dealForm, s);
+          dealForm.scrollIntoView({ behavior: "smooth" });
+        });
+        const delDeal = el("button", "account-linkish", "Elimina deal") as HTMLButtonElement;
+        delDeal.type = "button";
+        delDeal.addEventListener("click", async () => {
+          if (!confirm("Eliminare questo deal?")) return;
+          await apiFetch(base, `deals?id=${encodeURIComponent(s.deal.id)}`, { method: "DELETE" });
+          await renderAdmin(user);
+        });
+        actions.append(editBtn, delDeal);
+        wrap.append(actions);
         orders.append(wrap);
+      }
+      if (!document.getElementById("cc-sizes")) {
+        const dl = document.createElement("datalist");
+        dl.id = "cc-sizes";
+        for (const size of ["S", "M", "L", "XL"]) {
+          const opt = document.createElement("option");
+          opt.value = size;
+          dl.append(opt);
+        }
+        document.body.append(dl);
       }
     }
     mount.append(orders);
 
+    const dealSection = el("section", "account-card");
+    dealSection.append(el("h3", "", "Deal"));
+    dealSection.append(el("p", "account-lede", "Prezzo al cliente, costo per pezzo, percentuale artista."));
+    const dealForm = buildDealForm(artist.id);
+    dealForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(dealForm);
+      const msg = dealForm.querySelector<HTMLElement>("[data-msg]")!;
+      msg.hidden = false;
+      const costPerUnit = Number(fd.get("cost_per_unit") || 0);
+      const costs =
+        Number.isFinite(costPerUnit) && costPerUnit > 0
+          ? [{ label: "Costo per pezzo", amount: costPerUnit, per_unit: true }]
+          : [];
+      try {
+        await apiFetch(base, "deals", {
+          method: "POST",
+          body: JSON.stringify({
+            id: String(fd.get("id") || "") || undefined,
+            user_id: artist.id,
+            product_id: fd.get("product_id"),
+            product_title: fd.get("product_title") || fd.get("product_id"),
+            unit_price: Number(fd.get("unit_price")),
+            planned_qty: Number(fd.get("planned_qty")),
+            artist_share_pct: Number(fd.get("artist_share_pct")),
+            vat_rate_pct: Number(fd.get("vat_rate_pct")),
+            notes: fd.get("notes") || "",
+            costs,
+          }),
+        });
+        msg.textContent = "Deal salvato.";
+        await renderAdmin(user);
+      } catch (err) {
+        msg.textContent = err instanceof Error ? err.message : "Errore";
+      }
+    });
+    dealSection.append(dealForm);
+    mount.append(dealSection);
+
     const conti = el("section", "account-card");
     conti.append(el("h3", "", "Saldi mensili"));
-    const now = new Date();
-    const period = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    const settle = el("form", "account-inline-form account-inline-form--stack");
+    const settle = el("form", "account-action-form");
     settle.innerHTML = `
-      <span>Segna saldato</span>
-      <input name="period" value="${period}" required pattern="\\d{4}-\\d{2}" title="YYYY-MM" />
-      <input name="amount" type="number" step="0.01" value="${Math.max(0, dash.outstanding).toFixed(2)}" required />
-      <button type="submit">Salva</button>
+      <div class="account-action-form__row">
+        <label class="account-action-form__field account-action-form__field--month">
+          <span>Data saldo</span>
+          <input name="period" type="date" value="${todayISO()}" required />
+        </label>
+        <label class="account-action-form__field account-action-form__field--amount">
+          <span>Importo €</span>
+          <input name="amount" type="number" step="0.01" value="${Math.max(0, dashFull.outstanding).toFixed(2)}" required />
+        </label>
+        <div class="account-action-form__submit">
+          <span class="account-action-form__ghost" aria-hidden="true">Salva</span>
+          <button class="account-action-form__btn" type="submit">Salva</button>
+        </div>
+      </div>
+      <button type="button" class="account-action-form__today" data-today-month>Oggi</button>
     `;
+    settle.querySelector("[data-today-month]")!.addEventListener("click", () => {
+      settle.querySelector<HTMLInputElement>('[name="period"]')!.value = todayISO();
+    });
     settle.addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(settle);
@@ -523,51 +882,119 @@ if (!root || !app) {
     });
     conti.append(settle);
 
-    if (dash.settlements.length) {
-      const ul = el("ul", "account-list");
-      for (const st of dash.settlements) {
-        const li = el("li", "account-row");
-        li.append(
-          document.createTextNode(`${st.period}: ${money(st.amount)} · ${st.note || "saldato"}`),
-        );
-        const undo = el("button", "account-linkish", "Annulla") as HTMLButtonElement;
-        undo.type = "button";
-        undo.addEventListener("click", async () => {
-          await apiFetch(base, `settle?id=${encodeURIComponent(st.id)}`, { method: "DELETE" });
-          await renderAdmin(user);
-        });
-        li.append(undo);
-        ul.append(li);
-      }
-      conti.append(ul);
+    if (dashFull.settlements.length) {
+      conti.append(
+        settlementsByMonth(dashFull.settlements, {
+          onUndo: async (id) => {
+            await apiFetch(base, `settle?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+            await renderAdmin(user);
+          },
+        }),
+      );
     } else {
       conti.append(el("p", "account-lede", "Nessun saldo registrato."));
     }
     mount.append(conti);
   }
 
+  function buildDealForm(_artistId: string) {
+    const dealForm = el("form", "account-stack-form") as HTMLFormElement;
+    dealForm.innerHTML = `
+      <label class="account-stack-form__field">
+        <span>Product id (Tina)</span>
+        <input name="product_id" required placeholder="slug prodotto" />
+      </label>
+      <label class="account-stack-form__field">
+        <span>Titolo</span>
+        <input name="product_title" />
+      </label>
+      <div class="account-stack-form__row">
+        <label class="account-stack-form__field">
+          <span>Prezzo al cliente €</span>
+          <input name="unit_price" type="number" step="0.01" min="0" required />
+        </label>
+        <label class="account-stack-form__field">
+          <span>Pezzi previsti</span>
+          <input name="planned_qty" type="number" min="1" value="50" required />
+        </label>
+      </div>
+      <div class="account-stack-form__row">
+        <label class="account-stack-form__field">
+          <span>% artista</span>
+          <input name="artist_share_pct" type="number" min="0" max="100" value="40" required />
+        </label>
+        <label class="account-stack-form__field">
+          <span>IVA %</span>
+          <input name="vat_rate_pct" type="number" min="0" value="22" required />
+        </label>
+      </div>
+      <label class="account-stack-form__field">
+        <span>Note</span>
+        <input name="notes" />
+      </label>
+      <label class="account-stack-form__field">
+        <span>Costo per pezzo €</span>
+        <input name="cost_per_unit" type="number" step="0.01" min="0" value="0" />
+      </label>
+      <input type="hidden" name="id" value="" />
+      <button class="account-action-form__btn" type="submit">Salva deal</button>
+      <p class="account-msg" data-msg hidden></p>
+    `;
+    return dealForm;
+  }
+
+  function fillDealForm(dealForm: HTMLFormElement, s: DealSummary) {
+    (dealForm.elements.namedItem("id") as HTMLInputElement).value = s.deal.id;
+    (dealForm.elements.namedItem("product_id") as HTMLInputElement).value = s.deal.product_id;
+    (dealForm.elements.namedItem("product_title") as HTMLInputElement).value = s.deal.product_title;
+    (dealForm.elements.namedItem("unit_price") as HTMLInputElement).value = String(s.deal.unit_price);
+    (dealForm.elements.namedItem("planned_qty") as HTMLInputElement).value = String(
+      s.deal.planned_qty,
+    );
+    (dealForm.elements.namedItem("artist_share_pct") as HTMLInputElement).value = String(
+      s.deal.artist_share_pct,
+    );
+    (dealForm.elements.namedItem("vat_rate_pct") as HTMLInputElement).value = String(
+      s.deal.vat_rate_pct,
+    );
+    (dealForm.elements.namedItem("notes") as HTMLInputElement).value = s.deal.notes || "";
+    const perUnit = s.deal.costs
+      .filter((c) => c.per_unit)
+      .reduce((sum, c) => sum + c.amount, 0);
+    (dealForm.elements.namedItem("cost_per_unit") as HTMLInputElement).value = String(perUnit || 0);
+  }
+
   async function renderAdminSettings(
     mount: HTMLElement,
     user: User,
     artists: User[],
-    deals: DealSummary[],
+    _deals: DealSummary[],
   ) {
     mount.append(
       el("h2", "account-section-title", "Impostazioni"),
-      el("p", "account-lede", "Inviti, anagrafica artisti e deal di edizione."),
+      el("p", "account-lede", "Inviti e anagrafica artisti. I deal si gestiscono dalla scheda artista."),
     );
 
-    const invite = el("form", "account-form account-card");
+    const inviteCard = el("section", "account-card");
+    inviteCard.append(el("h3", "", "Invita artista"));
+    const invite = el("form", "account-stack-form");
     invite.innerHTML = `
-      <h3>Invita artista</h3>
-      <label><span>Nome</span><input name="name" required /></label>
-      <label><span>Email</span><input type="email" name="email" required /></label>
-      <label>
+      <div class="account-stack-form__row">
+        <label class="account-stack-form__field">
+          <span>Nome</span>
+          <input name="name" required />
+        </label>
+        <label class="account-stack-form__field">
+          <span>Email</span>
+          <input type="email" name="email" required />
+        </label>
+      </div>
+      <label class="account-stack-form__field">
         <span>Slug artista sul sito (opz.)</span>
         <input name="artist_slug" placeholder="es. ruco" />
       </label>
-      <p class="account-hint">Stesso slug della cartella artista in Tina (opzionale, si può aggiungere dopo).</p>
-      <button type="submit">Invia invito</button>
+      <p class="account-lede">Stesso slug della cartella artista in Tina (opzionale).</p>
+      <button class="account-action-form__btn" type="submit">Invia invito</button>
       <p class="account-msg" data-msg hidden></p>
     `;
     invite.addEventListener("submit", async (e) => {
@@ -605,21 +1032,28 @@ if (!root || !app) {
         setMsg(msg, err instanceof Error ? err.message : "Errore");
       }
     });
-    mount.append(invite);
+    inviteCard.append(invite);
+    mount.append(inviteCard);
 
     const roster = el("section", "account-card");
     roster.append(el("h3", "", "Elenco artisti"));
     if (!artists.length) {
       roster.append(el("p", "account-lede", "Nessun artista."));
     } else {
-      const ul = el("ul", "account-list");
+      const table = el("div", "account-table account-table--roster");
+      const head = el("div", "account-table__head");
+      head.append(el("span", "", "Artista"), el("span", "", ""));
+      table.append(head);
       for (const a of artists) {
-        const li = el("li", "account-row");
-        li.append(
-          document.createTextNode(
-            `${a.name || a.email} <${a.email}>${a.artist_slug ? ` · ${a.artist_slug}` : ""}`,
-          ),
-        );
+        const row = el("div", "account-table__row account-table__row--roster");
+        const open = el("button", "account-table__open") as HTMLButtonElement;
+        open.type = "button";
+        const primary = el("span", "account-table__primary");
+        primary.append(el("strong", "", a.name || a.email), el("small", "", a.email));
+        open.append(primary);
+        open.addEventListener("click", () => {
+          setAdminRoute({ name: "artist", id: a.id });
+        });
         const del = el("button", "account-linkish", "Rimuovi") as HTMLButtonElement;
         del.type = "button";
         del.addEventListener("click", async () => {
@@ -627,131 +1061,12 @@ if (!root || !app) {
           await apiFetch(base, `users?id=${encodeURIComponent(a.id)}`, { method: "DELETE" });
           await renderAdmin(user);
         });
-        li.append(del);
-        ul.append(li);
+        row.append(open, del);
+        table.append(row);
       }
-      roster.append(ul);
+      roster.append(table);
     }
     mount.append(roster);
-
-    const artistOpts = artists
-      .map((a) => `<option value="${a.id}">${escapeHtml(a.name || a.email)}</option>`)
-      .join("");
-
-    const dealForm = el("form", "account-form account-card");
-    dealForm.innerHTML = `
-      <h3>Deal edizione</h3>
-      <p class="account-hint">Prezzo al cliente, costi per pezzo/fissi, percentuale artista.</p>
-      <label><span>Artista</span><select name="user_id" required>${artistOpts}</select></label>
-      <label><span>Product id (Tina)</span><input name="product_id" required placeholder="slug prodotto" /></label>
-      <label><span>Titolo</span><input name="product_title" /></label>
-      <label><span>Prezzo al cliente €</span><input name="unit_price" type="number" step="0.01" min="0" required /></label>
-      <label><span>Pezzi previsti</span><input name="planned_qty" type="number" min="1" value="50" required /></label>
-      <label><span>% artista</span><input name="artist_share_pct" type="number" min="0" max="100" value="40" required /></label>
-      <label><span>IVA %</span><input name="vat_rate_pct" type="number" min="0" value="22" required /></label>
-      <label><span>Note</span><input name="notes" /></label>
-      <fieldset class="account-costs">
-        <legend>Costi (label|importo|fisso o pezzo)</legend>
-        <p class="account-hint">Es. <code>Maglie|8.5|pezzo</code> oppure <code>Affitto|120|fisso</code></p>
-        <textarea name="costs" rows="4" placeholder="Maglie|8.5|pezzo&#10;Telaio|40|fisso"></textarea>
-      </fieldset>
-      <input type="hidden" name="id" value="" />
-      <button type="submit">Salva deal</button>
-      <p class="account-msg" data-msg hidden></p>
-    `;
-    dealForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fd = new FormData(dealForm);
-      const msg = dealForm.querySelector<HTMLElement>("[data-msg]")!;
-      msg.hidden = false;
-      const costsRaw = String(fd.get("costs") || "");
-      const costs = costsRaw
-        .split("\n")
-        .map((l) => l.trim())
-        .filter(Boolean)
-        .map((line) => {
-          const [label, amount, kind] = line.split("|").map((x) => x.trim());
-          return {
-            label,
-            amount: Number(amount),
-            per_unit: /pezzo|unit/i.test(kind || ""),
-          };
-        })
-        .filter((c) => c.label && Number.isFinite(c.amount));
-      try {
-        await apiFetch(base, "deals", {
-          method: "POST",
-          body: JSON.stringify({
-            id: String(fd.get("id") || "") || undefined,
-            user_id: fd.get("user_id"),
-            product_id: fd.get("product_id"),
-            product_title: fd.get("product_title") || fd.get("product_id"),
-            unit_price: Number(fd.get("unit_price")),
-            planned_qty: Number(fd.get("planned_qty")),
-            artist_share_pct: Number(fd.get("artist_share_pct")),
-            vat_rate_pct: Number(fd.get("vat_rate_pct")),
-            notes: fd.get("notes") || "",
-            costs,
-          }),
-        });
-        msg.textContent = "Deal salvato.";
-        await renderAdmin(user);
-      } catch (err) {
-        msg.textContent = err instanceof Error ? err.message : "Errore";
-      }
-    });
-    mount.append(dealForm);
-
-    if (deals.length) {
-      const list = el("section", "account-card");
-      list.append(el("h3", "", "Deal esistenti"));
-      for (const s of deals) {
-        const artist = artists.find((a) => a.id === s.deal.user_id);
-        const wrap = el("div", "account-deal-wrap");
-        wrap.append(
-          el("p", "account-meta", `Artista: ${artist?.name || artist?.email || s.deal.user_id}`),
-          dealBlock(s),
-        );
-        const actions = el("div", "account-actions");
-        const editBtn = el("button", "", "Modifica") as HTMLButtonElement;
-        editBtn.type = "button";
-        editBtn.addEventListener("click", () => {
-          (dealForm.elements.namedItem("id") as HTMLInputElement).value = s.deal.id;
-          (dealForm.elements.namedItem("user_id") as HTMLSelectElement).value = s.deal.user_id;
-          (dealForm.elements.namedItem("product_id") as HTMLInputElement).value = s.deal.product_id;
-          (dealForm.elements.namedItem("product_title") as HTMLInputElement).value =
-            s.deal.product_title;
-          (dealForm.elements.namedItem("unit_price") as HTMLInputElement).value = String(
-            s.deal.unit_price,
-          );
-          (dealForm.elements.namedItem("planned_qty") as HTMLInputElement).value = String(
-            s.deal.planned_qty,
-          );
-          (dealForm.elements.namedItem("artist_share_pct") as HTMLInputElement).value = String(
-            s.deal.artist_share_pct,
-          );
-          (dealForm.elements.namedItem("vat_rate_pct") as HTMLInputElement).value = String(
-            s.deal.vat_rate_pct,
-          );
-          (dealForm.elements.namedItem("notes") as HTMLInputElement).value = s.deal.notes || "";
-          (dealForm.elements.namedItem("costs") as HTMLTextAreaElement).value = s.deal.costs
-            .map((c) => `${c.label}|${c.amount}|${c.per_unit ? "pezzo" : "fisso"}`)
-            .join("\n");
-          dealForm.scrollIntoView({ behavior: "smooth" });
-        });
-        const delDeal = el("button", "account-linkish", "Elimina") as HTMLButtonElement;
-        delDeal.type = "button";
-        delDeal.addEventListener("click", async () => {
-          if (!confirm("Eliminare questo deal?")) return;
-          await apiFetch(base, `deals?id=${encodeURIComponent(s.deal.id)}`, { method: "DELETE" });
-          await renderAdmin(user);
-        });
-        actions.append(editBtn, delDeal);
-        wrap.append(actions);
-        list.append(wrap);
-      }
-      mount.append(list);
-    }
   }
 
   function escapeHtml(s: string) {

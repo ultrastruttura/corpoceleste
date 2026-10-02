@@ -237,7 +237,7 @@ export async function listSettlements(userId: string) {
   await ensureSchema();
   const db = getDb();
   const res = await db.execute({
-    sql: "SELECT * FROM settlements WHERE user_id = ? ORDER BY period DESC",
+    sql: "SELECT * FROM settlements WHERE user_id = ? ORDER BY period DESC, paid_at DESC",
     args: [userId],
   });
   return res.rows.map((r) => ({
@@ -250,6 +250,7 @@ export async function listSettlements(userId: string) {
   }));
 }
 
+/** `period` = giorno saldo (YYYY-MM-DD). Righe legacy YYYY-MM restano valide. */
 export async function upsertSettlement(input: {
   user_id: string;
   period: string;
@@ -258,11 +259,12 @@ export async function upsertSettlement(input: {
 }) {
   await ensureSchema();
   const db = getDb();
-  const period = input.period.trim();
-  if (!/^\d{4}-\d{2}$/.test(period)) throw new Error("period must be YYYY-MM");
+  let day = input.period.trim();
+  if (/^\d{4}-\d{2}$/.test(day)) day = `${day}-01`;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error("period must be YYYY-MM-DD");
   const existing = await db.execute({
     sql: "SELECT id FROM settlements WHERE user_id = ? AND period = ?",
-    args: [input.user_id, period],
+    args: [input.user_id, day],
   });
   if (existing.rows[0]) {
     const prev = await db.execute({
@@ -271,10 +273,11 @@ export async function upsertSettlement(input: {
     });
     const prevAmount = Number(prev.rows[0]?.amount || 0);
     await db.execute({
-      sql: "UPDATE settlements SET amount = ?, note = ?, paid_at = datetime('now') WHERE id = ?",
+      sql: "UPDATE settlements SET amount = ?, note = ?, paid_at = ? WHERE id = ?",
       args: [
         euro(prevAmount + input.amount),
         input.note || "",
+        day,
         String(existing.rows[0].id),
       ],
     });
@@ -282,8 +285,8 @@ export async function upsertSettlement(input: {
   }
   const id = newId("set");
   await db.execute({
-    sql: "INSERT INTO settlements (id, user_id, period, amount, note) VALUES (?, ?, ?, ?, ?)",
-    args: [id, input.user_id, period, euro(input.amount), input.note || ""],
+    sql: "INSERT INTO settlements (id, user_id, period, amount, note, paid_at) VALUES (?, ?, ?, ?, ?, ?)",
+    args: [id, input.user_id, day, euro(input.amount), input.note || "", day],
   });
   return id;
 }
