@@ -6,6 +6,7 @@ title_de: Ein neues Shirt
 excerpt_it: 'Prova di un post in news. Posso usarlo per corsi, annunciare collaborazioni o quant''altro.'
 excerpt_en: 'A shirt with a drawing by Ada Neri is coming to the shop. One colour, cotton, like the others.'
 excerpt_de: 'Bald im Shop: ein Shirt mit einer Zeichnung von Ada Neri. Eine Farbe, Baumwolle, wie die anderen.'
+cover: /images/photos/corsi.jpg
 body_it: |-
   Prova di un post in news. Posso usarlo per corsi, annunciare collaborazioni o quant'altro.
   L'ideale sarebbe poterci mettere anche delle grafiche e dei link.
