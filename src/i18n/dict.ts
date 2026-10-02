@@ -62,8 +62,7 @@ const it = {
       "Misure del capo disteso, in centimetri. ½ petto = da cucitura a cucitura, non la circonferenza. Tolleranza di stampa circa ±1 cm. Confronta con una maglia che ti sta. Se l’etichetta cucita indica una composizione diversa da quella in pagina, vale l’etichetta.",
     galleryPrev: "Foto precedente",
     galleryNext: "Foto successiva",
-    shipLine: (itPrice: number, euPrice: number) =>
-      `Spedizione Italia ${itPrice} €, Europa ${euPrice} €`,
+    shipLine: "Spedizione in Italia e in Europa — costo calcolato al momento della spedizione.",
     /** Alt SEO commerciale: tipo + opera + artista + keyword vendita. */
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
@@ -104,6 +103,7 @@ const it = {
     qtyDown: "Diminuisci quantità",
     qtyUp: "Aumenta quantità",
     shipping: "Spedizione",
+    shippingLater: "calcolata in seguito",
     viewPage: "Apri pagina carrello",
     sizeUnavailable: "Questa taglia non è più disponibile: scegline un’altra o rimuovi la riga.",
   },
@@ -116,13 +116,13 @@ const it = {
     termsLead: "Ho letto i tempi di spedizione e le ",
     termsLink: "condizioni di vendita",
     termsTail: ", recesso e garanzia inclusi.",
-    vatIncluded: "Prezzi in euro, IVA inclusa. La spedizione è quella scelta qui sopra.",
+    vatIncluded: "Prezzi in euro, IVA inclusa. La spedizione sarà calcolata in seguito.",
     payObligation: "Premendo il pulsante concludi un ordine con obbligo di pagamento.",
     readPrivacy: (privacy: string) => `Ho letto l’${privacy}.`,
     privacyLink: "informativa privacy",
-    shipTo: "Spedizione",
-    italy: (n: number) => `Italia — ${n} €`,
-    europe: (n: number) => `Europa — ${n} €`,
+    shipTo: "Destinazione",
+    italy: "Italia",
+    europe: "Europa",
     paypal: "Paga con PayPal",
     paypalBack: "Torna a Corpoceleste",
     payTitle: "Scegli il pagamento",
@@ -316,8 +316,8 @@ const it = {
     productsBody:
       "Serigrafie stampate a mano, una per volta, in tiratura limitata: maglie, stampe su carta, pezzi numerati. Essendo stampa manuale, piccole differenze di registro, inchiostro e posizione fanno parte del pezzo e non sono difetti. Le foto sono indicative: colore e resa possono variare leggermente da schermo a schermo.",
     prices: "Prezzi",
-    pricesBody: (italy: number, europe: number) =>
-      `I prezzi sono in euro e IVA inclusa, salvo diversa indicazione. La spedizione è a parte e viene mostrata prima del pagamento: ${italy} € in Italia, ${europe} € in Europa. Il totale da pagare, spedizione compresa, è quello che vedi in checkout.`,
+    pricesBody:
+      "I prezzi sono in euro e IVA inclusa, salvo diversa indicazione. La spedizione è a parte: il costo viene calcolato al momento della spedizione in base a destinazione e corriere. Il totale merce che vedi in checkout è quello da pagare all’ordine; eventuali costi di spedizione ti sono comunicati prima della spedizione.",
     order: "Come si conclude l’ordine",
     orderBody:
       "Il contratto si conclude in checkout, quando premi il pulsante di pagamento e ricevi la conferma via email. Se un pezzo non c’è più dopo il pagamento, ti avviso e ti rimborso.",
@@ -436,8 +436,7 @@ const en: typeof it = {
       "Garment laid flat, in centimetres. ½ chest is seam to seam, not circumference. Print tolerance about ±1 cm. Compare with a shirt that fits you. If the sewn-in label states a different fibre composition, the label prevails.",
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
-    shipLine: (itPrice: number, euPrice: number) =>
-      `Shipping Italy ${itPrice} €, Europe ${euPrice} €`,
+    shipLine: "Shipping in Italy and across Europe — cost calculated when the parcel is sent.",
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
@@ -476,6 +475,7 @@ const en: typeof it = {
     qtyDown: "Decrease quantity",
     qtyUp: "Increase quantity",
     shipping: "Shipping",
+    shippingLater: "calculated later",
     viewPage: "Open cart page",
     sizeUnavailable: "This size is no longer available — pick another or remove the line.",
   },
@@ -488,13 +488,13 @@ const en: typeof it = {
     termsLead: "I have read the shipping times and the ",
     termsLink: "terms of sale",
     termsTail: ", including withdrawal and legal guarantee.",
-    vatIncluded: "Prices in euro, VAT included. Shipping is the option selected above.",
+    vatIncluded: "Prices in euro, VAT included. Shipping will be calculated later.",
     payObligation: "Pressing the button places an order with an obligation to pay.",
     readPrivacy: (privacy: string) => `I have read the ${privacy}.`,
     privacyLink: "privacy notice",
-    shipTo: "Shipping",
-    italy: (n: number) => `Italy — ${n} €`,
-    europe: (n: number) => `Europe — ${n} €`,
+    shipTo: "Destination",
+    italy: "Italy",
+    europe: "Europe",
     paypal: "Pay with PayPal",
     paypalBack: "Back to Corpoceleste",
     payTitle: "Choose how to pay",
@@ -687,8 +687,8 @@ const en: typeof it = {
     productsBody:
       "Hand-pulled screen prints in limited runs: shirts, prints on paper, numbered pieces. Because printing is manual, small differences in registration, ink and placement are part of the piece and are not defects. Photos are indicative: colour can vary slightly from screen to screen.",
     prices: "Prices",
-    pricesBody: (italy: number, europe: number) =>
-      `Prices are in euro and include VAT unless stated otherwise. Shipping is charged separately and shown before payment: €${italy} to Italy, €${europe} within Europe. The total you see at checkout, shipping included, is what you pay.`,
+    pricesBody:
+      "Prices are in euro and include VAT unless stated otherwise. Shipping is charged separately: the cost is calculated when the parcel is sent, based on destination and carrier. The merchandise total you see at checkout is what you pay with the order; any shipping costs are confirmed before dispatch.",
     order: "How the order is concluded",
     orderBody:
       "The contract is concluded at checkout, when you press the payment button and receive the confirmation by email. If a piece is gone after payment, I tell you and refund you.",
@@ -807,8 +807,7 @@ const de: typeof it = {
       "Maß des flach liegenden Kleidungsstücks, in Zentimetern. ½ Brust ist Naht zu Naht, nicht der Umfang. Drucktoleranz etwa ±1 cm. Vergleich mit einem Shirt, das dir passt. Steht auf dem eingenähten Etikett eine andere Faserzusammensetzung, gilt das Etikett.",
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
-    shipLine: (itPrice: number, euPrice: number) =>
-      `Versand Italien ${itPrice} €, Europa ${euPrice} €`,
+    shipLine: "Versand in Italien und Europa — Kosten werden bei Versand berechnet.",
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
@@ -847,6 +846,7 @@ const de: typeof it = {
     qtyDown: "Menge verringern",
     qtyUp: "Menge erhöhen",
     shipping: "Versand",
+    shippingLater: "später berechnet",
     viewPage: "Warenkorb-Seite öffnen",
     sizeUnavailable: "Diese Größe ist nicht mehr verfügbar — wähle eine andere oder entferne die Zeile.",
   },
@@ -859,13 +859,13 @@ const de: typeof it = {
     termsLead: "Ich habe die Versandzeiten und die ",
     termsLink: "Verkaufsbedingungen",
     termsTail: " gelesen, inklusive Widerruf und Gewährleistung.",
-    vatIncluded: "Preise in Euro, inklusive MwSt. Versand wie oben gewählt.",
+    vatIncluded: "Preise in Euro, inklusive MwSt. Versand wird später berechnet.",
     payObligation: "Mit dem Button gibst du eine zahlungspflichtige Bestellung ab.",
     readPrivacy: (privacy: string) => `Ich habe die ${privacy} gelesen.`,
     privacyLink: "Datenschutzhinweise",
-    shipTo: "Versand",
-    italy: (n: number) => `Italien — ${n} €`,
-    europe: (n: number) => `Europa — ${n} €`,
+    shipTo: "Zielort",
+    italy: "Italien",
+    europe: "Europa",
     paypal: "Mit PayPal bezahlen",
     paypalBack: "Zurück zu Corpoceleste",
     payTitle: "Zahlung wählen",
@@ -1058,8 +1058,8 @@ const de: typeof it = {
     productsBody:
       "Von Hand gedruckte Siebdrucke in limitierter Auflage: Shirts, Papierdrucke, nummerierte Stücke. Weil von Hand gedruckt wird, gehören kleine Abweichungen bei Register, Farbe und Position zum Stück und sind keine Mängel. Fotos sind Anhaltspunkte: Farben können je nach Bildschirm leicht abweichen.",
     prices: "Preise",
-    pricesBody: (italy: number, europe: number) =>
-      `Preise verstehen sich in Euro und inklusive MwSt., sofern nicht anders angegeben. Der Versand wird getrennt berechnet und vor der Zahlung angezeigt: ${italy} € nach Italien, ${europe} € innerhalb Europas. Der Gesamtbetrag an der Kasse, Versand inbegriffen, ist der Betrag, den du zahlst.`,
+    pricesBody:
+      "Preise verstehen sich in Euro und inklusive MwSt., sofern nicht anders angegeben. Der Versand wird getrennt berechnet: die Kosten ergeben sich bei Versand nach Zielort und Carrier. Die Waren-Summe an der Kasse ist der Betrag der Bestellung; etwaige Versandkosten werden vor dem Versand bestätigt.",
     order: "Zustandekommen der Bestellung",
     orderBody:
       "Der Vertrag kommt an der Kasse zustande, wenn du den Zahlungsbutton drückst und die Bestätigung per E-Mail erhältst. Ist ein Stück nach der Zahlung weg, melde ich mich und erstatte.",

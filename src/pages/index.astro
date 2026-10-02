@@ -39,15 +39,6 @@ const lcp = listed[0]?.images[0] ? cardImageUrls(listed[0].images[0]) : null;
 
     <ProductGrid products={listed} eager={1} />
 
-    {
-      sold.length > 0 && (
-        <>
-          <div class="section-head shop-home-sold-head">
-            <h2>{copy.shop.soldOut}</h2>
-          </div>
-          <ProductGrid products={sold} />
-        </>
-      )
-    }
+    {sold.length > 0 && <ProductGrid products={sold} />}
   </div>
 </Base>

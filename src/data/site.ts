@@ -9,8 +9,9 @@ export const site = {
   /** Vecchi progetti (pagina Contatti). */
   satellite: "https://web.archive.org/web/20161107120751/http://satellitepress.it/",
   tddDiscogs: "https://www.discogs.com/search/?q=TDD&type=label",
-  shippingItaly: 8,
-  shippingEU: 16,
+  /** Spedizione: 0 finché non c’è Packlink (o altro corriere). */
+  shippingItaly: 0,
+  shippingEU: 0,
   /** Giorni lavorativi indicativi per la spedizione (info precontrattuale). */
   shippingDays: "5",
   iban: "",

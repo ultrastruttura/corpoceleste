@@ -25,8 +25,8 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
         <div class="field checkout-ship">
           <label class="field-label" for="ship-to">{copy.checkout.shipTo}</label>
           <select id="ship-to" data-ship>
-            <option value="it" selected>{copy.checkout.italy(site.shippingItaly)}</option>
-            <option value="eu">{copy.checkout.europe(site.shippingEU)}</option>
+            <option value="it" selected>{copy.checkout.italy}</option>
+            <option value="eu">{copy.checkout.europe}</option>
           </select>
         </div>
         <div class="recap" data-recap></div>
@@ -198,11 +198,13 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     function orderText() {
       const items = sanitizeCart();
       const ship = shipping();
-      return [
-        ...items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`),
-        `Spedizione ${ship}€`,
-        `Totale ${total() + ship}€`,
-      ].join("\n");
+      const lines = items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`);
+      if (ship > 0) {
+        lines.push(`Spedizione ${ship}€`, `Totale ${total() + ship}€`);
+      } else {
+        lines.push("Spedizione: calcolata in seguito", `Totale merce ${total()}€`);
+      }
+      return lines.join("\n");
     }
 
     function unlocked() {

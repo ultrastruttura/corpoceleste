@@ -62,11 +62,20 @@ export function renderRecap(root: Element, items: CartItem[], shipping: number) 
     root.append(row);
   }
   const labels = copy();
-  const ship = el("div", "recap-row");
-  ship.append(el("span", undefined, labels.cart.shipping), el("span", undefined, `${shipping} €`));
-  root.append(ship);
+  if (shipping > 0) {
+    const ship = el("div", "recap-row");
+    ship.append(el("span", undefined, labels.cart.shipping), el("span", undefined, `${shipping} €`));
+    root.append(ship);
+  } else {
+    const ship = el("div", "recap-row");
+    ship.append(el("span", undefined, labels.cart.shipping), el("span", undefined, labels.cart.shippingLater));
+    root.append(ship);
+  }
   const tot = el("div", "recap-row");
-  tot.append(el("strong", undefined, labels.cart.totalLabel), el("strong", undefined, `${merce + shipping} €`));
+  tot.append(
+    el("strong", undefined, labels.cart.totalLabel),
+    el("strong", undefined, `${merce + Math.max(0, shipping)} €`),
+  );
   root.append(tot);
 }
 
