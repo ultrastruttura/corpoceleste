@@ -105,6 +105,7 @@ const it = {
     qtyUp: "Aumenta quantità",
     shipping: "Spedizione",
     viewPage: "Apri pagina carrello",
+    sizeUnavailable: "Questa taglia non è più disponibile: scegline un’altra o rimuovi la riga.",
   },
   checkout: {
     title: "Checkout",
@@ -476,6 +477,7 @@ const en: typeof it = {
     qtyUp: "Increase quantity",
     shipping: "Shipping",
     viewPage: "Open cart page",
+    sizeUnavailable: "This size is no longer available — pick another or remove the line.",
   },
   checkout: {
     title: "Checkout",
@@ -846,6 +848,7 @@ const de: typeof it = {
     qtyUp: "Menge erhöhen",
     shipping: "Versand",
     viewPage: "Warenkorb-Seite öffnen",
+    sizeUnavailable: "Diese Größe ist nicht mehr verfügbar — wähle eine andere oder entferne die Zeile.",
   },
   checkout: {
     title: "Kasse",

@@ -1536,6 +1536,81 @@ body.cart-open {
   background: var(--white);
 }
 
+.cart-sizes {
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.cart-size-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cart-size-row label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--white);
+}
+
+.cart-size-row input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cart-size-row label:has(input:checked) {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.cart-size-row label:has(input:focus-visible) {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cart-size-row label.is-oos {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.cart-size-row label.is-oos input {
+  pointer-events: none;
+}
+
+.cart-size-row label.is-oos:has(input:checked) {
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cart-size-left {
+  font-weight: 400;
+  font-size: 0.9em;
+  opacity: 0.85;
+  text-decoration: none;
+}
+
+.cart-line-warn {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--danger, #a11);
+}
+
 .cart-qty {
   display: flex;
   align-items: center;

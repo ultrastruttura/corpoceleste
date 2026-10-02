@@ -5,6 +5,7 @@ import {
   catalogProduct,
   catalogProducts,
   catalogSizeInStock,
+  catalogStock,
 } from "./catalog";
 import {
   changeSize,
@@ -101,21 +102,48 @@ function lineEl(item: CartItem) {
   meta.append(el("h4", undefined, item.title));
 
   const labels = copy();
-  const select = el("select", "cart-size");
-  select.setAttribute("aria-label", labels.cart.sizeOf(item.title));
-  select.dataset.changeSize = item.id;
-  select.dataset.fromSize = item.size;
   const product = catalogProduct(item.id);
+  const sizeField = el("fieldset", "cart-sizes");
+  const legend = el("legend", "visually-hidden", labels.cart.sizeOf(item.title));
+  sizeField.append(legend);
+  const sizeRow = el("div", "cart-size-row");
+
   for (const s of sizesFor(item.id)) {
     const inStock = product ? catalogSizeInStock(product, s) : false;
-    const label = inStock || s === item.size ? s : `${s} · ${labels.product.sizeOut}`;
-    const opt = el("option", undefined, label);
-    opt.value = s;
-    if (s === item.size) opt.selected = true;
-    if (!inStock && s !== item.size) opt.disabled = true;
-    select.append(opt);
+    const stock = product ? catalogStock(product, s) : 0;
+    const label = el("label", inStock ? undefined : "is-oos");
+    const input = el("input") as HTMLInputElement;
+    input.type = "radio";
+    input.name = `cart-size-${item.id}-${item.size}`;
+    input.value = s;
+    input.checked = s === item.size;
+    input.disabled = !inStock && s !== item.size;
+    input.dataset.changeSize = item.id;
+    input.dataset.fromSize = item.size;
+    if (!inStock && s === item.size) {
+      // Current line kept only if catalog still has stock; if not, mark clearly.
+      input.disabled = true;
+    }
+
+    const text = el("span");
+    if (!inStock) {
+      text.append(document.createTextNode(`${s} · ${labels.product.sizeOut}`));
+    } else {
+      text.append(document.createTextNode(s));
+      if (stock <= 3) {
+        const hint = el("span", "cart-size-left", ` · ${labels.product.stockLeft(stock)}`);
+        text.append(hint);
+      }
+    }
+    label.append(input, text);
+    sizeRow.append(label);
   }
-  meta.append(select);
+  sizeField.append(sizeRow);
+  meta.append(sizeField);
+
+  if (product && !catalogSizeInStock(product, item.size)) {
+    meta.append(el("p", "cart-line-warn", labels.cart.sizeUnavailable));
+  }
 
   const max = product ? catalogMaxQty(product, item.size) : item.qty;
   const qty = el("div", "cart-qty");
@@ -198,8 +226,9 @@ function onCartClick(e: Event) {
 }
 
 function onCartChange(e: Event) {
-  const t = e.target as HTMLSelectElement;
+  const t = e.target as HTMLInputElement | HTMLSelectElement;
   if (!t.dataset.changeSize || !t.dataset.fromSize) return;
+  if (t instanceof HTMLInputElement && t.type === "radio" && !t.checked) return;
   changeSize(t.dataset.changeSize, t.dataset.fromSize, t.value);
 }
 
