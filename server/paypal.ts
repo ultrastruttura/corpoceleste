@@ -1,4 +1,6 @@
-import { parseOrderLines, parseSku, type OrderLine } from "../src/lib/paypal-lines.js";
+import { parseOrderLines, parseSku, encodeSku, type OrderLine } from "../src/lib/paypal-lines.js";
+import type { PricedOrder } from "./order-pricing.js";
+import { money } from "./order-pricing.js";
 
 export type { OrderLine };
 
@@ -14,8 +16,24 @@ export type PayPalOrder = {
   payer?: { email_address?: string };
   purchase_units?: Array<{
     custom_id?: string;
-    amount?: { value?: string; currency_code?: string };
+    amount?: {
+      value?: string;
+      currency_code?: string;
+      breakdown?: {
+        item_total?: { value?: string; currency_code?: string };
+        shipping?: { value?: string; currency_code?: string };
+      };
+    };
     items?: PayPalItem[];
+    shipping?: {
+      address?: {
+        country_code?: string;
+        admin_area_1?: string;
+        admin_area_2?: string;
+        postal_code?: string;
+        address_line_1?: string;
+      };
+    };
   }>;
 };
 
@@ -100,6 +118,57 @@ export async function fetchPayPalOrder(orderId: string): Promise<PayPalOrder> {
   });
   if (!res.ok) throw new Error(`PayPal order fetch failed: ${res.status}`);
   return (await res.json()) as PayPalOrder;
+}
+
+/** Create checkout order with catalog prices (server-side). */
+export async function createPayPalCheckoutOrder(order: PricedOrder): Promise<string> {
+  const token = await paypalAccessToken();
+  const res = await fetch(`${paypalApiBase()}/v2/checkout/orders`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          description: "Corpoceleste",
+          custom_id: order.lines
+            .map((l) => `${l.id}:${l.size}:${l.qty}`)
+            .join("|")
+            .slice(0, 127),
+          amount: {
+            currency_code: "EUR",
+            value: money(order.total),
+            breakdown: {
+              item_total: { currency_code: "EUR", value: money(order.merchandise) },
+              shipping: { currency_code: "EUR", value: money(order.shipping) },
+            },
+          },
+          items: order.lines.map((l) => ({
+            name: `${l.title} (${l.size})`.slice(0, 127),
+            sku: encodeSku(l.id, l.size),
+            quantity: String(l.qty),
+            unit_amount: { currency_code: "EUR", value: money(l.unitPrice) },
+            category: "PHYSICAL_GOODS",
+          })),
+        },
+      ],
+      application_context: {
+        brand_name: "Corpoceleste",
+        shipping_preference: "GET_FROM_FILE",
+        user_action: "PAY_NOW",
+      },
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`PayPal create order failed: ${res.status} ${text}`);
+  }
+  const data = (await res.json()) as { id?: string };
+  if (!data.id) throw new Error("PayPal create order missing id");
+  return data.id;
 }
 
 export async function verifyPayPalWebhook(opts: {

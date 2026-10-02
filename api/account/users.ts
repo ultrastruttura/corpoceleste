@@ -22,6 +22,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return json(res, 405, { error: "Method not allowed" });
   } catch (err) {
     console.error("account users", err);
-    return json(res, 500, { error: err instanceof Error ? err.message : "Server error" });
+    return json(res, 500, { error: "Server error" });
   }
 }

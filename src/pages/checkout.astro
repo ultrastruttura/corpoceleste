@@ -117,6 +117,8 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
             <input type="hidden" name="_next" data-next-grazie="ordine" />
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="ordine" data-order-field />
+            <input type="hidden" name="lines" data-lines-field />
+            <input type="hidden" name="shipZone" data-ship-zone-field value="it" />
             <FormHoney />
             <div>
               <label for="o-name">{copy.checkout.name}</label>
@@ -163,8 +165,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
   <script>
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
-    import { site } from "../data/site";
-    import { encodeOrderLines, encodeSku } from "../lib/paypal-lines";
+    import { apiBase, site } from "../data/site";
 
     const base = import.meta.env.BASE_URL;
     const prefix = document.documentElement.dataset.localePrefix || "";
@@ -179,6 +180,8 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     const bankForm = document.querySelector<HTMLFormElement>("[data-checkout-form]");
     const bankSubmit = document.querySelector<HTMLButtonElement>("[data-bank-submit]");
     const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
+    const linesField = document.querySelector<HTMLInputElement>("[data-lines-field]");
+    const shipZoneField = document.querySelector<HTMLInputElement>("[data-ship-zone-field]");
     const methods = document.querySelectorAll<HTMLInputElement>("[data-method]");
     const panels = document.querySelectorAll<HTMLElement>("[data-method-panel]");
 
@@ -186,8 +189,8 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
       return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
     }
 
-    function money(n: number) {
-      return n.toFixed(2);
+    function shipZone(): "it" | "eu" {
+      return shipSel?.value === "eu" ? "eu" : "it";
     }
 
     function orderText() {
@@ -220,6 +223,12 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
         const ship = shipping();
         renderRecap(recap, items, ship);
         if (orderField) orderField.value = orderText();
+        if (linesField) {
+          linesField.value = JSON.stringify(
+            items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+          );
+        }
+        if (shipZoneField) shipZoneField.value = shipZone();
       }
       syncLock();
       page?.classList.add("is-ready");
@@ -266,44 +275,44 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
       ).paypal;
       if (!paypal?.Buttons || !paypal.FUNDING || !sanitizeCart().length) return;
 
+      const createApi = apiBase();
+      if (!createApi) {
+        console.warn("PayPal: formApi/apiBase missing — cannot create server orders");
+        return;
+      }
+
       const shared = {
         onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
           if (!unlocked()) return actions.reject();
           return actions.resolve();
         },
-        createOrder: (_: unknown, actions: { order: { create: (o: object) => Promise<string> } }) => {
+        onShippingAddressChange: async (
+          data: { shippingAddress?: { countryCode?: string } },
+          actions: { reject: () => Promise<void>; resolve: () => Promise<void> },
+        ) => {
+          const country = String(data.shippingAddress?.countryCode || "").toUpperCase();
+          const destZone = country === "IT" ? "it" : "eu";
+          if (destZone !== shipZone()) return actions.reject();
+          return actions.resolve();
+        },
+        createOrder: async () => {
           const items = sanitizeCart();
-          const ship = shipping();
-          const merce = total();
-          return actions.order.create({
-            purchase_units: [
-              {
-                description: "Corpoceleste",
-                custom_id: encodeOrderLines(
-                  items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
-                ),
-                amount: {
-                  currency_code: "EUR",
-                  value: money(merce + ship),
-                  breakdown: {
-                    item_total: { currency_code: "EUR", value: money(merce) },
-                    shipping: { currency_code: "EUR", value: money(ship) },
-                  },
-                },
-                items: items.map((i) => ({
-                  name: `${lineName(i)} (${i.size})`.slice(0, 127),
-                  sku: encodeSku(i.id, i.size),
-                  quantity: String(i.qty),
-                  unit_amount: { currency_code: "EUR", value: money(i.price) },
-                  category: "PHYSICAL_GOODS",
-                })),
-              },
-            ],
-            application_context: {
-              brand_name: "Corpoceleste",
-              shipping_preference: "GET_FROM_FILE",
-            },
+          const res = await fetch(`${createApi}/api/paypal-create-order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+              shipZone: shipZone(),
+            }),
           });
+          if (!res.ok) {
+            const err = await res.text();
+            console.error("paypal-create-order failed", res.status, err);
+            throw new Error("Order create failed");
+          }
+          const data = (await res.json()) as { id?: string };
+          if (!data.id) throw new Error("Missing order id");
+          return data.id;
         },
         onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
           saveOrderSnapshot(shipping());

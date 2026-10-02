@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { field, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
+import { abuseLimit } from "../server/abuse-limit.js";
+import { field, isHoney, parseForm, safeSubject, thanksUrl } from "../server/form-body.js";
 import { sendMail } from "../server/mail.js";
 
 const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newsletter"]);
@@ -8,8 +9,14 @@ const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newslett
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
+  const limited = await abuseLimit(req, "form", 8, 15 * 60);
+  if (!limited.ok) {
+    res.setHeader("Retry-After", String(limited.retryAfterSec || 60));
+    return res.status(429).send("Too many requests");
+  }
+
   const body = parseForm(req);
-  const subject = field(body, "_subject") || "Messaggio dal sito Corpoceleste";
+  const subject = safeSubject(field(body, "_subject"), "Messaggio dal sito Corpoceleste");
   const fromKey = guessFrom(subject, field(body, "_next"));
   const next = thanksUrl(body, fromKey);
   if (isHoney(body)) return res.redirect(303, next);
@@ -30,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (SKIP.has(key) || key.startsWith("_")) continue;
     const value = Array.isArray(raw) ? raw.map(String).join(", ") : String(raw ?? "").trim();
     if (!value) continue;
-    lines.push(`${key}: ${value}`);
+    lines.push(`${key}: ${value.slice(0, 2000)}`);
   }
   if (!lines.length) {
     return res.status(400).send("Empty form");
@@ -41,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     subject,
     text: lines.join("\n"),
   });
-  if (!ok.ok) {
+  if (ok.ok === false) {
     console.error("form: Resend failed for", subject, ok.error);
     return res.status(502).send("Mail failed");
   }

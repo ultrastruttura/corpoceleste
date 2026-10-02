@@ -1,9 +1,20 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { applyStockDecrement, createLedger, ledgerExists } from "../server/github-stock.js";
+import {
+  applyStockDecrement,
+  claimOrResumeLedger,
+  writeLedger,
+  type LedgerRecord,
+} from "../server/github-stock.js";
 import { notifyOrder } from "../server/notify-shop.js";
 import { customerOrderText } from "../server/customer-mail.js";
 import { formatCustomerOrderLines, formatShopOrderEmail } from "../server/stock-patch.js";
 import { parseOrderLines } from "../src/lib/paypal-lines.js";
+import {
+  money,
+  paymentCoversExpected,
+  priceOrderLines,
+  shipZoneFromCountry,
+} from "../server/order-pricing.js";
 import {
   fetchPayPalOrder,
   linesFromOrder,
@@ -20,6 +31,7 @@ export const config = {
 
 type CaptureResource = {
   id?: string;
+  amount?: { value?: string; currency_code?: string };
   custom_id?: string;
   supplementary_data?: {
     related_ids?: {
@@ -45,7 +57,7 @@ async function readRawBody(req: VercelRequest): Promise<string> {
 /**
  * PayPal → Vercel webhook.
  * Event: PAYMENT.CAPTURE.COMPLETED
- * Decrements stock + emails shop (FormSubmit server-side).
+ * Verifies catalog prices + destination shipping, then stock + mail (resumable ledger).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
@@ -83,10 +95,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!captureId) return res.status(200).json({ ok: true, skipped: "no capture id" });
 
   try {
-    if (await ledgerExists(captureId)) {
-      return res.status(200).json({ ok: true, duplicate: true });
-    }
-
     const orderId = event.resource?.supplementary_data?.related_ids?.order_id;
     let order: PayPalOrder | null = null;
     let lines = [] as ReturnType<typeof linesFromOrder>;
@@ -104,18 +112,67 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, skipped: "no lines" });
     }
 
-    const claimed = await createLedger(captureId, lines);
-    if (!claimed) return res.status(200).json({ ok: true, duplicate: true });
+    const country = order?.purchase_units?.[0]?.shipping?.address?.country_code;
+    const shipZone = shipZoneFromCountry(country);
+    const priced = await priceOrderLines(lines, shipZone);
+    const paidRaw =
+      event.resource?.amount?.value ||
+      order?.purchase_units?.[0]?.amount?.value ||
+      "";
+    const paid = Number(paidRaw);
 
-    const notes = await applyStockDecrement(lines);
+    if (priced.ok === false) {
+      console.error("catalog reject", captureId, priced.error);
+      await failLedger(captureId, lines, priced.error, paidRaw);
+      await alertUnderpay(captureId, priced.error, paidRaw);
+      return res.status(200).json({ ok: true, rejected: priced.error });
+    }
+
+    if (!paymentCoversExpected(paid, priced.order.total)) {
+      const msg = `UNDERPAY paid=${paidRaw} expected=${money(priced.order.total)} zone=${shipZone} country=${country || "?"}`;
+      console.error(msg, captureId);
+      await failLedger(captureId, lines, msg, paidRaw, money(priced.order.total));
+      await alertUnderpay(captureId, msg, paidRaw);
+      return res.status(200).json({ ok: true, rejected: "underpay" });
+    }
+
+    const claim = await claimOrResumeLedger(captureId, lines, {
+      expectedTotal: money(priced.order.total),
+      paidTotal: paidRaw,
+    });
+    if (claim.action === "skip") {
+      return res.status(200).json({ ok: true, duplicate: true });
+    }
+
+    let notes = claim.ledger.stockNotes || [];
+    if (!notes.length) {
+      try {
+        notes = await applyStockDecrement(lines);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("stock update failed", captureId, msg);
+        const failed: LedgerRecord = {
+          ...claim.ledger,
+          status: "failed",
+          error: msg,
+          at: new Date().toISOString(),
+        };
+        await writeLedger(failed);
+        if (msg.startsWith("INSUFFICIENT_STOCK")) {
+          await alertUnderpay(captureId, msg, paidRaw);
+          return res.status(200).json({ ok: true, rejected: "insufficient stock" });
+        }
+        return res.status(500).json({ error: "Stock update failed" });
+      }
+    }
+
     const bits = order ? orderEmailBits(order) : { labels: [] as string[], total: undefined };
-    const oversell = notes.some((n) => n.startsWith("OVERSELL"));
     const shopBody = formatShopOrderEmail({
       captureId,
       lines,
       stockNotes: notes,
       itemLabels: bits.labels,
-      total: bits.total,
+      total: bits.total || `${money(priced.order.total)} EUR`,
     });
     const customerBody = customerOrderText({
       metodo: "PayPal",
@@ -123,19 +180,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         captureId,
         lines,
         itemLabels: bits.labels,
-        total: bits.total,
+        total: bits.total || `${money(priced.order.total)} EUR`,
       }),
     });
 
-    await notifyOrder({
-      shopSubject: oversell
-        ? "ATTENZIONE oversell — Ordine Corpoceleste (PayPal)"
-        : "Ordine shop Corpoceleste (PayPal)",
-      shopBody,
-      customerTo: order?.payer?.email_address,
-      customerSubject: "Conferma d’ordine — Corpoceleste",
-      customerBody,
-    });
+    let emailed = Boolean(claim.ledger.emailed);
+    if (!emailed) {
+      emailed = await notifyOrder({
+        shopSubject: "Ordine shop Corpoceleste (PayPal)",
+        shopBody,
+        customerTo: order?.payer?.email_address,
+        customerSubject: "Conferma d’ordine — Corpoceleste",
+        customerBody,
+      });
+      if (!emailed) {
+        const pending: LedgerRecord = {
+          ...claim.ledger,
+          status: "pending",
+          stockNotes: notes,
+          emailed: false,
+          error: "notify failed",
+          at: new Date().toISOString(),
+        };
+        await writeLedger(pending);
+        return res.status(500).json({ error: "Notify failed" });
+      }
+    }
 
     let artistSales: string[] = [];
     try {
@@ -152,9 +222,58 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error("artist sales ledger failed", err);
     }
 
+    const done: LedgerRecord = {
+      ...claim.ledger,
+      status: "done",
+      stockNotes: notes,
+      emailed: true,
+      error: undefined,
+      at: new Date().toISOString(),
+      expectedTotal: money(priced.order.total),
+      paidTotal: paidRaw,
+    };
+    await writeLedger(done);
+
     return res.status(200).json({ ok: true, captureId, notes, emailed: true, artistSales });
   } catch (err) {
-    console.error("stock update failed", err);
-    return res.status(500).json({ error: "Stock update failed" });
+    console.error("webhook handler failed", err);
+    return res.status(500).json({ error: "Handler failed" });
+  }
+}
+
+async function failLedger(
+  captureId: string,
+  lines: ReturnType<typeof linesFromOrder>,
+  error: string,
+  paidTotal?: string,
+  expectedTotal?: string,
+) {
+  try {
+    await writeLedger({
+      captureId,
+      lines,
+      status: "failed",
+      at: new Date().toISOString(),
+      error,
+      paidTotal,
+      expectedTotal,
+    });
+  } catch (err) {
+    console.error("failLedger write", err);
+  }
+}
+
+async function alertUnderpay(captureId: string, detail: string, paid?: string) {
+  try {
+    const { sendMail } = await import("../server/mail.js");
+    const shop = (process.env.SHOP_EMAIL || "").trim();
+    if (!shop) return;
+    await sendMail({
+      to: shop,
+      subject: "ATTENZIONE pagamento anomalo — Corpoceleste",
+      text: [`Capture: ${captureId}`, paid ? `Pagato: ${paid}` : "", detail].filter(Boolean).join("\n"),
+    });
+  } catch (err) {
+    console.error("alertUnderpay", err);
   }
 }

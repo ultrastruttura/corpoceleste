@@ -1,4 +1,4 @@
-/** Simple sliding-window rate limit (Turso). Fail-open on errors. */
+/** Simple sliding-window rate limit (Turso). */
 
 import { ensureSchema, getDb } from "./db.js";
 
@@ -6,7 +6,10 @@ export async function rateLimit(opts: {
   key: string;
   limit: number;
   windowSeconds: number;
+  /** Default false — deny on DB errors for auth/abuse paths. */
+  failOpen?: boolean;
 }): Promise<{ ok: boolean; retryAfterSec?: number }> {
+  const failOpen = opts.failOpen === true;
   try {
     await ensureSchema();
     const db = getDb();
@@ -37,14 +40,32 @@ export async function rateLimit(opts: {
       const retryAfterSec = Math.max(1, Math.ceil((windowMs - (now - start)) / 1000));
       return { ok: false, retryAfterSec };
     }
-    await db.execute({
-      sql: "UPDATE rate_limits SET count = ? WHERE key = ?",
-      args: [count + 1, opts.key],
+    const bumped = await db.execute({
+      sql: "UPDATE rate_limits SET count = count + 1 WHERE key = ? AND count = ?",
+      args: [opts.key, count],
     });
+    if (Number(bumped.rowsAffected ?? 0) === 0) {
+      // Lost race — treat as consumed slot if still under limit on re-read
+      const again = await db.execute({
+        sql: "SELECT count, window_start FROM rate_limits WHERE key = ?",
+        args: [opts.key],
+      });
+      const row2 = again.rows[0];
+      const c2 = Number(row2?.count ?? opts.limit);
+      if (c2 >= opts.limit) {
+        const start2 = Number(row2?.window_start ?? now);
+        return {
+          ok: false,
+          retryAfterSec: Math.max(1, Math.ceil((windowMs - (now - start2)) / 1000)),
+        };
+      }
+      return { ok: true };
+    }
     return { ok: true };
   } catch (err) {
-    console.warn("rateLimit failed open", err);
-    return { ok: true };
+    console.warn("rateLimit failed", failOpen ? "open" : "closed", err);
+    if (failOpen) return { ok: true };
+    return { ok: false, retryAfterSec: 60 };
   }
 }
 

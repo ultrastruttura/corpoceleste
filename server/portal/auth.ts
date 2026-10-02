@@ -152,7 +152,7 @@ export async function sendMagicLinkEmail(user: PortalUser, token: string) {
       "Se non l’hai chiesto tu, ignora questa mail.",
     ].join("\n"),
   });
-  return { ok: result.ok, link, error: result.ok ? undefined : result.error };
+  return { ok: result.ok, link, error: result.ok === false ? result.error : undefined };
 }
 
 /** Expose magic links in API only for local/dev opt-in — never on Vercel production. */
@@ -170,21 +170,30 @@ export async function consumeMagicLink(token: string): Promise<MagicConsumeResul
   await ensureSchema();
   if (!token) return { ok: false, reason: "missing" };
   const db = getDb();
-  const res = await db.execute({
-    sql: "SELECT token, user_id, expires_at, used_at FROM magic_links WHERE token = ?",
+  const claim = await db.execute({
+    sql: `UPDATE magic_links
+          SET used_at = datetime('now')
+          WHERE token = ?
+            AND used_at IS NULL
+            AND expires_at > datetime('now')`,
     args: [token],
   });
-  const row = res.rows[0];
-  if (!row) return { ok: false, reason: "missing" };
-  if (row.used_at) return { ok: false, reason: "used" };
-  if (new Date(String(row.expires_at)).getTime() < Date.now()) {
+  if (Number(claim.rowsAffected ?? 0) === 0) {
+    const res = await db.execute({
+      sql: "SELECT used_at, expires_at FROM magic_links WHERE token = ?",
+      args: [token],
+    });
+    const row = res.rows[0];
+    if (!row) return { ok: false, reason: "missing" };
+    if (row.used_at) return { ok: false, reason: "used" };
     return { ok: false, reason: "expired" };
   }
-  await db.execute({
-    sql: "UPDATE magic_links SET used_at = datetime('now') WHERE token = ?",
+  const res = await db.execute({
+    sql: "SELECT user_id FROM magic_links WHERE token = ?",
     args: [token],
   });
-  const user = await getUserById(String(row.user_id));
+  const userId = res.rows[0] ? String(res.rows[0].user_id) : "";
+  const user = userId ? await getUserById(userId) : null;
   if (!user) return { ok: false, reason: "missing" };
   return { ok: true, user };
 }

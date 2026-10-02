@@ -108,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return json(res, 200, {
           ok: true,
           emailed: false,
-          message: `Non siamo riusciti a inviare l’email di accesso. ${sent.error || "Controlla Resend su Vercel."}`,
+          message: LOGIN_MSG,
         });
       }
       console.info("[portal] magic link emailed to", user.email);
@@ -195,6 +195,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err) {
     console.error("account auth", err);
     cors(req, res);
-    return json(res, 500, { error: err instanceof Error ? err.message : "Server error" });
+    return json(res, 500, { error: "Server error" });
   }
 }
