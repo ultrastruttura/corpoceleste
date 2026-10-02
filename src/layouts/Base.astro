@@ -124,6 +124,9 @@ const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
         <a class="btn btn--full" href={pageUrl(locale, "checkout/")} data-cart-checkout hidden>
           {copy.cart.checkout}
         </a>
+        <a class="btn btn--ghost btn--full" href={pageUrl(locale, "carrello/")} data-cart-page-link>
+          {copy.cart.viewPage}
+        </a>
       </div>
     </aside>
 

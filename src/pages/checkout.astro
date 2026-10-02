@@ -50,6 +50,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
             {copy.forms.privacyLead}<a href={pageUrl(locale, "privacy/")}>{copy.checkout.privacyLink}</a>{copy.forms.privacyTail}
           </span>
         </label>
+        <p class="checkout-lock-hint" data-pay-lock-hint>{copy.checkout.unlockPay}</p>
       </section>
 
       <section class="checkout-step checkout-step--pay">
@@ -179,6 +180,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     const payBox = document.querySelector("[data-pay-box]");
     const bankForm = document.querySelector<HTMLFormElement>("[data-checkout-form]");
     const bankSubmit = document.querySelector<HTMLButtonElement>("[data-bank-submit]");
+    const lockHint = document.querySelector<HTMLElement>("[data-pay-lock-hint]");
     const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
     const linesField = document.querySelector<HTMLInputElement>("[data-lines-field]");
     const shipZoneField = document.querySelector<HTMLInputElement>("[data-ship-zone-field]");
@@ -212,6 +214,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
       payBox?.classList.toggle("is-locked", !ok);
       bankForm?.classList.toggle("is-locked", !ok);
       if (bankSubmit) bankSubmit.disabled = !ok;
+      if (lockHint) lockHint.hidden = ok;
     }
 
     function syncPage() {

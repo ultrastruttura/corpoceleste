@@ -25,7 +25,9 @@ for (const a of listed) {
 
 <Base title={`${copy.artists.title} — Corpoceleste`}>
   <div class="wrap page-pad">
-    <h1 class="visually-hidden">{copy.artists.title}</h1>
+    <header class="page-hero">
+      <h1>{copy.artists.title}</h1>
+    </header>
     {
       [...groups.entries()].map(([letter, items]) => (
         <section class="artist-block">

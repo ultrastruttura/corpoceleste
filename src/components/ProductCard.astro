@@ -1,6 +1,7 @@
 ---
 import type { Product } from "../data/products";
-import { artistName, formatPrice, isInStock, productImageAlt } from "../data/products";
+import { artistName, formatPrice, isInStock, isLowStock, productImageAlt } from "../data/products";
+import { siteSettings } from "../data/settings";
 import { cardImageUrls } from "../lib/paths";
 import { currentLocale, pageUrl, t } from "../i18n";
 
@@ -10,14 +11,15 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const artist = artistName(product.artistId);
 const sold = !isInStock(product);
-const preorder = product.status === "preorder" && !sold;
+const lowStock = !sold && isLowStock(product, siteSettings.lowStockThreshold);
+const preorder = product.status === "preorder" && !sold && !lowStock;
 const hasTitle = artist !== product.title;
 const alt = productImageAlt(product, artist, locale);
 const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
 ---
 
 <a
-  class:list={["card", sold && "is-sold", preorder && "is-preorder"]}
+  class:list={["card", sold && "is-sold", preorder && "is-preorder", lowStock && "is-low-stock"]}
   href={pageUrl(locale, `prodotto/${product.slug}/`)}
   data-product
   data-nuovo={product.nuovo ? "1" : "0"}
@@ -25,6 +27,7 @@ const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
 >
   <div class="card-frame">
     {sold && <span class="badge">{copy.shop.soldBadge}</span>}
+    {lowStock && <span class="badge badge--quiet">{copy.shop.lowStockBadge}</span>}
     {preorder && <span class="badge badge--quiet">{copy.shop.preorderBadge}</span>}
     {
       cover && (

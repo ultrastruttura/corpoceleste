@@ -17,7 +17,9 @@ const bioParas = bio.split(/\n\n+/).filter(Boolean);
 
 <Base title={`${copy.contact.title} — Corpoceleste`}>
   <div class="wrap page-pad">
-    <h1 class="visually-hidden">{copy.contact.title}</h1>
+    <header class="page-hero">
+      <h1>{copy.contact.title}</h1>
+    </header>
 
     <div class="contact-board">
       <img

@@ -10,7 +10,9 @@ const copy = t(locale);
 
 <Base title={`${copy.news.title} — Corpoceleste`}>
   <div class="wrap page-pad">
-    <h1 class="visually-hidden">{copy.news.title}</h1>
+    <header class="page-hero">
+      <h1>{copy.news.title}</h1>
+    </header>
     {
       news.length > 0 ? (
         <ul class="news-list">

@@ -11,6 +11,7 @@ import {
   productSeoDescription,
   productImageAlt,
   isInStock,
+  isLowStock,
   sizeInStock,
   stockOf,
 } from "../../data/products";
@@ -34,6 +35,7 @@ if (!product) return Astro.redirect(pageUrl(locale));
 const artist = artistName(product.artistId);
 const artistSlug = artistById(product.artistId)?.slug ?? "corpoceleste";
 const sold = !isInStock(product);
+const lowStock = !sold && isLowStock(product, siteSettings.lowStockThreshold);
 const preorder = product.status === "preorder" && !sold;
 const alt = productImageAlt(product, artist, locale);
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
@@ -189,6 +191,7 @@ const jsonLd = {
       }
       <h1>{product.title}</h1>
       <div class="price">{formatPrice(product.price)}</div>
+      {lowStock && <p class="product-status">{copy.product.lowStock}</p>}
       {preorder && <p class="product-status">{copy.product.preorder}</p>}
 
       <div class="product-buy">

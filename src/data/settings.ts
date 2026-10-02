@@ -37,6 +37,15 @@ export const siteSettings = {
   ogImage: data.ogImage ? String(data.ogImage) : "",
   /** Cloudflare Web Analytics beacon token (public; empty = script off). */
   cloudflareAnalyticsToken: String(data.cloudflareAnalyticsToken ?? "").trim(),
+  /**
+   * Badge “in esaurimento” quando i pezzi totali ≤ questa soglia.
+   * 0 = disattivato. Default 10.
+   */
+  lowStockThreshold: (() => {
+    const n = Number(data.lowStockThreshold);
+    if (!Number.isFinite(n) || n < 0) return 10;
+    return Math.floor(n);
+  })(),
   andreaName: String(data.andreaName ?? "Andrea Baldelli"),
   andreaBio: asLocalized(data.andreaBio),
 };

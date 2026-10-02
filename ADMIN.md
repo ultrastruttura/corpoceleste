@@ -50,6 +50,8 @@ Senza questi secret (o senza un nuovo deploy dopo averli messi) l’admin online
 
 In ogni maglia imposta i pezzi per taglia (S/M/L/XL). Taglia a 0 = non acquistabile.
 
+Badge **In esaurimento**: in Tina → **SEO e home** → *Soglia “in esaurimento”*. Se la somma dei pezzi di tutte le taglie è ≤ quel numero (default **10**), in griglia e scheda prodotto compare il badge come per Pre-order. Metti **0** per spegnerlo.
+
 Se è attivo il **webhook PayPal** (guida: [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)), dopo un pagamento PayPal lo stock si abbassa da solo e arriva una mail ordine (FormSubmit dal server Vercel).  
 **Bonifico:** aggiorna i numeri a mano qui dopo il pagamento; la mail parte dal form del sito.
 

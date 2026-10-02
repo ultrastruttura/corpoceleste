@@ -33,11 +33,13 @@ const it = {
     withdrawal: "Recesso",
     privacy: "Privacy",
     cookies: "Cookie",
+    account: "Area",
   },
   shop: {
     soldOut: "Esaurite",
     soldBadge: "Esaurito",
     preorderBadge: "Pre-order",
+    lowStockBadge: "In esaurimento",
   },
   product: {
     size: "Taglia",
@@ -46,6 +48,7 @@ const it = {
     sizeOut: "Esaurita",
     stockLeft: (n: number) => (n === 1 ? "1 pezzo" : `${n} pezzi`),
     preorder: "Pre-order. Spedizione quando la stampa è pronta.",
+    lowStock: "Pochi pezzi rimasti.",
     reprint: "Richiedi ristampa",
     printOne: "Serigrafia, un colore",
     vatIncluded: "Prezzo IVA inclusa",
@@ -101,6 +104,7 @@ const it = {
     qtyDown: "Diminuisci quantità",
     qtyUp: "Aumenta quantità",
     shipping: "Spedizione",
+    viewPage: "Apri pagina carrello",
   },
   checkout: {
     title: "Checkout",
@@ -135,6 +139,7 @@ const it = {
     city: "CAP e città",
     notes: "Note",
     sendOrder: "Ordine con obbligo di pagamento",
+    unlockPay: "Accetta condizioni di vendita e privacy per proseguire con il pagamento.",
   },
   forms: {
     name: "Nome",
@@ -401,11 +406,13 @@ const en: typeof it = {
     withdrawal: "Withdrawal",
     privacy: "Privacy",
     cookies: "Cookies",
+    account: "Account",
   },
   shop: {
     soldOut: "Sold out",
     soldBadge: "Sold out",
     preorderBadge: "Pre-order",
+    lowStockBadge: "Low stock",
   },
   product: {
     size: "Size",
@@ -414,6 +421,7 @@ const en: typeof it = {
     sizeOut: "Sold out",
     stockLeft: (n: number) => (n === 1 ? "1 left" : `${n} left`),
     preorder: "Pre-order. Ships when the print is ready.",
+    lowStock: "Only a few left.",
     reprint: "Request a reprint",
     printOne: "Screen print, one colour",
     vatIncluded: "Price includes VAT",
@@ -467,6 +475,7 @@ const en: typeof it = {
     qtyDown: "Decrease quantity",
     qtyUp: "Increase quantity",
     shipping: "Shipping",
+    viewPage: "Open cart page",
   },
   checkout: {
     title: "Checkout",
@@ -501,6 +510,7 @@ const en: typeof it = {
     city: "Postcode and city",
     notes: "Notes",
     sendOrder: "Order with obligation to pay",
+    unlockPay: "Accept the terms of sale and privacy notice to continue to payment.",
   },
   forms: {
     name: "Name",
@@ -766,11 +776,13 @@ const de: typeof it = {
     withdrawal: "Widerruf",
     privacy: "Datenschutz",
     cookies: "Cookies",
+    account: "Bereich",
   },
   shop: {
     soldOut: "Ausverkauft",
     soldBadge: "Ausverkauft",
     preorderBadge: "Pre-order",
+    lowStockBadge: "Fast ausverkauft",
   },
   product: {
     size: "Größe",
@@ -779,6 +791,7 @@ const de: typeof it = {
     sizeOut: "Ausverkauft",
     stockLeft: (n: number) => (n === 1 ? "1 Stück" : `${n} Stück`),
     preorder: "Pre-order. Versand, sobald der Druck fertig ist.",
+    lowStock: "Nur noch wenige Stück.",
     reprint: "Nachdruck anfragen",
     printOne: "Siebdruck, eine Farbe",
     vatIncluded: "Preis inkl. MwSt.",
@@ -832,6 +845,7 @@ const de: typeof it = {
     qtyDown: "Menge verringern",
     qtyUp: "Menge erhöhen",
     shipping: "Versand",
+    viewPage: "Warenkorb-Seite öffnen",
   },
   checkout: {
     title: "Kasse",
@@ -866,6 +880,7 @@ const de: typeof it = {
     city: "PLZ und Ort",
     notes: "Anmerkungen",
     sendOrder: "Zahlungspflichtig bestellen",
+    unlockPay: "Akzeptiere Verkaufsbedingungen und Datenschutz, um zur Zahlung fortzufahren.",
   },
   forms: {
     name: "Name",

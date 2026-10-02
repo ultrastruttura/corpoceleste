@@ -16,6 +16,7 @@ homeLede:
 ogImage: /uploads/prints/stella.jpg
 # Token da Cloudflare → Analytics → Web Analytics → Add site (visibile nel beacon JS)
 cloudflareAnalyticsToken: ""
+lowStockThreshold: 10
 andreaName: Andrea Baldelli
 andreaBio:
   it: |-

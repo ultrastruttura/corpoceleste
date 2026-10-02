@@ -255,6 +255,13 @@ export default defineConfig({
             description:
               "Da dash.cloudflare.com → Analytics & logs → Web Analytics → Add a site. Incolla solo il token (non tutto lo script). Vuoto = analytics spente.",
           },
+          {
+            type: "number",
+            name: "lowStockThreshold",
+            label: "Soglia “in esaurimento” (pezzi totali)",
+            description:
+              "Se i pezzi rimasti (somma di tutte le taglie) sono ≤ questo numero, sul sito compare il badge “In esaurimento”. Default 10. Metti 0 per spegnere.",
+          },
           { type: "string", name: "andreaName", label: "Nome (bio studio)" },
           localizedText("andreaBio", "Bio Andrea"),
         ],

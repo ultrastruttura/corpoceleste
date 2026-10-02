@@ -91,6 +91,22 @@ export function stockOf(product: Product, size: string) {
   return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
 }
 
+/** Pezzi totali ancora disponibili (tutte le taglie). */
+export function totalStock(product: Product) {
+  return product.sizes.reduce((sum, size) => sum + stockOf(product, size), 0);
+}
+
+/**
+ * In esaurimento: acquistabile e pezzi totali ≤ soglia (Tina / settings).
+ * Soglia ≤ 0 spegne il badge.
+ */
+export function isLowStock(product: Product, threshold: number) {
+  if (!isInStock(product)) return false;
+  const limit = Math.floor(Number(threshold));
+  if (!Number.isFinite(limit) || limit < 1) return false;
+  return totalStock(product) <= limit;
+}
+
 export function maxQtyFor(product: Product, size: string) {
   return Math.min(99, stockOf(product, size));
 }

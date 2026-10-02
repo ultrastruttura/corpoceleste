@@ -58,6 +58,6 @@ function active(href: string) {
   <a class={active("news/")} href={pageUrl(locale, "news/")}>{copy.nav.news}</a>
   <a class={active("corsi/")} href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
   <a class={active("contatti/")} href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
-  <a class={active("carrello/")} href={pageUrl(locale, "carrello/")}>{copy.nav.cart}</a>
+  <a class={active("carrello/")} href={pageUrl(locale, "carrello/")} data-open-cart>{copy.nav.cart}</a>
   <LangSwitch />
 </nav>

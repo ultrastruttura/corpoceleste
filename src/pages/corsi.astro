@@ -16,7 +16,9 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
 
 <Base title={`${copy.workshops.title} — Corpoceleste`}>
   <div class="wrap page-pad">
-    <h1 class="visually-hidden">{copy.workshops.title}</h1>
+    <header class="page-hero">
+      <h1>{copy.workshops.title}</h1>
+    </header>
 
     <section class="workshops-intro">
       <img
