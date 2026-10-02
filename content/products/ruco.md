@@ -15,10 +15,10 @@ sizes:
   - L
   - XL
 stock:
-  S: 5
-  M: 5
-  L: 5
-  XL: 5
+  S: 0
+  M: 3
+  L: 2
+  XL: 2
 images:
   - /uploads/prints/meridiana.jpg
 seoDescription:
