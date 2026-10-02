@@ -125,15 +125,9 @@ function lineEl(item: CartItem) {
       input.disabled = true;
     }
 
-    const text = el("span");
-    if (!inStock) {
-      text.append(document.createTextNode(`${s} · ${labels.product.sizeOut}`));
-    } else {
-      text.append(document.createTextNode(s));
-      if (stock <= 3) {
-        const hint = el("span", "cart-size-left", ` · ${labels.product.stockLeft(stock)}`);
-        text.append(hint);
-      }
+    const text = el("span", undefined, s);
+    if (inStock && stock <= 3) {
+      text.append(el("span", "cart-size-left", ` · ${labels.product.stockLeft(stock)}`));
     }
     label.append(input, text);
     sizeRow.append(label);

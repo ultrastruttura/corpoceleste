@@ -1059,19 +1059,12 @@ body.cart-open {
 .size-row label.is-oos {
   opacity: 0.4;
   cursor: not-allowed;
-  text-decoration: line-through;
   pointer-events: none;
 }
 
 .size-row label.is-oos:has(input:checked) {
   background: transparent;
   color: inherit;
-}
-
-.size-oos {
-  font-weight: 400;
-  font-size: 0.85em;
-  text-decoration: none;
 }
 
 .attrs {
@@ -1585,7 +1578,6 @@ body.cart-open {
 .cart-size-row label.is-oos {
   opacity: 0.45;
   cursor: not-allowed;
-  text-decoration: line-through;
 }
 
 .cart-size-row label.is-oos input {
@@ -1595,7 +1587,6 @@ body.cart-open {
 .cart-size-row label.is-oos:has(input:checked) {
   background: transparent;
   color: inherit;
-  text-decoration: none;
 }
 
 .cart-size-left {
