@@ -681,6 +681,18 @@ body.cart-open {
   margin-bottom: 8px;
 }
 
+.checkout-ship-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .checkout-ship-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .checkout-bank-title {
   margin: 0 0 16px;
   font-size: 18px;

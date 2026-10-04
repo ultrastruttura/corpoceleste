@@ -11,13 +11,16 @@ const copy = t(locale);
 const shopEmail = siteSettings.shopEmail;
 const paypalSdk = Boolean(site.paypalClientId);
 const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}`;
-const shipCountries = [...SHIP_COUNTRIES];
+const regionNames = new Intl.DisplayNames([locale, "en"], { type: "region" });
+const shipCountries = SHIP_COUNTRIES.map((code) => ({
+  code,
+  label: `${regionNames.of(code) || code} (${code})`,
+}));
 ---
 
 <Base title={`${copy.checkout.title} — Corpoceleste`}>
   <div
     class="wrap page-main page-main--narrow checkout-page"
-    data-ui-locale={locale}
     data-ship-need-zip={copy.checkout.shippingQuoteNeedZip}
     data-ship-loading={copy.checkout.shippingQuoteLoading}
     data-ship-error={copy.checkout.shippingQuoteError}
@@ -30,21 +33,35 @@ const shipCountries = [...SHIP_COUNTRIES];
 
     <div class="checkout-flow" data-checkout-flow hidden>
       <section class="checkout-step checkout-step--order">
+        <h2 class="checkout-bank-title">{copy.checkout.shipTo}</h2>
         <div class="field checkout-ship">
           <label class="field-label" for="ship-country">{copy.checkout.shipCountry}</label>
-          <select id="ship-country" data-ship-country>
+          <select id="ship-country" data-ship-country autocomplete="country">
             {
-              shipCountries.map((code) => (
+              shipCountries.map(({ code, label }) => (
                 <option value={code} selected={code === "IT"}>
-                  {code}
+                  {label}
                 </option>
               ))
             }
           </select>
         </div>
-        <div class="field checkout-ship">
-          <label class="field-label" for="ship-zip">{copy.checkout.shipZip}</label>
-          <input id="ship-zip" data-ship-zip type="text" autocomplete="postal-code" inputmode="text" />
+        <div class="checkout-ship-row">
+          <div class="field checkout-ship">
+            <label class="field-label" for="ship-zip">{copy.checkout.shipZip}</label>
+            <input
+              id="ship-zip"
+              data-ship-zip
+              type="text"
+              autocomplete="postal-code"
+              inputmode="text"
+              spellcheck="false"
+            />
+          </div>
+          <div class="field checkout-ship">
+            <label class="field-label" for="ship-city">{copy.checkout.city}</label>
+            <input id="ship-city" data-ship-city type="text" autocomplete="address-level2" />
+          </div>
         </div>
         <p class="checkout-vat" data-ship-status>{copy.checkout.shippingQuoteNeedZip}</p>
         <div class="recap" data-recap></div>
@@ -122,7 +139,6 @@ const shipCountries = [...SHIP_COUNTRIES];
                     {copy.checkout.applePay}
                   </button>
                 </div>
-                <p class="checkout-vat">{copy.checkout.paypalSoon}</p>
               </div>
             )
           }
@@ -154,12 +170,9 @@ const shipCountries = [...SHIP_COUNTRIES];
             </div>
             <div>
               <label for="o-addr">{copy.checkout.address}</label>
-              <input id="o-addr" name="indirizzo" required />
+              <input id="o-addr" name="indirizzo" required autocomplete="street-address" />
             </div>
-            <div>
-              <label for="o-city">{copy.checkout.city}</label>
-              <input id="o-city" name="citta" required />
-            </div>
+            <input type="hidden" name="citta" data-ship-city-field value="" />
             <div>
               <label for="o-note">{copy.checkout.notes}</label>
               <textarea id="o-note" name="note"></textarea>
@@ -195,12 +208,12 @@ const shipCountries = [...SHIP_COUNTRIES];
       loading: page?.dataset.shipLoading || "",
       error: page?.dataset.shipError || "",
     };
-    const uiLocale = page?.dataset.uiLocale || "it";
     const emptyEl = document.querySelector("[data-checkout-empty]");
     const flowEl = document.querySelector("[data-checkout-flow]");
     const recap = document.querySelector("[data-recap]");
     const countrySel = document.querySelector<HTMLSelectElement>("[data-ship-country]");
     const zipInput = document.querySelector<HTMLInputElement>("[data-ship-zip]");
+    const cityInput = document.querySelector<HTMLInputElement>("[data-ship-city]");
     const shipStatus = document.querySelector<HTMLElement>("[data-ship-status]");
     const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
     const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
@@ -212,6 +225,7 @@ const shipCountries = [...SHIP_COUNTRIES];
     const linesField = document.querySelector<HTMLInputElement>("[data-lines-field]");
     const shipCountryField = document.querySelector<HTMLInputElement>("[data-ship-country-field]");
     const shipZipField = document.querySelector<HTMLInputElement>("[data-ship-zip-field]");
+    const shipCityField = document.querySelector<HTMLInputElement>("[data-ship-city-field]");
     const methods = document.querySelectorAll<HTMLInputElement>("[data-method]");
     const panels = document.querySelectorAll<HTMLElement>("[data-method-panel]");
 
@@ -241,12 +255,18 @@ const shipCountries = [...SHIP_COUNTRIES];
       return normalizeZip(zipInput?.value || "");
     }
 
+    function destCity() {
+      return String(cityInput?.value || "").trim();
+    }
+
     function shippingAmount() {
       return quote?.shipping ?? 0;
     }
 
     function hasValidQuote() {
-      return Boolean(quote && quote.shipping >= 0 && !quoteError && !quoteLoading);
+      return Boolean(
+        quote && quote.shipping >= 0 && !quoteError && !quoteLoading && destCity(),
+      );
     }
 
     function orderText() {
@@ -278,19 +298,6 @@ const shipCountries = [...SHIP_COUNTRIES];
       if (shipStatus) shipStatus.textContent = text;
     }
 
-    function labelCountries() {
-      if (!countrySel) return;
-      try {
-        const dn = new Intl.DisplayNames([uiLocale, "en"], { type: "region" });
-        for (const opt of countrySel.options) {
-          const code = opt.value;
-          opt.textContent = `${dn.of(code) || code} (${code})`;
-        }
-      } catch {
-        /* keep ISO codes */
-      }
-    }
-
     function syncPage() {
       const items = sanitizeCart();
       const empty = !items.length;
@@ -306,6 +313,7 @@ const shipCountries = [...SHIP_COUNTRIES];
         }
         if (shipCountryField) shipCountryField.value = destCountry();
         if (shipZipField) shipZipField.value = destZip();
+        if (shipCityField) shipCityField.value = destCity();
       }
       syncLock();
       page?.classList.add("is-ready");
@@ -419,7 +427,6 @@ const shipCountries = [...SHIP_COUNTRIES];
 
     methods.forEach((radio) => radio.addEventListener("change", syncMethod));
     syncMethod();
-    labelCountries();
 
     countrySel?.addEventListener("change", () => {
       scheduleQuote();
@@ -427,6 +434,9 @@ const shipCountries = [...SHIP_COUNTRIES];
     });
     zipInput?.addEventListener("input", () => {
       scheduleQuote();
+      syncPage();
+    });
+    cityInput?.addEventListener("input", () => {
       syncPage();
     });
     disclaimer?.addEventListener("change", syncLock);
