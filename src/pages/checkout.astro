@@ -15,7 +15,13 @@ const shipCountries = [...SHIP_COUNTRIES];
 ---
 
 <Base title={`${copy.checkout.title} — Corpoceleste`}>
-  <div class="wrap page-main page-main--narrow checkout-page">
+  <div
+    class="wrap page-main page-main--narrow checkout-page"
+    data-ui-locale={locale}
+    data-ship-need-zip={copy.checkout.shippingQuoteNeedZip}
+    data-ship-loading={copy.checkout.shippingQuoteLoading}
+    data-ship-error={copy.checkout.shippingQuoteError}
+  >
     <h1>{copy.checkout.title}</h1>
 
     <p class="empty" data-checkout-empty hidden>
@@ -176,21 +182,20 @@ const shipCountries = [...SHIP_COUNTRIES];
     )
   }
 
-  <script define:vars={{
-    labels: {
-      needZip: copy.checkout.shippingQuoteNeedZip,
-      loading: copy.checkout.shippingQuoteLoading,
-      error: copy.checkout.shippingQuoteError,
-    },
-    uiLocale: locale,
-  }}>
+  <script>
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
     import { apiBase, site } from "../data/site";
 
     const base = import.meta.env.BASE_URL;
     const prefix = document.documentElement.dataset.localePrefix || "";
-    const page = document.querySelector(".checkout-page");
+    const page = document.querySelector<HTMLElement>(".checkout-page");
+    const labels = {
+      needZip: page?.dataset.shipNeedZip || "",
+      loading: page?.dataset.shipLoading || "",
+      error: page?.dataset.shipError || "",
+    };
+    const uiLocale = page?.dataset.uiLocale || "it";
     const emptyEl = document.querySelector("[data-checkout-empty]");
     const flowEl = document.querySelector("[data-checkout-flow]");
     const recap = document.querySelector("[data-recap]");
