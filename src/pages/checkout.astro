@@ -46,22 +46,16 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             }
           </select>
         </div>
-        <div class="checkout-ship-row">
-          <div class="field checkout-ship">
-            <label class="field-label" for="ship-zip">{copy.checkout.shipZip}</label>
-            <input
-              id="ship-zip"
-              data-ship-zip
-              type="text"
-              autocomplete="postal-code"
-              inputmode="text"
-              spellcheck="false"
-            />
-          </div>
-          <div class="field checkout-ship">
-            <label class="field-label" for="ship-city">{copy.checkout.city}</label>
-            <input id="ship-city" data-ship-city type="text" autocomplete="address-level2" />
-          </div>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-zip">{copy.checkout.shipZip}</label>
+          <input
+            id="ship-zip"
+            data-ship-zip
+            type="text"
+            autocomplete="postal-code"
+            inputmode="text"
+            spellcheck="false"
+          />
         </div>
         <p class="checkout-vat" data-ship-status>{copy.checkout.shippingQuoteNeedZip}</p>
         <div class="recap" data-recap></div>
@@ -172,7 +166,10 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
               <label for="o-addr">{copy.checkout.address}</label>
               <input id="o-addr" name="indirizzo" required autocomplete="street-address" />
             </div>
-            <input type="hidden" name="citta" data-ship-city-field value="" />
+            <div>
+              <label for="o-city">{copy.checkout.city}</label>
+              <input id="o-city" name="citta" required autocomplete="address-level2" />
+            </div>
             <div>
               <label for="o-note">{copy.checkout.notes}</label>
               <textarea id="o-note" name="note"></textarea>
@@ -213,7 +210,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     const recap = document.querySelector("[data-recap]");
     const countrySel = document.querySelector<HTMLSelectElement>("[data-ship-country]");
     const zipInput = document.querySelector<HTMLInputElement>("[data-ship-zip]");
-    const cityInput = document.querySelector<HTMLInputElement>("[data-ship-city]");
     const shipStatus = document.querySelector<HTMLElement>("[data-ship-status]");
     const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
     const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
@@ -225,7 +221,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     const linesField = document.querySelector<HTMLInputElement>("[data-lines-field]");
     const shipCountryField = document.querySelector<HTMLInputElement>("[data-ship-country-field]");
     const shipZipField = document.querySelector<HTMLInputElement>("[data-ship-zip-field]");
-    const shipCityField = document.querySelector<HTMLInputElement>("[data-ship-city-field]");
     const methods = document.querySelectorAll<HTMLInputElement>("[data-method]");
     const panels = document.querySelectorAll<HTMLElement>("[data-method-panel]");
 
@@ -255,18 +250,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       return normalizeZip(zipInput?.value || "");
     }
 
-    function destCity() {
-      return String(cityInput?.value || "").trim();
-    }
-
     function shippingAmount() {
       return quote?.shipping ?? 0;
     }
 
     function hasValidQuote() {
-      return Boolean(
-        quote && quote.shipping >= 0 && !quoteError && !quoteLoading && destCity(),
-      );
+      return Boolean(quote && quote.shipping >= 0 && !quoteError && !quoteLoading);
     }
 
     function orderText() {
@@ -313,7 +302,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         }
         if (shipCountryField) shipCountryField.value = destCountry();
         if (shipZipField) shipZipField.value = destZip();
-        if (shipCityField) shipCityField.value = destCity();
       }
       syncLock();
       page?.classList.add("is-ready");
@@ -434,9 +422,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     });
     zipInput?.addEventListener("input", () => {
       scheduleQuote();
-      syncPage();
-    });
-    cityInput?.addEventListener("input", () => {
       syncPage();
     });
     disclaimer?.addEventListener("change", syncLock);
