@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { site, formEndpoint } from "../data/site";
 import { siteSettings } from "../data/settings";
+import { SHIP_COUNTRIES } from "../lib/ship-countries";
 import { currentLocale, pageUrl, paypalSdkLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
@@ -10,6 +11,7 @@ const copy = t(locale);
 const shopEmail = siteSettings.shopEmail;
 const paypalSdk = Boolean(site.paypalClientId);
 const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}`;
+const shipCountries = [...SHIP_COUNTRIES];
 ---
 
 <Base title={`${copy.checkout.title} — Corpoceleste`}>
@@ -23,12 +25,22 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     <div class="checkout-flow" data-checkout-flow hidden>
       <section class="checkout-step checkout-step--order">
         <div class="field checkout-ship">
-          <label class="field-label" for="ship-to">{copy.checkout.shipTo}</label>
-          <select id="ship-to" data-ship>
-            <option value="it" selected>{copy.checkout.italy}</option>
-            <option value="eu">{copy.checkout.europe}</option>
+          <label class="field-label" for="ship-country">{copy.checkout.shipCountry}</label>
+          <select id="ship-country" data-ship-country>
+            {
+              shipCountries.map((code) => (
+                <option value={code} selected={code === "IT"}>
+                  {code}
+                </option>
+              ))
+            }
           </select>
         </div>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-zip">{copy.checkout.shipZip}</label>
+          <input id="ship-zip" data-ship-zip type="text" autocomplete="postal-code" inputmode="text" />
+        </div>
+        <p class="checkout-vat" data-ship-status>{copy.checkout.shippingQuoteNeedZip}</p>
         <div class="recap" data-recap></div>
       </section>
 
@@ -119,7 +131,8 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="ordine" data-order-field />
             <input type="hidden" name="lines" data-lines-field />
-            <input type="hidden" name="shipZone" data-ship-zone-field value="it" />
+            <input type="hidden" name="shipCountry" data-ship-country-field value="IT" />
+            <input type="hidden" name="shipZip" data-ship-zip-field value="" />
             <FormHoney />
             <div>
               <label for="o-name">{copy.checkout.name}</label>
@@ -138,8 +151,8 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
               <input id="o-addr" name="indirizzo" required />
             </div>
             <div>
-              <label for="o-cap">{copy.checkout.city}</label>
-              <input id="o-cap" name="citta" required />
+              <label for="o-city">{copy.checkout.city}</label>
+              <input id="o-city" name="citta" required />
             </div>
             <div>
               <label for="o-note">{copy.checkout.notes}</label>
@@ -163,7 +176,14 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     )
   }
 
-  <script>
+  <script define:vars={{
+    labels: {
+      needZip: copy.checkout.shippingQuoteNeedZip,
+      loading: copy.checkout.shippingQuoteLoading,
+      error: copy.checkout.shippingQuoteError,
+    },
+    uiLocale: locale,
+  }}>
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
     import { apiBase, site } from "../data/site";
@@ -174,7 +194,9 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     const emptyEl = document.querySelector("[data-checkout-empty]");
     const flowEl = document.querySelector("[data-checkout-flow]");
     const recap = document.querySelector("[data-recap]");
-    const shipSel = document.querySelector<HTMLSelectElement>("[data-ship]");
+    const countrySel = document.querySelector<HTMLSelectElement>("[data-ship-country]");
+    const zipInput = document.querySelector<HTMLInputElement>("[data-ship-zip]");
+    const shipStatus = document.querySelector<HTMLElement>("[data-ship-status]");
     const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
     const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
     const payBox = document.querySelector("[data-pay-box]");
@@ -183,32 +205,60 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
     const lockHint = document.querySelector<HTMLElement>("[data-pay-lock-hint]");
     const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
     const linesField = document.querySelector<HTMLInputElement>("[data-lines-field]");
-    const shipZoneField = document.querySelector<HTMLInputElement>("[data-ship-zone-field]");
+    const shipCountryField = document.querySelector<HTMLInputElement>("[data-ship-country-field]");
+    const shipZipField = document.querySelector<HTMLInputElement>("[data-ship-zip-field]");
     const methods = document.querySelectorAll<HTMLInputElement>("[data-method]");
     const panels = document.querySelectorAll<HTMLElement>("[data-method-panel]");
 
-    function shipping() {
-      return shipSel?.value === "eu" ? site.shippingEU : site.shippingItaly;
+    type Quote = {
+      shipping: number;
+      country: string;
+      zip: string;
+      serviceId: number;
+      carrier: string;
+    };
+
+    let quote: Quote | null = null;
+    let quoteError = false;
+    let quoteLoading = false;
+    let quoteSeq = 0;
+    let quoteTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function normalizeZip(z: string) {
+      return z.trim().replace(/\s+/g, "").toUpperCase();
     }
 
-    function shipZone(): "it" | "eu" {
-      return shipSel?.value === "eu" ? "eu" : "it";
+    function destCountry() {
+      return String(countrySel?.value || "IT").toUpperCase();
+    }
+
+    function destZip() {
+      return normalizeZip(zipInput?.value || "");
+    }
+
+    function shippingAmount() {
+      return quote?.shipping ?? 0;
+    }
+
+    function hasValidQuote() {
+      return Boolean(quote && quote.shipping >= 0 && !quoteError && !quoteLoading);
     }
 
     function orderText() {
       const items = sanitizeCart();
-      const ship = shipping();
+      const ship = shippingAmount();
       const lines = items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`);
-      if (ship > 0) {
-        lines.push(`Spedizione ${ship}€`, `Totale ${total() + ship}€`);
+      if (hasValidQuote()) {
+        const carrier = quote?.carrier ? ` (${quote.carrier})` : "";
+        lines.push(`Spedizione ${ship}€${carrier}`, `Totale ${total() + ship}€`);
       } else {
-        lines.push("Spedizione: calcolata in seguito", `Totale merce ${total()}€`);
+        lines.push("Spedizione: da calcolare", `Totale merce ${total()}€`);
       }
       return lines.join("\n");
     }
 
     function unlocked() {
-      return Boolean(disclaimer?.checked && privacy?.checked && sanitizeCart().length);
+      return Boolean(disclaimer?.checked && privacy?.checked && sanitizeCart().length && hasValidQuote());
     }
 
     function syncLock() {
@@ -219,24 +269,139 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
       if (lockHint) lockHint.hidden = ok;
     }
 
+    function setStatus(text: string) {
+      if (shipStatus) shipStatus.textContent = text;
+    }
+
+    function labelCountries() {
+      if (!countrySel) return;
+      try {
+        const dn = new Intl.DisplayNames([uiLocale, "en"], { type: "region" });
+        for (const opt of countrySel.options) {
+          const code = opt.value;
+          opt.textContent = `${dn.of(code) || code} (${code})`;
+        }
+      } catch {
+        /* keep ISO codes */
+      }
+    }
+
     function syncPage() {
       const items = sanitizeCart();
       const empty = !items.length;
       if (emptyEl) emptyEl.hidden = !empty;
       if (flowEl) flowEl.hidden = empty;
       if (!empty && recap) {
-        const ship = shipping();
-        renderRecap(recap, items, ship);
+        renderRecap(recap, items, hasValidQuote() ? shippingAmount() : 0);
         if (orderField) orderField.value = orderText();
         if (linesField) {
           linesField.value = JSON.stringify(
             items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
           );
         }
-        if (shipZoneField) shipZoneField.value = shipZone();
+        if (shipCountryField) shipCountryField.value = destCountry();
+        if (shipZipField) shipZipField.value = destZip();
       }
       syncLock();
       page?.classList.add("is-ready");
+    }
+
+    async function fetchQuote() {
+      const items = sanitizeCart();
+      const country = destCountry();
+      const zip = destZip();
+      const createApi = apiBase();
+
+      quote = null;
+      quoteError = false;
+
+      if (!items.length) {
+        quoteLoading = false;
+        setStatus(labels.needZip);
+        syncPage();
+        return;
+      }
+      if (!zip || zip.length < 3) {
+        quoteLoading = false;
+        setStatus(labels.needZip);
+        syncPage();
+        return;
+      }
+      if (!createApi) {
+        quoteLoading = false;
+        quoteError = true;
+        setStatus(labels.error);
+        syncPage();
+        return;
+      }
+
+      const seq = ++quoteSeq;
+      quoteLoading = true;
+      setStatus(labels.loading);
+      syncPage();
+
+      try {
+        const res = await fetch(`${createApi}/api/shipping-quote`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            country,
+            zip,
+            lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+          }),
+        });
+        if (seq !== quoteSeq) return;
+        if (!res.ok) {
+          quoteError = true;
+          quote = null;
+          setStatus(labels.error);
+          syncPage();
+          return;
+        }
+        const data = (await res.json()) as {
+          shipping?: string;
+          country?: string;
+          zip?: string;
+          serviceId?: number;
+          carrier?: string;
+        };
+        const shipping = Number(data.shipping);
+        if (!Number.isFinite(shipping) || !data.serviceId) {
+          quoteError = true;
+          quote = null;
+          setStatus(labels.error);
+          syncPage();
+          return;
+        }
+        quote = {
+          shipping,
+          country: String(data.country || country).toUpperCase(),
+          zip: normalizeZip(String(data.zip || zip)),
+          serviceId: Number(data.serviceId),
+          carrier: String(data.carrier || ""),
+        };
+        quoteError = false;
+        const carrier = quote.carrier ? ` · ${quote.carrier}` : "";
+        setStatus(`${quote.shipping.toFixed(2)} €${carrier}`);
+        syncPage();
+      } catch (err) {
+        if (seq !== quoteSeq) return;
+        console.error("shipping-quote", err);
+        quoteError = true;
+        quote = null;
+        setStatus(labels.error);
+        syncPage();
+      } finally {
+        if (seq === quoteSeq) quoteLoading = false;
+        syncLock();
+      }
+    }
+
+    function scheduleQuote() {
+      if (quoteTimer) clearTimeout(quoteTimer);
+      quoteTimer = setTimeout(() => {
+        void fetchQuote();
+      }, 400);
     }
 
     function syncMethod() {
@@ -249,11 +414,22 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
 
     methods.forEach((radio) => radio.addEventListener("change", syncMethod));
     syncMethod();
+    labelCountries();
 
-    shipSel?.addEventListener("change", syncPage);
+    countrySel?.addEventListener("change", () => {
+      scheduleQuote();
+      syncPage();
+    });
+    zipInput?.addEventListener("input", () => {
+      scheduleQuote();
+      syncPage();
+    });
     disclaimer?.addEventListener("change", syncLock);
     privacy?.addEventListener("change", syncLock);
-    window.addEventListener("cart:change", syncPage);
+    window.addEventListener("cart:change", () => {
+      scheduleQuote();
+      syncPage();
+    });
 
     bankForm?.addEventListener("submit", (e) => {
       sanitizeCart();
@@ -262,7 +438,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
         e.preventDefault();
         return;
       }
-      saveOrderSnapshot(shipping());
+      saveOrderSnapshot(shippingAmount());
     });
 
     syncPage();
@@ -292,22 +468,31 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
           return actions.resolve();
         },
         onShippingAddressChange: async (
-          data: { shippingAddress?: { countryCode?: string } },
+          data: {
+            shippingAddress?: {
+              countryCode?: string;
+              postalCode?: string;
+            };
+          },
           actions: { reject: () => Promise<void>; resolve: () => Promise<void> },
         ) => {
+          if (!quote) return actions.reject();
           const country = String(data.shippingAddress?.countryCode || "").toUpperCase();
-          const destZone = country === "IT" ? "it" : "eu";
-          if (destZone !== shipZone()) return actions.reject();
+          const postal = normalizeZip(String(data.shippingAddress?.postalCode || ""));
+          if (country && country !== quote.country) return actions.reject();
+          if (postal && postal !== quote.zip) return actions.reject();
           return actions.resolve();
         },
         createOrder: async () => {
           const items = sanitizeCart();
+          if (!quote) throw new Error("Missing shipping quote");
           const res = await fetch(`${createApi}/api/paypal-create-order`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
-              shipZone: shipZone(),
+              country: quote.country,
+              zip: quote.zip,
             }),
           });
           if (!res.ok) {
@@ -320,7 +505,7 @@ const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}
           return data.id;
         },
         onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
-          saveOrderSnapshot(shipping());
+          saveOrderSnapshot(shippingAmount());
           await actions.order.capture();
           clearCart();
           location.href = `${base}${prefix}grazie/?from=paypal`;

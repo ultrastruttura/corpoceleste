@@ -36,16 +36,28 @@ export function formatShopOrderEmail(opts: {
   stockNotes: string[];
   itemLabels?: string[];
   total?: string;
+  packlinkRef?: string;
+  packlinkLabels?: string[];
+  packlinkError?: string;
+  shippingAddress?: string;
 }): string {
   const rows =
     opts.itemLabels?.length
       ? opts.itemLabels
       : opts.lines.map((l) => `${l.id} · ${l.size} · ×${l.qty}`);
+  const packlinkLines: string[] = [];
+  if (opts.packlinkRef) packlinkLines.push(`Packlink: ${opts.packlinkRef}`);
+  if (opts.packlinkLabels?.length) {
+    for (const url of opts.packlinkLabels) packlinkLines.push(`Etichetta: ${url}`);
+  }
+  if (opts.packlinkError) packlinkLines.push(`Packlink errore: ${opts.packlinkError}`);
   return [
     ...rows,
     "",
     `Capture: ${opts.captureId}`,
     opts.total ? `Totale PayPal: ${opts.total}` : "",
+    opts.shippingAddress ? `Spedizione a:\n${opts.shippingAddress}` : "",
+    ...packlinkLines,
     "",
     "Magazzino:",
     ...(opts.stockNotes.length ? opts.stockNotes : ["(nessuna variazione)"]),

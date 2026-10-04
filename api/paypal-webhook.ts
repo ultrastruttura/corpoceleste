@@ -11,10 +11,17 @@ import { formatCustomerOrderLines, formatShopOrderEmail } from "../server/stock-
 import { parseOrderLines } from "../src/lib/paypal-lines.js";
 import {
   money,
+  parseShipDest,
   paymentCoversExpected,
   priceOrderLines,
-  shipZoneFromCountry,
 } from "../server/order-pricing.js";
+import {
+  createShipmentAndLabels,
+  normalizeZip,
+  packagesForQty,
+  packlinkConfigured,
+  personFromFullName,
+} from "../server/packlink.js";
 import {
   fetchPayPalOrder,
   linesFromOrder,
@@ -54,10 +61,105 @@ async function readRawBody(req: VercelRequest): Promise<string> {
   return JSON.stringify(req.body ?? {});
 }
 
+function shippingAddressText(order: PayPalOrder | null): string {
+  const ship = order?.purchase_units?.[0]?.shipping;
+  if (!ship?.address) return "";
+  const a = ship.address;
+  return [
+    ship.name?.full_name || "",
+    a.address_line_1 || "",
+    a.address_line_2 || "",
+    [a.postal_code, a.admin_area_2].filter(Boolean).join(" "),
+    a.admin_area_1 || "",
+    a.country_code || "",
+  ]
+    .map((x) => String(x || "").trim())
+    .filter(Boolean)
+    .join("\n");
+}
+
+async function ensurePacklinkShipment(opts: {
+  ledger: LedgerRecord;
+  order: PayPalOrder | null;
+  priced: Extract<Awaited<ReturnType<typeof priceOrderLines>>, { ok: true }>["order"];
+  captureId: string;
+}): Promise<Pick<LedgerRecord, "packlinkRef" | "packlinkLabels" | "packlinkError" | "packlinkServiceId">> {
+  if (opts.ledger.packlinkRef) {
+    return {
+      packlinkRef: opts.ledger.packlinkRef,
+      packlinkLabels: opts.ledger.packlinkLabels || [],
+      packlinkServiceId: opts.ledger.packlinkServiceId || opts.priced.packlink.serviceId,
+      packlinkError: opts.ledger.packlinkError,
+    };
+  }
+
+  if (!packlinkConfigured()) {
+    return { packlinkError: "PACKLINK_API_KEY missing" };
+  }
+
+  const ship = opts.order?.purchase_units?.[0]?.shipping;
+  const addr = ship?.address;
+  const dest = parseShipDest({
+    country: addr?.country_code,
+    zip: addr?.postal_code,
+  });
+  if (!dest || !addr?.address_line_1 || !addr.admin_area_2) {
+    return { packlinkError: "PayPal shipping address incomplete" };
+  }
+
+  const fullName = ship?.name?.full_name || "Cliente";
+  const person = personFromFullName(fullName);
+  const email = (opts.order?.payer?.email_address || process.env.SHOP_EMAIL || "").trim();
+  const paypalPhone = String(ship?.phone?.phone_number?.national_number || "").trim();
+  const phone = (
+    paypalPhone ||
+    process.env.PACKLINK_DEFAULT_TO_PHONE ||
+    process.env.PACKLINK_FROM_PHONE ||
+    ""
+  ).trim();
+  if (!email || !phone) {
+    return { packlinkError: "Missing recipient email/phone for Packlink" };
+  }
+
+  const pieceCount = opts.priced.lines.reduce((n, l) => n + l.qty, 0);
+
+  try {
+    const created = await createShipmentAndLabels({
+      serviceId: opts.priced.packlink.serviceId,
+      packages: packagesForQty(pieceCount),
+      content: "Maglie serigrafate",
+      contentValue: opts.priced.merchandise,
+      customReference: opts.captureId.slice(0, 50),
+      to: {
+        name: person.name,
+        surname: person.surname,
+        street1: String(addr.address_line_1),
+        street2: addr.address_line_2 ? String(addr.address_line_2) : undefined,
+        zip_code: normalizeZip(dest.zip),
+        city: String(addr.admin_area_2),
+        state: addr.admin_area_1 ? String(addr.admin_area_1) : undefined,
+        country: dest.country,
+        phone,
+        email,
+      },
+    });
+    return {
+      packlinkRef: created.reference,
+      packlinkLabels: created.labelUrls,
+      packlinkServiceId: opts.priced.packlink.serviceId,
+      packlinkError: created.labelUrls.length ? undefined : "Shipment created, labels pending",
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("packlink shipment", opts.captureId, msg);
+    return { packlinkError: msg, packlinkServiceId: opts.priced.packlink.serviceId };
+  }
+}
+
 /**
  * PayPal → Vercel webhook.
  * Event: PAYMENT.CAPTURE.COMPLETED
- * Verifies catalog prices + destination shipping, then stock + mail (resumable ledger).
+ * Verifies catalog prices + Packlink shipping, then stock + label + mail (resumable ledger).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
@@ -112,9 +214,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, skipped: "no lines" });
     }
 
-    const country = order?.purchase_units?.[0]?.shipping?.address?.country_code;
-    const shipZone = shipZoneFromCountry(country);
-    const priced = await priceOrderLines(lines, shipZone);
+    const addr = order?.purchase_units?.[0]?.shipping?.address;
+    const dest = parseShipDest({
+      country: addr?.country_code,
+      zip: addr?.postal_code,
+    });
+    if (!dest) {
+      const msg = `Missing PayPal shipping CAP/country (${addr?.country_code || "?"}/${addr?.postal_code || "?"})`;
+      console.error(msg, captureId);
+      await failLedger(captureId, lines, msg, event.resource?.amount?.value);
+      await alertUnderpay(captureId, msg, event.resource?.amount?.value);
+      return res.status(200).json({ ok: true, rejected: "no shipping address" });
+    }
+
+    const priced = await priceOrderLines(lines, dest);
     const paidRaw =
       event.resource?.amount?.value ||
       order?.purchase_units?.[0]?.amount?.value ||
@@ -129,7 +242,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!paymentCoversExpected(paid, priced.order.total)) {
-      const msg = `UNDERPAY paid=${paidRaw} expected=${money(priced.order.total)} zone=${shipZone} country=${country || "?"}`;
+      const msg = `UNDERPAY paid=${paidRaw} expected=${money(priced.order.total)} ${dest.country} ${dest.zip}`;
       console.error(msg, captureId);
       await failLedger(captureId, lines, msg, paidRaw, money(priced.order.total));
       await alertUnderpay(captureId, msg, paidRaw);
@@ -166,6 +279,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    const packlink = await ensurePacklinkShipment({
+      ledger: { ...claim.ledger, stockNotes: notes },
+      order,
+      priced: priced.order,
+      captureId,
+    });
+
     const bits = order ? orderEmailBits(order) : { labels: [] as string[], total: undefined };
     const shopBody = formatShopOrderEmail({
       captureId,
@@ -173,6 +293,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       stockNotes: notes,
       itemLabels: bits.labels,
       total: bits.total || `${money(priced.order.total)} EUR`,
+      shippingAddress: shippingAddressText(order),
+      packlinkRef: packlink.packlinkRef,
+      packlinkLabels: packlink.packlinkLabels,
+      packlinkError: packlink.packlinkError,
     });
     const customerBody = customerOrderText({
       metodo: "PayPal",
@@ -201,6 +325,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           emailed: false,
           error: "notify failed",
           at: new Date().toISOString(),
+          ...packlink,
         };
         await writeLedger(pending);
         return res.status(500).json({ error: "Notify failed" });
@@ -231,10 +356,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       at: new Date().toISOString(),
       expectedTotal: money(priced.order.total),
       paidTotal: paidRaw,
+      ...packlink,
     };
     await writeLedger(done);
 
-    return res.status(200).json({ ok: true, captureId, notes, emailed: true, artistSales });
+    return res.status(200).json({
+      ok: true,
+      captureId,
+      notes,
+      emailed: true,
+      artistSales,
+      packlinkRef: packlink.packlinkRef,
+    });
   } catch (err) {
     console.error("webhook handler failed", err);
     return res.status(500).json({ error: "Handler failed" });

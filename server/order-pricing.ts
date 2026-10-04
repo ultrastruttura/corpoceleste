@@ -1,7 +1,14 @@
 /** Server-side pricing from catalog — never trust client unit amounts. */
 
-import { site } from "../src/data/site.js";
 import { isPurchasableStatus, loadCatalogProduct } from "./catalog.js";
+import { isSupportedShipCountry } from "../src/lib/ship-countries.js";
+import {
+  normalizeCountry,
+  normalizeZip,
+  packagesForQty,
+  quoteCheapest,
+  type PacklinkQuote,
+} from "./packlink.js";
 import type { OrderLine } from "./paypal.js";
 
 export type PricedLine = OrderLine & {
@@ -10,31 +17,51 @@ export type PricedLine = OrderLine & {
   lineTotal: number;
 };
 
+export type ShipDest = {
+  country: string;
+  zip: string;
+};
+
 export type PricedOrder = {
   lines: PricedLine[];
   merchandise: number;
   shipping: number;
   total: number;
   shipZone: "it" | "eu";
+  shipCountry: string;
+  shipZip: string;
+  packlink: PacklinkQuote;
 };
 
 export function money(n: number) {
   return (Math.round(n * 100) / 100).toFixed(2);
 }
 
-export function shippingForZone(zone: "it" | "eu") {
-  return zone === "eu" ? site.shippingEU : site.shippingItaly;
+export function shipZoneFromCountry(countryCode: string | undefined | null): "it" | "eu" {
+  return normalizeCountry(countryCode) === "IT" ? "it" : "eu";
 }
 
-export function shipZoneFromCountry(countryCode: string | undefined | null): "it" | "eu" {
-  return String(countryCode || "").toUpperCase() === "IT" ? "it" : "eu";
+export function parseShipDest(input: {
+  country?: string;
+  zip?: string;
+}): ShipDest | null {
+  const country = normalizeCountry(input.country);
+  const zip = normalizeZip(input.zip);
+  if (!country || !zip || !isSupportedShipCountry(country)) return null;
+  return { country, zip };
 }
 
 export async function priceOrderLines(
   rawLines: OrderLine[],
-  shipZone: "it" | "eu",
+  dest: ShipDest,
 ): Promise<{ ok: true; order: PricedOrder } | { ok: false; error: string }> {
   if (!rawLines.length) return { ok: false, error: "Empty cart" };
+
+  const shipCountry = normalizeCountry(dest.country);
+  const shipZip = normalizeZip(dest.zip);
+  if (!shipCountry || !shipZip || !isSupportedShipCountry(shipCountry)) {
+    return { ok: false, error: "Invalid shipping destination" };
+  }
 
   const merged = new Map<string, OrderLine>();
   for (const line of rawLines) {
@@ -50,6 +77,7 @@ export async function priceOrderLines(
 
   const priced: PricedLine[] = [];
   let merchandise = 0;
+  let pieceCount = 0;
   for (const line of merged.values()) {
     const product = await loadCatalogProduct(line.id);
     if (!product) return { ok: false, error: `Unknown product ${line.id}` };
@@ -69,6 +97,7 @@ export async function priceOrderLines(
     const unitPrice = Math.round(product.price * 100) / 100;
     const lineTotal = Math.round(unitPrice * line.qty * 100) / 100;
     merchandise += lineTotal;
+    pieceCount += line.qty;
     priced.push({
       id: line.id,
       size: line.size,
@@ -80,17 +109,39 @@ export async function priceOrderLines(
   }
 
   merchandise = Math.round(merchandise * 100) / 100;
-  const shipping = shippingForZone(shipZone);
+
+  let packlink: PacklinkQuote | null = null;
+  try {
+    packlink = await quoteCheapest({
+      toCountry: shipCountry,
+      toZip: shipZip,
+      packages: packagesForQty(pieceCount),
+    });
+  } catch (err) {
+    console.error("packlink quote", err);
+  }
+  if (!packlink) return { ok: false, error: "Shipping unavailable" };
+
+  const shipping = packlink.price;
   const total = Math.round((merchandise + shipping) * 100) / 100;
   return {
     ok: true,
-    order: { lines: priced, merchandise, shipping, total, shipZone },
+    order: {
+      lines: priced,
+      merchandise,
+      shipping,
+      total,
+      shipZone: shipZoneFromCountry(shipCountry),
+      shipCountry,
+      shipZip,
+      packlink,
+    },
   };
 }
 
 /**
  * Paid amount must cover catalog merchandise + shipping for destination.
- * Overpay (e.g. EU rate to an IT address) is accepted; underpay is not.
+ * Overpay is accepted; underpay is not.
  */
 export function paymentCoversExpected(paid: number, expected: number) {
   return Number.isFinite(paid) && Number.isFinite(expected) && paid + 0.015 >= expected;

@@ -3,7 +3,7 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import { customerOrderText } from "../server/customer-mail.js";
 import { field, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { nowRome, sendMail } from "../server/mail.js";
-import { money, priceOrderLines } from "../server/order-pricing.js";
+import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -25,19 +25,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).send("Missing fields");
   }
 
-  const shipZone = field(body, "shipZone") === "eu" ? "eu" : "it";
+  const dest = parseShipDest({
+    country: field(body, "shipCountry"),
+    zip: field(body, "shipZip"),
+  });
+  if (!dest) return res.status(400).send("Invalid shipping destination");
+
   let ordine = field(body, "ordine");
   const linesRaw = field(body, "lines");
   if (linesRaw) {
     try {
       const parsed = JSON.parse(linesRaw) as OrderLine[];
-      const priced = await priceOrderLines(Array.isArray(parsed) ? parsed : [], shipZone);
+      const priced = await priceOrderLines(Array.isArray(parsed) ? parsed : [], dest);
       if (priced.ok === false) return res.status(400).send(priced.error);
+      const carrier = priced.order.packlink.carrier
+        ? ` · ${priced.order.packlink.carrier}`
+        : "";
       ordine = [
         ...priced.order.lines.map(
           (l) => `${l.title} · ${l.size} · ×${l.qty} · ${money(l.lineTotal)}€`,
         ),
-        `Spedizione ${money(priced.order.shipping)}€ (${shipZone.toUpperCase()})`,
+        `Spedizione ${money(priced.order.shipping)}€ (${priced.order.shipCountry} ${priced.order.shipZip}${carrier})`,
         `Totale ${money(priced.order.total)}€`,
       ].join("\n");
     } catch {
@@ -55,7 +63,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `Email: ${email}`,
     `Telefono: ${field(body, "telefono")}`,
     `Indirizzo: ${field(body, "indirizzo")}`,
+    `CAP: ${dest.zip}`,
     `Città: ${field(body, "citta")}`,
+    `Paese: ${dest.country}`,
     field(body, "note") ? `Note: ${field(body, "note")}` : "",
     "",
     ordine,

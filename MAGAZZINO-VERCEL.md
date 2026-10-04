@@ -117,6 +117,17 @@ Aggiungi queste (Environment: **Production**, e anche Preview se vuoi testare i 
 | `GITHUB_TOKEN` | il fine-grained token |
 | `GITHUB_REPO` | `ultrastruttura/corpoceleste` |
 | `GITHUB_BRANCH` | `main` |
+| `PACKLINK_API_KEY` | API key da Packlink PRO → Settings → Packlink PRO API |
+| `PACKLINK_FROM_COUNTRY` | `IT` |
+| `PACKLINK_FROM_ZIP` | CAP del tuo studio (partenza) |
+| `PACKLINK_FROM_CITY` | Città studio |
+| `PACKLINK_FROM_ADDRESS` | Via e numero studio |
+| `PACKLINK_FROM_NAME` | Nome mittente (es. Andrea Baldelli) |
+| `PACKLINK_FROM_PHONE` | Telefono mittente |
+| `PACKLINK_FROM_EMAIL` | Email mittente (es. `info@corpoceleste.eu`) |
+| `PACKLINK_DEFAULT_TO_PHONE` | *(opzionale)* telefono destinazione se PayPal non lo passa |
+
+Serve un account **Packlink PRO** con metodo di pagamento attivo: al pagamento PayPal il webhook crea la spedizione e addebita Packlink, poi mette il link etichetta nella mail shop.
 
 Salva, poi **Redeploy** l’ultimo deployment (Deployments → ⋮ → Redeploy), altrimenti le variabili non entrano in vigore.
 
@@ -164,9 +175,10 @@ Se `paypalClientId` è vuoto, vedi solo il bonifico.
 2. Account acquirente di test da developer.paypal.com → Sandbox → Accounts.
 3. Ordina una maglia, paga con l’account sandbox.
 4. Controlla:
-   - [ ] Repo GitHub: nuovo file in `stock-ledger/`
+   - [ ] In checkout, con paese+CAP, compare il costo spedizione Packlink
+   - [ ] Repo GitHub: nuovo file in `stock-ledger/` (con `packlinkRef` se Packlink è configurato)
    - [ ] File prodotto in `content/products/…`: numeri `stock` diminuiti
-   - [ ] Email a `SHOP_EMAIL` (FormSubmit; la prima volta FormSubmit può chiedere conferma all’indirizzo)
+   - [ ] Email a `SHOP_EMAIL` con totale + link etichetta Packlink
    - [ ] Dopo 1–3 minuti, sul sito la taglia aggiornata (o esaurita se a 0)
 
 ### Opzione B — Live
@@ -179,8 +191,8 @@ Stesso flusso con `PAYPAL_MODE=live`, Client ID Live, e un ordine reale piccolo.
 
 | Situazione | Cosa fare |
 |------------|-----------|
-| Vendita **PayPal** (bottone sul sito) | Niente: stock e mail automatici |
-| Vendita **bonifico** | Quando arriva il soldi → Tina → Maglia → **Magazzino** → abbassa la taglia → Salva |
+| Vendita **PayPal** (bottone sul sito) | Niente: stock, mail e etichetta Packlink automatici |
+| Vendita **bonifico** | Quando arriva il soldi → Tina → Maglia → **Magazzino** → abbassa la taglia → Salva; etichetta Packlink a mano (non automatica) |
 | Nuova maglia | Tina: pezzi iniziali per S/M/L/XL |
 | Taglia a 0 | Non acquistabile da sola; se tutte a 0 → trattata come esaurita |
 | Mail “ATTENZIONE oversell” | Due ordini quasi insieme sulla stessa pezza: verifica a mano e scusa/ristorna se serve |
@@ -204,6 +216,7 @@ Stesso flusso con `PAYPAL_MODE=live`, Client ID Live, e un ordine reale piccolo.
 
 - Non sposta il sito su Vercel (resta Pages)
 - Non aggiorna lo stock per i bonifici
+- Non crea etichette Packlink sui bonifici
 - Non evita al 100% la doppia vendita nello stesso minuto (volume basso: ok; se cresci, serve altro)
 
 ---

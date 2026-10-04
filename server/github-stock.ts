@@ -19,6 +19,10 @@ export type LedgerRecord = {
   error?: string;
   expectedTotal?: string;
   paidTotal?: string;
+  packlinkRef?: string;
+  packlinkLabels?: string[];
+  packlinkError?: string;
+  packlinkServiceId?: number;
 };
 
 function repo() {

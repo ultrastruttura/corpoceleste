@@ -26,12 +26,15 @@ export type PayPalOrder = {
     };
     items?: PayPalItem[];
     shipping?: {
+      name?: { full_name?: string };
+      phone?: { phone_number?: { national_number?: string; country_code?: string } };
       address?: {
         country_code?: string;
         admin_area_1?: string;
         admin_area_2?: string;
         postal_code?: string;
         address_line_1?: string;
+        address_line_2?: string;
       };
     };
   }>;
