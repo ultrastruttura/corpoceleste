@@ -390,43 +390,53 @@ if (!root || !app) {
     },
   ) {
     const bar = el("div", "account-filters");
-    const presets = el("div", "account-filters__presets");
+    const toolbar = el("div", "account-filters__toolbar");
+
+    const presets = el("div", "account-filters__group");
+    presets.append(el("span", "account-filters__label", "Periodo"));
+    const chipRow = el("div", "account-filters__chips");
     const chipMonth = el("button", "account-chip", "Questo mese") as HTMLButtonElement;
     chipMonth.type = "button";
     chipMonth.dataset.preset = "month";
     const chipAll = el("button", "account-chip", "Tutto") as HTMLButtonElement;
     chipAll.type = "button";
     chipAll.dataset.preset = "all";
-    presets.append(chipMonth, chipAll);
+    chipRow.append(chipMonth, chipAll);
+    presets.append(chipRow);
+    toolbar.append(presets);
 
-    const fields = el("div", "account-filters__fields");
     if (opts?.status) {
-      const statusLabel = el("label", "account-filters__field");
-      statusLabel.append(el("span", "account-filters__label", "Stato"));
-      const sel = document.createElement("select");
-      sel.name = "status";
-      sel.className = "account-filters__control";
+      const statusGroup = el("div", "account-filters__group");
+      statusGroup.append(el("span", "account-filters__label", "Stato"));
+      const statusChips = el("div", "account-filters__chips");
       for (const opt of opts.status.options) {
-        const o = document.createElement("option");
-        o.value = opt.value;
-        o.textContent = opt.label;
-        if (opt.value === opts.status.value) o.selected = true;
-        sel.append(o);
+        const chip = el("button", "account-chip", opt.label) as HTMLButtonElement;
+        chip.type = "button";
+        chip.dataset.status = opt.value;
+        if (opt.value === opts.status.value) chip.classList.add("is-active");
+        chip.addEventListener("click", () => {
+          statusChips.querySelectorAll(".account-chip").forEach((c) => c.classList.remove("is-active"));
+          chip.classList.add("is-active");
+          opts.status!.onChange(opt.value);
+        });
+        statusChips.append(chip);
       }
-      sel.addEventListener("change", () => opts.status!.onChange(sel.value));
-      statusLabel.append(sel);
-      fields.append(statusLabel);
+      statusGroup.append(statusChips);
+      toolbar.append(statusGroup);
     }
 
+    const fields = el("div", "account-filters__fields");
     const mkField = (name: string, label: string, type: string, value: string) => {
       const wrap = el("label", "account-filters__field");
       wrap.append(el("span", "account-filters__label", label));
+      const shell = el("div", "account-filters__shell");
       const input = document.createElement("input");
       input.type = type;
       input.name = name;
       input.value = value;
       input.className = "account-filters__control";
-      wrap.append(input);
+      shell.append(input);
+      wrap.append(shell);
       return wrap;
     };
 
@@ -436,7 +446,7 @@ if (!root || !app) {
       mkField("to", "A", "date", initial.to || ""),
     );
 
-    bar.append(presets, fields);
+    bar.append(toolbar, fields);
 
     const month = () => bar.querySelector<HTMLInputElement>('[name="month"]')!;
     const from = () => bar.querySelector<HTMLInputElement>('[name="from"]')!;
@@ -799,15 +809,11 @@ if (!root || !app) {
         )) as { orders: ShopOrder[] };
 
         const orders = data.orders.filter((o) => inRange(o.created_at.slice(0, 10), period));
-        const salesTotal = euroLocal(orders.reduce((s, o) => s + o.total, 0));
         const merceTotal = euroLocal(orders.reduce((s, o) => s + o.merchandise, 0));
-        const shipTotal = euroLocal(orders.reduce((s, o) => s + o.shipping, 0));
 
         summaryHost.replaceChildren(
           metrics([
-            ["Totale vendite", money(salesTotal)],
-            ["Merce", money(merceTotal)],
-            ["Spedizioni", money(shipTotal)],
+            ["Totale merce", money(merceTotal)],
             ["Ordini", String(orders.length)],
           ]),
         );
