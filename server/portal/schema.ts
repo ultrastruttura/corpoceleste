@@ -79,4 +79,31 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   count INTEGER NOT NULL DEFAULT 0,
   window_start TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS shop_orders (
+  id TEXT PRIMARY KEY,
+  external_id TEXT NOT NULL UNIQUE,
+  source TEXT NOT NULL CHECK (source IN ('paypal', 'bank')),
+  status TEXT NOT NULL DEFAULT 'nuovo' CHECK (status IN ('nuovo', 'evaso')),
+  order_year INTEGER,
+  order_seq INTEGER,
+  customer_name TEXT NOT NULL DEFAULT '',
+  customer_email TEXT NOT NULL DEFAULT '',
+  customer_phone TEXT NOT NULL DEFAULT '',
+  shipping_address TEXT NOT NULL DEFAULT '',
+  ship_country TEXT NOT NULL DEFAULT '',
+  ship_zip TEXT NOT NULL DEFAULT '',
+  merchandise REAL NOT NULL DEFAULT 0,
+  shipping REAL NOT NULL DEFAULT 0,
+  total REAL NOT NULL DEFAULT 0,
+  currency TEXT NOT NULL DEFAULT 'EUR',
+  lines_json TEXT NOT NULL DEFAULT '[]',
+  packlink_ref TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_shop_orders_status ON shop_orders(status);
+CREATE INDEX IF NOT EXISTS idx_shop_orders_created ON shop_orders(created_at);
 `;

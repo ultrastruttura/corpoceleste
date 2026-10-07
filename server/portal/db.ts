@@ -28,6 +28,17 @@ export async function ensureSchema() {
   for (const sql of statements) {
     await db.execute(sql);
   }
+  // Additive migrations for existing Turso DBs
+  for (const sql of [
+    `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
+    `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
+  ]) {
+    try {
+      await db.execute(sql);
+    } catch {
+      /* column already exists */
+    }
+  }
   migrated = true;
 }
 

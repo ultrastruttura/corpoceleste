@@ -6,7 +6,7 @@ Lo shop resta su **GitHub Pages**. Auth + database + API vivono su **Vercel** (s
 
 ## Cosa fa
 
-- **Admin (Andrea):** invita artisti via magic link, crea deal (prodotto + %, costi edizione), conferma vendite bonifico, segna “saldato” per mese.
+- **Admin (Andrea):** sezione **Ordini** (PayPal/bonifico automatici, stato nuovo/evaso, PDF proforma, elimina), invita artisti via magic link, crea deal (prodotto + %, costi edizione), conferma vendite bonifico, segna “saldato” per mese.
 - **Artista:** vede pezzi venduti, costi, utile, sua quota, totale dovuto, storico saldi.
 - **PayPal:** il webhook, oltre allo stock, scrive le righe vendita sui deal collegati al `product_id`.
 
@@ -63,9 +63,11 @@ Solo in locale / preview: `PORTAL_DEV_LINKS=1` (mai su Production). Con quella f
 | `GET/POST/DELETE /api/account/deals` | CRUD deal |
 | `POST /api/account/sales` | conferma bonifico / vendita manuale |
 | `GET/POST/DELETE /api/account/settle` | dashboard + saldi |
+| `GET/PATCH/DELETE /api/account/orders` | ordini shop (lista, stato, elimina); `?id=&pdf=1` → PDF proforma |
 
 ## Limiti v1
 
+- Il PDF ordine è un **documento di spedizione / proforma** (imballo), **non** FatturaPA.
 - Non genera FatturaPA: l’artista vede il **lordo da fatturare**, Andrea segna quando ha pagato.
 - Un settlement per artista per mese (`YYYY-MM`); pagamenti successivi nello stesso mese si **sommano**.
 - Spedizione / fee PayPal fuori dal prospetto (solo costi di edizione sul deal).

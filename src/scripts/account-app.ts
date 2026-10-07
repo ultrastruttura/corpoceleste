@@ -158,7 +158,36 @@ function filterDashboard(dash: Dashboard, filter: PeriodFilter): Dashboard {
 type AdminRoute =
   | { name: "artists" }
   | { name: "artist"; id: string }
+  | { name: "orders" }
   | { name: "settings" };
+
+type ShopOrder = {
+  id: string;
+  external_id: string;
+  source: "paypal" | "bank";
+  status: "nuovo" | "evaso";
+  number: string;
+  pieces: number;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address: string;
+  ship_country: string;
+  ship_zip: string;
+  merchandise: number;
+  shipping: number;
+  total: number;
+  lines: Array<{
+    title: string;
+    size: string;
+    qty: number;
+    unitPrice: number;
+    lineTotal: number;
+  }>;
+  packlink_ref: string;
+  notes: string;
+  created_at: string;
+};
 
 const root = document.querySelector<HTMLElement>("[data-account-root]");
 const app = document.querySelector<HTMLElement>("[data-account-app]");
@@ -349,56 +378,117 @@ if (!root || !app) {
     return host;
   }
 
-  function periodFilterBar(initial: PeriodFilter, onChange: (next: PeriodFilter) => void) {
-    const bar = el("div", "account-period-filter");
-    bar.innerHTML = `
-      <label>Mese
-        <input type="month" name="month" value="${initial.month || ""}" />
-      </label>
-      <label>Da
-        <input type="date" name="from" value="${initial.from || ""}" />
-      </label>
-      <label>A
-        <input type="date" name="to" value="${initial.to || ""}" />
-      </label>
-      <button type="button" class="btn" data-apply>Applica</button>
-      <button type="button" class="account-linkish" data-clear>Tutto</button>
-      <button type="button" class="account-linkish" data-today>Mese corrente</button>
-    `;
+  function periodFilterBar(
+    initial: PeriodFilter,
+    onChange: (next: PeriodFilter) => void,
+    opts?: {
+      status?: {
+        value: string;
+        options: Array<{ value: string; label: string }>;
+        onChange: (value: string) => void;
+      };
+    },
+  ) {
+    const bar = el("div", "account-filters");
+    const presets = el("div", "account-filters__presets");
+    const chipMonth = el("button", "account-chip", "Questo mese") as HTMLButtonElement;
+    chipMonth.type = "button";
+    chipMonth.dataset.preset = "month";
+    const chipAll = el("button", "account-chip", "Tutto") as HTMLButtonElement;
+    chipAll.type = "button";
+    chipAll.dataset.preset = "all";
+    presets.append(chipMonth, chipAll);
+
+    const fields = el("div", "account-filters__fields");
+    if (opts?.status) {
+      const statusLabel = el("label", "account-filters__field");
+      statusLabel.append(el("span", "account-filters__label", "Stato"));
+      const sel = document.createElement("select");
+      sel.name = "status";
+      sel.className = "account-filters__control";
+      for (const opt of opts.status.options) {
+        const o = document.createElement("option");
+        o.value = opt.value;
+        o.textContent = opt.label;
+        if (opt.value === opts.status.value) o.selected = true;
+        sel.append(o);
+      }
+      sel.addEventListener("change", () => opts.status!.onChange(sel.value));
+      statusLabel.append(sel);
+      fields.append(statusLabel);
+    }
+
+    const mkField = (name: string, label: string, type: string, value: string) => {
+      const wrap = el("label", "account-filters__field");
+      wrap.append(el("span", "account-filters__label", label));
+      const input = document.createElement("input");
+      input.type = type;
+      input.name = name;
+      input.value = value;
+      input.className = "account-filters__control";
+      wrap.append(input);
+      return wrap;
+    };
+
+    fields.append(
+      mkField("month", "Mese", "month", initial.month || ""),
+      mkField("from", "Da", "date", initial.from || ""),
+      mkField("to", "A", "date", initial.to || ""),
+    );
+
+    bar.append(presets, fields);
+
     const month = () => bar.querySelector<HTMLInputElement>('[name="month"]')!;
     const from = () => bar.querySelector<HTMLInputElement>('[name="from"]')!;
     const to = () => bar.querySelector<HTMLInputElement>('[name="to"]')!;
-    month().addEventListener("change", () => {
-      if (month().value) {
-        from().value = "";
-        to().value = "";
-      }
-    });
-    const clearMonthIfRange = () => {
-      if (from().value || to().value) month().value = "";
+
+    const syncChips = () => {
+      const m = month().value;
+      const hasRange = Boolean(from().value || to().value);
+      chipMonth.classList.toggle("is-active", Boolean(m) && m === currentMonth() && !hasRange);
+      chipAll.classList.toggle("is-active", !m && !hasRange);
     };
-    from().addEventListener("change", clearMonthIfRange);
-    to().addEventListener("change", clearMonthIfRange);
-    bar.querySelector("[data-apply]")!.addEventListener("click", () => {
+
+    const emit = () => {
       onChange({
         month: month().value || undefined,
         from: from().value || undefined,
         to: to().value || undefined,
       });
+      syncChips();
+    };
+
+    month().addEventListener("change", () => {
+      if (month().value) {
+        from().value = "";
+        to().value = "";
+      }
+      emit();
     });
-    bar.querySelector("[data-clear]")!.addEventListener("click", () => {
-      month().value = "";
-      from().value = "";
-      to().value = "";
-      onChange({});
+    from().addEventListener("change", () => {
+      if (from().value || to().value) month().value = "";
+      emit();
     });
-    bar.querySelector("[data-today]")!.addEventListener("click", () => {
+    to().addEventListener("change", () => {
+      if (from().value || to().value) month().value = "";
+      emit();
+    });
+
+    chipMonth.addEventListener("click", () => {
       const m = currentMonth();
       month().value = m;
       from().value = "";
       to().value = "";
-      onChange({ month: m });
+      emit();
     });
+    chipAll.addEventListener("click", () => {
+      month().value = "";
+      from().value = "";
+      to().value = "";
+      emit();
+    });
+
+    syncChips();
     return bar;
   }
 
@@ -533,6 +623,7 @@ if (!root || !app) {
       const id = decodeURIComponent(raw.slice("artista/".length));
       if (id) return { name: "artist", id };
     }
+    if (raw === "ordini") return { name: "orders" };
     if (raw === "impostazioni") return { name: "settings" };
     return { name: "artists" };
   }
@@ -541,11 +632,31 @@ if (!root || !app) {
     const next =
       route.name === "artists"
         ? "#artisti"
-        : route.name === "settings"
-          ? "#impostazioni"
-          : `#artista/${encodeURIComponent(route.id)}`;
+        : route.name === "orders"
+          ? "#ordini"
+          : route.name === "settings"
+            ? "#impostazioni"
+            : `#artista/${encodeURIComponent(route.id)}`;
     if (location.hash === next) return;
     location.hash = next;
+  }
+
+  async function downloadOrderPdf(orderId: string) {
+    const headers = new Headers();
+    const session = getSession();
+    if (session) headers.set("Authorization", `Bearer ${session}`);
+    const res = await fetch(
+      `${base}/api/account/orders?id=${encodeURIComponent(orderId)}&pdf=1`,
+      { headers },
+    );
+    if (!res.ok) throw new Error("PDF non disponibile");
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `corpoceleste-ordine-${orderId}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   let adminHashBound = false;
@@ -574,7 +685,7 @@ if (!root || !app) {
     app!.innerHTML = "";
     app!.append(toolbar(user));
     const title = document.querySelector(".account-page > h1");
-    if (title) title.textContent = "Studio";
+    if (title) title.textContent = "Area personale";
 
     if (meData.mailConfigured === false) {
       app!.append(
@@ -602,6 +713,9 @@ if (!root || !app) {
     };
 
     nav.append(
+      mkTab("Ordini", route.name === "orders", () => {
+        setAdminRoute({ name: "orders" });
+      }),
       mkTab("Artisti", route.name === "artists" || route.name === "artist", () => {
         setAdminRoute({ name: "artists" });
       }),
@@ -612,7 +726,8 @@ if (!root || !app) {
     shell.append(nav);
 
     const main = el("div", "account-shell__main");
-    if (route.name === "artists") await renderAdminArtists(main, user, artists, dealsData.deals);
+    if (route.name === "orders") await renderAdminOrders(main);
+    else if (route.name === "artists") await renderAdminArtists(main, user, artists, dealsData.deals);
     else if (route.name === "artist") {
       const artist = artists.find((a) => a.id === route.id);
       if (!artist) {
@@ -627,6 +742,187 @@ if (!root || !app) {
 
     shell.append(main);
     app!.append(shell);
+  }
+
+  async function renderAdminOrders(mount: HTMLElement) {
+    mount.append(
+      el("h2", "account-section-title", "Ordini"),
+      el(
+        "p",
+        "account-lede",
+        "PayPal e bonifico compaiono qui in automatico. Scarica il PDF (documento di spedizione / proforma) per il pacco.",
+      ),
+    );
+
+    let period: PeriodFilter = { month: currentMonth() };
+    let statusFilter: "all" | "nuovo" | "evaso" = "all";
+
+    const summaryHost = el("div", "");
+    const listHost = el("div", "");
+    const msg = el("p", "account-msg");
+    msg.hidden = true;
+
+    mount.append(
+      periodFilterBar(
+        period,
+        (next) => {
+          period = next;
+          void paint();
+        },
+        {
+          status: {
+            value: statusFilter,
+            options: [
+              { value: "all", label: "Tutti" },
+              { value: "nuovo", label: "Nuovi" },
+              { value: "evaso", label: "Evasi" },
+            ],
+            onChange: (value) => {
+              statusFilter = value as "all" | "nuovo" | "evaso";
+              void paint();
+            },
+          },
+        },
+      ),
+      summaryHost,
+      listHost,
+      msg,
+    );
+
+    const paint = async () => {
+      listHost.replaceChildren(el("p", "lede", "Caricamento…"));
+      msg.hidden = true;
+      try {
+        const data = (await apiFetch(
+          base,
+          `orders?status=${encodeURIComponent(statusFilter)}`,
+        )) as { orders: ShopOrder[] };
+
+        const orders = data.orders.filter((o) => inRange(o.created_at.slice(0, 10), period));
+        const salesTotal = euroLocal(orders.reduce((s, o) => s + o.total, 0));
+        const merceTotal = euroLocal(orders.reduce((s, o) => s + o.merchandise, 0));
+        const shipTotal = euroLocal(orders.reduce((s, o) => s + o.shipping, 0));
+
+        summaryHost.replaceChildren(
+          metrics([
+            ["Totale vendite", money(salesTotal)],
+            ["Merce", money(merceTotal)],
+            ["Spedizioni", money(shipTotal)],
+            ["Ordini", String(orders.length)],
+          ]),
+        );
+
+        listHost.replaceChildren();
+        if (!orders.length) {
+          listHost.append(el("p", "lede", "Nessun ordine in questo periodo / filtro."));
+          return;
+        }
+
+        const table = el("div", "account-table account-orders-table");
+        const head = el("div", "account-table__head");
+        head.innerHTML = `<span>N.</span><span>Ordine</span><span>Numero</span><span>Totale</span><span>Stato</span><span></span>`;
+        table.append(head);
+
+        for (const order of orders) {
+          const row = el("div", "account-table__row account-table__row--order");
+          const num = el("span", "account-orders__num account-table__num", order.number || "—");
+          const primary = el("span", "account-table__primary");
+          const title = el("strong", undefined, order.customer_name || order.customer_email || order.id);
+          const meta = el(
+            "small",
+            undefined,
+            [
+              order.source === "paypal" ? "PayPal" : "Bonifico",
+              formatDayLabel(order.created_at.slice(0, 10)),
+              order.ship_country && order.ship_zip
+                ? `${order.ship_zip} ${order.ship_country}`
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" · "),
+          );
+          primary.append(title, meta);
+
+          const items = el("small", "account-orders__lines");
+          items.textContent = order.lines
+            .map((l) => `${l.title}${l.size ? ` ${l.size}` : ""} ×${l.qty}`)
+            .join(", ");
+          primary.append(items);
+
+          const actions = el("div", "account-orders__actions");
+
+          const pdfBtn = el("button", "account-linkish", "PDF") as HTMLButtonElement;
+          pdfBtn.type = "button";
+          pdfBtn.title = "Scarica fattura proforma";
+          pdfBtn.addEventListener("click", async () => {
+            try {
+              await downloadOrderPdf(order.id);
+            } catch (err) {
+              setMsg(msg, err instanceof Error ? err.message : "Errore PDF");
+            }
+          });
+
+          const statusBtn = el(
+            "button",
+            "account-linkish",
+            order.status === "nuovo" ? "Segna evaso" : "Riapri",
+          ) as HTMLButtonElement;
+          statusBtn.type = "button";
+          statusBtn.addEventListener("click", async () => {
+            const next = order.status === "nuovo" ? "evaso" : "nuovo";
+            try {
+              await apiFetch(base, "orders", {
+                method: "PATCH",
+                body: JSON.stringify({ id: order.id, status: next }),
+              });
+              await paint();
+            } catch (err) {
+              setMsg(msg, err instanceof Error ? err.message : "Errore aggiornamento");
+            }
+          });
+
+          const delBtn = el("button", "account-linkish", "Elimina") as HTMLButtonElement;
+          delBtn.type = "button";
+          delBtn.addEventListener("click", async () => {
+            if (!confirm(`Eliminare l’ordine ${order.number || order.customer_name || order.id}?`)) return;
+            try {
+              await apiFetch(base, "orders", {
+                method: "DELETE",
+                body: JSON.stringify({ id: order.id }),
+              });
+              await paint();
+            } catch (err) {
+              setMsg(msg, err instanceof Error ? err.message : "Errore eliminazione");
+            }
+          });
+
+          actions.append(pdfBtn, statusBtn, delBtn);
+
+          const badge = el(
+            "span",
+            `account-orders__badge account-orders__badge--${order.status}`,
+            order.status === "nuovo" ? "Nuovo" : "Evaso",
+          );
+
+          row.append(
+            num,
+            primary,
+            el("span", "account-orders__qty", String(order.pieces ?? 0)),
+            el("span", "account-table__num", money(order.total)),
+            badge,
+            actions,
+          );
+          table.append(row);
+        }
+        listHost.append(table);
+      } catch (err) {
+        summaryHost.replaceChildren();
+        listHost.replaceChildren();
+        setMsg(msg, err instanceof Error ? err.message : "Errore caricamento ordini");
+      }
+    };
+
+    await paint();
   }
 
   async function renderAdminArtists(

@@ -342,9 +342,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           source: "paypal",
           lines,
         });
+        const { upsertShopOrder } = await import("../server/portal/orders.js");
+        const ship = order?.purchase_units?.[0]?.shipping;
+        await upsertShopOrder({
+          external_id: captureId,
+          source: "paypal",
+          customer_name: ship?.name?.full_name || "",
+          customer_email: order?.payer?.email_address || "",
+          shipping_address: shippingAddressText(order),
+          ship_country: dest.country,
+          ship_zip: dest.zip,
+          merchandise: priced.order.merchandise,
+          shipping: priced.order.shipping,
+          total: priced.order.total,
+          lines: priced.order.lines.map((l) => ({
+            title: l.title,
+            size: l.size,
+            qty: l.qty,
+            unitPrice: l.unitPrice,
+            lineTotal: l.lineTotal,
+          })),
+          packlink_ref: packlink.packlinkRef || "",
+          notes: packlink.packlinkError ? `Packlink: ${packlink.packlinkError}` : "",
+        });
       }
     } catch (err) {
-      console.error("artist sales ledger failed", err);
+      console.error("artist sales / shop order ledger failed", err);
     }
 
     const done: LedgerRecord = {
