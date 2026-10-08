@@ -1,14 +1,11 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 
-// GitHub Pages: https://ultrastruttura.github.io/corpoceleste/
+// Produzione: https://www.corpoceleste.eu/
 // Locale: http://localhost:4321/
-// Dominio custom: imposta GITHUB_PAGES=false e site sul dominio, base: "/"
-const githubPages = process.env.GITHUB_PAGES === "true";
-
 export default defineConfig({
-  site: "https://ultrastruttura.github.io",
-  base: githubPages ? "/corpoceleste/" : "/",
+  site: "https://www.corpoceleste.eu",
+  base: "/",
   trailingSlash: "always",
   integrations: [
     sitemap({

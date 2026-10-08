@@ -68,7 +68,7 @@ export function mailConfigured() {
 }
 
 export function siteBase() {
-  return (process.env.SITE_URL || "https://ultrastruttura.github.io/corpoceleste").replace(/\/$/, "");
+  return (process.env.SITE_URL || "https://www.corpoceleste.eu").replace(/\/$/, "");
 }
 
 export function nowRome(locale = "it-IT") {
