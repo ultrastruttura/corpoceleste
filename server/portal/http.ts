@@ -41,6 +41,29 @@ export function cors(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
 }
 
+function requestOrigin(req: VercelRequest): string {
+  const origin = String(req.headers.origin || "").trim();
+  if (origin) return originOnly(origin);
+  const referer = String(req.headers.referer || req.headers.referrer || "").trim();
+  if (!referer) return "";
+  try {
+    return new URL(referer).origin;
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Block curl/script abuse on browser JSON APIs: require Origin or Referer from allowlist.
+ * Call after cors(); OPTIONS should already be handled.
+ */
+export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): boolean {
+  const origin = requestOrigin(req);
+  if (origin && allowedOrigins().includes(origin)) return true;
+  json(res, 403, { error: "Forbidden origin" });
+  return false;
+}
+
 export function bearer(req: VercelRequest) {
   const h = req.headers.authorization;
   if (!h) return null;

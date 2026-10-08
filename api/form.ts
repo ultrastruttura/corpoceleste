@@ -9,12 +9,6 @@ const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newslett
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
-  const limited = await abuseLimit(req, "form", 8, 15 * 60);
-  if (!limited.ok) {
-    res.setHeader("Retry-After", String(limited.retryAfterSec || 60));
-    return res.status(429).send("Too many requests");
-  }
-
   const body = parseForm(req);
   const subject = safeSubject(field(body, "_subject"), "Messaggio dal sito Corpoceleste");
   const fromKey = guessFrom(subject, field(body, "_next"));
@@ -24,6 +18,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const email = field(body, "email");
   if (!email || !email.includes("@")) {
     return res.status(400).send("Missing email");
+  }
+
+  const limited = await abuseLimit(req, "form", 5, 60 * 60, { email });
+  if (!limited.ok) {
+    res.setHeader("Retry-After", String(limited.retryAfterSec || 60));
+    return res.status(429).send("Too many requests");
   }
 
   const shopTo = (process.env.SHOP_EMAIL || "").trim();

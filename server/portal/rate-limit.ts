@@ -69,11 +69,27 @@ export async function rateLimit(opts: {
   }
 }
 
+function headerOne(
+  headers: Record<string, string | string[] | undefined>,
+  name: string,
+): string {
+  const raw = headers[name] ?? headers[name.toLowerCase()];
+  const v = Array.isArray(raw) ? raw[0] : raw;
+  return String(v || "").trim();
+}
+
+/**
+ * Prefer platform-set IPs (harder to spoof) over the left-most X-Forwarded-For hop.
+ * Vercel: x-real-ip / x-vercel-forwarded-for. Cloudflare: cf-connecting-ip.
+ */
 export function clientIp(headers: Record<string, string | string[] | undefined> | undefined) {
   const h = headers || {};
-  const xf = h["x-forwarded-for"];
-  const raw = Array.isArray(xf) ? xf[0] : xf;
-  if (raw) return raw.split(",")[0]?.trim() || "unknown";
-  const real = h["x-real-ip"];
-  return (Array.isArray(real) ? real[0] : real) || "unknown";
+  const vercel =
+    headerOne(h, "x-real-ip") || headerOne(h, "x-vercel-forwarded-for").split(",")[0]?.trim();
+  if (vercel) return vercel;
+  const cf = headerOne(h, "cf-connecting-ip");
+  if (cf) return cf;
+  const xf = headerOne(h, "x-forwarded-for");
+  if (xf) return xf.split(",")[0]?.trim() || "unknown";
+  return "unknown";
 }

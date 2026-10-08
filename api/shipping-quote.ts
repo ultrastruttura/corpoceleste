@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
-import { cors, json, readJson } from "../server/portal/http.js";
+import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
@@ -12,8 +12,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   cors(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
+  if (!requireSiteOrigin(req, res)) return;
 
-  const limited = await abuseLimit(req, "shipping-quote", 60, 15 * 60);
+  const limited = await abuseLimit(req, "shipping-quote", 30, 15 * 60);
   if (!limited.ok) {
     return json(res, 429, { error: "Too many requests", retryAfterSec: limited.retryAfterSec });
   }
