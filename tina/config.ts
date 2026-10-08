@@ -1,6 +1,5 @@
 import { defineConfig } from "tinacms";
 
-const githubPages = process.env.GITHUB_PAGES === "true";
 const branch =
   process.env.GITHUB_BRANCH ||
   process.env.HEAD ||
@@ -41,7 +40,7 @@ export default defineConfig({
   build: {
     outputFolder: "admin",
     publicFolder: "public",
-    basePath: githubPages ? "corpoceleste" : "",
+    basePath: "",
   },
   media: {
     tina: {

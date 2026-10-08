@@ -14,9 +14,7 @@ npm run dev
 1. Push su `https://github.com/ultrastruttura/corpoceleste`.
 2. Su GitHub: **Settings → Pages → Source: GitHub Actions**.
 3. Il workflow in `.github/workflows/deploy.yml` pubblica a ogni push su `main`.
-4. URL: `https://ultrastruttura.github.io/corpoceleste/`
-
-Se usi un dominio (es. corpoceleste.eu): in `astro.config.mjs` metti `base: "/"` e `site: "https://www.corpoceleste.eu"`, e togli `GITHUB_PAGES: "true"` dal workflow.
+4. URL: `https://www.corpoceleste.eu/` (dominio custom su GitHub Pages; DNS su Cloudflare).
 
 ## Contenuti da cambiare
 

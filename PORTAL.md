@@ -22,13 +22,13 @@ Tina resta solo per catalogo pubblico. Percentuali e saldi **non** vanno nei mar
    - `TURSO_DATABASE_URL`
    - `TURSO_AUTH_TOKEN`
    - `PORTAL_ADMIN_EMAIL` = email di Andrea (diventa admin al primo accesso API)
-   - opzionale: `PORTAL_ADMIN_NAME`, `PORTAL_CORS_ORIGINS` (origini esatte separate da virgola, es. `https://ultrastruttura.github.io,http://localhost:4321`), `PORTAL_SESSION_DAYS` (default 14), `PORTAL_MAGIC_MINUTES` (default 30)
+   - opzionale: `PORTAL_ADMIN_NAME`, `PORTAL_CORS_ORIGINS` (origini esatte separate da virgola, es. `https://www.corpoceleste.eu,https://corpoceleste.eu,http://localhost:4321`), `PORTAL_SESSION_DAYS` (default 14), `PORTAL_MAGIC_MINUTES` (default 30)
    - **mai** `PORTAL_DEV_LINKS=1` in produzione
 
 Serve già anche (mail / sito):
 
 - `RESEND_API_KEY`, `MAIL_FROM` o `SHOP_EMAIL`
-- `SITE_URL` = URL pubblico del sito (es. `https://ultrastruttura.github.io/corpoceleste`) — usato per i link in mail; il CORS usa solo l’**origin** (`https://ultrastruttura.github.io`)
+- `SITE_URL` = URL pubblico del sito (`https://www.corpoceleste.eu`) — usato per i link in mail; il CORS usa solo l’**origin** (`https://www.corpoceleste.eu`)
 
 ### 2. Sito
 

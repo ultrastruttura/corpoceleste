@@ -18,8 +18,14 @@ function allowedOrigins() {
     .map(originOnly)
     .filter(Boolean);
   if (fromEnv.length) return fromEnv;
-  const site = originOnly(process.env.SITE_URL || "https://ultrastruttura.github.io");
-  return [site, "http://localhost:4321", "http://127.0.0.1:4321"];
+  const site = originOnly(process.env.SITE_URL || "https://www.corpoceleste.eu");
+  return [
+    site,
+    "https://www.corpoceleste.eu",
+    "https://corpoceleste.eu",
+    "http://localhost:4321",
+    "http://127.0.0.1:4321",
+  ].filter((v, i, a) => v && a.indexOf(v) === i);
 }
 
 /** Exact Origin match only (no startsWith). */

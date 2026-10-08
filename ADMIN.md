@@ -41,7 +41,7 @@ git push
    - `TINA_TOKEN` (token Content Read)
 4. **Actions → Run workflow** (il Client ID va nel build come `NEXT_PUBLIC_…`, altrimenti login = Forbidden)
 5. Dopo il deploy, apri:  
-   `https://ultrastruttura.github.io/corpoceleste/admin/`  
+   `https://www.corpoceleste.eu/admin/`  
    Accedi con GitHub, modifica, salva → Tina fa commit → Pages si ricostruisce.
 
 Senza questi secret (o senza un nuovo deploy dopo averli messi) l’admin online non autentica.
@@ -60,7 +60,7 @@ Email shop (form + fallback): **SEO e home** → *Email shop (ordini e form)*. P
 ### Cloudflare Web Analytics (gratis)
 
 1. Account gratis su [dash.cloudflare.com](https://dash.cloudflare.com) (non serve spostare il DNS).
-2. **Analytics & logs** → **Web Analytics** → **Add a site** → hostname del sito (es. `ultrastruttura.github.io` o poi `www.corpoceleste.eu`).
+2. **Analytics & logs** → **Web Analytics** → **Add a site** → hostname `corpoceleste.eu` (o `www.corpoceleste.eu`).
 3. Copia il **token** dallo snippet JS (`token: "…"`).
 4. In Tina → **SEO e home** → *Cloudflare Web Analytics — token*, incolla e salva → push / publish.
 
