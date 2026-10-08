@@ -121,7 +121,7 @@ const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
         />
       )
     }
-    <link rel="icon" href={asset("brand/favicon.png")} type="image/png" />
+    <link rel="icon" href={asset("brand/favicon.png")} type="image/png" sizes="128x128" />
     <link rel="describedby" href={llmsHref} type="text/plain" title="llms.txt" />
     {
       jsonLdBlocks.map((block) => (
