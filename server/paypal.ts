@@ -174,12 +174,41 @@ export async function createPayPalCheckoutOrder(order: PricedOrder): Promise<str
   return data.id;
 }
 
+/** PayPal cert URLs only — blocks SSRF via paypal-cert-url header. */
+function isPayPalCertUrl(raw: string): boolean {
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== "https:") return false;
+    const host = u.hostname.toLowerCase();
+    return (
+      host === "api.paypal.com" ||
+      host === "api.sandbox.paypal.com" ||
+      host.endsWith(".paypal.com") ||
+      host.endsWith(".paypalobjects.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function paypalWebhookConfigured(): boolean {
+  return Boolean(
+    (process.env.PAYPAL_WEBHOOK_ID || "").trim() &&
+      (process.env.PAYPAL_CLIENT_ID || "").trim() &&
+      (process.env.PAYPAL_CLIENT_SECRET || "").trim() &&
+      (process.env.GITHUB_TOKEN || "").trim(),
+  );
+}
+
 export async function verifyPayPalWebhook(opts: {
   body: string;
   headers: Record<string, string | string[] | undefined>;
 }): Promise<boolean> {
-  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  const webhookId = (process.env.PAYPAL_WEBHOOK_ID || "").trim();
   if (!webhookId) throw new Error("Missing PAYPAL_WEBHOOK_ID");
+  if (!(process.env.GITHUB_TOKEN || "").trim()) {
+    throw new Error("Missing GITHUB_TOKEN — refusing webhook that can mutate stock");
+  }
 
   const transmissionId = header(opts.headers, "paypal-transmission-id");
   const transmissionTime = header(opts.headers, "paypal-transmission-time");
@@ -189,6 +218,7 @@ export async function verifyPayPalWebhook(opts: {
   if (!transmissionId || !transmissionTime || !certUrl || !authAlgo || !transmissionSig) {
     return false;
   }
+  if (!isPayPalCertUrl(certUrl)) return false;
 
   let webhookEvent: unknown;
   try {

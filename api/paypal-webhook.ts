@@ -26,6 +26,7 @@ import {
   fetchPayPalOrder,
   linesFromOrder,
   orderEmailBits,
+  paypalWebhookConfigured,
   verifyPayPalWebhook,
   type PayPalOrder,
 } from "../server/paypal.js";
@@ -163,24 +164,31 @@ async function ensurePacklinkShipment(opts: {
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
-    return res.status(200).json({ ok: true, service: "paypal-webhook" });
+    return res.status(204).end();
   }
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // Fail closed: never touch GitHub stock without full PayPal + token config.
+  if (!paypalWebhookConfigured()) {
+    console.error("paypal-webhook: misconfigured (WEBHOOK_ID / PayPal creds / GITHUB_TOKEN)");
+    return res.status(503).json({ error: "Webhook not configured" });
+  }
+
   const rawBody = await readRawBody(req);
 
+  let verified = false;
   try {
-    const ok = await verifyPayPalWebhook({
+    verified = await verifyPayPalWebhook({
       body: rawBody,
       headers: req.headers as Record<string, string | string[] | undefined>,
     });
-    if (!ok) return res.status(400).json({ error: "Invalid signature" });
   } catch (err) {
     console.error("verify failed", err);
     return res.status(500).json({ error: "Verification error" });
   }
+  if (!verified) return res.status(400).json({ error: "Invalid signature" });
 
   let event: { event_type?: string; resource?: CaptureResource };
   try {

@@ -196,7 +196,9 @@ function basePath(path: string) {
 export function buildRobotsTxt() {
   const disallow = [
     "/admin/",
+    "/admin/index.html",
     "/account/",
+    "/account/auth/",
     "/carrello/",
     "/checkout/",
     "/grazie/",

@@ -38,6 +38,20 @@ jobs:
             echo "WARNING: TINA_CLIENT_ID / TINA_TOKEN secrets missing — building local admin (login online will fail)"
             npx tinacms build --local --skip-cloud-checks
           fi
+      - name: Tina admin noindex
+        run: |
+          node -e "
+          const fs = require('fs');
+          const p = 'public/admin/index.html';
+          if (!fs.existsSync(p)) { console.log('no admin index, skip'); process.exit(0); }
+          let html = fs.readFileSync(p, 'utf8');
+          const tag = '<meta name=\"robots\" content=\"noindex, nofollow\" />';
+          if (!html.includes('noindex')) {
+            html = html.replace(/<head[^>]*>/i, (m) => m + tag);
+            fs.writeFileSync(p, html);
+            console.log('injected robots noindex into admin');
+          }
+          "
       - run: npx astro build
       - uses: actions/upload-pages-artifact@v3
         with:

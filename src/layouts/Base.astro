@@ -6,6 +6,7 @@ import { absoluteUrl } from "../lib/seo";
 import { llmsTxtUrl } from "../lib/llms";
 import { products, artistName, productImageAlt } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
+import { site } from "../data/site";
 import { currentLocale, innerPath, localePrefix, locales, pageAbs, pageUrl, t } from "../i18n";
 import "../styles/global.css";
 
@@ -17,6 +18,8 @@ type Props = {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   preloadImage?: string;
   preloadImageType?: string;
+  /** Hide from search engines (account, etc.). */
+  noIndex?: boolean;
 };
 
 const locale = currentLocale(Astro.currentLocale);
@@ -31,7 +34,34 @@ const {
   jsonLd,
   preloadImage,
   preloadImageType = "image/webp",
+  noIndex = false,
 } = Astro.props;
+const apiOrigin = (() => {
+  try {
+    return site.formApi ? new URL(site.formApi).origin : "";
+  } catch {
+    return "";
+  }
+})();
+/** GitHub Pages cannot set HTTP headers — meta CSP is the practical layer. */
+const csp = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://static.cloudflareinsights.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  `connect-src 'self' ${apiOrigin} https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://static.cloudflareinsights.com https://cloudflareinsights.com`.replace(
+    /\s+/g,
+    " ",
+  ),
+  "frame-src https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com",
+  `form-action 'self' ${apiOrigin}`.trim(),
+]
+  .filter(Boolean)
+  .join("; ");
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const rest = innerPath(Astro.url.pathname);
 const prefix = localePrefix(locale);
@@ -62,6 +92,10 @@ const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <meta http-equiv="Content-Security-Policy" content={csp} />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="canonical" href={canonical.href} />
     {locales.map((code) => <link rel="alternate" hreflang={code} href={pageAbs(code, rest)} />)}
     <link rel="alternate" hreflang="x-default" href={pageAbs("it", rest)} />

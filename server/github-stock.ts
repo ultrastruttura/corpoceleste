@@ -60,7 +60,19 @@ function ledgerPath(captureId: string) {
   return `stock-ledger/${safeId(captureId)}.json`;
 }
 
+/** Only stock-ledger + product markdown — never arbitrary repo paths. */
+function assertWritableRepoPath(path: string) {
+  const p = path.replace(/^\/+/, "");
+  if (p.includes("..") || p.includes("\\")) {
+    throw new Error(`Refusing unsafe GitHub path: ${path}`);
+  }
+  if (p.startsWith("stock-ledger/") && p.endsWith(".json")) return;
+  if (p.startsWith("content/products/") && p.endsWith(".md")) return;
+  throw new Error(`Refusing GitHub write outside allowlist: ${path}`);
+}
+
 export async function getRepoFile(path: string): Promise<GhFile | null> {
+  assertWritableRepoPath(path);
   const { owner, name, branch } = repo();
   const res = await gh(`/repos/${owner}/${name}/contents/${path}?ref=${encodeURIComponent(branch)}`);
   if (res.status === 404) return null;
@@ -72,6 +84,7 @@ export async function getRepoFile(path: string): Promise<GhFile | null> {
 }
 
 async function putRepoFile(path: string, sha: string | undefined, content: string, message: string) {
+  assertWritableRepoPath(path);
   const { owner, name, branch } = repo();
   const body: Record<string, unknown> = {
     message,

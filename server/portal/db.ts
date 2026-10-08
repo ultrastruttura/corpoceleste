@@ -5,7 +5,9 @@ let client: Client | null = null;
 let migrated = false;
 
 export function portalConfigured() {
-  return Boolean((process.env.TURSO_DATABASE_URL || process.env.LIBSQL_URL || "").trim());
+  const url = (process.env.TURSO_DATABASE_URL || process.env.LIBSQL_URL || "").trim();
+  const authToken = (process.env.TURSO_AUTH_TOKEN || process.env.LIBSQL_AUTH_TOKEN || "").trim();
+  return Boolean(url && authToken);
 }
 
 export function getDb(): Client {
@@ -15,7 +17,10 @@ export function getDb(): Client {
     throw new Error("Missing TURSO_DATABASE_URL (or LIBSQL_URL) for artist portal");
   }
   const authToken = (process.env.TURSO_AUTH_TOKEN || process.env.LIBSQL_AUTH_TOKEN || "").trim();
-  client = createClient(authToken ? { url, authToken } : { url });
+  if (!authToken) {
+    throw new Error("Missing TURSO_AUTH_TOKEN (or LIBSQL_AUTH_TOKEN) for artist portal");
+  }
+  client = createClient({ url, authToken });
   return client;
 }
 
