@@ -131,7 +131,7 @@ export function buildOrderProformaPdf(order: ShopOrder): Buffer {
     `Pezzi totali: ${order.pieces}`,
   );
 
-  if (order.packlink_ref) textLines.push(`Spedizione Packlink: ${order.packlink_ref}`);
+  if (order.packlink_ref) textLines.push(`Spedizione Sendcloud: ${order.packlink_ref}`);
   if (order.notes) textLines.push("", "Note", `  ${order.notes}`);
 
   textLines.push(

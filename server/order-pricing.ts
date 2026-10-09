@@ -7,8 +7,8 @@ import {
   normalizeZip,
   packagesForQty,
   quoteCheapest,
-  type PacklinkQuote,
-} from "./packlink.js";
+  type ShippingQuote,
+} from "./sendcloud.js";
 import type { OrderLine } from "./paypal.js";
 
 export type PricedLine = OrderLine & {
@@ -30,7 +30,8 @@ export type PricedOrder = {
   shipZone: "it" | "eu";
   shipCountry: string;
   shipZip: string;
-  packlink: PacklinkQuote;
+  /** Cheapest Sendcloud rate for destination (ledger still uses packlink* field names). */
+  packlink: ShippingQuote;
 };
 
 export function money(n: number) {
@@ -110,7 +111,7 @@ export async function priceOrderLines(
 
   merchandise = Math.round(merchandise * 100) / 100;
 
-  let packlink: PacklinkQuote | null = null;
+  let packlink: ShippingQuote | null = null;
   try {
     packlink = await quoteCheapest({
       toCountry: shipCountry,
@@ -118,7 +119,7 @@ export async function priceOrderLines(
       packages: packagesForQty(pieceCount),
     });
   } catch (err) {
-    console.error("packlink quote", err);
+    console.error("sendcloud quote", err);
   }
   if (!packlink) return { ok: false, error: "Shipping unavailable" };
 

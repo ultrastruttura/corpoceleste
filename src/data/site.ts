@@ -9,7 +9,7 @@ export const site = {
   /** Vecchi progetti (pagina Contatti). */
   satellite: "https://web.archive.org/web/20161107120751/http://satellitepress.it/",
   tddDiscogs: "https://www.discogs.com/search/?q=TDD&type=label",
-  /** Legacy UI fallback; checkout usa Packlink (paese + codice postale UE). */
+  /** Legacy UI fallback; checkout usa Sendcloud (paese + codice postale UE). */
   shippingItaly: 0,
   shippingEU: 0,
   /** Giorni lavorativi indicativi per la spedizione (info precontrattuale). */

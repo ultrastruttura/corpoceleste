@@ -62,7 +62,7 @@ const it = {
       "Misure del capo disteso, in centimetri. ½ petto = da cucitura a cucitura, non la circonferenza. Tolleranza di stampa circa ±1 cm. Confronta con una maglia che ti sta. Se l’etichetta cucita indica una composizione diversa da quella in pagina, vale l’etichetta.",
     galleryPrev: "Foto precedente",
     galleryNext: "Foto successiva",
-    shipLine: "Spedizione in Italia e in Europa — costo calcolato in checkout (Packlink).",
+    shipLine: "Spedizione in Italia e in Europa — costo calcolato in checkout (Sendcloud).",
     /** Alt SEO commerciale: tipo + opera + artista + keyword vendita. */
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
@@ -116,7 +116,7 @@ const it = {
     termsLead: "Ho letto i tempi di spedizione e le ",
     termsLink: "condizioni di vendita",
     termsTail: ", recesso e garanzia inclusi.",
-    vatIncluded: "Prezzi in euro, IVA inclusa. La spedizione è calcolata con Packlink per Italia e Unione europea.",
+    vatIncluded: "Prezzi in euro, IVA inclusa. La spedizione è calcolata con Sendcloud per Italia e Unione europea.",
     payObligation: "Premendo il pulsante concludi un ordine con obbligo di pagamento.",
     readPrivacy: (privacy: string) => `Ho letto l’${privacy}.`,
     privacyLink: "informativa privacy",
@@ -321,7 +321,7 @@ const it = {
       "Serigrafie stampate a mano, una per volta, in tiratura limitata: maglie, stampe su carta, pezzi numerati. Essendo stampa manuale, piccole differenze di registro, inchiostro e posizione fanno parte del pezzo e non sono difetti. Le foto sono indicative: colore e resa possono variare leggermente da schermo a schermo.",
     prices: "Prezzi",
     pricesBody:
-      "I prezzi sono in euro e IVA inclusa, salvo diversa indicazione. La spedizione è a parte: in checkout, per Italia e Unione europea, Packlink calcola il corriere più economico da paese e codice postale; il costo entra nel totale da pagare (PayPal o bonifico).",
+      "I prezzi sono in euro e IVA inclusa, salvo diversa indicazione. La spedizione è a parte: in checkout, per Italia e Unione europea, Sendcloud calcola il corriere più economico da paese e codice postale; il costo entra nel totale da pagare (PayPal o bonifico).",
     order: "Come si conclude l’ordine",
     orderBody:
       "Il contratto si conclude in checkout, quando premi il pulsante di pagamento e ricevi la conferma via email. Se un pezzo non c’è più dopo il pagamento, ti avviso e ti rimborso.",
@@ -440,7 +440,7 @@ const en: typeof it = {
       "Garment laid flat, in centimetres. ½ chest is seam to seam, not circumference. Print tolerance about ±1 cm. Compare with a shirt that fits you. If the sewn-in label states a different fibre composition, the label prevails.",
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
-    shipLine: "Shipping in Italy and across Europe — cost calculated at checkout (Packlink).",
+    shipLine: "Shipping in Italy and across Europe — cost calculated at checkout (Sendcloud).",
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
@@ -492,7 +492,7 @@ const en: typeof it = {
     termsLead: "I have read the shipping times and the ",
     termsLink: "terms of sale",
     termsTail: ", including withdrawal and legal guarantee.",
-    vatIncluded: "Prices in euro, VAT included. Shipping is calculated with Packlink for Italy and the EU.",
+    vatIncluded: "Prices in euro, VAT included. Shipping is calculated with Sendcloud for Italy and the EU.",
     payObligation: "Pressing the button places an order with an obligation to pay.",
     readPrivacy: (privacy: string) => `I have read the ${privacy}.`,
     privacyLink: "privacy notice",
@@ -696,7 +696,7 @@ const en: typeof it = {
       "Hand-pulled screen prints in limited runs: shirts, prints on paper, numbered pieces. Because printing is manual, small differences in registration, ink and placement are part of the piece and are not defects. Photos are indicative: colour can vary slightly from screen to screen.",
     prices: "Prices",
     pricesBody:
-      "Prices are in euro and include VAT unless stated otherwise. Shipping is charged separately: at checkout, from country and postcode, Packlink picks the cheapest carrier and the cost is added to the total you pay (PayPal or bank transfer).",
+      "Prices are in euro and include VAT unless stated otherwise. Shipping is charged separately: at checkout, from country and postcode, Sendcloud picks the cheapest carrier and the cost is added to the total you pay (PayPal or bank transfer).",
     order: "How the order is concluded",
     orderBody:
       "The contract is concluded at checkout, when you press the payment button and receive the confirmation by email. If a piece is gone after payment, I tell you and refund you.",
@@ -815,7 +815,7 @@ const de: typeof it = {
       "Maß des flach liegenden Kleidungsstücks, in Zentimetern. ½ Brust ist Naht zu Naht, nicht der Umfang. Drucktoleranz etwa ±1 cm. Vergleich mit einem Shirt, das dir passt. Steht auf dem eingenähten Etikett eine andere Faserzusammensetzung, gilt das Etikett.",
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
-    shipLine: "Versand in Italien und Europa — Kosten an der Kasse (Packlink).",
+    shipLine: "Versand in Italien und Europa — Kosten an der Kasse (Sendcloud).",
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
@@ -867,7 +867,7 @@ const de: typeof it = {
     termsLead: "Ich habe die Versandzeiten und die ",
     termsLink: "Verkaufsbedingungen",
     termsTail: " gelesen, inklusive Widerruf und Gewährleistung.",
-    vatIncluded: "Preise in Euro, inklusive MwSt. Versand wird mit Packlink für Italien und die EU berechnet.",
+    vatIncluded: "Preise in Euro, inklusive MwSt. Versand wird mit Sendcloud für Italien und die EU berechnet.",
     payObligation: "Mit dem Button gibst du eine zahlungspflichtige Bestellung ab.",
     readPrivacy: (privacy: string) => `Ich habe die ${privacy} gelesen.`,
     privacyLink: "Datenschutzhinweise",
@@ -1071,7 +1071,7 @@ const de: typeof it = {
       "Von Hand gedruckte Siebdrucke in limitierter Auflage: Shirts, Papierdrucke, nummerierte Stücke. Weil von Hand gedruckt wird, gehören kleine Abweichungen bei Register, Farbe und Position zum Stück und sind keine Mängel. Fotos sind Anhaltspunkte: Farben können je nach Bildschirm leicht abweichen.",
     prices: "Preise",
     pricesBody:
-      "Preise verstehen sich in Euro und inklusive MwSt., sofern nicht anders angegeben. Der Versand wird getrennt berechnet: an der Kasse ermittelt Packlink aus Land und PLZ den günstigsten Carrier und der Betrag fließt in die zu zahlende Summe (PayPal oder Überweisung).",
+      "Preise verstehen sich in Euro und inklusive MwSt., sofern nicht anders angegeben. Der Versand wird getrennt berechnet: an der Kasse ermittelt Sendcloud aus Land und PLZ den günstigsten Carrier und der Betrag fließt in die zu zahlende Summe (PayPal oder Überweisung).",
     order: "Zustandekommen der Bestellung",
     orderBody:
       "Der Vertrag kommt an der Kasse zustande, wenn du den Zahlungsbutton drückst und die Bestätigung per E-Mail erhältst. Ist ein Stück nach der Zahlung weg, melde ich mich und erstatte.",

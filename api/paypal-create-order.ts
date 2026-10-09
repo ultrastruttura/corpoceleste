@@ -6,7 +6,7 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
- * Server-side PayPal order create — prices, stock and Packlink shipping from server.
+ * Server-side PayPal order create — prices, stock and Sendcloud shipping from server.
  * POST { lines: [{ id, size, qty }], country, zip }
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {

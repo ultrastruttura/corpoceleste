@@ -5,7 +5,7 @@ import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.j
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
- * Preview Packlink cheapest rate for checkout UI.
+ * Preview Sendcloud cheapest rate for checkout UI.
  * POST { lines, country, zip }
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {

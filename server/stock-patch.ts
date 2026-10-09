@@ -46,11 +46,11 @@ export function formatShopOrderEmail(opts: {
       ? opts.itemLabels
       : opts.lines.map((l) => `${l.id} · ${l.size} · ×${l.qty}`);
   const packlinkLines: string[] = [];
-  if (opts.packlinkRef) packlinkLines.push(`Packlink: ${opts.packlinkRef}`);
+  if (opts.packlinkRef) packlinkLines.push(`Sendcloud: ${opts.packlinkRef}`);
   if (opts.packlinkLabels?.length) {
     for (const url of opts.packlinkLabels) packlinkLines.push(`Etichetta: ${url}`);
   }
-  if (opts.packlinkError) packlinkLines.push(`Packlink errore: ${opts.packlinkError}`);
+  if (opts.packlinkError) packlinkLines.push(`Sendcloud errore: ${opts.packlinkError}`);
   return [
     ...rows,
     "",
