@@ -38,10 +38,10 @@ Guida completa passo-passo: **[MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)**.
 
 Dopo `PAYMENT.CAPTURE.COMPLETED` il webhook:
 - abbassa lo stock nei markdown (patch solo delle righe `stock:`)
-- crea spedizione Sendcloud + link etichetta (se `SENDCLOUD_*` è configurato)
+- crea spedizione Spedire + link etichetta (se `SPEDIRE_*` è configurato)
 - manda email allo shop (**server-side**, non dal browser)
 
-**Bonifico:** stock a mano in Tina; spedizione quotata in checkout, etichetta Sendcloud a mano.
+**Bonifico:** stock a mano in Tina; spedizione quotata in checkout, etichetta Spedire a mano.
 
 Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora “oversell”; in quel caso la mail ha oggetto `ATTENZIONE oversell`.
 
@@ -71,7 +71,7 @@ Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora 
    - `GITHUB_TOKEN`
    - `GITHUB_REPO=ultrastruttura/corpoceleste`
    - `GITHUB_BRANCH=main`
-   - `SENDCLOUD_PUBLIC_KEY` / `SENDCLOUD_SECRET_KEY` + `SENDCLOUD_FROM_*` (vedi `.env.example` / [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md))
+   - `SPEDIRE_API_BASE` / `SPEDIRE_API_KEY` + `SPEDIRE_FROM_*` (vedi `.env.example` / [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md))
 6. URL funzione: `https://TUO-PROGETTO.vercel.app/api/paypal-webhook`  
    (GET deve rispondere `{ ok: true }`).
 

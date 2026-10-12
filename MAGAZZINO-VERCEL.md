@@ -117,19 +117,21 @@ Aggiungi queste (Environment: **Production**, e anche Preview se vuoi testare i 
 | `GITHUB_TOKEN` | il fine-grained token |
 | `GITHUB_REPO` | `ultrastruttura/corpoceleste` |
 | `GITHUB_BRANCH` | `main` |
-| `SENDCLOUD_PUBLIC_KEY` | Public key da Sendcloud → Settings → Integrations → API |
-| `SENDCLOUD_SECRET_KEY` | Secret key (stessa pagina API) |
-| `SENDCLOUD_FROM_COUNTRY` | `IT` |
-| `SENDCLOUD_FROM_ZIP` | CAP del tuo studio (partenza) |
-| `SENDCLOUD_FROM_CITY` | Città studio |
-| `SENDCLOUD_FROM_ADDRESS` | Via e numero studio |
-| `SENDCLOUD_FROM_NAME` | Nome mittente (es. Andrea Baldelli) |
-| `SENDCLOUD_FROM_PHONE` | Telefono mittente |
-| `SENDCLOUD_FROM_EMAIL` | Email mittente (es. `info@corpoceleste.eu`) |
-| `SENDCLOUD_DEFAULT_TO_PHONE` | *(opzionale)* telefono destinazione se PayPal non lo passa |
-| `SENDCLOUD_SENDER_ADDRESS_ID` | *(opzionale)* id indirizzo mittente nel pannello Sendcloud |
+| `SPEDIRE_API_BASE` | Base URL API da supporto Spedire.com / Alsendo |
+| `SPEDIRE_API_KEY` | API key (Bearer; oppure user se usi anche `SPEDIRE_API_SECRET`) |
+| `SPEDIRE_API_SECRET` | *(opzionale)* se auth Basic key:secret |
+| `SPEDIRE_QUOTE_PATH` | *(opzionale)* path preventivo (default `/v1/rates`) |
+| `SPEDIRE_CREATE_PATH` | *(opzionale)* path creazione spedizione (default `/v1/shipments`) |
+| `SPEDIRE_FROM_COUNTRY` | `IT` |
+| `SPEDIRE_FROM_ZIP` | CAP del tuo studio (partenza) |
+| `SPEDIRE_FROM_CITY` | Città studio |
+| `SPEDIRE_FROM_ADDRESS` | Via e numero studio |
+| `SPEDIRE_FROM_NAME` | Nome mittente (es. Andrea Baldelli) |
+| `SPEDIRE_FROM_PHONE` | Telefono mittente |
+| `SPEDIRE_FROM_EMAIL` | Email mittente (es. `info@corpoceleste.eu`) |
+| `SPEDIRE_DEFAULT_TO_PHONE` | *(opzionale)* telefono destinazione se PayPal non lo passa |
 
-Serve un account **Sendcloud Free** con corrieri abilitati nel pannello e metodo di pagamento per le etichette: al pagamento PayPal il webhook crea il pacco e mette il link etichetta nella mail shop.
+Serve un account **Spedire.com** con API REST attiva: al pagamento PayPal il webhook crea il pacco e mette il link etichetta nella mail shop. Finché non hai base URL + path ufficiali dal supporto, lascia le variabili vuote (checkout non quoteraà).
 
 Salva, poi **Redeploy** l’ultimo deployment (Deployments → ⋮ → Redeploy), altrimenti le variabili non entrano in vigore.
 
@@ -177,10 +179,10 @@ Se `paypalClientId` è vuoto, vedi solo il bonifico.
 2. Account acquirente di test da developer.paypal.com → Sandbox → Accounts.
 3. Ordina una maglia, paga con l’account sandbox.
 4. Controlla:
-   - [ ] In checkout, con paese+CAP, compare il costo spedizione Sendcloud
-   - [ ] Repo GitHub: nuovo file in `stock-ledger/` (con `packlinkRef` se Sendcloud è configurato)
+   - [ ] In checkout, con paese+CAP, compare il costo spedizione Spedire
+   - [ ] Repo GitHub: nuovo file in `stock-ledger/` (con `packlinkRef` se Spedire è configurato)
    - [ ] File prodotto in `content/products/…`: numeri `stock` diminuiti
-   - [ ] Email a `SHOP_EMAIL` con totale + link etichetta Sendcloud
+   - [ ] Email a `SHOP_EMAIL` con totale + link etichetta Spedire
    - [ ] Dopo 1–3 minuti, sul sito la taglia aggiornata (o esaurita se a 0)
 
 ### Opzione B — Live
@@ -193,8 +195,8 @@ Stesso flusso con `PAYPAL_MODE=live`, Client ID Live, e un ordine reale piccolo.
 
 | Situazione | Cosa fare |
 |------------|-----------|
-| Vendita **PayPal** (bottone sul sito) | Niente: stock, mail e etichetta Sendcloud automatici |
-| Vendita **bonifico** | Quando arriva il soldi → Tina → Maglia → **Magazzino** → abbassa la taglia → Salva; etichetta Sendcloud a mano (non automatica) |
+| Vendita **PayPal** (bottone sul sito) | Niente: stock, mail e etichetta Spedire automatici |
+| Vendita **bonifico** | Quando arriva il soldi → Tina → Maglia → **Magazzino** → abbassa la taglia → Salva; etichetta Spedire a mano (non automatica) |
 | Nuova maglia | Tina: pezzi iniziali per S/M/L/XL |
 | Taglia a 0 | Non acquistabile da sola; se tutte a 0 → trattata come esaurita |
 | Mail “ATTENZIONE oversell” | Due ordini quasi insieme sulla stessa pezza: verifica a mano e scusa/ristorna se serve |
@@ -218,7 +220,7 @@ Stesso flusso con `PAYPAL_MODE=live`, Client ID Live, e un ordine reale piccolo.
 
 - Non sposta il sito su Vercel (resta Pages)
 - Non aggiorna lo stock per i bonifici
-- Non crea etichette Sendcloud sui bonifici
+- Non crea etichette Spedire sui bonifici
 - Non evita al 100% la doppia vendita nello stesso minuto (volume basso: ok; se cresci, serve altro)
 
 ---

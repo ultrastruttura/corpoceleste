@@ -22,7 +22,7 @@ export type LedgerRecord = {
   packlinkRef?: string;
   packlinkLabels?: string[];
   packlinkError?: string;
-  packlinkServiceId?: number;
+  packlinkServiceId?: string | number;
 };
 
 function repo() {
