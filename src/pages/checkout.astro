@@ -228,7 +228,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       shipping: number;
       country: string;
       zip: string;
-      serviceId: number;
+      /** Alias corriere Spedire (es. UPS) o id numerico legacy. */
+      serviceId: string | number;
       carrier: string;
     };
 
@@ -363,14 +364,21 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           shipping?: string;
           country?: string;
           zip?: string;
-          serviceId?: number;
+          serviceId?: string | number;
           carrier?: string;
         };
         const shipping = Number(data.shipping);
-        if (!Number.isFinite(shipping) || !data.serviceId) {
+        const serviceId =
+          data.serviceId == null || data.serviceId === ""
+            ? ""
+            : typeof data.serviceId === "number"
+              ? data.serviceId
+              : String(data.serviceId).trim();
+        if (!Number.isFinite(shipping) || serviceId === "" || serviceId === 0) {
           quoteError = true;
           quote = null;
           setStatus(labels.error);
+          quoteLoading = false;
           syncPage();
           return;
         }
@@ -378,10 +386,11 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           shipping,
           country: String(data.country || country).toUpperCase(),
           zip: normalizeZip(String(data.zip || zip)),
-          serviceId: Number(data.serviceId),
+          serviceId,
           carrier: String(data.carrier || ""),
         };
         quoteError = false;
+        quoteLoading = false;
         const carrier = quote.carrier ? ` · ${quote.carrier}` : "";
         setStatus(`${quote.shipping.toFixed(2)} €${carrier}`);
         syncPage();
@@ -390,6 +399,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         console.error("shipping-quote", err);
         quoteError = true;
         quote = null;
+        quoteLoading = false;
         setStatus(labels.error);
         syncPage();
       } finally {
