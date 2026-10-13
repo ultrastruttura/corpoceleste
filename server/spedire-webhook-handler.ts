@@ -1,12 +1,10 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 /**
- * Endpoint di ascolto eventi SpedirePRO (etichetta pronta, tracking, errori).
- * Configura questo URL in Impostazioni → App e Integrazioni → API.
- *
- * Per ora: ack 200 + log. Estendibile (salvare URL etichetta, mail shop, ecc.).
+ * Handler eventi SpedirePRO (etichetta / tracking).
+ * Esposto come /api/spedire-webhook via rewrite → /api/form (limite Hobby: 12 functions).
  */
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export async function handleSpedireWebhook(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET" || req.method === "HEAD") {
     return res.status(200).json({ ok: true, provider: "spedirepro" });
   }
@@ -22,4 +20,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   return res.status(200).json({ ok: true });
+}
+
+export function isSpedireWebhookRequest(req: VercelRequest) {
+  const q = req.query?.spedire_hook;
+  const flag = Array.isArray(q) ? q[0] : q;
+  if (String(flag || "") === "1") return true;
+  const url = String(req.url || "");
+  return url.includes("spedire-webhook") || url.includes("spedire_hook=1");
 }

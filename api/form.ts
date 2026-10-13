@@ -2,11 +2,21 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
 import { field, isHoney, parseForm, safeSubject, thanksUrl } from "../server/form-body.js";
 import { sendMail } from "../server/mail.js";
+import {
+  handleSpedireWebhook,
+  isSpedireWebhookRequest,
+} from "../server/spedire-webhook-handler.js";
 
 const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newsletter"]);
 
-/** Generic site forms → Resend to shop. Contact, newsletter, workshops, consulting, reprint. */
+/** Generic site forms → Resend to shop. Contact, newsletter, workshops, consulting, reprint.
+ *  Also hosts SpedirePRO webhook via rewrite /api/spedire-webhook → ?spedire_hook=1 (Hobby 12-fn limit).
+ */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (isSpedireWebhookRequest(req)) {
+    return handleSpedireWebhook(req, res);
+  }
+
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
   const body = parseForm(req);
