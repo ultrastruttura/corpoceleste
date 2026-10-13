@@ -159,14 +159,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       const token = String(body.token || "").trim();
       const consumed = await consumeMagicLink(token);
-      if (!consumed.ok) {
+      if (consumed.ok === false) {
+        const reason = consumed.reason;
         const error =
-          consumed.reason === "used"
+          reason === "used"
             ? "Questo link è già stato usato. Torna all’area personale e richiedi un nuovo accesso."
-            : consumed.reason === "expired"
+            : reason === "expired"
               ? "Questo link è scaduto. Torna all’area personale e richiedi un nuovo accesso."
               : "Link non valido. Torna all’area personale e richiedi un nuovo accesso.";
-        return json(res, 400, { error, reason: consumed.reason });
+        return json(res, 400, { error, reason });
       }
       const session = await createSession(consumed.user.id);
       return json(res, 200, {
