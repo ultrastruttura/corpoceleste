@@ -117,12 +117,10 @@ Aggiungi queste (Environment: **Production**, e anche Preview se vuoi testare i 
 | `GITHUB_TOKEN` | il fine-grained token |
 | `GITHUB_REPO` | `ultrastruttura/corpoceleste` |
 | `GITHUB_BRANCH` | `main` |
-| `SPEDIRE_API_BASE` | Base URL API da supporto Spedire.com / Alsendo |
-| `SPEDIRE_API_KEY` | API key (Bearer; oppure user se usi anche `SPEDIRE_API_SECRET`) |
-| `SPEDIRE_API_SECRET` | *(opzionale)* se auth Basic key:secret |
-| `SPEDIRE_QUOTE_PATH` | *(opzionale)* path preventivo (default `/v1/rates`) |
-| `SPEDIRE_CREATE_PATH` | *(opzionale)* path creazione spedizione (default `/v1/shipments`) |
+| `SPEDIRE_API_KEY` | Token da SpedirePRO → Impostazioni → App e Integrazioni → API (`X-Api-Key`) |
+| `SPEDIRE_API_BASE` | *(opzionale)* default `https://www.spedirepro.com/public-api` |
 | `SPEDIRE_FROM_COUNTRY` | `IT` |
+| `SPEDIRE_FROM_PROVINCE` | Sigla provincia mittente (es. `PU`) — obbligatoria per create-label |
 | `SPEDIRE_FROM_ZIP` | CAP del tuo studio (partenza) |
 | `SPEDIRE_FROM_CITY` | Città studio |
 | `SPEDIRE_FROM_ADDRESS` | Via e numero studio |
@@ -131,7 +129,7 @@ Aggiungi queste (Environment: **Production**, e anche Preview se vuoi testare i 
 | `SPEDIRE_FROM_EMAIL` | Email mittente (es. `info@corpoceleste.eu`) |
 | `SPEDIRE_DEFAULT_TO_PHONE` | *(opzionale)* telefono destinazione se PayPal non lo passa |
 
-Serve un account **Spedire.com** con API REST attiva: al pagamento PayPal il webhook crea il pacco e mette il link etichetta nella mail shop. Finché non hai base URL + path ufficiali dal supporto, lascia le variabili vuote (checkout non quoteraà).
+Serve un account **SpedirePRO** con API abilitate e **wallet ricaricato** (create-label addebita il saldo). In Impostazioni API imposta il webhook su `https://TUO-PROGETTO.vercel.app/api/spedire-webhook`. Al pagamento PayPal il webhook PayPal crea la spedizione e, se pronta, mette il link etichetta nella mail shop.
 
 Salva, poi **Redeploy** l’ultimo deployment (Deployments → ⋮ → Redeploy), altrimenti le variabili non entrano in vigore.
 

@@ -95,7 +95,7 @@ async function ensureSpedireShipment(opts: {
   }
 
   if (!spedireConfigured()) {
-    return { packlinkError: "SPEDIRE_API_BASE / SPEDIRE_API_KEY missing" };
+    return { packlinkError: "SPEDIRE_API_KEY missing" };
   }
 
   const ship = opts.order?.purchase_units?.[0]?.shipping;

@@ -71,7 +71,7 @@ Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora 
    - `GITHUB_TOKEN`
    - `GITHUB_REPO=ultrastruttura/corpoceleste`
    - `GITHUB_BRANCH=main`
-   - `SPEDIRE_API_BASE` / `SPEDIRE_API_KEY` + `SPEDIRE_FROM_*` (vedi `.env.example` / [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md))
+   - `SPEDIRE_API_KEY` + `SPEDIRE_FROM_*` (incluso `SPEDIRE_FROM_PROVINCE`; vedi `.env.example` / [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md))
 6. URL funzione: `https://TUO-PROGETTO.vercel.app/api/paypal-webhook`  
    (GET deve rispondere `{ ok: true }`).
 
