@@ -5,6 +5,7 @@ import {
   el,
   getSession,
   money,
+  onSessionBroadcast,
   setMsg,
   setSession,
 } from "./account-api";
@@ -195,6 +196,9 @@ if (!root || !app) {
   // not on account page
 } else {
   const base = apiRoot(root);
+  onSessionBroadcast(() => {
+    void boot();
+  });
   boot();
 
   async function boot() {
@@ -1283,17 +1287,17 @@ if (!root || !app) {
     invite.innerHTML = `
       <div class="account-stack-form__row">
         <label class="account-stack-form__field">
-          <span>Nome</span>
-          <input name="name" required />
+          <span>Nome artista</span>
+          <input name="name" required autocomplete="off" placeholder="es. Matteo Baldelli" />
         </label>
         <label class="account-stack-form__field">
-          <span>Email</span>
-          <input type="email" name="email" required />
+          <span>Email artista</span>
+          <input type="email" name="email" required autocomplete="off" />
         </label>
       </div>
       <label class="account-stack-form__field">
         <span>Slug artista sul sito (opz.)</span>
-        <input name="artist_slug" placeholder="es. ruco" />
+        <input name="artist_slug" placeholder="es. ruco" autocomplete="off" />
       </label>
       <p class="account-lede">Stesso slug della cartella artista in Tina (opzionale).</p>
       <button class="account-action-form__btn" type="submit">Invia invito</button>

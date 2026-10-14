@@ -135,17 +135,28 @@ export async function issueMagicLink(userId: string) {
   return token;
 }
 
-export async function sendMagicLinkEmail(user: PortalUser, token: string) {
+export async function sendMagicLinkEmail(
+  user: PortalUser,
+  token: string,
+  opts?: { kind?: "login" | "invite" },
+) {
   // Hash fragment: not sent in Referer / server logs of the landing request.
   const link = `${siteBase()}/account/auth/#t=${encodeURIComponent(token)}`;
   const mins = magicMinutes();
+  const isArtist = user.role === "artist" || opts?.kind === "invite";
+  const subject = isArtist
+    ? "Accesso area personale artista — Corpoceleste"
+    : "Accesso area Corpoceleste";
+  const areaLine = isArtist
+    ? "Usa questo link per entrare nell’area personale artista Corpoceleste."
+    : "Usa questo link per entrare nell’area personale Corpoceleste.";
   const result = await sendMail({
     to: user.email,
-    subject: "Accesso area Corpoceleste",
+    subject,
     text: [
       `Ciao${user.name ? ` ${user.name}` : ""},`,
       "",
-      "Usa questo link per entrare nell’area personale Corpoceleste.",
+      areaLine,
       `È monouso e scade dopo circa ${mins} minuti:`,
       link,
       "",

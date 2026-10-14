@@ -8,6 +8,17 @@ function store() {
   }
 }
 
+const bc =
+  typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("cc-portal-session") : null;
+
+function writeSession(token: string | null, broadcast: boolean) {
+  const s = store();
+  if (!s) return;
+  if (token) s.setItem(KEY, token);
+  else s.removeItem(KEY);
+  if (broadcast) bc?.postMessage({ type: token ? "set" : "clear", token: token || "" });
+}
+
 export function getSession(): string {
   try {
     return store()?.getItem(KEY) || "";
@@ -17,11 +28,25 @@ export function getSession(): string {
 }
 
 export function setSession(token: string) {
-  store()?.setItem(KEY, token);
+  writeSession(token, true);
 }
 
 export function clearSession() {
-  store()?.removeItem(KEY);
+  writeSession(null, true);
+}
+
+/** Other tabs (e.g. admin still open) adopt the session from a magic-link login. */
+export function onSessionBroadcast(handler: (token: string | null) => void) {
+  if (!bc) return () => {};
+  const listener = (ev: MessageEvent) => {
+    const data = ev.data as { type?: string; token?: string } | null;
+    if (!data || (data.type !== "set" && data.type !== "clear")) return;
+    const token = data.type === "set" ? String(data.token || "") : "";
+    writeSession(token || null, false);
+    handler(token || null);
+  };
+  bc.addEventListener("message", listener);
+  return () => bc.removeEventListener("message", listener);
 }
 
 export function apiRoot(el: HTMLElement) {

@@ -48,6 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       name?: string;
       artist_slug?: string;
       token?: string;
+      replace_session?: string;
     }>(req);
     const action = String(body.action || "");
     const ip = clientIp(req.headers as Record<string, string | string[] | undefined>);
@@ -131,7 +132,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const artist_slug = String(body.artist_slug || "").trim() || undefined;
       const user = await createArtistUser({ email, name, artist_slug });
       const token = await issueMagicLink(user.id);
-      const sent = await sendMagicLinkEmail(user, token);
+      const sent = await sendMagicLinkEmail(user, token, { kind: "invite" });
       const payload: Record<string, unknown> = {
         ok: true,
         user,
@@ -169,6 +170,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               : "Link non valido. Torna all’area personale e richiedi un nuovo accesso.";
         return json(res, 400, { error, reason });
       }
+      // If another user was logged in on this browser, kill that session so
+      // opening an artist invite never leaves you as admin in other tabs.
+      const prev = String(body.replace_session || bearer(req) || "").trim();
+      if (prev) await destroySession(prev);
       const session = await createSession(consumed.user.id);
       return json(res, 200, {
         ok: true,
