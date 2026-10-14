@@ -234,7 +234,7 @@ if (!root || !app) {
       el(
         "p",
         "lede",
-        "Inserisci l’email con cui sei stato invitato. In produzione ricevi un link monouso; in locale (vercel dev) entri subito.",
+        "Inserisci l’email con cui sei stato invitato: ti mandiamo un link monouso per entrare.",
       ),
     );
     const form = el("form", "account-form account-login");
