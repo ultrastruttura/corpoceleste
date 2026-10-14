@@ -14,11 +14,23 @@ import {
 } from "../../server/portal/auth.js";
 import { portalConfigured } from "../../server/portal/db.js";
 import { mailConfigured } from "../../server/mail.js";
-import { bearer, cors, json, readJson, requireUser } from "../../server/portal/http.js";
+import { bearer, cors, json, readJson, requireSiteOrigin, requireUser } from "../../server/portal/http.js";
 import { clientIp, rateLimit } from "../../server/portal/rate-limit.js";
 
 const LOGIN_MSG =
   "Se l’email è registrata, riceverai un link di accesso. Controlla la posta.";
+
+/** Minimum wall time for production login replies — reduces timing email enumeration. */
+const LOGIN_MIN_MS = 900;
+
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+async function padLoginTiming(started: number) {
+  const pad = LOGIN_MIN_MS - (Date.now() - started);
+  if (pad > 0) await sleep(pad);
+}
 
 /**
  * Auth endpoints for artist portal.
@@ -27,6 +39,7 @@ const LOGIN_MSG =
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   cors(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
+  if (!requireSiteOrigin(req, res)) return;
 
   try {
     if (!portalConfigured()) {
@@ -54,17 +67,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const ip = clientIp(req.headers as Record<string, string | string[] | undefined>);
 
     if (action === "login") {
+      const started = Date.now();
       const email = String(body.email || "").trim().toLowerCase();
-      const rl = await rateLimit({
-        key: `login:${ip}:${email || "none"}`,
-        limit: 5,
+      const rlIp = await rateLimit({
+        key: `login:ip:${ip}`,
+        limit: 10,
         windowSeconds: 15 * 60,
       });
-      if (!rl.ok) {
+      if (!rlIp.ok) {
+        await padLoginTiming(started);
         return json(res, 429, {
           error: "Troppi tentativi. Riprova tra poco.",
-          retryAfterSec: rl.retryAfterSec,
+          retryAfterSec: rlIp.retryAfterSec,
         });
+      }
+      if (email.includes("@")) {
+        const rlEmail = await rateLimit({
+          key: `login:email:${email}`,
+          limit: 3,
+          windowSeconds: 15 * 60,
+        });
+        if (!rlEmail.ok) {
+          await padLoginTiming(started);
+          return json(res, 429, {
+            error: "Troppi tentativi. Riprova tra poco.",
+            retryAfterSec: rlEmail.retryAfterSec,
+          });
+        }
       }
       let user = email.includes("@") ? await getUserByEmail(email) : null;
       // Dev: if they type the configured admin email, ensure the row exists then continue.
@@ -86,6 +115,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               : "Nessun utente. Imposta PORTAL_ADMIN_EMAIL nel .env e riavvia vercel dev.",
           });
         }
+        await padLoginTiming(started);
         return json(res, 200, { ok: true, message: LOGIN_MSG });
       }
       // Local/dev only: skip magic link, open session immediately.
@@ -106,6 +136,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const sent = await sendMagicLinkEmail(user, token);
       if (!sent.ok) {
         console.warn("[portal] magic link email failed for", user.email, sent.error);
+        await padLoginTiming(started);
         return json(res, 200, {
           ok: true,
           emailed: false,
@@ -113,6 +144,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
       console.info("[portal] magic link emailed to", user.email);
+      await padLoginTiming(started);
       return json(res, 200, { ok: true, emailed: true, message: LOGIN_MSG });
     }
 
@@ -156,7 +188,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         windowSeconds: 15 * 60,
       });
       if (!rl.ok) {
-        return json(res, 429, { error: "Troppi tentativi. Riprova tra poco." });
+        return json(res, 429, {
+          error: "Troppi tentativi. Riprova tra poco.",
+          retryAfterSec: rl.retryAfterSec,
+        });
       }
       const token = String(body.token || "").trim();
       const consumed = await consumeMagicLink(token);
