@@ -9,9 +9,15 @@ export type PortalUser = {
   artist_slug: string | null;
 };
 
-/** Email that becomes admin on first API call. Prefer PORTAL_ADMIN_EMAIL over SHOP_EMAIL. */
+/**
+ * Only PORTAL_ADMIN_EMAIL becomes admin — never SHOP_EMAIL (shared inbox ≠ portal admin).
+ */
 export function portalAdminEmail() {
-  return (process.env.PORTAL_ADMIN_EMAIL || process.env.SHOP_EMAIL || "").trim().toLowerCase();
+  return (process.env.PORTAL_ADMIN_EMAIL || "").trim().toLowerCase();
+}
+
+function portalAdminName() {
+  return (process.env.PORTAL_ADMIN_NAME || "Andrea Baldelli").trim();
 }
 
 function sessionDays() {
@@ -27,29 +33,40 @@ export async function ensureAdmin() {
   const email = portalAdminEmail();
   if (!email) return null;
   const db = getDb();
+  const adminName = portalAdminName();
   const existing = await db.execute({
     sql: "SELECT id, email, name, role, artist_slug FROM users WHERE email = ?",
     args: [email],
   });
+  let admin: PortalUser;
   if (existing.rows[0]) {
     const row = existing.rows[0];
-    if (String(row.role) !== "admin") {
-      await db.execute({ sql: "UPDATE users SET role = 'admin' WHERE id = ?", args: [String(row.id)] });
-    }
-    return rowToUser(row);
+    const id = String(row.id);
+    await db.execute({
+      sql: "UPDATE users SET role = 'admin', name = ? WHERE id = ?",
+      args: [adminName, id],
+    });
+    admin = {
+      id,
+      email,
+      name: adminName,
+      role: "admin",
+      artist_slug: row.artist_slug ? String(row.artist_slug) : null,
+    };
+  } else {
+    const id = newId("usr");
+    await db.execute({
+      sql: "INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, 'admin')",
+      args: [id, email, adminName],
+    });
+    admin = { id, email, name: adminName, role: "admin", artist_slug: null };
   }
-  const id = newId("usr");
+  // Single admin: anyone else previously promoted (e.g. via old SHOP_EMAIL fallback) becomes artist.
   await db.execute({
-    sql: "INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, 'admin')",
-    args: [id, email, (process.env.PORTAL_ADMIN_NAME || "Andrea Baldelli").trim()],
+    sql: "UPDATE users SET role = 'artist' WHERE role = 'admin' AND email != ?",
+    args: [email],
   });
-  return {
-    id,
-    email,
-    name: (process.env.PORTAL_ADMIN_NAME || "Andrea Baldelli").trim(),
-    role: "admin" as const,
-    artist_slug: null,
-  };
+  return admin;
 }
 
 function rowToUser(row: Record<string, unknown>): PortalUser {
@@ -96,17 +113,29 @@ export async function createArtistUser(opts: {
   artist_slug?: string;
 }) {
   await ensureSchema();
+  await ensureAdmin();
   const email = opts.email.trim().toLowerCase();
   if (!email.includes("@")) throw new Error("Invalid email");
+  if (email === portalAdminEmail()) {
+    throw new Error(
+      `Questa email è l’admin del portal (${email}). Usa un’altra email per l’artista, oppure cambia PORTAL_ADMIN_EMAIL su Vercel.`,
+    );
+  }
   const existing = await getUserByEmail(email);
   if (existing) {
-    if (existing.role === "admin") throw new Error("Email is admin");
+    if (existing.role === "admin") {
+      throw new Error(
+        `Questa email è ancora admin in database. Controlla PORTAL_ADMIN_EMAIL su Vercel (Production) e fai Redeploy.`,
+      );
+    }
     const db = getDb();
     await db.execute({
-      sql: "UPDATE users SET name = ?, artist_slug = COALESCE(?, artist_slug) WHERE id = ?",
+      sql: "UPDATE users SET name = ?, role = 'artist', artist_slug = COALESCE(?, artist_slug) WHERE id = ?",
       args: [opts.name.trim() || existing.name, opts.artist_slug?.trim() || null, existing.id],
     });
-    return (await getUserById(existing.id))!;
+    const updated = (await getUserById(existing.id))!;
+    if (updated.role !== "artist") throw new Error("Impossibile creare artista per questa email");
+    return updated;
   }
   const id = newId("usr");
   const db = getDb();
@@ -143,13 +172,18 @@ export async function sendMagicLinkEmail(
   // Hash fragment: not sent in Referer / server logs of the landing request.
   const link = `${siteBase()}/account/auth/#t=${encodeURIComponent(token)}`;
   const mins = magicMinutes();
-  const isArtist = user.role === "artist" || opts?.kind === "invite";
-  const subject = isArtist
-    ? "Accesso area personale artista — Corpoceleste"
-    : "Accesso area Corpoceleste";
-  const areaLine = isArtist
-    ? "Usa questo link per entrare nell’area personale artista Corpoceleste."
-    : "Usa questo link per entrare nell’area personale Corpoceleste.";
+  const isInvite = opts?.kind === "invite";
+  const isArtist = user.role === "artist" || isInvite;
+  const subject = isInvite
+    ? "Invito area personale artista — Corpoceleste"
+    : isArtist
+      ? "Accesso area personale artista — Corpoceleste"
+      : "Accesso area Corpoceleste";
+  const areaLine = isInvite
+    ? `Sei stato invitato come artista su Corpoceleste (${user.email}). Usa questo link per entrare nell’area personale artista:`
+    : isArtist
+      ? "Usa questo link per entrare nell’area personale artista Corpoceleste."
+      : "Usa questo link per entrare nell’area personale Corpoceleste.";
   const result = await sendMail({
     to: user.email,
     subject,

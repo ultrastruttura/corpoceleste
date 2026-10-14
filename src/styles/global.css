@@ -2092,7 +2092,15 @@ body.cart-open {
 
 .account-who {
   margin: 0;
+  display: grid;
+  gap: 0.15rem;
   font-size: 0.95rem;
+}
+
+.account-who__email {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 400;
 }
 
 .account-linkish {
@@ -2144,6 +2152,9 @@ body.cart-open {
 .account-section-title {
   margin-top: 0 !important;
   margin-bottom: 0.35rem !important;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .account-lede {
@@ -2892,15 +2903,27 @@ body.cart-open {
 
 .account-orders-table .account-table__head,
 .account-orders-table .account-table__row {
-  grid-template-columns: 3.5rem minmax(9rem, 1.5fr) 3.25rem 5rem 4.5rem minmax(8rem, 1fr);
-  padding: 0.65rem 0;
+  grid-template-columns: 4.25rem minmax(10rem, 1.6fr) 2.75rem 5.25rem 4.25rem minmax(7.5rem, 1fr);
+  padding: 0.7rem 0;
   font-size: 0.9rem;
   align-items: start;
+  column-gap: 1.1rem;
+}
+
+.account-orders-table .account-table__head {
+  align-items: end;
+}
+
+.account-orders-table .account-table__head > :nth-child(1),
+.account-orders-table .account-table__row > :nth-child(1) {
+  text-align: left;
+  justify-self: start;
 }
 
 .account-orders__num {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .account-orders-table .account-table__head > :nth-child(3),
@@ -2909,6 +2932,12 @@ body.cart-open {
   text-align: center;
   justify-self: center;
   font-variant-numeric: tabular-nums;
+}
+
+.account-orders-table .account-table__head > :nth-child(2),
+.account-orders-table .account-table__row > :nth-child(2) {
+  text-align: left;
+  justify-self: stretch;
 }
 
 .account-table__row--order {

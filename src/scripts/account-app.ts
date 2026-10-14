@@ -238,16 +238,16 @@ if (!root || !app) {
       el(
         "p",
         "lede",
-        "Inserisci l’email con cui sei stato invitato: ti mandiamo un link monouso per entrare.",
+        "Qui entri tu, con la tua email. Non è un invito: se non sei già in elenco non arriva nessuna mail. Gli artisti nuovi si invitano da Impostazioni, dopo l’accesso admin.",
       ),
     );
     const form = el("form", "account-form account-login");
     form.innerHTML = `
       <label class="account-login-field">
-        <span>Email</span>
-        <input type="email" name="email" required autocomplete="email" placeholder="nome@email.com" />
+        <span>La tua email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="la tua email, non quella di un’altra persona" />
       </label>
-      <button class="btn" type="submit">Entra</button>
+      <button class="btn" type="submit">Invia link di accesso</button>
       <p class="account-msg" data-msg hidden></p>
     `;
     form.addEventListener("submit", async (e) => {
@@ -307,11 +307,15 @@ if (!root || !app) {
 
   function toolbar(user: User) {
     const bar = el("div", "account-toolbar");
-    const who = el(
-      "p",
-      "account-who",
-      `${user.name || user.email} · ${user.role === "admin" ? "admin" : "artista"}`,
+    const role = user.role === "admin" ? "admin" : "artista";
+    const who = el("p", "account-who");
+    who.append(
+      el("strong", "", user.name || user.email),
+      document.createTextNode(` · ${role}`),
     );
+    if (user.name && user.email) {
+      who.append(el("small", "account-who__email", user.email));
+    }
     const out = el("button", "account-linkish", "Esci") as HTMLButtonElement;
     out.type = "button";
     out.addEventListener("click", async () => {
@@ -674,13 +678,15 @@ if (!root || !app) {
   }
 
   let adminHashBound = false;
+  let adminUserRef: User | null = null;
 
   async function renderAdmin(user: User) {
+    adminUserRef = user;
     root!.classList.add("account-page--admin");
     if (!adminHashBound) {
       adminHashBound = true;
       window.addEventListener("hashchange", () => {
-        void renderAdmin(user);
+        if (adminUserRef) void renderAdmin(adminUserRef);
       });
     }
     if (!location.hash || location.hash === "#") {
@@ -693,7 +699,7 @@ if (!root || !app) {
     const meData = (await apiFetch(base, "auth", {
       method: "POST",
       body: JSON.stringify({ action: "me" }),
-    })) as { mailConfigured?: boolean };
+    })) as { mailConfigured?: boolean; portalAdminEmail?: string | null };
     const artists = usersData.users.filter((u) => u.role === "artist");
 
     app!.innerHTML = "";
@@ -830,7 +836,9 @@ if (!root || !app) {
 
         const table = el("div", "account-table account-orders-table");
         const head = el("div", "account-table__head");
-        head.innerHTML = `<span>N.</span><span>Ordine</span><span>Numero</span><span>Totale</span><span>Stato</span><span></span>`;
+        for (const label of ["N°", "Ordine", "Pz", "Totale", "Stato", ""]) {
+          head.append(el("span", "", label));
+        }
         table.append(head);
 
         for (const order of orders) {
@@ -953,7 +961,9 @@ if (!root || !app) {
 
     const table = el("div", "account-table");
     const head = el("div", "account-table__head");
-    head.innerHTML = `<span>Artista</span><span>Deal</span><span>Dovuto</span><span>Residuo</span>`;
+    for (const label of ["Artista", "Deal", "Dovuto", "Residuo"]) {
+      head.append(el("span", "", label));
+    }
     table.append(head);
 
     for (const a of artists) {
@@ -1281,8 +1291,26 @@ if (!root || !app) {
       el("p", "account-lede", "Inviti e anagrafica artisti. I deal si gestiscono dalla scheda artista."),
     );
 
+    const identity = el("section", "account-card");
+    identity.append(
+      el("h3", "", "Accesso corrente"),
+      el(
+        "p",
+        "account-lede",
+        `${user.name || "—"} · ${user.email} · admin. Solo PORTAL_ADMIN_EMAIL su Vercel è admin; le altre email vanno invitate come artisti.`,
+      ),
+    );
+    mount.append(identity);
+
     const inviteCard = el("section", "account-card");
     inviteCard.append(el("h3", "", "Invita artista"));
+    inviteCard.append(
+      el(
+        "p",
+        "account-lede",
+        "Solo da qui si crea un artista nuovo. Il form in Area personale è solo login, non invita nessuno.",
+      ),
+    );
     const invite = el("form", "account-stack-form");
     invite.innerHTML = `
       <div class="account-stack-form__row">

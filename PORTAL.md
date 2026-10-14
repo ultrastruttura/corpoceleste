@@ -21,7 +21,7 @@ Tina resta solo per catalogo pubblico. Percentuali e saldi **non** vanno nei mar
 3. Su Vercel → Project → Settings → Environment Variables:
    - `TURSO_DATABASE_URL`
    - `TURSO_AUTH_TOKEN`
-   - `PORTAL_ADMIN_EMAIL` = email di Andrea (diventa admin al primo accesso API)
+   - `PORTAL_ADMIN_EMAIL` = email di Andrea (unica admin; **non** usare `SHOP_EMAIL` come fallback)
    - opzionale: `PORTAL_ADMIN_NAME`, `PORTAL_CORS_ORIGINS` (origini esatte separate da virgola, es. `https://www.corpoceleste.eu,https://corpoceleste.eu,http://localhost:4321`), `PORTAL_SESSION_DAYS` (default 14), `PORTAL_MAGIC_MINUTES` (default 30)
    - **mai** `PORTAL_DEV_LINKS=1` in produzione
 

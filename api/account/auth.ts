@@ -162,15 +162,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const email = String(body.email || "").trim().toLowerCase();
       const name = String(body.name || "").trim();
       const artist_slug = String(body.artist_slug || "").trim() || undefined;
+      if (!name) return json(res, 400, { error: "Nome artista obbligatorio" });
+      if (!email.includes("@")) return json(res, 400, { error: "Email non valida" });
       const user = await createArtistUser({ email, name, artist_slug });
+      if (user.role !== "artist") {
+        return json(res, 400, {
+          error: `L’utente ${user.email} non è artista (ruolo: ${user.role}). Controlla PORTAL_ADMIN_EMAIL su Vercel.`,
+        });
+      }
       const token = await issueMagicLink(user.id);
       const sent = await sendMagicLinkEmail(user, token, { kind: "invite" });
+      console.info("[portal] invite →", user.email, user.name, user.role, sent.ok ? "mailed" : "mail-failed");
       const payload: Record<string, unknown> = {
         ok: true,
         user,
         emailed: sent.ok,
         message: sent.ok
-          ? "Invito inviato."
+          ? `Invito artista inviato a ${user.name} <${user.email}>. Controlla che nome e mail siano quelli dell’artista (non admin).`
           : `Utente creato, ma email non inviata. ${sent.error || "Controlla RESEND_API_KEY e MAIL_FROM su Vercel."}`,
       };
       if (!sent.ok && allowDevMagicLinks()) {
@@ -229,6 +237,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return json(res, user ? 200 : 401, {
         user,
         mailConfigured: user?.role === "admin" ? mailConfigured() : undefined,
+        // So admin can verify Production env without guessing.
+        portalAdminEmail: user?.role === "admin" ? portalAdminEmail() || null : undefined,
       });
     }
 
