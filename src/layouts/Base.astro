@@ -121,7 +121,12 @@ const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
         />
       )
     }
-    <link rel="icon" href={asset("brand/favicon.png")} type="image/png" sizes="128x128" />
+    <!-- Google Search: multipli di 48px, almeno 48×48; sorgente nitida da logo-stella -->
+    <link rel="icon" href={asset("brand/favicon-48.png")} type="image/png" sizes="48x48" />
+    <link rel="icon" href={asset("brand/favicon-96.png")} type="image/png" sizes="96x96" />
+    <link rel="icon" href={asset("brand/favicon-192.png")} type="image/png" sizes="192x192" />
+    <link rel="icon" href={asset("brand/favicon.png")} type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href={asset("brand/apple-touch-icon.png")} sizes="180x180" />
     <link rel="describedby" href={llmsHref} type="text/plain" title="llms.txt" />
     {
       jsonLdBlocks.map((block) => (
