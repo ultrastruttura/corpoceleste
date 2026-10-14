@@ -58,6 +58,38 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           />
         </div>
         <p class="checkout-vat" data-ship-status>{copy.checkout.shippingQuoteNeedZip}</p>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-name">{copy.checkout.name}</label>
+          <input id="ship-name" data-ship-name autocomplete="name" required />
+        </div>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-email">{copy.checkout.email}</label>
+          <input id="ship-email" data-ship-email type="email" autocomplete="email" required />
+        </div>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-phone">{copy.checkout.phone}</label>
+          <input id="ship-phone" data-ship-phone type="tel" autocomplete="tel" required />
+        </div>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-street">{copy.checkout.address}</label>
+          <input id="ship-street" data-ship-street autocomplete="street-address" required />
+        </div>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-city">{copy.checkout.city}</label>
+          <input id="ship-city" data-ship-city autocomplete="address-level2" required />
+        </div>
+        <div class="field checkout-ship">
+          <label class="field-label" for="ship-province">{copy.checkout.province}</label>
+          <input
+            id="ship-province"
+            data-ship-province
+            autocomplete="address-level1"
+            maxlength="2"
+            spellcheck="false"
+            placeholder="RM"
+            required
+          />
+        </div>
         <div class="recap" data-recap></div>
       </section>
 
@@ -150,26 +182,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             <input type="hidden" name="shipCountry" data-ship-country-field value="IT" />
             <input type="hidden" name="shipZip" data-ship-zip-field value="" />
             <FormHoney />
-            <div>
-              <label for="o-name">{copy.checkout.name}</label>
-              <input id="o-name" name="nome" required />
-            </div>
-            <div>
-              <label for="o-email">{copy.checkout.email}</label>
-              <input id="o-email" type="email" name="email" required />
-            </div>
-            <div>
-              <label for="o-tel">{copy.checkout.phone}</label>
-              <input id="o-tel" name="telefono" required />
-            </div>
-            <div>
-              <label for="o-addr">{copy.checkout.address}</label>
-              <input id="o-addr" name="indirizzo" required autocomplete="street-address" />
-            </div>
-            <div>
-              <label for="o-city">{copy.checkout.city}</label>
-              <input id="o-city" name="citta" required autocomplete="address-level2" />
-            </div>
+            <input type="hidden" name="nome" data-bank-name />
+            <input type="hidden" name="email" data-bank-email />
+            <input type="hidden" name="telefono" data-bank-phone />
+            <input type="hidden" name="indirizzo" data-bank-street />
+            <input type="hidden" name="citta" data-bank-city />
+            <input type="hidden" name="provincia" data-bank-province />
             <div>
               <label for="o-note">{copy.checkout.notes}</label>
               <textarea id="o-note" name="note"></textarea>
@@ -210,6 +228,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     const recap = document.querySelector("[data-recap]");
     const countrySel = document.querySelector<HTMLSelectElement>("[data-ship-country]");
     const zipInput = document.querySelector<HTMLInputElement>("[data-ship-zip]");
+    const nameInput = document.querySelector<HTMLInputElement>("[data-ship-name]");
+    const emailInput = document.querySelector<HTMLInputElement>("[data-ship-email]");
+    const phoneInput = document.querySelector<HTMLInputElement>("[data-ship-phone]");
+    const streetInput = document.querySelector<HTMLInputElement>("[data-ship-street]");
+    const cityInput = document.querySelector<HTMLInputElement>("[data-ship-city]");
+    const provinceInput = document.querySelector<HTMLInputElement>("[data-ship-province]");
     const shipStatus = document.querySelector<HTMLElement>("[data-ship-status]");
     const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
     const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
@@ -221,6 +245,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     const linesField = document.querySelector<HTMLInputElement>("[data-lines-field]");
     const shipCountryField = document.querySelector<HTMLInputElement>("[data-ship-country-field]");
     const shipZipField = document.querySelector<HTMLInputElement>("[data-ship-zip-field]");
+    const bankName = document.querySelector<HTMLInputElement>("[data-bank-name]");
+    const bankEmail = document.querySelector<HTMLInputElement>("[data-bank-email]");
+    const bankPhone = document.querySelector<HTMLInputElement>("[data-bank-phone]");
+    const bankStreet = document.querySelector<HTMLInputElement>("[data-bank-street]");
+    const bankCity = document.querySelector<HTMLInputElement>("[data-bank-city]");
+    const bankProvince = document.querySelector<HTMLInputElement>("[data-bank-province]");
     const methods = document.querySelectorAll<HTMLInputElement>("[data-method]");
     const panels = document.querySelectorAll<HTMLElement>("[data-method-panel]");
 
@@ -251,6 +281,27 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       return normalizeZip(zipInput?.value || "");
     }
 
+    function shipTo() {
+      return {
+        fullName: String(nameInput?.value || "").trim(),
+        email: String(emailInput?.value || "").trim(),
+        phone: String(phoneInput?.value || "").trim(),
+        street: String(streetInput?.value || "").trim(),
+        city: String(cityInput?.value || "").trim(),
+        province: String(provinceInput?.value || "")
+          .trim()
+          .toUpperCase()
+          .slice(0, 2),
+      };
+    }
+
+    function hasCompleteAddress() {
+      const a = shipTo();
+      if (!a.fullName || !a.email.includes("@") || !a.phone || !a.street || !a.city) return false;
+      if (destCountry() === "IT" && a.province.length < 2) return false;
+      return true;
+    }
+
     function shippingAmount() {
       return quote?.shipping ?? 0;
     }
@@ -262,6 +313,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     function orderText() {
       const items = sanitizeCart();
       const ship = shippingAmount();
+      const a = shipTo();
       const lines = items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`);
       if (hasValidQuote()) {
         const carrier = quote?.carrier ? ` (${quote.carrier})` : "";
@@ -269,11 +321,28 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       } else {
         lines.push("Spedizione: da calcolare", `Totale merce ${total()}€`);
       }
+      if (hasCompleteAddress()) {
+        lines.push(
+          "",
+          `Destinatario: ${a.fullName}`,
+          a.street,
+          `${a.province} ${destZip()} ${a.city}`.trim(),
+          destCountry(),
+          a.phone,
+          a.email,
+        );
+      }
       return lines.join("\n");
     }
 
     function unlocked() {
-      return Boolean(disclaimer?.checked && privacy?.checked && sanitizeCart().length && hasValidQuote());
+      return Boolean(
+        disclaimer?.checked &&
+          privacy?.checked &&
+          sanitizeCart().length &&
+          hasValidQuote() &&
+          hasCompleteAddress(),
+      );
     }
 
     function syncLock() {
@@ -303,6 +372,13 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         }
         if (shipCountryField) shipCountryField.value = destCountry();
         if (shipZipField) shipZipField.value = destZip();
+        const a = shipTo();
+        if (bankName) bankName.value = a.fullName;
+        if (bankEmail) bankEmail.value = a.email;
+        if (bankPhone) bankPhone.value = a.phone;
+        if (bankStreet) bankStreet.value = a.street;
+        if (bankCity) bankCity.value = a.city;
+        if (bankProvince) bankProvince.value = a.province;
       }
       syncLock();
       page?.classList.add("is-ready");
@@ -434,6 +510,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       scheduleQuote();
       syncPage();
     });
+    for (const el of [nameInput, emailInput, phoneInput, streetInput, cityInput, provinceInput]) {
+      el?.addEventListener("input", syncPage);
+    }
     disclaimer?.addEventListener("change", syncLock);
     privacy?.addEventListener("change", syncLock);
     window.addEventListener("cart:change", () => {
@@ -477,25 +556,11 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           if (!unlocked()) return actions.reject();
           return actions.resolve();
         },
-        onShippingAddressChange: async (
-          data: {
-            shippingAddress?: {
-              countryCode?: string;
-              postalCode?: string;
-            };
-          },
-          actions: { reject: () => Promise<void>; resolve: () => Promise<void> },
-        ) => {
-          if (!quote) return actions.reject();
-          const country = String(data.shippingAddress?.countryCode || "").toUpperCase();
-          const postal = normalizeZip(String(data.shippingAddress?.postalCode || ""));
-          if (country && country !== quote.country) return actions.reject();
-          if (postal && postal !== quote.zip) return actions.reject();
-          return actions.resolve();
-        },
         createOrder: async () => {
           const items = sanitizeCart();
           if (!quote) throw new Error("Missing shipping quote");
+          if (!hasCompleteAddress()) throw new Error("Missing shipping address");
+          const a = shipTo();
           const res = await fetch(`${createApi}/api/paypal-create-order`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -503,6 +568,14 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
               lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
               country: quote.country,
               zip: quote.zip,
+              shipTo: {
+                fullName: a.fullName,
+                email: a.email,
+                phone: a.phone,
+                street: a.street,
+                city: a.city,
+                province: a.province || quote.country,
+              },
             }),
           });
           if (!res.ok) {

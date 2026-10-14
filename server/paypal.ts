@@ -16,6 +16,7 @@ export type PayPalOrder = {
   payer?: { email_address?: string };
   purchase_units?: Array<{
     custom_id?: string;
+    invoice_id?: string;
     amount?: {
       value?: string;
       currency_code?: string;
@@ -28,6 +29,7 @@ export type PayPalOrder = {
     shipping?: {
       name?: { full_name?: string };
       phone?: { phone_number?: { national_number?: string; country_code?: string } };
+      phone_number?: { national_number?: string; country_code?: string };
       address?: {
         country_code?: string;
         admin_area_1?: string;
@@ -123,9 +125,29 @@ export async function fetchPayPalOrder(orderId: string): Promise<PayPalOrder> {
   return (await res.json()) as PayPalOrder;
 }
 
+/** Indirizzo di spedizione raccolto nel checkout (non quello del wallet PayPal). */
+export type CheckoutShipTo = {
+  fullName: string;
+  email: string;
+  phone: string;
+  street: string;
+  city: string;
+  province: string;
+  zip: string;
+  country: string;
+};
+
+function digitsPhone(phone: string) {
+  return phone.replace(/\D+/g, "").slice(0, 15);
+}
+
 /** Create checkout order with catalog prices (server-side). */
-export async function createPayPalCheckoutOrder(order: PricedOrder): Promise<string> {
+export async function createPayPalCheckoutOrder(
+  order: PricedOrder,
+  shipTo: CheckoutShipTo,
+): Promise<string> {
   const token = await paypalAccessToken();
+  const phone = digitsPhone(shipTo.phone);
   const res = await fetch(`${paypalApiBase()}/v2/checkout/orders`, {
     method: "POST",
     headers: {
@@ -141,6 +163,8 @@ export async function createPayPalCheckoutOrder(order: PricedOrder): Promise<str
             .map((l) => `${l.id}:${l.size}:${l.qty}`)
             .join("|")
             .slice(0, 127),
+          // Telefono checkout per il webhook Spedire (PayPal spesso non lo passa).
+          invoice_id: `t:${phone}|e:${shipTo.email}`.slice(0, 127),
           amount: {
             currency_code: "EUR",
             value: money(order.total),
@@ -156,11 +180,21 @@ export async function createPayPalCheckoutOrder(order: PricedOrder): Promise<str
             unit_amount: { currency_code: "EUR", value: money(l.unitPrice) },
             category: "PHYSICAL_GOODS",
           })),
+          shipping: {
+            name: { full_name: shipTo.fullName.slice(0, 300) },
+            address: {
+              address_line_1: shipTo.street.slice(0, 300),
+              admin_area_2: shipTo.city.slice(0, 120),
+              admin_area_1: shipTo.province.slice(0, 40),
+              postal_code: shipTo.zip.slice(0, 20),
+              country_code: shipTo.country.slice(0, 2),
+            },
+          },
         },
       ],
       application_context: {
         brand_name: "Corpoceleste",
-        shipping_preference: "GET_FROM_FILE",
+        shipping_preference: "SET_PROVIDED_ADDRESS",
         user_action: "PAY_NOW",
       },
     }),
@@ -172,6 +206,16 @@ export async function createPayPalCheckoutOrder(order: PricedOrder): Promise<str
   const data = (await res.json()) as { id?: string };
   if (!data.id) throw new Error("PayPal create order missing id");
   return data.id;
+}
+
+export function shipContactFromInvoiceId(invoiceId: string | undefined | null): {
+  phone: string;
+  email: string;
+} {
+  const raw = String(invoiceId || "");
+  const phone = (/t:([^|]+)/.exec(raw)?.[1] || "").replace(/\D+/g, "");
+  const email = (/e:([^|]+)/.exec(raw)?.[1] || "").trim();
+  return { phone, email };
 }
 
 /** PayPal cert URLs only — blocks SSRF via paypal-cert-url header. */

@@ -27,6 +27,7 @@ import {
   linesFromOrder,
   orderEmailBits,
   paypalWebhookConfigured,
+  shipContactFromInvoiceId,
   verifyPayPalWebhook,
   type PayPalOrder,
 } from "../server/paypal.js";
@@ -98,21 +99,33 @@ async function ensureSpedireShipment(opts: {
     return { packlinkError: "SPEDIRE_API_KEY missing" };
   }
 
-  const ship = opts.order?.purchase_units?.[0]?.shipping;
+  const unit = opts.order?.purchase_units?.[0];
+  const ship = unit?.shipping;
   const addr = ship?.address;
   const dest = parseShipDest({
     country: addr?.country_code,
     zip: addr?.postal_code,
   });
   if (!dest || !addr?.address_line_1 || !addr.admin_area_2) {
-    return { packlinkError: "PayPal shipping address incomplete" };
+    return { packlinkError: "Checkout shipping address incomplete" };
   }
 
   const fullName = ship?.name?.full_name || "Cliente";
   const person = personFromFullName(fullName);
-  const email = (opts.order?.payer?.email_address || process.env.SHOP_EMAIL || "").trim();
-  const paypalPhone = String(ship?.phone?.phone_number?.national_number || "").trim();
+  const fromInvoice = shipContactFromInvoiceId(unit?.invoice_id);
+  const email = (
+    fromInvoice.email ||
+    opts.order?.payer?.email_address ||
+    process.env.SHOP_EMAIL ||
+    ""
+  ).trim();
+  const paypalPhone = String(
+    ship?.phone_number?.national_number ||
+      ship?.phone?.phone_number?.national_number ||
+      "",
+  ).trim();
   const phone = (
+    fromInvoice.phone ||
     paypalPhone ||
     process.env.SPEDIRE_DEFAULT_TO_PHONE ||
     process.env.SPEDIRE_FROM_PHONE ||

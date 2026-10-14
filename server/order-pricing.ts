@@ -38,6 +38,12 @@ export function money(n: number) {
   return (Math.round(n * 100) / 100).toFixed(2);
 }
 
+/** Sconto spedizione al cliente: arrotonda per difetto allo scaglione da 0,50 € (6,20→6,00; 6,70→6,50). */
+export function floorShippingEuro(n: number) {
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.floor(n * 2) / 2;
+}
+
 export function shipZoneFromCountry(countryCode: string | undefined | null): "it" | "eu" {
   return normalizeCountry(countryCode) === "IT" ? "it" : "eu";
 }
@@ -123,7 +129,7 @@ export async function priceOrderLines(
   }
   if (!packlink) return { ok: false, error: "Shipping unavailable" };
 
-  const shipping = packlink.price;
+  const shipping = floorShippingEuro(packlink.price);
   const total = Math.round((merchandise + shipping) * 100) / 100;
   return {
     ok: true,
@@ -135,7 +141,7 @@ export async function priceOrderLines(
       shipZone: shipZoneFromCountry(shipCountry),
       shipCountry,
       shipZip,
-      packlink,
+      packlink: { ...packlink, price: shipping },
     },
   };
 }
