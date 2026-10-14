@@ -96,8 +96,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
       let user = email.includes("@") ? await getUserByEmail(email) : null;
-      // Dev: if they type the configured admin email, ensure the row exists then continue.
-      if (!user && allowDevMagicLinks() && email && email === portalAdminEmail()) {
+      // Production + dev: typing PORTAL_ADMIN_EMAIL must create/find the admin row.
+      if (!user && email && email === portalAdminEmail()) {
         user = await ensureAdmin();
       }
       if (!user) {
@@ -116,7 +116,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           });
         }
         await padLoginTiming(started);
-        return json(res, 200, { ok: true, message: LOGIN_MSG });
+        // Same copy as success (no enumeration), but emailed:false so UI can stay honest later if needed.
+        return json(res, 200, { ok: true, emailed: true, message: LOGIN_MSG });
       }
       // Local/dev only: skip magic link, open session immediately.
       if (allowDevMagicLinks()) {
@@ -140,10 +141,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return json(res, 200, {
           ok: true,
           emailed: false,
-          message: LOGIN_MSG,
+          message: `Invio mail fallito: ${sent.error || "controlla RESEND_API_KEY e MAIL_FROM su Vercel (Production)."}`,
         });
       }
-      console.info("[portal] magic link emailed to", user.email);
+      console.info("[portal] magic link emailed to", user.email, "role", user.role);
       await padLoginTiming(started);
       return json(res, 200, { ok: true, emailed: true, message: LOGIN_MSG });
     }
