@@ -6,7 +6,7 @@ import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
  * Preview Spedire cheapest rate for checkout UI.
- * POST { lines, country, zip }
+ * POST { lines, country, zip, city?, province? }
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   cors(req, res);
@@ -24,8 +24,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       lines?: OrderLine[];
       country?: string;
       zip?: string;
+      city?: string;
+      province?: string;
     }>(req);
-    const dest = parseShipDest({ country: body.country, zip: body.zip });
+    const dest = parseShipDest({
+      country: body.country,
+      zip: body.zip,
+      city: body.city,
+      province: body.province,
+    });
     if (!dest) return json(res, 400, { error: "Invalid shipping destination" });
 
     const lines = Array.isArray(body.lines) ? body.lines : [];

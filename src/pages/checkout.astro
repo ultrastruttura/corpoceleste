@@ -84,10 +84,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             id="ship-province"
             data-ship-province
             autocomplete="address-level1"
-            maxlength="2"
+            maxlength="40"
             spellcheck="false"
             placeholder="RM"
-            required
           />
         </div>
         <div class="recap" data-recap></div>
@@ -269,8 +268,11 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     let quoteSeq = 0;
     let quoteTimer: ReturnType<typeof setTimeout> | undefined;
 
-    function normalizeZip(z: string) {
-      return z.trim().replace(/\s+/g, "").toUpperCase();
+    function normalizeZip(z: string, country: string) {
+      let out = z.trim().toUpperCase().replace(/\s+/g, " ");
+      if (country === "IT") out = out.replace(/\s+/g, "").replace(/[^0-9]/g, "").slice(0, 5);
+      else out = out.replace(/[^A-Z0-9 -]/g, "").slice(0, 22);
+      return out;
     }
 
     function destCountry() {
@@ -278,27 +280,36 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     }
 
     function destZip() {
-      return normalizeZip(zipInput?.value || "");
+      return normalizeZip(zipInput?.value || "", destCountry());
+    }
+
+    function syncProvinceField() {
+      const it = destCountry() === "IT";
+      if (!provinceInput) return;
+      provinceInput.placeholder = it ? "RM" : "";
+      provinceInput.maxLength = it ? 2 : 40;
+      provinceInput.required = it;
+      provinceInput.setAttribute("aria-required", it ? "true" : "false");
     }
 
     function shipTo() {
+      const country = destCountry();
+      let province = String(provinceInput?.value || "").trim().toUpperCase();
+      if (country === "IT") province = province.slice(0, 2);
       return {
         fullName: String(nameInput?.value || "").trim(),
         email: String(emailInput?.value || "").trim(),
         phone: String(phoneInput?.value || "").trim(),
         street: String(streetInput?.value || "").trim(),
         city: String(cityInput?.value || "").trim(),
-        province: String(provinceInput?.value || "")
-          .trim()
-          .toUpperCase()
-          .slice(0, 2),
+        province,
       };
     }
 
     function hasCompleteAddress() {
       const a = shipTo();
       if (!a.fullName || !a.email.includes("@") || !a.phone || !a.street || !a.city) return false;
-      if (destCountry() === "IT" && a.province.length < 2) return false;
+      if (destCountry() === "IT" && !/^[A-Z]{2}$/.test(a.province)) return false;
       return true;
     }
 
@@ -419,12 +430,15 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       syncPage();
 
       try {
+        const a = shipTo();
         const res = await fetch(`${createApi}/api/shipping-quote`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             country,
             zip,
+            city: a.city || undefined,
+            province: a.province || undefined,
             lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
           }),
         });
@@ -461,7 +475,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         quote = {
           shipping,
           country: String(data.country || country).toUpperCase(),
-          zip: normalizeZip(String(data.zip || zip)),
+          zip: normalizeZip(String(data.zip || zip), country),
           serviceId,
           carrier: String(data.carrier || ""),
         };
@@ -503,6 +517,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     syncMethod();
 
     countrySel?.addEventListener("change", () => {
+      syncProvinceField();
       scheduleQuote();
       syncPage();
     });
@@ -511,7 +526,10 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       syncPage();
     });
     for (const el of [nameInput, emailInput, phoneInput, streetInput, cityInput, provinceInput]) {
-      el?.addEventListener("input", syncPage);
+      el?.addEventListener("input", () => {
+        syncPage();
+        if (el === cityInput || el === provinceInput) scheduleQuote();
+      });
     }
     disclaimer?.addEventListener("change", syncLock);
     privacy?.addEventListener("change", syncLock);
@@ -530,6 +548,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       saveOrderSnapshot(shippingAmount());
     });
 
+    syncProvinceField();
     syncPage();
 
     function mountButtons() {

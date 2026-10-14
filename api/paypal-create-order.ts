@@ -17,7 +17,7 @@ function parseShipTo(raw: Partial<CheckoutShipTo> | undefined, country: string, 
   const city = String(raw.city || "").trim();
   const province = String(raw.province || "").trim();
   if (!fullName || !email.includes("@") || !phone || !street || !city) return null;
-  if (country === "IT" && province.length < 2) return null;
+  if (country === "IT" && !/^[A-Z]{2}$/i.test(province)) return null;
   return {
     fullName,
     email,
@@ -53,7 +53,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       shipTo?: Partial<CheckoutShipTo>;
     }>(req);
     const lines = Array.isArray(body.lines) ? body.lines : [];
-    const dest = parseShipDest({ country: body.country, zip: body.zip });
+    const dest = parseShipDest({
+      country: body.country,
+      zip: body.zip,
+      city: body.shipTo?.city,
+      province: body.shipTo?.province,
+    });
     if (!dest) return json(res, 400, { error: "Invalid shipping destination" });
 
     const shipTo = parseShipTo(body.shipTo, dest.country, dest.zip);

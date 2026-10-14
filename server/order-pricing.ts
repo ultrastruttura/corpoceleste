@@ -20,6 +20,8 @@ export type PricedLine = OrderLine & {
 export type ShipDest = {
   country: string;
   zip: string;
+  city?: string;
+  province?: string;
 };
 
 export type PricedOrder = {
@@ -51,11 +53,21 @@ export function shipZoneFromCountry(countryCode: string | undefined | null): "it
 export function parseShipDest(input: {
   country?: string;
   zip?: string;
+  city?: string;
+  province?: string;
 }): ShipDest | null {
   const country = normalizeCountry(input.country);
-  const zip = normalizeZip(input.zip);
+  const zip = normalizeZip(input.zip, country);
   if (!country || !zip || !isSupportedShipCountry(country)) return null;
-  return { country, zip };
+  if (country === "IT" && !/^\d{5}$/.test(zip)) return null;
+  const city = String(input.city || "").trim();
+  const province = String(input.province || "").trim();
+  return {
+    country,
+    zip,
+    ...(city ? { city } : {}),
+    ...(province ? { province } : {}),
+  };
 }
 
 export async function priceOrderLines(
@@ -65,8 +77,11 @@ export async function priceOrderLines(
   if (!rawLines.length) return { ok: false, error: "Empty cart" };
 
   const shipCountry = normalizeCountry(dest.country);
-  const shipZip = normalizeZip(dest.zip);
+  const shipZip = normalizeZip(dest.zip, shipCountry);
   if (!shipCountry || !shipZip || !isSupportedShipCountry(shipCountry)) {
+    return { ok: false, error: "Invalid shipping destination" };
+  }
+  if (shipCountry === "IT" && !/^\d{5}$/.test(shipZip)) {
     return { ok: false, error: "Invalid shipping destination" };
   }
 
@@ -122,6 +137,8 @@ export async function priceOrderLines(
     packlink = await quoteCheapest({
       toCountry: shipCountry,
       toZip: shipZip,
+      toCity: dest.city,
+      toProvince: dest.province,
       packages: packagesForQty(pieceCount),
     });
   } catch (err) {

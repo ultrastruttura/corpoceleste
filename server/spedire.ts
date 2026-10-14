@@ -99,11 +99,30 @@ export function normalizeCountry(code: string | undefined | null) {
     .slice(0, 2);
 }
 
-export function normalizeZip(zip: string | undefined | null) {
-  return String(zip || "")
+/**
+ * Normalizza CAP/postcode per SpedirePRO.
+ * IT: 5 cifre senza spazi. Altri paesi UE: mantiene lettere/cifre/trattini e un solo spazio
+ * (es. UK "SW1A 1AA", NL "1012 AB") — togliere tutti gli spazi rompe le quote estere.
+ */
+export function normalizeZip(zip: string | undefined | null, country?: string) {
+  let z = String(zip || "")
     .trim()
-    .replace(/\s+/g, "")
+    .toUpperCase()
+    .replace(/\s+/g, " ");
+  const cc = normalizeCountry(country);
+  if (cc === "IT") z = z.replace(/\s+/g, "").replace(/[^0-9]/g, "").slice(0, 5);
+  else z = z.replace(/[^A-Z0-9 -]/g, "").slice(0, 22);
+  return z;
+}
+
+/** Province obbligatoria in create-label: IT = sigla; altri paesi = regione o codice ISO. */
+export function provinceForLabel(country: string, province: string | undefined | null) {
+  const cc = normalizeCountry(country) || "IT";
+  const p = String(province || "")
+    .trim()
     .toUpperCase();
+  if (cc === "IT") return (p.slice(0, 2) || "XX");
+  return (p || cc).slice(0, 40);
 }
 
 function clip(s: string, max: number) {
@@ -129,7 +148,7 @@ export function originFromEnv(): ShipAddress & { province: string } {
     surname: parts.slice(1).join(" ") || "Studio",
     company: envStr("SPEDIRE_FROM_COMPANY", "Corpoceleste"),
     street1: envStr("SPEDIRE_FROM_ADDRESS"),
-    zip_code: normalizeZip(envStr("SPEDIRE_FROM_ZIP")),
+    zip_code: normalizeZip(envStr("SPEDIRE_FROM_ZIP"), envStr("SPEDIRE_FROM_COUNTRY", "IT")),
     city: envStr("SPEDIRE_FROM_CITY"),
     state: envStr("SPEDIRE_FROM_PROVINCE"),
     province: envStr("SPEDIRE_FROM_PROVINCE"),
@@ -189,7 +208,7 @@ function str(v: unknown): string {
 /** CAP → città/provincia (oggi coperto solo IT; altri paesi → []). */
 export async function resolvePostcode(country: string, postcode: string): Promise<GeoHit | null> {
   const cc = normalizeCountry(country);
-  const zip = normalizeZip(postcode);
+  const zip = normalizeZip(postcode, cc);
   if (!cc || !zip || !spedireConfigured()) return null;
 
   const res = await spedireFetch(`/v1/geo/${encodeURIComponent(cc)}/${encodeURIComponent(zip)}`);
@@ -276,12 +295,14 @@ export async function quoteCheapest(input: {
   }
 
   const toCountry = normalizeCountry(input.toCountry);
-  const toZip = normalizeZip(input.toZip);
+  const toZip = normalizeZip(input.toZip, toCountry);
   if (!toCountry || !toZip || !isSupportedShipCountry(toCountry)) return null;
+  if (toCountry === "IT" && !/^\d{5}$/.test(toZip)) return null;
 
   let toCity = (input.toCity || "").trim();
   let toProvince = (input.toProvince || "").trim();
-  if (!toCity || (!toProvince && toCountry === "IT")) {
+  // /v1/geo oggi copre solo l'Italia; per UE la city va dal form checkout.
+  if ((!toCity || !toProvince) && toCountry === "IT") {
     try {
       const geo = await resolvePostcode(toCountry, toZip);
       if (geo) {
@@ -292,8 +313,10 @@ export async function quoteCheapest(input: {
       console.error("[SPEDIRE] geo for quote", err);
     }
   }
-  // Geo oggi copre solo IT; per UE senza city usiamo il CAP come fallback testuale.
+  // Preventivo: se manca la city (form non ancora compilato / geo vuoto) usa il CAP.
+  // create-label richiede invece la città reale dal checkout.
   if (!toCity) toCity = toZip;
+  toProvince = provinceForLabel(toCountry, toProvince);
 
   const body = {
     from: {
@@ -395,8 +418,8 @@ function partyPayload(addr: ShipAddress, province: string) {
     ...(addr.company ? { attention_name: clip(addr.company, 22) } : {}),
     country: normalizeCountry(addr.country),
     city: addr.city.trim(),
-    postcode: normalizeZip(addr.zip_code),
-    province: province.trim(),
+    postcode: normalizeZip(addr.zip_code, addr.country),
+    province: provinceForLabel(addr.country, province),
     street: addr.street1.trim(),
     ...(addr.street2 ? { address_2: clip(addr.street2, 85) } : {}),
     email: addr.email.trim(),
@@ -418,13 +441,11 @@ export async function createShipmentAndLabels(input: {
   }
 
   let toProvince = (input.to.state || "").trim();
-  if (!toProvince) {
+  if (!toProvince && normalizeCountry(input.to.country) === "IT") {
     const geo = await resolvePostcode(input.to.country, input.to.zip_code);
     toProvince = geo?.province || "";
   }
-  if (!toProvince) {
-    throw new Error("Spedire: missing recipient province (state / CAP geo)");
-  }
+  toProvince = provinceForLabel(input.to.country, toProvince);
   if (!input.to.city?.trim()) {
     throw new Error("Spedire: missing recipient city");
   }
