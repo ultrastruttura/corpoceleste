@@ -233,6 +233,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
     const base = import.meta.env.BASE_URL;
     const prefix = document.documentElement.dataset.localePrefix || "";
+    let googlePayReady: (() => void) | null = null;
+    let buttonsMounted = false;
     const page = document.querySelector<HTMLElement>(".checkout-page");
     const labels = {
       needZip: page?.dataset.shipNeedZip || "",
@@ -459,6 +461,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       }
       syncLock();
       page?.classList.add("is-ready");
+      tryMountButtons?.();
     }
 
     async function fetchQuote() {
@@ -618,6 +621,26 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       }
       saveOrderSnapshot(shippingAmount());
     });
+
+    // Always react to Google Pay tap, even before SDK finishes loading.
+    document.querySelector<HTMLButtonElement>("[data-google-fallback]")?.addEventListener(
+      "click",
+      (e) => {
+        e.preventDefault();
+        if (googlePayReady) {
+          googlePayReady();
+          return;
+        }
+        if (!unlocked()) {
+          window.alert(
+            lockHint?.textContent?.trim() ||
+              "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.",
+          );
+          return;
+        }
+        window.alert("Google Pay si sta caricando… riprova tra un secondo, oppure usa PayPal.");
+      },
+    );
 
     syncProvinceField();
     syncPage();
@@ -779,9 +802,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       createApi: string,
       createServerOrder: () => Promise<string>,
     ) {
-      const slot = document.querySelector<HTMLElement>("[data-googlepay-slot]");
       const googleFallback = document.querySelector<HTMLButtonElement>("[data-google-fallback]");
-      if (!slot) return;
+      const gpaySdk = document.querySelector<HTMLElement>("#googlepay-button");
+      if (!googleFallback && !gpaySdk) return;
 
       type GPayClient = {
         isReadyToPay: (r: object) => Promise<{ result?: boolean }>;
@@ -790,6 +813,10 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       };
       type GPayCtor = new (o: Record<string, unknown>) => GPayClient;
       type GPayNS = { payments: { api: { PaymentsClient: GPayCtor } } };
+
+      const lockMsg = () =>
+        lockHint?.textContent?.trim() ||
+        "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.";
 
       const waitDeps = () =>
         new Promise<{ googleNs: GPayNS; gp: NonNullable<typeof paypal.Googlepay> } | null>((resolve) => {
@@ -804,15 +831,10 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           tick();
         });
 
-      const gpayUnavailable = () => {
-        if (!unlocked()) return;
-        window.alert("Google Pay non disponibile al momento. Usa PayPal.");
-      };
-
       const deps = await waitDeps();
       if (!deps) {
         console.warn("Google Pay: SDK not available");
-        googleFallback?.addEventListener("click", gpayUnavailable);
+        googlePayReady = () => window.alert("Google Pay non disponibile. Usa PayPal.");
         return;
       }
 
@@ -828,26 +850,24 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         gpConfig = await deps.gp().config();
       } catch (err) {
         console.warn("Google Pay config unavailable", err);
-        googleFallback?.addEventListener("click", gpayUnavailable);
+        googlePayReady = () =>
+          window.alert("Google Pay non è attivo sull’account PayPal. Usa PayPal.");
         return;
       }
 
       const allowedPaymentMethods = gpConfig.allowedPaymentMethods || [];
       if (!allowedPaymentMethods.length) {
-        console.warn("Google Pay: no allowed payment methods");
-        googleFallback?.addEventListener("click", gpayUnavailable);
+        googlePayReady = () =>
+          window.alert("Google Pay non è attivo sull’account PayPal. Usa PayPal.");
         return;
       }
 
       const env =
         String(gpConfig.environment || "").toUpperCase() === "TEST" ? "TEST" : "PRODUCTION";
 
-      const onGooglePayClick = () => {
+      const startGooglePay = () => {
         if (!unlocked()) {
-          window.alert(
-            lockHint?.textContent?.trim() ||
-              "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.",
-          );
+          window.alert(lockMsg());
           return;
         }
         const price =
@@ -858,7 +878,10 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           apiVersion: gpConfig.apiVersion ?? 2,
           apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
           allowedPaymentMethods,
-          merchantInfo: gpConfig.merchantInfo,
+          merchantInfo: {
+            ...gpConfig.merchantInfo,
+            merchantName: String(gpConfig.merchantInfo?.merchantName || "Corpoceleste"),
+          },
           transactionInfo: {
             countryCode: gpConfig.countryCode || "IT",
             currencyCode: "EUR",
@@ -868,8 +891,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           callbackIntents: ["PAYMENT_AUTHORIZATION" as const],
         };
 
-        // Create PayPal order inside onPaymentAuthorized (PayPal docs). Calling
-        // createOrder before loadPaymentData breaks the user-gesture and the sheet never opens.
         const client = new deps.googleNs.payments.api.PaymentsClient({
           environment: env,
           paymentDataCallbacks: {
@@ -918,52 +939,39 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           },
         });
 
-        client.loadPaymentData(paymentDataRequest).catch((err: unknown) => {
-          const code = String((err as { statusCode?: string })?.statusCode || err);
-          if (code.includes("CANCELED")) return;
-          console.error("Google Pay click", err);
-          window.alert("Google Pay non è riuscito ad aprire il pagamento. Riprova o usa PayPal.");
-        });
+        // Must stay in the click stack (no await before this).
+        const pending = client.loadPaymentData(paymentDataRequest);
+        if (pending && typeof (pending as Promise<unknown>).catch === "function") {
+          (pending as Promise<unknown>).catch((err: unknown) => {
+            const code = String((err as { statusCode?: string })?.statusCode || err);
+            if (code.includes("CANCELED") || code.includes("AbortError")) return;
+            console.error("Google Pay click", err);
+            window.alert("Google Pay non è riuscito ad aprire il pagamento. Riprova o usa PayPal.");
+          });
+        }
       };
 
-      const gpaySdk = document.querySelector<HTMLElement>("#googlepay-button");
-      const baseClient = new deps.googleNs.payments.api.PaymentsClient({
-        environment: env,
-      });
-      try {
-        await baseClient.isReadyToPay({
-          apiVersion: gpConfig.apiVersion ?? 2,
-          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
-          allowedPaymentMethods,
-        });
-      } catch (err) {
-        console.warn("Google Pay isReadyToPay", err);
-      }
+      googlePayReady = startGooglePay;
 
-      try {
-        const button = baseClient.createButton({
-          onClick: onGooglePayClick,
-          allowedPaymentMethods,
-          buttonType: "pay",
-          buttonSizeMode: "fill",
-          buttonColor: "black",
-        });
-        if (gpaySdk && button) {
-          gpaySdk.replaceChildren(button);
-          gpaySdk.hidden = false;
-          if (googleFallback) googleFallback.hidden = true;
-        } else {
-          googleFallback?.addEventListener("click", () => void onGooglePayClick());
-        }
-      } catch (err) {
-        console.warn("Google Pay createButton", err);
-        googleFallback?.addEventListener("click", () => void onGooglePayClick());
+      // Prefer the labeled button (reliable click). Official mark is decorative-optional.
+      if (googleFallback) googleFallback.hidden = false;
+      if (gpaySdk) {
+        gpaySdk.hidden = true;
+        gpaySdk.replaceChildren();
       }
+    }
+
+    function tryMountButtons() {
+      if (buttonsMounted) return;
+      if (!(window as unknown as { paypal?: unknown }).paypal) return;
+      if (!sanitizeCart().length) return;
+      buttonsMounted = true;
+      mountButtons();
     }
 
     if (site.paypalClientId) {
       const wait = () => {
-        if ((window as unknown as { paypal?: unknown }).paypal) mountButtons();
+        if ((window as unknown as { paypal?: unknown }).paypal) tryMountButtons();
         else setTimeout(wait, 80);
       };
       wait();
