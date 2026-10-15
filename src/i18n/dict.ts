@@ -6,7 +6,7 @@ const it = {
       "Serigrafia d’artista a un colore, stampata a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand. Spedizione in Italia e in Europa.",
   },
   home: {
-    title: "Serigrafia d’artista",
+    title: "Serigrafie d’autore",
     lede: "Un colore, stampato a mano a Bergamo. Maglie, stampe, edizioni.",
   },
   nav: {
@@ -21,7 +21,8 @@ const it = {
     menu: "Menu",
     language: "Lingua",
     skip: "Vai al contenuto",
-    brandMark: "Corpoceleste — serigrafia d'artista e maglie stampate a mano a Bergamo",
+    tagline: "Serigrafie d’autore",
+    brandMark: "Corpoceleste — serigrafie d'autore e maglie stampate a mano a Bergamo",
     brandWord: "Corpoceleste, shop di maglie serigrafate e stampe d'artista",
   },
   footer: {
@@ -386,7 +387,7 @@ const en: typeof it = {
       "One-colour artist screen printing, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand. Shipping in Italy and across Europe.",
   },
   home: {
-    title: "Artist screen printing",
+    title: "Author’s screen prints",
     lede: "One colour, hand-printed in Bergamo. Shirts, prints, editions.",
   },
   nav: {
@@ -401,7 +402,8 @@ const en: typeof it = {
     menu: "Menu",
     language: "Language",
     skip: "Skip to content",
-    brandMark: "Corpoceleste — artist screen printing and hand-printed shirts in Bergamo",
+    tagline: "Author’s screen prints",
+    brandMark: "Corpoceleste — author’s screen prints and hand-printed shirts in Bergamo",
     brandWord: "Corpoceleste, shop for screen-printed shirts and artist prints",
   },
   footer: {
@@ -763,7 +765,7 @@ const de: typeof it = {
       "Einfarbiger Künstlersiebdruck, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand. Versand in Italien und Europa.",
   },
   home: {
-    title: "Künstlersiebdruck",
+    title: "Siebdrucke von Autoren",
     lede: "Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke, Editionen.",
   },
   nav: {
@@ -778,7 +780,8 @@ const de: typeof it = {
     menu: "Menü",
     language: "Sprache",
     skip: "Zum Inhalt",
-    brandMark: "Corpoceleste — künstlerischer Siebdruck und handgedruckte Shirts in Bergamo",
+    tagline: "Siebdrucke von Autoren",
+    brandMark: "Corpoceleste — Siebdrucke von Autoren und handgedruckte Shirts in Bergamo",
     brandWord: "Corpoceleste, Shop für siebgedruckte Shirts und Künstlerdrucke",
   },
   footer: {

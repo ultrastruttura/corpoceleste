@@ -167,6 +167,7 @@ p:last-child {
   gap: 10px;
   min-width: 0;
   text-decoration: none;
+  color: inherit;
 }
 
 .logo:hover {
@@ -180,6 +181,14 @@ p:last-child {
   object-fit: contain;
 }
 
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+}
+
 .logo-word {
   height: 14px;
   width: auto;
@@ -188,6 +197,17 @@ p:last-child {
   display: block;
   object-fit: contain;
   object-position: left center;
+}
+
+.logo-tagline {
+  font-size: 10px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .nav {
@@ -460,6 +480,14 @@ body.cart-open {
     max-width: 100%;
     object-fit: contain;
     object-position: left center;
+  }
+
+  .logo-text {
+    gap: 2px;
+  }
+
+  .logo-tagline {
+    font-size: 9px;
   }
 }
 

@@ -1,6 +1,6 @@
 export const site = {
   name: "Corpoceleste",
-  tagline: "Serigrafia d’artista",
+  tagline: "Serigrafie d’autore",
   email: "info@corpoceleste.eu",
   instagram: "https://www.instagram.com/ultrastruttura/",
   facebook: "https://www.facebook.com/ultrastruttura",
@@ -24,7 +24,8 @@ export const site = {
    * Client ID da developer.paypal.com (gratis).
    * Obbligatorio per mostrare PayPal in checkout e per magazzino/mail via webhook Vercel.
    */
-  paypalClientId: "",
+  paypalClientId:
+    "BAAM0t3KcdroiWYnkmi328SdvzTkYVhsGK9W2sRAOgmXuAF0cP8B7bPs-Pu7EJGvMRRxhLyteIrIUMyd-I",
   /**
    * URL del progetto Vercel (senza slash finale), es. https://corpoceleste-xxxx.vercel.app
    * Se vuoto, bonifico e recesso restano su FormSubmit. Con URL: mail transazionali da Vercel.

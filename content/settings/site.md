@@ -6,9 +6,9 @@ metaDescription:
   en: One-colour artist screen printing, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand. Shipping in Italy and across Europe.
   de: Einfarbiger Künstlersiebdruck, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand. Versand in Italien und Europa.
 homeTitle:
-  it: Serigrafia d’artista
-  en: Artist screen printing
-  de: Künstlersiebdruck
+  it: Serigrafie d’autore
+  en: Author’s screen prints
+  de: Siebdrucke von Autoren
 homeLede:
   it: Un colore, stampato a mano a Bergamo. Maglie, stampe, edizioni.
   en: One colour, hand-printed in Bergamo. Shirts, prints, editions.
