@@ -61,6 +61,7 @@ const it = {
     sizeUnit: "cm",
     sizeChartNote:
       "Misure del capo disteso, in centimetri. ½ petto = da cucitura a cucitura, non la circonferenza. Tolleranza di stampa circa ±1 cm. Confronta con una maglia che ti sta. Se l’etichetta cucita indica una composizione diversa da quella in pagina, vale l’etichetta.",
+    careGuideAlt: "Guida al lavaggio della maglia serigrafata Corpoceleste",
     galleryPrev: "Foto precedente",
     galleryNext: "Foto successiva",
     shipLine: "Spedizione in Italia e in Europa — costo calcolato in checkout (Spedire).",
@@ -441,6 +442,7 @@ const en: typeof it = {
     sizeUnit: "cm",
     sizeChartNote:
       "Garment laid flat, in centimetres. ½ chest is seam to seam, not circumference. Print tolerance about ±1 cm. Compare with a shirt that fits you. If the sewn-in label states a different fibre composition, the label prevails.",
+    careGuideAlt: "Care guide for Corpoceleste screen-printed shirts",
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
     shipLine: "Shipping in Italy and across Europe — cost calculated at checkout (Spedire).",
@@ -818,6 +820,7 @@ const de: typeof it = {
     sizeUnit: "cm",
     sizeChartNote:
       "Maß des flach liegenden Kleidungsstücks, in Zentimetern. ½ Brust ist Naht zu Naht, nicht der Umfang. Drucktoleranz etwa ±1 cm. Vergleich mit einem Shirt, das dir passt. Steht auf dem eingenähten Etikett eine andere Faserzusammensetzung, gilt das Etikett.",
+    careGuideAlt: "Pflegehinweise für siebgedruckte Corpoceleste-Shirts",
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
     shipLine: "Versand in Italien und Europa — Kosten an der Kasse (Spedire).",

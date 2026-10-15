@@ -2,8 +2,7 @@ export const site = {
   name: "Corpoceleste",
   tagline: "Serigrafie d’autore",
   email: "info@corpoceleste.eu",
-  instagram: "https://www.instagram.com/ultrastruttura/",
-  facebook: "https://www.facebook.com/ultrastruttura",
+  instagram: "https://www.instagram.com/cccorpocelesteee/",
   corpoc: "https://ccoorrppoocc.wordpress.com/",
   ultrastruttura: "https://ultrastruttura.com/",
   /** Vecchi progetti (pagina Contatti). */

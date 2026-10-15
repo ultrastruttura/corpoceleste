@@ -1179,6 +1179,18 @@ body.cart-open {
   opacity: 0.7;
 }
 
+.care-guide {
+  margin: 16px 0 24px;
+  padding: 0;
+}
+
+.care-guide img {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+}
+
 .name-list {
   list-style: none;
   margin: 0 0 48px;
@@ -1205,18 +1217,22 @@ body.cart-open {
   color: var(--muted);
 }
 
+.artist-block {
+  margin-top: 2.75rem;
+}
+
+.artist-block:first-of-type {
+  margin-top: 0;
+}
+
 .artist-letter {
-  margin: 1.75rem 0 0.45rem;
+  margin: 0 0 0.5rem;
   font-size: 1.75rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--ink);
   font-weight: 700;
   line-height: 1;
-}
-
-.artist-letter:first-child {
-  margin-top: 0;
 }
 
 .artist-block .name-list {

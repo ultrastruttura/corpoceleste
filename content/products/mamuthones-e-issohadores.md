@@ -1,7 +1,7 @@
-ï»¿---
+---
 title: Maglia 6
 artist: content/artists/artista-6.md
-price: 38
+price: 1
 status: soldout
 kind: shirt
 nuovo: false
@@ -21,9 +21,9 @@ stock:
   XL: 0
 images: []
 seoDescription:
-  it: Maglia 6 di Artista 6 â€” placeholder Corpoceleste.
-  en: Maglia 6 by Artist 6 â€” Corpoceleste placeholder.
-  de: Maglia 6 von KÃ¼nstler 6 â€” Corpoceleste-Platzhalter.
+  it: Maglia 6 di Artista 6 — placeholder Corpoceleste.
+  en: Maglia 6 by Artist 6 — Corpoceleste placeholder.
+  de: Maglia 6 von Künstler 6 — Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.

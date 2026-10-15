@@ -19,7 +19,7 @@ import { artistById } from "../../data/artists";
 import { site, publicFormAction } from "../../data/site";
 import { siteSettings } from "../../data/settings";
 import { SHIP_COUNTRIES } from "../../lib/ship-countries";
-import { cardImageUrls, largeImageUrls } from "../../lib/paths";
+import { asset, cardImageUrls, largeImageUrls } from "../../lib/paths";
 import { absoluteUrl, metaSnippet } from "../../lib/seo";
 import { currentLocale, pageAbs, pageUrl, t } from "../../i18n";
 
@@ -336,6 +336,21 @@ const jsonLd = {
           )
         }
       </div>
+
+      {
+        product.kind === "shirt" && (
+          <figure class="care-guide">
+            <img
+              src={asset("images/guida-lavaggio.webp")}
+              alt={copy.product.careGuideAlt}
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        )
+      }
 
       {
         description && (

@@ -1,7 +1,7 @@
-ï»¿---
+---
 title: Maglia 7
 artist: content/artists/artista-7.md
-price: 38
+price: 1
 status: soldout
 kind: shirt
 nuovo: false
@@ -21,9 +21,9 @@ stock:
   XL: 0
 images: []
 seoDescription:
-  it: Maglia 7 di Artista 7 â€” placeholder Corpoceleste.
-  en: Maglia 7 by Artist 7 â€” Corpoceleste placeholder.
-  de: Maglia 7 von KÃ¼nstler 7 â€” Corpoceleste-Platzhalter.
+  it: Maglia 7 di Artista 7 — placeholder Corpoceleste.
+  en: Maglia 7 by Artist 7 — Corpoceleste placeholder.
+  de: Maglia 7 von Künstler 7 — Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.

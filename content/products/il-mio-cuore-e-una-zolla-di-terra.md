@@ -1,7 +1,7 @@
-ï»¿---
+---
 title: Maglia 4
 artist: content/artists/artista-4.md
-price: 38
+price: 1
 status: soldout
 kind: shirt
 nuovo: false
@@ -21,9 +21,9 @@ stock:
   XL: 0
 images: []
 seoDescription:
-  it: Maglia 4 di Artista 4 â€” placeholder Corpoceleste.
-  en: Maglia 4 by Artist 4 â€” Corpoceleste placeholder.
-  de: Maglia 4 von KÃ¼nstler 4 â€” Corpoceleste-Platzhalter.
+  it: Maglia 4 di Artista 4 — placeholder Corpoceleste.
+  en: Maglia 4 by Artist 4 — Corpoceleste placeholder.
+  de: Maglia 4 von Künstler 4 — Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.

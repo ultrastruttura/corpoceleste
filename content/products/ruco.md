@@ -1,7 +1,7 @@
-ï»¿---
+---
 title: Maglia 8
 artist: content/artists/artista-8.md
-price: 38
+price: 1
 status: available
 kind: shirt
 nuovo: false
@@ -21,9 +21,9 @@ stock:
   XL: 2
 images: []
 seoDescription:
-  it: Maglia 8 di Artista 8 â€” placeholder Corpoceleste.
-  en: Maglia 8 by Artist 8 â€” Corpoceleste placeholder.
-  de: Maglia 8 von KÃ¼nstler 8 â€” Corpoceleste-Platzhalter.
+  it: Maglia 8 di Artista 8 — placeholder Corpoceleste.
+  en: Maglia 8 by Artist 8 — Corpoceleste placeholder.
+  de: Maglia 8 von Künstler 8 — Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.

@@ -1,7 +1,7 @@
-ï»¿---
+---
 title: Maglia 2
 artist: content/artists/artista-2.md
-price: 38
+price: 1
 status: available
 kind: shirt
 nuovo: true
@@ -21,9 +21,9 @@ stock:
   XL: 2
 images: []
 seoDescription:
-  it: Maglia 2 di Artista 2 â€” placeholder Corpoceleste.
-  en: Maglia 2 by Artist 2 â€” Corpoceleste placeholder.
-  de: Maglia 2 von KÃ¼nstler 2 â€” Corpoceleste-Platzhalter.
+  it: Maglia 2 di Artista 2 — placeholder Corpoceleste.
+  en: Maglia 2 by Artist 2 — Corpoceleste placeholder.
+  de: Maglia 2 von Künstler 2 — Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.
