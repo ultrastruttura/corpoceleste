@@ -2099,7 +2099,6 @@ body.cart-open {
 #paypal-button,
 #applepay-button,
 #googlepay-button {
-  min-height: 48px;
   margin-top: 0;
   width: 100%;
 }
@@ -2112,6 +2111,7 @@ body.cart-open {
 }
 
 .pay-buttons--stack {
+  --pay-btn-h: 48px;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -2136,13 +2136,31 @@ body.cart-open {
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  height: var(--pay-btn-h);
+  overflow: hidden;
 }
 
-.pay-buttons__slot > div,
-.pay-buttons__slot > button,
-.pay-buttons__slot > .wallet-btn,
-.pay-buttons__sdk {
+.pay-buttons--stack .pay-buttons__slot > div,
+.pay-buttons--stack .pay-buttons__slot > button,
+.pay-buttons--stack .wallet-btn,
+.pay-buttons--stack .pay-buttons__sdk,
+.pay-buttons--stack #paypal-button {
+  box-sizing: border-box;
   width: 100%;
+  height: var(--pay-btn-h);
+  min-height: var(--pay-btn-h);
+  max-height: var(--pay-btn-h);
+}
+
+/* PayPal / Google inject iframes or nested buttons — force same box */
+.pay-buttons--stack .pay-buttons__slot iframe,
+.pay-buttons--stack .pay-buttons__slot > div > div,
+.pay-buttons--stack .pay-buttons__slot button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: var(--pay-btn-h) !important;
+  min-height: var(--pay-btn-h) !important;
+  max-height: var(--pay-btn-h) !important;
 }
 
 .pay-buttons__sdk[hidden] {
@@ -2154,7 +2172,6 @@ body.cart-open {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 48px;
   padding: 0 16px;
   border: none;
   border-radius: 4px;
