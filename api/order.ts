@@ -88,6 +88,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const bankId = newId("bank");
 
   // Hold GitHub stock before notifying the shop (parity with PayPal webhook).
+  // True OOS → reject. Infra/token errors → still take the order and warn in the shop mail
+  // (bonifico is not paid yet; losing the request is worse than a manual stock tweak).
+  let stockNote = "";
   if (pricedOrder && (process.env.GITHUB_TOKEN || "").trim()) {
     const stockLines = pricedOrder.lines.map((l) => ({
       id: l.id,
@@ -116,6 +119,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           stockComplete: true,
           at: new Date().toISOString(),
         });
+        stockNote = held.stockNotes?.length
+          ? `Magazzino:\n${held.stockNotes.join("\n")}`
+          : "Magazzino: aggiornato";
+      } else if (claim.action === "skip") {
+        stockNote = "Magazzino: già scalato (ledger)";
       }
     } catch (err) {
       const { LedgerBusyError } = await import("../server/github-stock.js");
@@ -127,15 +135,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (msg.includes("INSUFFICIENT_STOCK")) {
         return res.status(409).send("Out of stock");
       }
-      return res.status(503).send("Stock unavailable");
+      // Do not block bonifico on GitHub/API failures — ask shop to adjust stock by hand.
+      stockNote = `Magazzino: NON aggiornato automaticamente (${msg.slice(0, 200)}). Aggiorna a mano su Tina.`;
     }
+  } else if (pricedOrder) {
+    stockNote = "Magazzino: GITHUB_TOKEN assente — aggiorna a mano su Tina.";
   }
 
   // Only mail the shop — no Resend to attacker-controlled customer email.
   const shop = await sendMail({
     to: shopTo,
     subject: "Ordine shop Corpoceleste (bonifico)",
-    text: recap,
+    text: [recap, "", stockNote].filter(Boolean).join("\n"),
   });
   if (!shop.ok) {
     console.error("order: mail failed");
