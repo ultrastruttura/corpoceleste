@@ -2097,22 +2097,35 @@ body.cart-open {
 
 #paypal-buttons,
 #paypal-button,
-#applepay-button {
+#applepay-button,
+#googlepay-button {
   min-height: 48px;
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 .pay-buttons {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
+  align-items: stretch;
 }
 
 .pay-buttons .btn + .btn--ghost {
   margin-left: 0;
 }
 
-.pay-buttons__slot:first-child {
-  margin-top: 0;
+.pay-buttons__slot {
+  flex: 1 1 140px;
+  min-width: 120px;
+}
+
+.pay-buttons__slot[hidden] {
+  display: none !important;
+}
+
+.pay-buttons__slot > div,
+.pay-buttons__slot > button {
+  width: 100%;
 }
 
 /* Account / artist portal */

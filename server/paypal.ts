@@ -125,6 +125,30 @@ export async function fetchPayPalOrder(orderId: string): Promise<PayPalOrder> {
   return (await res.json()) as PayPalOrder;
 }
 
+/** Capture an approved order (used by Google Pay after confirmOrder). */
+export async function capturePayPalOrder(orderId: string): Promise<{
+  id?: string;
+  status?: string;
+}> {
+  const id = String(orderId || "").trim();
+  if (!id || !/^[A-Z0-9_-]+$/i.test(id)) throw new Error("Invalid order id");
+  const token = await paypalAccessToken();
+  const res = await fetch(`${paypalApiBase()}/v2/checkout/orders/${encodeURIComponent(id)}/capture`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: "{}",
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`PayPal capture failed: ${res.status} ${text}`);
+  }
+  return (await res.json()) as { id?: string; status?: string };
+}
+
 /** Indirizzo di spedizione raccolto nel checkout (non quello del wallet PayPal). */
 export type CheckoutShipTo = {
   fullName: string;

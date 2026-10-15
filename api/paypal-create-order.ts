@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import {
+  capturePayPalOrder,
   createPayPalCheckoutOrder,
   type CheckoutShipTo,
 } from "../server/paypal.js";
@@ -48,11 +49,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const body = await readJson<{
+      action?: string;
+      orderId?: string;
       lines?: OrderLine[];
       country?: string;
       zip?: string;
       shipTo?: Partial<CheckoutShipTo>;
     }>(req);
+
+    // Google Pay (and similar) confirm then capture server-side.
+    if (body.action === "capture") {
+      const orderId = String(body.orderId || "").trim();
+      if (!orderId) return json(res, 400, { error: "Missing orderId" });
+      const captured = await capturePayPalOrder(orderId);
+      return json(res, 200, { ok: true, id: captured.id, status: captured.status });
+    }
+
     const lines = Array.isArray(body.lines) ? body.lines : [];
     const dest = parseShipDest({
       country: body.country,

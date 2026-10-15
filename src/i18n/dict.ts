@@ -133,8 +133,9 @@ const it = {
     paypal: "PayPal",
     paypalBack: "Torna a Corpoceleste",
     payTitle: "Scegli il pagamento",
-    methodPaypal: "PayPal / Apple Pay",
+    methodPaypal: "PayPal / Apple Pay / Google Pay",
     applePay: "Apple Pay",
+    googlePay: "Google Pay",
     bank: "Bonifico",
     bankNote:
       "Invia il modulo: ricevi l’IBAN via email. L’ordine è confermato quando arriva il pagamento; poi spedisco.",
@@ -516,8 +517,9 @@ const en: typeof it = {
     paypal: "PayPal",
     paypalBack: "Back to Corpoceleste",
     payTitle: "Choose how to pay",
-    methodPaypal: "PayPal / Apple Pay",
+    methodPaypal: "PayPal / Apple Pay / Google Pay",
     applePay: "Apple Pay",
+    googlePay: "Google Pay",
     bank: "Bank transfer",
     bankNote:
       "Send the form: you’ll get the IBAN by email. The order is confirmed when payment arrives; then I ship.",
@@ -898,8 +900,9 @@ const de: typeof it = {
     paypal: "PayPal",
     paypalBack: "Zurück zu Corpoceleste",
     payTitle: "Zahlung wählen",
-    methodPaypal: "PayPal / Apple Pay",
+    methodPaypal: "PayPal / Apple Pay / Google Pay",
     applePay: "Apple Pay",
+    googlePay: "Google Pay",
     bank: "Überweisung",
     bankNote:
       "Schick das Formular: du bekommst die IBAN per E-Mail. Die Bestellung gilt, wenn die Zahlung da ist; danach verschicke ich.",

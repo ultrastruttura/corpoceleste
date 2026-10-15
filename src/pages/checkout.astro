@@ -148,6 +148,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                   <div class="pay-buttons">
                     <div id="paypal-button" class="pay-buttons__slot"></div>
                     <div id="applepay-button" class="pay-buttons__slot" hidden data-applepay-slot></div>
+                    <div id="googlepay-button" class="pay-buttons__slot" hidden data-googlepay-slot></div>
                   </div>
                 </div>
               </>
@@ -159,6 +160,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                   </button>
                   <button class="btn btn--full btn--ghost" type="button" disabled>
                     {copy.checkout.applePay}
+                  </button>
+                  <button class="btn btn--full btn--ghost" type="button" disabled>
+                    {copy.checkout.googlePay}
                   </button>
                 </div>
               </div>
@@ -200,8 +204,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     paypalSdk && (
       <script define:vars={{ clientId: site.paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
-        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=${sdkLocale}&enable-funding=applepay&disable-funding=card,credit,paylater,venmo`;
+        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=card,credit,paylater,venmo`;
         document.head.append(s);
+        const g = document.createElement("script");
+        g.src = "https://pay.google.com/gp/p/js/pay.js";
+        g.async = true;
+        document.head.append(g);
       </script>
     )
   }
@@ -608,9 +616,26 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         render: (s: string) => Promise<void> | void;
         isEligible?: () => boolean;
       };
+      type GooglePayApi = {
+        config: () => Promise<{
+          allowedPaymentMethods: unknown[];
+          merchantInfo: Record<string, unknown>;
+          apiVersion?: number;
+          apiVersionMinor?: number;
+        }>;
+        confirmOrder: (o: {
+          orderId: string;
+          paymentMethodData: unknown;
+        }) => Promise<{ status?: string }>;
+        initiatePayerAction?: (o: { orderId: string }) => Promise<unknown>;
+      };
       const paypal = (
         window as unknown as {
-          paypal?: { Buttons: ButtonsFactory; FUNDING: Funding };
+          paypal?: {
+            Buttons: ButtonsFactory;
+            FUNDING: Funding;
+            Googlepay?: () => GooglePayApi;
+          };
         }
       ).paypal;
       if (!paypal?.Buttons || !paypal.FUNDING || !sanitizeCart().length) return;
@@ -621,42 +646,44 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         return;
       }
 
+      async function createServerOrder(): Promise<string> {
+        const items = sanitizeCart();
+        if (!quote) throw new Error("Missing shipping quote");
+        if (!hasCompleteAddress()) throw new Error("Missing shipping address");
+        const a = shipTo();
+        const res = await fetch(`${createApi}/api/paypal-create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+            country: quote.country,
+            zip: quote.zip,
+            shipTo: {
+              fullName: a.fullName,
+              email: a.email,
+              phone: a.phone,
+              street: a.street,
+              city: a.city,
+              province: a.province || quote.country,
+            },
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.text();
+          console.error("paypal-create-order failed", res.status, err);
+          throw new Error("Order create failed");
+        }
+        const data = (await res.json()) as { id?: string };
+        if (!data.id) throw new Error("Missing order id");
+        return data.id;
+      }
+
       const shared = {
         onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
           if (!unlocked()) return actions.reject();
           return actions.resolve();
         },
-        createOrder: async () => {
-          const items = sanitizeCart();
-          if (!quote) throw new Error("Missing shipping quote");
-          if (!hasCompleteAddress()) throw new Error("Missing shipping address");
-          const a = shipTo();
-          const res = await fetch(`${createApi}/api/paypal-create-order`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
-              country: quote.country,
-              zip: quote.zip,
-              shipTo: {
-                fullName: a.fullName,
-                email: a.email,
-                phone: a.phone,
-                street: a.street,
-                city: a.city,
-                province: a.province || quote.country,
-              },
-            }),
-          });
-          if (!res.ok) {
-            const err = await res.text();
-            console.error("paypal-create-order failed", res.status, err);
-            throw new Error("Order create failed");
-          }
-          const data = (await res.json()) as { id?: string };
-          if (!data.id) throw new Error("Missing order id");
-          return data.id;
-        },
+        createOrder: async () => createServerOrder(),
         onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
           saveOrderSnapshot(shippingAmount());
           await actions.order.capture();
@@ -681,6 +708,169 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         appleSlot.hidden = false;
         void appleBtn.render("#applepay-button");
       }
+
+      void mountGooglePay(paypal, createApi, createServerOrder);
+    }
+
+    async function mountGooglePay(
+      paypal: {
+        Googlepay?: () => {
+          config: () => Promise<{
+            allowedPaymentMethods: unknown[];
+            merchantInfo: Record<string, unknown>;
+            apiVersion?: number;
+            apiVersionMinor?: number;
+          }>;
+          confirmOrder: (o: {
+            orderId: string;
+            paymentMethodData: unknown;
+          }) => Promise<{ status?: string }>;
+          initiatePayerAction?: (o: { orderId: string }) => Promise<unknown>;
+        };
+      },
+      createApi: string,
+      createServerOrder: () => Promise<string>,
+    ) {
+      const slot = document.querySelector<HTMLElement>("[data-googlepay-slot]");
+      if (!slot || slot.hasChildNodes() || !paypal.Googlepay) return;
+
+      type GPayClient = {
+        isReadyToPay: (r: object) => Promise<{ result?: boolean }>;
+        createButton: (o: object) => HTMLElement;
+        loadPaymentData: (r: object) => Promise<unknown>;
+      };
+      type GPayCtor = new (o: Record<string, unknown>) => GPayClient;
+      type GPayNS = { payments: { api: { PaymentsClient: GPayCtor } } };
+
+      const waitGoogle = () =>
+        new Promise<GPayNS | null>((resolve) => {
+          let n = 0;
+          const tick = () => {
+            const g = (window as unknown as { google?: GPayNS }).google;
+            if (g?.payments?.api?.PaymentsClient) return resolve(g);
+            if (n++ > 80) return resolve(null);
+            setTimeout(tick, 100);
+          };
+          tick();
+        });
+
+      const googleNs = await waitGoogle();
+      if (!googleNs) return;
+
+      let gpConfig: {
+        allowedPaymentMethods: unknown[];
+        merchantInfo: Record<string, unknown>;
+        apiVersion?: number;
+        apiVersionMinor?: number;
+      };
+      try {
+        gpConfig = await paypal.Googlepay().config();
+      } catch (err) {
+        console.warn("Google Pay config unavailable", err);
+        return;
+      }
+
+      const allowedPaymentMethods = gpConfig.allowedPaymentMethods || [];
+      const baseClient = new googleNs.payments.api.PaymentsClient({
+        environment: "PRODUCTION",
+      });
+      try {
+        const ready = await baseClient.isReadyToPay({
+          apiVersion: gpConfig.apiVersion ?? 2,
+          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
+          allowedPaymentMethods,
+        });
+        if (!ready.result) return;
+      } catch (err) {
+        console.warn("Google Pay not ready", err);
+        return;
+      }
+
+      const onGooglePayClick = async () => {
+        if (!unlocked()) return;
+        try {
+          const orderId = await createServerOrder();
+          const price =
+            quote?.shipping != null
+              ? (total() + quote.shipping).toFixed(2)
+              : total().toFixed(2);
+          const paymentDataRequest = {
+            apiVersion: gpConfig.apiVersion ?? 2,
+            apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
+            allowedPaymentMethods,
+            merchantInfo: gpConfig.merchantInfo,
+            transactionInfo: {
+              countryCode: "IT",
+              currencyCode: "EUR",
+              totalPriceStatus: "FINAL",
+              totalPrice: price,
+            },
+            callbackIntents: ["PAYMENT_AUTHORIZATION"],
+          };
+
+          const client = new googleNs.payments.api.PaymentsClient({
+            environment: "PRODUCTION",
+            paymentDataCallbacks: {
+              onPaymentAuthorized: async (paymentData: { paymentMethodData: unknown }) => {
+                try {
+                  const gp = paypal.Googlepay!();
+                  let confirm = await gp.confirmOrder({
+                    orderId,
+                    paymentMethodData: paymentData.paymentMethodData,
+                  });
+                  if (confirm.status === "PAYER_ACTION_REQUIRED" && gp.initiatePayerAction) {
+                    await gp.initiatePayerAction({ orderId });
+                    confirm = await gp.confirmOrder({
+                      orderId,
+                      paymentMethodData: paymentData.paymentMethodData,
+                    });
+                  }
+                  if (confirm.status === "APPROVED" || confirm.status === "COMPLETED") {
+                    const cap = await fetch(`${createApi}/api/paypal-create-order`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "capture", orderId }),
+                    });
+                    if (!cap.ok) throw new Error("Capture failed");
+                    saveOrderSnapshot(shippingAmount());
+                    clearCart();
+                    location.href = `${base}${prefix}grazie/?from=paypal`;
+                    return { transactionState: "SUCCESS" };
+                  }
+                  return {
+                    transactionState: "ERROR",
+                    error: { intent: "PAYMENT_AUTHORIZATION", message: "Not approved" },
+                  };
+                } catch (err) {
+                  console.error("Google Pay authorize", err);
+                  return {
+                    transactionState: "ERROR",
+                    error: {
+                      intent: "PAYMENT_AUTHORIZATION",
+                      message: err instanceof Error ? err.message : "Failed",
+                    },
+                  };
+                }
+              },
+            },
+          });
+
+          await client.loadPaymentData(paymentDataRequest);
+        } catch (err) {
+          const code = String((err as { statusCode?: string })?.statusCode || err);
+          if (code.includes("CANCELED")) return;
+          console.error("Google Pay click", err);
+        }
+      };
+
+      const button = baseClient.createButton({
+        onClick: onGooglePayClick,
+        allowedPaymentMethods,
+        buttonType: "pay",
+        buttonSizeMode: "fill",
+      });
+      slot.hidden = false;
+      slot.append(button);
     }
 
     if (site.paypalClientId) {
