@@ -525,7 +525,7 @@ if (!root || !app) {
     return source;
   }
 
-  function dealBlock(s: DealSummary, showArtist = true) {
+  function dealBlock(s: DealSummary, adminHints = false) {
     const box = el("article", "account-deal");
     box.append(
       el("h3", "", s.deal.product_title || s.deal.product_id),
@@ -535,7 +535,6 @@ if (!root || !app) {
         `${s.soldQty}/${s.deal.planned_qty} pezzi · ${s.deal.artist_share_pct}% artista · IVA ${s.deal.vat_rate_pct}% · ${money(s.deal.unit_price)}`,
       ),
     );
-    void showArtist;
 
     const orders = el("div", "account-sales");
     orders.append(el("h4", "", "Ordini"));
@@ -544,7 +543,9 @@ if (!root || !app) {
         el(
           "p",
           "account-lede",
-          "Nessun ordine ancora. PayPal entra da solo; i bonifici si registrano con «Registra» qui sotto.",
+          adminHints
+            ? "Nessun ordine ancora. PayPal entra da solo; i bonifici si registrano con «Registra» qui sotto."
+            : "Nessun ordine ancora.",
         ),
       );
     } else {
@@ -1051,7 +1052,7 @@ if (!root || !app) {
     } else {
       for (const s of deals) {
         const wrap = el("div", "account-deal-wrap");
-        wrap.append(dealBlock(s, false));
+        wrap.append(dealBlock(s, true));
 
         const bank = el("form", "account-action-form");
         bank.innerHTML = `
