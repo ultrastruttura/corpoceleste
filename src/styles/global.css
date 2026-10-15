@@ -223,17 +223,33 @@ p:last-child {
 }
 
 .nav a {
-  text-decoration: none;
-}
-
-.nav a:hover {
+  display: inline-grid;
+  justify-items: start;
   text-decoration: none;
   text-transform: uppercase;
+  font-weight: 400;
 }
 
+.nav a .nav-label {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+/* Invisible bold twin locks width — hover/active never shift neighbors */
+.nav a::after {
+  content: attr(data-nav);
+  grid-area: 1 / 1;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.nav a:hover,
 .nav a.is-active {
   text-decoration: none;
-  text-transform: uppercase;
   font-weight: 700;
 }
 
@@ -410,14 +426,9 @@ p:last-child {
   border-bottom: 0;
 }
 
-.mobile-nav > a:hover {
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
+.mobile-nav > a:hover,
 .mobile-nav > a.is-active {
   text-decoration: none;
-  text-transform: uppercase;
   font-weight: 700;
 }
 
@@ -504,9 +515,15 @@ body.cart-open {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 720px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -1713,7 +1730,7 @@ body.cart-open {
 }
 
 .shop-home .grid {
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 28px;
 }
 
@@ -1722,20 +1739,20 @@ body.cart-open {
 }
 
 .shop-home .card-meta {
-  padding: 10px 2px 2px;
+  padding: 8px 2px 2px;
 }
 
 .shop-home .card-artist {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .shop-home .card-title {
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 2px;
 }
 
 .shop-home .card-price {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 @media (max-width: 899px) {
