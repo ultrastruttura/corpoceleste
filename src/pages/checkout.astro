@@ -919,12 +919,39 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         }
       };
 
-      // Always keep the full-width labeled Google Pay button (column layout).
-      googleFallback?.addEventListener("click", () => void onGooglePayClick());
-
       const gpaySdk = document.querySelector<HTMLElement>("#googlepay-button");
-      if (gpaySdk) gpaySdk.hidden = true;
-      if (googleFallback) googleFallback.hidden = false;
+      const baseClient = new deps.googleNs.payments.api.PaymentsClient({
+        environment: env,
+      });
+      try {
+        await baseClient.isReadyToPay({
+          apiVersion: gpConfig.apiVersion ?? 2,
+          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
+          allowedPaymentMethods,
+        });
+      } catch (err) {
+        console.warn("Google Pay isReadyToPay", err);
+      }
+
+      try {
+        const button = baseClient.createButton({
+          onClick: onGooglePayClick,
+          allowedPaymentMethods,
+          buttonType: "pay",
+          buttonSizeMode: "fill",
+          buttonColor: "black",
+        });
+        if (gpaySdk && button) {
+          gpaySdk.replaceChildren(button);
+          gpaySdk.hidden = false;
+          if (googleFallback) googleFallback.hidden = true;
+        } else {
+          googleFallback?.addEventListener("click", () => void onGooglePayClick());
+        }
+      } catch (err) {
+        console.warn("Google Pay createButton", err);
+        googleFallback?.addEventListener("click", () => void onGooglePayClick());
+      }
     }
 
     if (site.paypalClientId) {

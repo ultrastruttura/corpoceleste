@@ -8,19 +8,6 @@ const copy = t(locale);
 const listed = [...artists].sort((a, b) =>
   artistSortKey(a.name).localeCompare(artistSortKey(b.name), locale, { sensitivity: "base" }),
 );
-
-const groups = new Map<string, typeof listed>();
-for (const a of listed) {
-  const letter = artistSortKey(a.name)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .charAt(0)
-    .toUpperCase();
-  const key = /[A-Z]/.test(letter) ? letter : "#";
-  const bucket = groups.get(key) || [];
-  bucket.push(a);
-  groups.set(key, bucket);
-}
 ---
 
 <Base title={`${copy.artists.title} — Corpoceleste`}>
@@ -28,19 +15,14 @@ for (const a of listed) {
     <header class="page-hero">
       <h1>{copy.artists.title}</h1>
     </header>
-    {
-      [...groups.entries()].map(([letter, items]) => (
-        <section class="artist-block">
-          <h2 class="artist-letter">{letter}</h2>
-          <ul class="name-list">
-            {items.map((a) => (
-              <li>
-                <a href={pageUrl(locale, `artisti/${a.slug}/`)}>{a.name}</a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))
-    }
+    <ul class="artist-directory name-list">
+      {
+        listed.map((a) => (
+          <li>
+            <a href={pageUrl(locale, `artisti/${a.slug}/`)}>{a.name}</a>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </Base>
