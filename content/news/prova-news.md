@@ -6,7 +6,7 @@ title_de: News-Test
 excerpt_it: Prova di un post in news. Placeholder senza immagini. Prova di nuovo.
 excerpt_en: News post placeholder. No images yet.
 excerpt_de: News-Platzhalter. Noch keine Bilder.
-cover: ''
+cover: /uploads/Corpoceleste-logo-scritta.png
 images:
   - /uploads/Corpoceleste-logo-scritta.png
 body_it: Prova di un post in news. Placeholder — contenuti e foto in aggiornamento.
