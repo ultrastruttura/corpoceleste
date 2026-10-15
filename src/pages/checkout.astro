@@ -146,16 +146,20 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                 <p class="checkout-obligation">{copy.checkout.payObligation}</p>
                 <div class="pay-box is-locked" data-pay-box>
                   <div class="pay-buttons pay-buttons--stack">
-                    <div id="paypal-button" class="pay-buttons__slot" data-paypal-slot></div>
-                    <div id="applepay-button" class="pay-buttons__slot" data-applepay-slot>
+                    <div class="pay-buttons__slot">
+                      <div id="paypal-button" data-paypal-slot></div>
+                    </div>
+                    <div class="pay-buttons__slot" data-applepay-slot>
                       <button type="button" class="wallet-btn wallet-btn--apple" data-apple-fallback>
                         {copy.checkout.applePay}
                       </button>
+                      <div id="applepay-button" class="pay-buttons__sdk" hidden></div>
                     </div>
-                    <div id="googlepay-button" class="pay-buttons__slot" data-googlepay-slot>
+                    <div class="pay-buttons__slot" data-googlepay-slot>
                       <button type="button" class="wallet-btn wallet-btn--google" data-google-fallback>
                         {copy.checkout.googlePay}
                       </button>
+                      <div id="googlepay-button" class="pay-buttons__sdk" hidden></div>
                     </div>
                   </div>
                 </div>
@@ -711,9 +715,11 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           .render("#paypal-button");
       }
 
-      const appleSlot = document.querySelector<HTMLElement>("[data-applepay-slot]");
       const appleFallback = document.querySelector<HTMLButtonElement>("[data-apple-fallback]");
-      if (appleSlot && paypal.FUNDING.APPLEPAY) {
+      const appleSdk = document.querySelector<HTMLElement>("#applepay-button");
+      let appleRendered = false;
+
+      if (appleSdk && paypal.FUNDING.APPLEPAY) {
         const appleBtn = paypal.Buttons({
           ...shared,
           fundingSource: paypal.FUNDING.APPLEPAY,
@@ -721,15 +727,24 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         });
         const eligible = !appleBtn.isEligible || appleBtn.isEligible();
         if (eligible) {
-          appleSlot.replaceChildren();
-          void appleBtn.render("#applepay-button").catch((err: unknown) => {
-            console.warn("Apple Pay render skipped", err);
-            if (appleFallback) appleSlot.append(appleFallback);
-          });
+          void appleBtn
+            .render("#applepay-button")
+            .then(() => {
+              appleRendered = true;
+              appleSdk.hidden = false;
+              if (appleFallback) appleFallback.hidden = true;
+            })
+            .catch((err: unknown) => {
+              console.warn("Apple Pay render skipped", err);
+              appleSdk.hidden = true;
+              if (appleFallback) appleFallback.hidden = false;
+            });
         }
       }
+
       appleFallback?.addEventListener("click", () => {
-        if (!unlocked()) return;
+        if (!unlocked() || appleRendered) return;
+        // On Safari the SDK button replaces this; elsewhere explain availability.
         const lang = (document.documentElement.lang || "it").slice(0, 2);
         window.alert(
           lang === "en"
@@ -904,35 +919,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         }
       };
 
-      // Keep custom Google Pay button visible and wire it; official mark is optional.
+      // Always keep the full-width labeled Google Pay button (column layout).
       googleFallback?.addEventListener("click", () => void onGooglePayClick());
 
-      const baseClient = new deps.googleNs.payments.api.PaymentsClient({
-        environment: env,
-      });
-      try {
-        await baseClient.isReadyToPay({
-          apiVersion: gpConfig.apiVersion ?? 2,
-          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
-          allowedPaymentMethods,
-        });
-      } catch (err) {
-        console.warn("Google Pay isReadyToPay", err);
-      }
-
-      // Prefer Google's official button when available; otherwise keep the labeled fallback.
-      try {
-        const button = baseClient.createButton({
-          onClick: onGooglePayClick,
-          allowedPaymentMethods,
-          buttonType: "pay",
-          buttonSizeMode: "fill",
-          buttonColor: "black",
-        });
-        if (button) slot.replaceChildren(button);
-      } catch (err) {
-        console.warn("Google Pay createButton", err);
-      }
+      const gpaySdk = document.querySelector<HTMLElement>("#googlepay-button");
+      if (gpaySdk) gpaySdk.hidden = true;
+      if (googleFallback) googleFallback.hidden = false;
     }
 
     if (site.paypalClientId) {

@@ -2101,6 +2101,7 @@ body.cart-open {
 #googlepay-button {
   min-height: 48px;
   margin-top: 0;
+  width: 100%;
 }
 
 .pay-buttons {
@@ -2111,8 +2112,12 @@ body.cart-open {
 }
 
 .pay-buttons--stack {
+  display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  align-items: stretch;
+  width: 100%;
+  gap: 12px;
 }
 
 .pay-buttons .btn + .btn--ghost {
@@ -2127,12 +2132,21 @@ body.cart-open {
 
 .pay-buttons--stack .pay-buttons__slot {
   flex: 0 0 auto;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .pay-buttons__slot > div,
 .pay-buttons__slot > button,
-.pay-buttons__slot > .wallet-btn {
+.pay-buttons__slot > .wallet-btn,
+.pay-buttons__sdk {
   width: 100%;
+}
+
+.pay-buttons__sdk[hidden] {
+  display: none !important;
 }
 
 .wallet-btn {
