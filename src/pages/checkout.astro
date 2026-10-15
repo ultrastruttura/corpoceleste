@@ -842,81 +842,88 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       const env =
         String(gpConfig.environment || "").toUpperCase() === "TEST" ? "TEST" : "PRODUCTION";
 
-      const onGooglePayClick = async () => {
-        if (!unlocked()) return;
-        try {
-          const orderId = await createServerOrder();
-          const price =
-            quote?.shipping != null
-              ? (total() + quote.shipping).toFixed(2)
-              : total().toFixed(2);
-          const paymentDataRequest = {
-            apiVersion: gpConfig.apiVersion ?? 2,
-            apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
-            allowedPaymentMethods,
-            merchantInfo: gpConfig.merchantInfo,
-            transactionInfo: {
-              countryCode: gpConfig.countryCode || "IT",
-              currencyCode: "EUR",
-              totalPriceStatus: "FINAL" as const,
-              totalPrice: price,
-            },
-            callbackIntents: ["PAYMENT_AUTHORIZATION" as const],
-          };
+      const onGooglePayClick = () => {
+        if (!unlocked()) {
+          window.alert(
+            lockHint?.textContent?.trim() ||
+              "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.",
+          );
+          return;
+        }
+        const price =
+          quote?.shipping != null
+            ? (total() + quote.shipping).toFixed(2)
+            : total().toFixed(2);
+        const paymentDataRequest = {
+          apiVersion: gpConfig.apiVersion ?? 2,
+          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
+          allowedPaymentMethods,
+          merchantInfo: gpConfig.merchantInfo,
+          transactionInfo: {
+            countryCode: gpConfig.countryCode || "IT",
+            currencyCode: "EUR",
+            totalPriceStatus: "FINAL" as const,
+            totalPrice: price,
+          },
+          callbackIntents: ["PAYMENT_AUTHORIZATION" as const],
+        };
 
-          const client = new deps.googleNs.payments.api.PaymentsClient({
-            environment: env,
-            paymentDataCallbacks: {
-              onPaymentAuthorized: async (paymentData: { paymentMethodData: unknown }) => {
-                try {
-                  const gp = deps.gp();
-                  let confirm = await gp.confirmOrder({
+        // Create PayPal order inside onPaymentAuthorized (PayPal docs). Calling
+        // createOrder before loadPaymentData breaks the user-gesture and the sheet never opens.
+        const client = new deps.googleNs.payments.api.PaymentsClient({
+          environment: env,
+          paymentDataCallbacks: {
+            onPaymentAuthorized: async (paymentData: { paymentMethodData: unknown }) => {
+              try {
+                const orderId = await createServerOrder();
+                const gp = deps.gp();
+                let confirm = await gp.confirmOrder({
+                  orderId,
+                  paymentMethodData: paymentData.paymentMethodData,
+                });
+                if (confirm.status === "PAYER_ACTION_REQUIRED" && gp.initiatePayerAction) {
+                  await gp.initiatePayerAction({ orderId });
+                  confirm = await gp.confirmOrder({
                     orderId,
                     paymentMethodData: paymentData.paymentMethodData,
                   });
-                  if (confirm.status === "PAYER_ACTION_REQUIRED" && gp.initiatePayerAction) {
-                    await gp.initiatePayerAction({ orderId });
-                    confirm = await gp.confirmOrder({
-                      orderId,
-                      paymentMethodData: paymentData.paymentMethodData,
-                    });
-                  }
-                  if (confirm.status === "APPROVED" || confirm.status === "COMPLETED") {
-                    const cap = await fetch(`${createApi}/api/paypal-create-order`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ action: "capture", orderId }),
-                    });
-                    if (!cap.ok) throw new Error("Capture failed");
-                    saveOrderSnapshot(shippingAmount());
-                    clearCart();
-                    location.href = `${base}${prefix}grazie/?from=paypal`;
-                    return { transactionState: "SUCCESS" };
-                  }
-                  return {
-                    transactionState: "ERROR",
-                    error: { intent: "PAYMENT_AUTHORIZATION", message: "Not approved" },
-                  };
-                } catch (err) {
-                  console.error("Google Pay authorize", err);
-                  return {
-                    transactionState: "ERROR",
-                    error: {
-                      intent: "PAYMENT_AUTHORIZATION",
-                      message: err instanceof Error ? err.message : "Failed",
-                    },
-                  };
                 }
-              },
+                if (confirm.status === "APPROVED" || confirm.status === "COMPLETED") {
+                  const cap = await fetch(`${createApi}/api/paypal-create-order`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "capture", orderId }),
+                  });
+                  if (!cap.ok) throw new Error("Capture failed");
+                  saveOrderSnapshot(shippingAmount());
+                  clearCart();
+                  location.href = `${base}${prefix}grazie/?from=paypal`;
+                  return { transactionState: "SUCCESS" };
+                }
+                return {
+                  transactionState: "ERROR",
+                  error: { intent: "PAYMENT_AUTHORIZATION", message: "Not approved" },
+                };
+              } catch (err) {
+                console.error("Google Pay authorize", err);
+                return {
+                  transactionState: "ERROR",
+                  error: {
+                    intent: "PAYMENT_AUTHORIZATION",
+                    message: err instanceof Error ? err.message : "Failed",
+                  },
+                };
+              }
             },
-          });
+          },
+        });
 
-          await client.loadPaymentData(paymentDataRequest);
-        } catch (err) {
+        client.loadPaymentData(paymentDataRequest).catch((err: unknown) => {
           const code = String((err as { statusCode?: string })?.statusCode || err);
           if (code.includes("CANCELED")) return;
           console.error("Google Pay click", err);
-        }
+          window.alert("Google Pay non è riuscito ad aprire il pagamento. Riprova o usa PayPal.");
+        });
       };
 
       const gpaySdk = document.querySelector<HTMLElement>("#googlepay-button");

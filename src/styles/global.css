@@ -2103,7 +2103,6 @@ body.cart-open {
 
 .pay-box.is-locked .pay-buttons {
   opacity: 0.45;
-  pointer-events: none;
 }
 
 .form.is-locked [data-bank-submit] {
@@ -2152,15 +2151,12 @@ body.cart-open {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  height: var(--pay-btn-h);
-  overflow: hidden;
+  min-height: var(--pay-btn-h);
 }
 
-.pay-buttons--stack .pay-buttons__slot > div,
-.pay-buttons--stack .pay-buttons__slot > button,
 .pay-buttons--stack .wallet-btn,
-.pay-buttons--stack .pay-buttons__sdk,
-.pay-buttons--stack #paypal-button {
+.pay-buttons--stack #paypal-button,
+.pay-buttons--stack #paypal-button iframe {
   box-sizing: border-box;
   width: 100%;
   height: var(--pay-btn-h);
@@ -2168,15 +2164,13 @@ body.cart-open {
   max-height: var(--pay-btn-h);
 }
 
-/* PayPal / Google inject iframes or nested buttons — force same box */
-.pay-buttons--stack .pay-buttons__slot iframe,
-.pay-buttons--stack .pay-buttons__slot > div > div,
-.pay-buttons--stack .pay-buttons__slot button {
-  box-sizing: border-box !important;
+/* Official Google Pay button: full width, keep natural click target */
+.pay-buttons--stack #googlepay-button,
+.pay-buttons--stack #googlepay-button > div,
+.pay-buttons--stack #googlepay-button button {
+  box-sizing: border-box;
   width: 100% !important;
-  height: var(--pay-btn-h) !important;
-  min-height: var(--pay-btn-h) !important;
-  max-height: var(--pay-btn-h) !important;
+  min-height: var(--pay-btn-h);
 }
 
 .pay-buttons__sdk[hidden] {
