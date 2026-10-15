@@ -1,6 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { news, newsBySlug, newsField } from "../../data/news";
+import { news, newsBySlug, newsField, newsPreviewImage } from "../../data/news";
 import { mediaUrl } from "../../lib/paths";
 import { currentLocale, formatDate, pageUrl, t } from "../../i18n";
 
@@ -32,11 +32,15 @@ if (!item) return Astro.redirect(pageUrl(locale, "news/"));
 const title = newsField(item, locale, "title");
 const excerpt = newsField(item, locale, "excerpt");
 const paras = newsField(item, locale, "body").split(/\n\n+/).filter(Boolean);
-const cover = item.cover ? mediaUrl(item.cover) : "";
-const gallery = item.images.map(mediaUrl).filter(Boolean);
+const preview = newsPreviewImage(item);
+const cover = preview ? mediaUrl(preview) : "";
+const gallery = item.images
+  .filter((src) => src && src !== preview)
+  .map(mediaUrl)
+  .filter(Boolean);
 ---
 
-<Base title={`${title} — Corpoceleste`} description={excerpt} image={item.cover || undefined}>
+<Base title={`${title} — Corpoceleste`} description={excerpt} image={preview || undefined}>
   <div class="wrap page-main page-main--article">
     <header class="page-hero">
       <p class="card-artist"><a href={pageUrl(locale, "news/")}>News</a> · {formatDate(item.date, locale)}</p>

@@ -1,6 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { news, newsField } from "../../data/news";
+import { news, newsField, newsPreviewImage } from "../../data/news";
 import { mediaUrl } from "../../lib/paths";
 import { currentLocale, formatDate, pageUrl, t } from "../../i18n";
 
@@ -17,15 +17,16 @@ const copy = t(locale);
       news.length > 0 ? (
         <ul class="news-list">
           {news.map((n) => {
-            const cover = n.cover ? mediaUrl(n.cover) : "";
+            const thumbSrc = newsPreviewImage(n);
+            const thumb = thumbSrc ? mediaUrl(thumbSrc) : "";
             return (
               <li>
-                <div class="news-list__row">
-                  {cover && (
-                    <a href={pageUrl(locale, `news/${n.slug}/`)}>
+                <div class={`news-list__row${thumb ? " news-list__row--thumb" : ""}`}>
+                  {thumb ? (
+                    <a class="news-list__media" href={pageUrl(locale, `news/${n.slug}/`)}>
                       <img
                         class="news-list__thumb"
-                        src={cover}
+                        src={thumb}
                         alt={copy.news.imageAlt(newsField(n, locale, "title"))}
                         width="280"
                         height="280"
@@ -33,7 +34,7 @@ const copy = t(locale);
                         decoding="async"
                       />
                     </a>
-                  )}
+                  ) : null}
                   <div>
                     <span class="date">{formatDate(n.date, locale)}</span>
                     <h2>

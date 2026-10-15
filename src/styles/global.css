@@ -1312,13 +1312,19 @@ body.cart-open {
 }
 
 @media (min-width: 640px) {
-  .news-list__row {
+  .news-list__row--thumb {
     grid-template-columns: 140px minmax(0, 1fr);
     align-items: start;
   }
 }
 
+.news-list__media {
+  display: block;
+  max-width: 200px;
+}
+
 .news-list__thumb {
+  display: block;
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;

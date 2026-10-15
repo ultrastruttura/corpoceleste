@@ -63,3 +63,8 @@ export function newsBySlug(slug: string) {
 export function newsField(item: NewsItem, locale: Locale, field: "title" | "excerpt" | "body") {
   return item[field][locale];
 }
+
+/** Cover for list/detail, falling back to the first gallery image. */
+export function newsPreviewImage(item: NewsItem) {
+  return item.cover || item.images[0] || "";
+}
