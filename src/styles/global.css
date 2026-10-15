@@ -2110,6 +2110,11 @@ body.cart-open {
   align-items: stretch;
 }
 
+.pay-buttons--stack {
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
 .pay-buttons .btn + .btn--ghost {
   margin-left: 0;
 }
@@ -2117,15 +2122,48 @@ body.cart-open {
 .pay-buttons__slot {
   flex: 1 1 140px;
   min-width: 120px;
+  width: 100%;
 }
 
-.pay-buttons__slot[hidden] {
-  display: none !important;
+.pay-buttons--stack .pay-buttons__slot {
+  flex: 0 0 auto;
 }
 
 .pay-buttons__slot > div,
-.pay-buttons__slot > button {
+.pay-buttons__slot > button,
+.pay-buttons__slot > .wallet-btn {
   width: 100%;
+}
+
+.wallet-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.wallet-btn--apple {
+  background: #000;
+  color: #fff;
+}
+
+.wallet-btn--google {
+  background: #000;
+  color: #fff;
+}
+
+.wallet-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* Account / artist portal */

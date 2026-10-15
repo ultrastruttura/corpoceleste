@@ -145,10 +145,18 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
               <>
                 <p class="checkout-obligation">{copy.checkout.payObligation}</p>
                 <div class="pay-box is-locked" data-pay-box>
-                  <div class="pay-buttons">
-                    <div id="paypal-button" class="pay-buttons__slot"></div>
-                    <div id="applepay-button" class="pay-buttons__slot" hidden data-applepay-slot></div>
-                    <div id="googlepay-button" class="pay-buttons__slot" hidden data-googlepay-slot></div>
+                  <div class="pay-buttons pay-buttons--stack">
+                    <div id="paypal-button" class="pay-buttons__slot" data-paypal-slot></div>
+                    <div id="applepay-button" class="pay-buttons__slot" data-applepay-slot>
+                      <button type="button" class="wallet-btn wallet-btn--apple" data-apple-fallback>
+                        {copy.checkout.applePay}
+                      </button>
+                    </div>
+                    <div id="googlepay-button" class="pay-buttons__slot" data-googlepay-slot>
+                      <button type="button" class="wallet-btn wallet-btn--google" data-google-fallback>
+                        {copy.checkout.googlePay}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </>
@@ -204,7 +212,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     paypalSdk && (
       <script define:vars={{ clientId: site.paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
-        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=card,credit,paylater,venmo`;
+        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=card,credit,paylater,venmo`;
         document.head.append(s);
         const g = document.createElement("script");
         g.src = "https://pay.google.com/gp/p/js/pay.js";
@@ -611,18 +619,21 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     syncPage();
 
     function mountButtons() {
-      type Funding = { PAYPAL: string; APPLEPAY: string };
+      type Funding = { PAYPAL: string; APPLEPAY?: string };
       type ButtonsFactory = (o: object) => {
         render: (s: string) => Promise<void> | void;
         isEligible?: () => boolean;
       };
+      type GooglePayConfig = {
+        allowedPaymentMethods: unknown[];
+        merchantInfo: Record<string, unknown>;
+        apiVersion?: number;
+        apiVersionMinor?: number;
+        countryCode?: string;
+        environment?: string;
+      };
       type GooglePayApi = {
-        config: () => Promise<{
-          allowedPaymentMethods: unknown[];
-          merchantInfo: Record<string, unknown>;
-          apiVersion?: number;
-          apiVersionMinor?: number;
-        }>;
+        config: () => Promise<GooglePayConfig>;
         confirmOrder: (o: {
           orderId: string;
           paymentMethodData: unknown;
@@ -679,6 +690,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       }
 
       const shared = {
+        style: { layout: "vertical", shape: "rect", height: 48 },
         onClick: (_: unknown, actions: { reject: () => Promise<void>; resolve: () => Promise<void> }) => {
           if (!unlocked()) return actions.reject();
           return actions.resolve();
@@ -694,20 +706,39 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
       const paypalNode = document.querySelector("#paypal-button");
       if (paypalNode && !paypalNode.hasChildNodes()) {
-        paypal
+        void paypal
           .Buttons({ ...shared, fundingSource: paypal.FUNDING.PAYPAL })
           .render("#paypal-button");
       }
 
       const appleSlot = document.querySelector<HTMLElement>("[data-applepay-slot]");
-      const appleBtn = paypal.Buttons({
-        ...shared,
-        fundingSource: paypal.FUNDING.APPLEPAY,
-      });
-      if (appleSlot && appleBtn.isEligible?.() && !appleSlot.hasChildNodes()) {
-        appleSlot.hidden = false;
-        void appleBtn.render("#applepay-button");
+      const appleFallback = document.querySelector<HTMLButtonElement>("[data-apple-fallback]");
+      if (appleSlot && paypal.FUNDING.APPLEPAY) {
+        const appleBtn = paypal.Buttons({
+          ...shared,
+          fundingSource: paypal.FUNDING.APPLEPAY,
+          style: { ...shared.style, color: "black", label: "pay" },
+        });
+        const eligible = !appleBtn.isEligible || appleBtn.isEligible();
+        if (eligible) {
+          appleSlot.replaceChildren();
+          void appleBtn.render("#applepay-button").catch((err: unknown) => {
+            console.warn("Apple Pay render skipped", err);
+            if (appleFallback) appleSlot.append(appleFallback);
+          });
+        }
       }
+      appleFallback?.addEventListener("click", () => {
+        if (!unlocked()) return;
+        const lang = (document.documentElement.lang || "it").slice(0, 2);
+        window.alert(
+          lang === "en"
+            ? "Apple Pay is available in Safari on Apple devices."
+            : lang === "de"
+              ? "Apple Pay ist in Safari auf Apple-Geräten verfügbar."
+              : "Apple Pay è disponibile in Safari su dispositivi Apple.",
+        );
+      });
 
       void mountGooglePay(paypal, createApi, createServerOrder);
     }
@@ -720,6 +751,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             merchantInfo: Record<string, unknown>;
             apiVersion?: number;
             apiVersionMinor?: number;
+            countryCode?: string;
+            environment?: string;
           }>;
           confirmOrder: (o: {
             orderId: string;
@@ -732,7 +765,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       createServerOrder: () => Promise<string>,
     ) {
       const slot = document.querySelector<HTMLElement>("[data-googlepay-slot]");
-      if (!slot || slot.hasChildNodes() || !paypal.Googlepay) return;
+      const googleFallback = document.querySelector<HTMLButtonElement>("[data-google-fallback]");
+      if (!slot) return;
 
       type GPayClient = {
         isReadyToPay: (r: object) => Promise<{ result?: boolean }>;
@@ -742,49 +776,56 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       type GPayCtor = new (o: Record<string, unknown>) => GPayClient;
       type GPayNS = { payments: { api: { PaymentsClient: GPayCtor } } };
 
-      const waitGoogle = () =>
-        new Promise<GPayNS | null>((resolve) => {
+      const waitDeps = () =>
+        new Promise<{ googleNs: GPayNS; gp: NonNullable<typeof paypal.Googlepay> } | null>((resolve) => {
           let n = 0;
           const tick = () => {
+            const gp = paypal.Googlepay;
             const g = (window as unknown as { google?: GPayNS }).google;
-            if (g?.payments?.api?.PaymentsClient) return resolve(g);
-            if (n++ > 80) return resolve(null);
+            if (gp && g?.payments?.api?.PaymentsClient) return resolve({ googleNs: g, gp });
+            if (n++ > 100) return resolve(null);
             setTimeout(tick, 100);
           };
           tick();
         });
 
-      const googleNs = await waitGoogle();
-      if (!googleNs) return;
+      const gpayUnavailable = () => {
+        if (!unlocked()) return;
+        window.alert("Google Pay non disponibile al momento. Usa PayPal.");
+      };
+
+      const deps = await waitDeps();
+      if (!deps) {
+        console.warn("Google Pay: SDK not available");
+        googleFallback?.addEventListener("click", gpayUnavailable);
+        return;
+      }
 
       let gpConfig: {
         allowedPaymentMethods: unknown[];
         merchantInfo: Record<string, unknown>;
         apiVersion?: number;
         apiVersionMinor?: number;
+        countryCode?: string;
+        environment?: string;
       };
       try {
-        gpConfig = await paypal.Googlepay().config();
+        gpConfig = await deps.gp().config();
       } catch (err) {
         console.warn("Google Pay config unavailable", err);
+        googleFallback?.addEventListener("click", gpayUnavailable);
         return;
       }
 
       const allowedPaymentMethods = gpConfig.allowedPaymentMethods || [];
-      const baseClient = new googleNs.payments.api.PaymentsClient({
-        environment: "PRODUCTION",
-      });
-      try {
-        const ready = await baseClient.isReadyToPay({
-          apiVersion: gpConfig.apiVersion ?? 2,
-          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
-          allowedPaymentMethods,
-        });
-        if (!ready.result) return;
-      } catch (err) {
-        console.warn("Google Pay not ready", err);
+      if (!allowedPaymentMethods.length) {
+        console.warn("Google Pay: no allowed payment methods");
+        googleFallback?.addEventListener("click", gpayUnavailable);
         return;
       }
+
+      const env =
+        String(gpConfig.environment || "").toUpperCase() === "TEST" ? "TEST" : "PRODUCTION";
 
       const onGooglePayClick = async () => {
         if (!unlocked()) return;
@@ -800,20 +841,20 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             allowedPaymentMethods,
             merchantInfo: gpConfig.merchantInfo,
             transactionInfo: {
-              countryCode: "IT",
+              countryCode: gpConfig.countryCode || "IT",
               currencyCode: "EUR",
-              totalPriceStatus: "FINAL",
+              totalPriceStatus: "FINAL" as const,
               totalPrice: price,
             },
-            callbackIntents: ["PAYMENT_AUTHORIZATION"],
+            callbackIntents: ["PAYMENT_AUTHORIZATION" as const],
           };
 
-          const client = new googleNs.payments.api.PaymentsClient({
-            environment: "PRODUCTION",
+          const client = new deps.googleNs.payments.api.PaymentsClient({
+            environment: env,
             paymentDataCallbacks: {
               onPaymentAuthorized: async (paymentData: { paymentMethodData: unknown }) => {
                 try {
-                  const gp = paypal.Googlepay!();
+                  const gp = deps.gp();
                   let confirm = await gp.confirmOrder({
                     orderId,
                     paymentMethodData: paymentData.paymentMethodData,
@@ -863,14 +904,35 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         }
       };
 
-      const button = baseClient.createButton({
-        onClick: onGooglePayClick,
-        allowedPaymentMethods,
-        buttonType: "pay",
-        buttonSizeMode: "fill",
+      // Keep custom Google Pay button visible and wire it; official mark is optional.
+      googleFallback?.addEventListener("click", () => void onGooglePayClick());
+
+      const baseClient = new deps.googleNs.payments.api.PaymentsClient({
+        environment: env,
       });
-      slot.hidden = false;
-      slot.append(button);
+      try {
+        await baseClient.isReadyToPay({
+          apiVersion: gpConfig.apiVersion ?? 2,
+          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
+          allowedPaymentMethods,
+        });
+      } catch (err) {
+        console.warn("Google Pay isReadyToPay", err);
+      }
+
+      // Prefer Google's official button when available; otherwise keep the labeled fallback.
+      try {
+        const button = baseClient.createButton({
+          onClick: onGooglePayClick,
+          allowedPaymentMethods,
+          buttonType: "pay",
+          buttonSizeMode: "fill",
+          buttonColor: "black",
+        });
+        if (button) slot.replaceChildren(button);
+      } catch (err) {
+        console.warn("Google Pay createButton", err);
+      }
     }
 
     if (site.paypalClientId) {
