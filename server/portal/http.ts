@@ -58,23 +58,43 @@ function requestOrigin(req: VercelRequest): string {
  * plus soft Sec-Fetch attestation (still spoofable, raises the bar with rate limits).
  * Call after cors(); OPTIONS should already be handled.
  */
+function forbid(req: VercelRequest, res: VercelResponse, message: string) {
+  const contentType = String(req.headers["content-type"] || "").toLowerCase();
+  const isBrowserFormPost =
+    contentType.includes("application/x-www-form-urlencoded") ||
+    contentType.includes("multipart/form-data");
+  // Form POST navigates the tab — plain text is clearer than JSON.
+  if (isBrowserFormPost || String(req.headers["sec-fetch-mode"] || "").toLowerCase() === "navigate") {
+    res.status(403).setHeader("Content-Type", "text/plain; charset=utf-8").send(message);
+    return;
+  }
+  json(res, 403, { error: message });
+}
+
 export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): boolean {
   const origin = requestOrigin(req);
   if (!origin || !allowedOrigins().includes(origin)) {
-    json(res, 403, { error: "Forbidden origin" });
+    forbid(req, res, "Forbidden origin");
     return false;
   }
   const site = String(req.headers["sec-fetch-site"] || "").toLowerCase();
   const mode = String(req.headers["sec-fetch-mode"] || "").toLowerCase();
+  const contentType = String(req.headers["content-type"] || "").toLowerCase();
+  const isBrowserFormPost =
+    contentType.includes("application/x-www-form-urlencoded") ||
+    contentType.includes("multipart/form-data");
   if (site) {
     if (!["same-origin", "same-site", "cross-site"].includes(site)) {
-      json(res, 403, { error: "Forbidden" });
+      forbid(req, res, "Forbidden");
       return false;
     }
-    // Checkout calls Vercel cross-site via fetch → mode cors.
-    if (site === "cross-site" && mode && mode !== "cors") {
-      json(res, 403, { error: "Forbidden" });
-      return false;
+    // fetch → mode cors; HTML form POST (bonifico / recesso / form) → mode navigate.
+    if (site === "cross-site" && mode) {
+      const okMode = mode === "cors" || (mode === "navigate" && isBrowserFormPost);
+      if (!okMode) {
+        forbid(req, res, "Forbidden");
+        return false;
+      }
     }
   }
   return true;
