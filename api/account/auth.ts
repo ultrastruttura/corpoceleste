@@ -136,13 +136,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const token = await issueMagicLink(user.id);
       const sent = await sendMagicLinkEmail(user, token);
       if (!sent.ok) {
+        // Same client body as success — do not leak that the email exists via Resend errors.
         console.warn("[portal] magic link email failed for", user.email, sent.error);
         await padLoginTiming(started);
-        return json(res, 200, {
-          ok: true,
-          emailed: false,
-          message: `Invio mail fallito: ${sent.error || "controlla RESEND_API_KEY e MAIL_FROM su Vercel (Production)."}`,
-        });
+        return json(res, 200, { ok: true, emailed: true, message: LOGIN_MSG });
       }
       console.info("[portal] magic link emailed to", user.email, "role", user.role);
       await padLoginTiming(started);

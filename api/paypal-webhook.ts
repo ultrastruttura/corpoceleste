@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
-  applyStockDecrement,
+  applyStockDecrementCheckpointed,
   claimOrResumeLedger,
+  getLedger,
   LedgerBusyError,
   StockPartialError,
   writeLedger,
@@ -220,6 +221,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!captureId) return res.status(200).json({ ok: true, skipped: "no capture id" });
 
   try {
+    // Never overwrite a finished capture (retry / quote drift after done).
+    const alreadyDone = await getLedger(captureId);
+    if (alreadyDone?.status === "done") {
+      return res.status(200).json({ ok: true, duplicate: true });
+    }
+
     const orderId = event.resource?.supplementary_data?.related_ids?.order_id;
     let order: PayPalOrder | null = null;
     let lines = [] as ReturnType<typeof linesFromOrder>;
@@ -312,30 +319,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let working: LedgerRecord = { ...claim.ledger };
 
     let notes = working.stockNotes || [];
-    if (!notes.length) {
+    if (!working.stockComplete) {
       try {
-        notes = await applyStockDecrement(lines);
-        working = {
-          ...working,
-          status: "processing",
-          stockNotes: notes,
-          error: undefined,
-          at: new Date().toISOString(),
-        };
-        // Checkpoint BEFORE Spedire/notify — retries must not re-decrement.
-        await writeLedger(working);
+        // Per-line ledger checkpoint — PayPal retries resume remaining lines only.
+        working = await applyStockDecrementCheckpointed(working, lines, writeLedger);
+        notes = working.stockNotes || [];
       } catch (err) {
-        const partial = err instanceof StockPartialError ? err.appliedNotes : [];
         const msg = err instanceof Error ? err.message : String(err);
         console.error("stock update failed", captureId, msg);
-        const failed: LedgerRecord = {
-          ...working,
-          status: "failed",
-          stockNotes: partial.length ? partial : working.stockNotes,
-          error: msg,
-          at: new Date().toISOString(),
-        };
-        await writeLedger(failed);
+        if (err instanceof StockPartialError) {
+          working = {
+            ...working,
+            status: "failed",
+            stockNotes: err.appliedNotes.length ? err.appliedNotes : working.stockNotes,
+            error: msg,
+            at: new Date().toISOString(),
+          };
+        }
         if (msg.includes("INSUFFICIENT_STOCK")) {
           await alertUnderpay(captureId, msg, paidRaw);
           return res.status(200).json({ ok: true, rejected: "insufficient stock" });
@@ -466,6 +466,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ...working,
       status: "done",
       stockNotes: notes,
+      stockComplete: true,
       emailed: true,
       error: undefined,
       at: new Date().toISOString(),
@@ -497,14 +498,24 @@ async function failLedger(
   expectedTotal?: string,
 ) {
   try {
+    const existing = await getLedger(captureId);
+    if (existing?.status === "done") return;
     await writeLedger({
       captureId,
-      lines,
+      lines: existing?.lines?.length ? existing.lines : lines,
       status: "failed",
       at: new Date().toISOString(),
       error,
       paidTotal,
       expectedTotal,
+      stockNotes: existing?.stockNotes,
+      stockAppliedKeys: existing?.stockAppliedKeys,
+      stockComplete: existing?.stockComplete,
+      packlinkRef: existing?.packlinkRef,
+      packlinkLabels: existing?.packlinkLabels,
+      packlinkError: existing?.packlinkError,
+      packlinkServiceId: existing?.packlinkServiceId,
+      emailed: existing?.emailed,
     });
   } catch (err) {
     console.error("failLedger write", err);

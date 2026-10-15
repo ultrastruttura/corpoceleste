@@ -200,11 +200,11 @@ export async function sendMagicLinkEmail(
   return { ok: result.ok, link, error: result.ok === false ? result.error : undefined };
 }
 
-/** Expose magic links in API only for local/dev opt-in — never on Vercel production. */
+/** Instant/dev magic links only on local/dev — never Vercel production or preview. */
 export function allowDevMagicLinks() {
-  if (process.env.VERCEL_ENV === "production") return false;
-  if (process.env.NODE_ENV === "production" && process.env.PORTAL_DEV_LINKS !== "1") return false;
-  return process.env.PORTAL_DEV_LINKS === "1" || process.env.VERCEL_ENV === "development";
+  const vercel = process.env.VERCEL_ENV || "";
+  if (vercel === "production" || vercel === "preview") return false;
+  return process.env.PORTAL_DEV_LINKS === "1" || vercel === "development";
 }
 
 export type MagicConsumeResult =

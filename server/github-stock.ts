@@ -15,6 +15,10 @@ export type LedgerRecord = {
   status: LedgerStatus;
   at: string;
   stockNotes?: string[];
+  /** Keys `id:size:qty` already decremented — resume must not re-apply these. */
+  stockAppliedKeys?: string[];
+  /** True only after every line is decremented and checkpointed. */
+  stockComplete?: boolean;
   emailed?: boolean;
   error?: string;
   expectedTotal?: string;
@@ -24,6 +28,25 @@ export type LedgerRecord = {
   packlinkError?: string;
   packlinkServiceId?: string | number;
 };
+
+export function stockLineKey(line: OrderLine): string {
+  return `${line.id}:${line.size}:${line.qty}`;
+}
+
+/** Lines not yet checkpointed as decremented (supports legacy stockNotes-only ledgers). */
+export function remainingStockLines(lines: OrderLine[], ledger: LedgerRecord): OrderLine[] {
+  const keys = new Set(ledger.stockAppliedKeys || []);
+  if (!keys.size && ledger.stockNotes?.length) {
+    for (const line of lines) {
+      const prefix = `${line.id} ${line.size} `;
+      if (ledger.stockNotes.some((n) => n.startsWith(prefix))) {
+        keys.add(stockLineKey(line));
+      }
+    }
+  }
+  if (ledger.stockComplete && !keys.size) return [];
+  return lines.filter((l) => !keys.has(stockLineKey(l)));
+}
 
 /** Another webhook delivery is mid-flight (soft lock via ledger status). */
 export class LedgerBusyError extends Error {
@@ -172,6 +195,8 @@ export async function claimOrResumeLedger(
   };
   // Keep progress fields from existing resume.
   if (existing?.stockNotes?.length) ledger.stockNotes = existing.stockNotes;
+  if (existing?.stockAppliedKeys?.length) ledger.stockAppliedKeys = existing.stockAppliedKeys;
+  if (existing?.stockComplete) ledger.stockComplete = existing.stockComplete;
   if (existing?.packlinkRef) ledger.packlinkRef = existing.packlinkRef;
   if (existing?.packlinkLabels) ledger.packlinkLabels = existing.packlinkLabels;
   if (existing?.packlinkError) ledger.packlinkError = existing.packlinkError;
@@ -241,6 +266,85 @@ export async function applyStockDecrement(lines: OrderLine[]): Promise<string[]>
     const msg = err instanceof Error ? err.message : String(err);
     throw new StockPartialError(msg, notes);
   }
+}
+
+/**
+ * Decrement remaining lines with a ledger checkpoint after each line so PayPal
+ * retries never re-decrement applied keys and can finish partial carts.
+ */
+export async function applyStockDecrementCheckpointed(
+  ledger: LedgerRecord,
+  lines: OrderLine[],
+  persist: (next: LedgerRecord) => Promise<void>,
+): Promise<LedgerRecord> {
+  let working: LedgerRecord = {
+    ...ledger,
+    stockNotes: [...(ledger.stockNotes || [])],
+    stockAppliedKeys: [...(ledger.stockAppliedKeys || [])],
+  };
+
+  // Hydrate keys from legacy notes-only ledgers.
+  if (!working.stockAppliedKeys?.length && working.stockNotes?.length) {
+    const keys: string[] = [];
+    for (const line of lines) {
+      const prefix = `${line.id} ${line.size} `;
+      if (working.stockNotes.some((n) => n.startsWith(prefix))) {
+        keys.push(stockLineKey(line));
+      }
+    }
+    working.stockAppliedKeys = keys;
+  }
+
+  if (working.stockComplete) return working;
+
+  const remaining = remainingStockLines(lines, working);
+  if (!remaining.length) {
+    working = {
+      ...working,
+      stockComplete: true,
+      status: "processing",
+      at: new Date().toISOString(),
+    };
+    await persist(working);
+    return working;
+  }
+
+  for (const line of remaining) {
+    try {
+      const note = await decrementProduct(line);
+      const stockNotes = [...(working.stockNotes || []), note];
+      const stockAppliedKeys = [...(working.stockAppliedKeys || []), stockLineKey(line)];
+      working = {
+        ...working,
+        status: "processing",
+        stockNotes,
+        stockAppliedKeys,
+        error: undefined,
+        at: new Date().toISOString(),
+      };
+      await persist(working);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      working = {
+        ...working,
+        status: "failed",
+        error: msg,
+        at: new Date().toISOString(),
+      };
+      await persist(working);
+      throw new StockPartialError(msg, working.stockNotes || []);
+    }
+  }
+
+  working = {
+    ...working,
+    stockComplete: true,
+    status: "processing",
+    error: undefined,
+    at: new Date().toISOString(),
+  };
+  await persist(working);
+  return working;
 }
 
 async function decrementProduct(line: OrderLine): Promise<string> {

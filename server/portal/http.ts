@@ -54,14 +54,30 @@ function requestOrigin(req: VercelRequest): string {
 }
 
 /**
- * Block curl/script abuse on browser JSON APIs: require Origin or Referer from allowlist.
+ * Block casual curl/script abuse on browser JSON APIs: allowlisted Origin/Referer
+ * plus soft Sec-Fetch attestation (still spoofable, raises the bar with rate limits).
  * Call after cors(); OPTIONS should already be handled.
  */
 export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): boolean {
   const origin = requestOrigin(req);
-  if (origin && allowedOrigins().includes(origin)) return true;
-  json(res, 403, { error: "Forbidden origin" });
-  return false;
+  if (!origin || !allowedOrigins().includes(origin)) {
+    json(res, 403, { error: "Forbidden origin" });
+    return false;
+  }
+  const site = String(req.headers["sec-fetch-site"] || "").toLowerCase();
+  const mode = String(req.headers["sec-fetch-mode"] || "").toLowerCase();
+  if (site) {
+    if (!["same-origin", "same-site", "cross-site"].includes(site)) {
+      json(res, 403, { error: "Forbidden" });
+      return false;
+    }
+    // Checkout calls Vercel cross-site via fetch → mode cors.
+    if (site === "cross-site" && mode && mode !== "cors") {
+      json(res, 403, { error: "Forbidden" });
+      return false;
+    }
+  }
+  return true;
 }
 
 export function bearer(req: VercelRequest) {

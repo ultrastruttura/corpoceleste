@@ -79,11 +79,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .filter(Boolean)
     .join("\n");
 
-  // Only mail the shop — no Resend to attacker-controlled customer email (grazie page is the UX ack).
   if (!shopTo) {
     console.error("order: SHOP_EMAIL missing");
     return res.status(503).send("Mail not configured");
   }
+
+  const { newId, portalConfigured } = await import("../server/portal/db.js");
+  const bankId = newId("bank");
+
+  // Hold GitHub stock before notifying the shop (parity with PayPal webhook).
+  if (pricedOrder && (process.env.GITHUB_TOKEN || "").trim()) {
+    const stockLines = pricedOrder.lines.map((l) => ({
+      id: l.id,
+      size: l.size,
+      qty: l.qty,
+    }));
+    try {
+      const {
+        claimOrResumeLedger,
+        applyStockDecrementCheckpointed,
+        writeLedger,
+        LedgerBusyError,
+      } = await import("../server/github-stock.js");
+      const claim = await claimOrResumeLedger(bankId, stockLines, {
+        expectedTotal: money(pricedOrder.total),
+      });
+      if (claim.action === "process" && !claim.ledger.stockComplete) {
+        const held = await applyStockDecrementCheckpointed(
+          claim.ledger,
+          stockLines,
+          writeLedger,
+        );
+        await writeLedger({
+          ...held,
+          status: "done",
+          stockComplete: true,
+          at: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      const { LedgerBusyError } = await import("../server/github-stock.js");
+      if (err instanceof LedgerBusyError) {
+        return res.status(503).send("Stock busy, retry");
+      }
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("order: stock hold failed", msg);
+      if (msg.includes("INSUFFICIENT_STOCK")) {
+        return res.status(409).send("Out of stock");
+      }
+      return res.status(503).send("Stock unavailable");
+    }
+  }
+
+  // Only mail the shop — no Resend to attacker-controlled customer email.
   const shop = await sendMail({
     to: shopTo,
     subject: "Ordine shop Corpoceleste (bonifico)",
@@ -94,36 +142,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(502).send("Mail failed");
   }
 
-  if (pricedOrder) {
+  if (pricedOrder && portalConfigured()) {
     try {
-      const { portalConfigured, newId } = await import("../server/portal/db.js");
-      if (portalConfigured()) {
-        const { upsertShopOrder } = await import("../server/portal/orders.js");
-        const shippingAddress = [address, `${dest.zip} ${city}`.trim(), dest.country]
-          .filter(Boolean)
-          .join("\n");
-        await upsertShopOrder({
-          external_id: newId("bank"),
-          source: "bank",
-          customer_name: nome,
-          customer_email: email,
-          customer_phone: phone,
-          shipping_address: shippingAddress,
-          ship_country: dest.country,
-          ship_zip: dest.zip,
-          merchandise: pricedOrder.merchandise,
-          shipping: pricedOrder.shipping,
-          total: pricedOrder.total,
-          lines: pricedOrder.lines.map((l) => ({
-            title: l.title,
-            size: l.size,
-            qty: l.qty,
-            unitPrice: l.unitPrice,
-            lineTotal: l.lineTotal,
-          })),
-          notes: note,
-        });
-      }
+      const { upsertShopOrder } = await import("../server/portal/orders.js");
+      const shippingAddress = [address, `${dest.zip} ${city}`.trim(), dest.country]
+        .filter(Boolean)
+        .join("\n");
+      await upsertShopOrder({
+        external_id: bankId,
+        source: "bank",
+        customer_name: nome,
+        customer_email: email,
+        customer_phone: phone,
+        shipping_address: shippingAddress,
+        ship_country: dest.country,
+        ship_zip: dest.zip,
+        merchandise: pricedOrder.merchandise,
+        shipping: pricedOrder.shipping,
+        total: pricedOrder.total,
+        lines: pricedOrder.lines.map((l) => ({
+          title: l.title,
+          size: l.size,
+          qty: l.qty,
+          unitPrice: l.unitPrice,
+          lineTotal: l.lineTotal,
+        })),
+        notes: note,
+      });
     } catch (err) {
       console.error("order: shop order save failed", err);
     }

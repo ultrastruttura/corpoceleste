@@ -17,7 +17,6 @@ const listed = [
 ];
 const sold = soldOutProducts();
 const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
-const homeLede = localizedSetting("homeLede", locale) || copy.home.lede;
 const description = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
@@ -32,10 +31,7 @@ const lcp = listed[0]?.images[0] ? cardImageUrls(listed[0].images[0]) : null;
   preloadImageType="image/webp"
 >
   <div class="wrap shop-home">
-    <header class="page-hero shop-home-hero">
-      <h1 class="visually-hidden">{homeTitle}</h1>
-      {homeLede && <p class="lede">{homeLede}</p>}
-    </header>
+    <h1 class="visually-hidden">{homeTitle}</h1>
 
     <ProductGrid products={listed} eager={1} />
 

@@ -7,7 +7,7 @@ const it = {
   },
   home: {
     title: "Serigrafie d’autore",
-    lede: "Un colore, stampato a mano a Bergamo. Maglie, stampe, edizioni.",
+    lede: "",
   },
   nav: {
     main: "Principale",
@@ -388,7 +388,7 @@ const en: typeof it = {
   },
   home: {
     title: "Author’s screen prints",
-    lede: "One colour, hand-printed in Bergamo. Shirts, prints, editions.",
+    lede: "",
   },
   nav: {
     main: "Main",
@@ -766,7 +766,7 @@ const de: typeof it = {
   },
   home: {
     title: "Siebdrucke von Autoren",
-    lede: "Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke, Editionen.",
+    lede: "",
   },
   nav: {
     main: "Hauptnavigation",
