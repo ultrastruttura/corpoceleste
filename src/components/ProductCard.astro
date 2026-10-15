@@ -30,7 +30,7 @@ const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
     {lowStock && <span class="badge badge--quiet">{copy.shop.lowStockBadge}</span>}
     {preorder && <span class="badge badge--quiet">{copy.shop.preorderBadge}</span>}
     {
-      cover && (
+      cover ? (
         <picture>
           <source type="image/webp" srcset={cover.webp} />
           <img
@@ -45,6 +45,8 @@ const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
             fetchpriority={eager ? "high" : "low"}
           />
         </picture>
+      ) : (
+        <div class="card-frame__empty" aria-hidden="true" />
       )
     }
   </div>

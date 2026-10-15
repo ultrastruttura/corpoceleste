@@ -1,6 +1,6 @@
----
-title: Ha la barba spaziale
-artist: content/artists/dr-pira.md
+﻿---
+title: Maglia 3
+artist: content/artists/artista-3.md
 price: 38
 status: available
 kind: shirt
@@ -15,28 +15,17 @@ sizes:
   - L
   - XL
 stock:
-  S: 5
-  M: 5
-  L: 5
-  XL: 5
-images:
-  - /uploads/prints/orbite.jpg
+  S: 2
+  M: 3
+  L: 2
+  XL: 2
+images: []
 seoDescription:
-  it: "Ha la barba spaziale di Dr. Pira — maglia viola serigrafata a un colore, arte indossabile da fumetto stampata a mano a Bergamo."
-  en: "Ha la barba spaziale by Dr. Pira — violet one-colour screen-printed shirt, wearable comic art hand-printed in Bergamo."
-  de: "Ha la barba spaziale von Dr. Pira — violettes einfarbig siebgedrucktes Shirt, Comic-Wearable-Art handgedruckt in Bergamo."
-
+  it: Maglia 3 di Artista 3 — placeholder Corpoceleste.
+  en: Maglia 3 by Artist 3 — Corpoceleste placeholder.
+  de: Maglia 3 von Künstler 3 — Corpoceleste-Platzhalter.
 description:
-  it: |-
-    Disegno di Dr. Pira su maglia viola. Serigrafia a un colore, cotone, stampata a mano nello studio di Bergamo.
-
-    Un pezzo da fumetto e illustrazione, non merch generico. Taglie S–XL.
-  en: |-
-    A drawing by Dr. Pira on a violet shirt. One-colour screen print on cotton, hand-printed in the Bergamo studio.
-
-    From comics and illustration — not generic merch. Sizes S–XL.
-  de: |-
-    Zeichnung von Dr. Pira auf einem violetten Shirt. Einfarbiger Siebdruck auf Baumwolle, handgedruckt im Atelier in Bergamo.
-
-    Aus Comics und Illustration — kein Generik-Merch. Größen S–XL.
+  it: Placeholder maglia. Contenuto in aggiornamento.
+  en: Placeholder. Content coming soon.
+  de: Platzhalter. Inhalt folgt.
 ---

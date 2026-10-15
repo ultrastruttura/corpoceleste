@@ -1,6 +1,6 @@
----
-title: Ruco
-artist: content/artists/ruco.md
+﻿---
+title: Maglia 8
+artist: content/artists/artista-8.md
 price: 38
 status: available
 kind: shirt
@@ -19,24 +19,13 @@ stock:
   M: 3
   L: 2
   XL: 2
-images:
-  - /uploads/prints/meridiana.jpg
+images: []
 seoDescription:
-  it: "Maglia Ruco — serigrafia artistica a un colore su cotone, arte indossabile stampata a mano a Bergamo da Corpoceleste."
-  en: "Ruco shirt — one-colour artist screen print on cotton, wearable art hand-printed in Bergamo by Corpoceleste."
-  de: "Shirt Ruco — einfarbiger künstlerischer Siebdruck auf Baumwolle, Wearable Art handgedruckt in Bergamo von Corpoceleste."
-
+  it: Maglia 8 di Artista 8 — placeholder Corpoceleste.
+  en: Maglia 8 by Artist 8 — Corpoceleste placeholder.
+  de: Maglia 8 von Künstler 8 — Corpoceleste-Platzhalter.
 description:
-  it: |-
-    Disegno di Ruco. Serigrafia a un colore su maglia di cotone, stampata a mano da Corpoceleste a Bergamo.
-
-    Stampa diretta, un inchiostro, niente filtri da negozio online. Taglie S–XL.
-  en: |-
-    A drawing by Ruco. One-colour screen print on a cotton shirt, hand-printed by Corpoceleste in Bergamo.
-
-    Direct print, one ink — no online-shop filters. Sizes S–XL.
-  de: |-
-    Zeichnung von Ruco. Einfarbiger Siebdruck auf einem Baumwollshirt, handgedruckt von Corpoceleste in Bergamo.
-
-    Direkter Druck, eine Farbe — keine Online-Shop-Filter. Größen S–XL.
+  it: Placeholder maglia. Contenuto in aggiornamento.
+  en: Placeholder. Content coming soon.
+  de: Platzhalter. Inhalt folgt.
 ---

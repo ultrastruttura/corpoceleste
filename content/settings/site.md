@@ -13,7 +13,7 @@ homeLede:
   it: Un colore, stampato a mano a Bergamo. Maglie, stampe, edizioni.
   en: One colour, hand-printed in Bergamo. Shirts, prints, editions.
   de: Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke, Editionen.
-ogImage: /uploads/prints/stella.jpg
+ogImage: ""
 # Token da Cloudflare → Analytics → Web Analytics → Add site (visibile nel beacon JS)
 cloudflareAnalyticsToken: ""
 lowStockThreshold: 10

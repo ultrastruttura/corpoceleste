@@ -111,7 +111,7 @@ const jsonLd = {
   <div class="wrap product-layout">
     <div class="product-stage" data-gallery={multi ? "" : undefined}>
       {
-        cover && (
+        cover ? (
           <div class="product-stage-frame" data-gallery-frame>
             <picture>
               <source type="image/webp" srcset={cover.webp} data-product-main-webp />
@@ -149,6 +149,8 @@ const jsonLd = {
               )
             }
           </div>
+        ) : (
+          <div class="product-stage-frame product-stage-frame--empty" aria-hidden="true" />
         )
       }
       {

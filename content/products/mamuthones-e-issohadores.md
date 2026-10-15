@@ -1,6 +1,6 @@
----
-title: Mamuthones e Issohadores
-artist: content/artists/108.md
+﻿---
+title: Maglia 6
+artist: content/artists/artista-6.md
 price: 38
 status: soldout
 kind: shirt
@@ -19,24 +19,13 @@ stock:
   M: 0
   L: 0
   XL: 0
-images:
-  - /uploads/prints/notturno.jpg
+images: []
 seoDescription:
-  it: "Mamuthones e Issohadores di 108 — maglia serigrafata d'artista Corpoceleste, cotone stampato a mano a Bergamo (esaurita)."
-  en: "Mamuthones e Issohadores by 108 — Corpoceleste artist screen-printed shirt, cotton hand-printed in Bergamo (sold out)."
-  de: "Mamuthones e Issohadores von 108 — Corpoceleste-Künstlersiebdruckshirt, Baumwolle handgedruckt in Bergamo (ausverkauft)."
-
+  it: Maglia 6 di Artista 6 — placeholder Corpoceleste.
+  en: Maglia 6 by Artist 6 — Corpoceleste placeholder.
+  de: Maglia 6 von Künstler 6 — Corpoceleste-Platzhalter.
 description:
-  it: |-
-    Disegno di 108. Serigrafia a un colore su maglia di cotone, stampata a mano a Bergamo.
-
-    Edizione esaurita: puoi lasciare l’email per una eventuale ristampa. Taglie S–XL.
-  en: |-
-    A drawing by 108. One-colour screen print on a cotton shirt, hand-printed in Bergamo.
-
-    Sold out: leave your email if you want a possible reprint. Sizes S–XL.
-  de: |-
-    Zeichnung von 108. Einfarbiger Siebdruck auf einem Baumwollshirt, handgedruckt in Bergamo.
-
-    Ausverkauft: E-Mail hinterlassen für einen möglichen Nachdruck. Größen S–XL.
+  it: Placeholder maglia. Contenuto in aggiornamento.
+  en: Placeholder. Content coming soon.
+  de: Platzhalter. Inhalt folgt.
 ---

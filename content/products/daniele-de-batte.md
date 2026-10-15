@@ -1,11 +1,11 @@
----
-title: Daniele De Batté
-artist: content/artists/daniele-de-batte.md
+﻿---
+title: Maglia 2
+artist: content/artists/artista-2.md
 price: 38
 status: available
 kind: shirt
 nuovo: true
-createdAt: 2018-11-04T00:00:00.000Z
+createdAt: 2017-05-14T00:00:00.000Z
 color: "#141414"
 colorName: Nero
 composition: 100% cotone
@@ -15,28 +15,17 @@ sizes:
   - L
   - XL
 stock:
-  S: 5
-  M: 5
-  L: 5
-  XL: 5
-images:
-  - /uploads/prints/stella.jpg
+  S: 2
+  M: 3
+  L: 2
+  XL: 2
+images: []
 seoDescription:
-  it: "Maglia Daniele De Batté — serigrafia artistica a un colore su cotone, edizione Corpoceleste stampata a mano a Bergamo."
-  en: "Daniele De Batté shirt — one-colour artist screen print on cotton, Corpoceleste edition hand-printed in Bergamo."
-  de: "Shirt Daniele De Batté — einfarbiger künstlerischer Siebdruck auf Baumwolle, Corpoceleste-Edition handgedruckt in Bergamo."
-
+  it: Maglia 2 di Artista 2 — placeholder Corpoceleste.
+  en: Maglia 2 by Artist 2 — Corpoceleste placeholder.
+  de: Maglia 2 von Künstler 2 — Corpoceleste-Platzhalter.
 description:
-  it: |-
-    Disegno di Daniele De Batté. Serigrafia a un colore su maglia di cotone, stampata a mano a Bergamo.
-
-    Edizione Corpoceleste: un telaio, un colore, niente produrre su richiesta. Taglie S–XL.
-  en: |-
-    A drawing by Daniele De Batté. One-colour screen print on a cotton shirt, hand-printed in Bergamo.
-
-    Corpoceleste edition: one screen, one colour — not made on demand. Sizes S–XL.
-  de: |-
-    Zeichnung von Daniele De Batté. Einfarbiger Siebdruck auf einem Baumwollshirt, handgedruckt in Bergamo.
-
-    Corpoceleste-Edition: ein Rahmen, eine Farbe — nicht auf Bestellung. Größen S–XL.
+  it: Placeholder maglia. Contenuto in aggiornamento.
+  en: Placeholder. Content coming soon.
+  de: Platzhalter. Inhalt folgt.
 ---
