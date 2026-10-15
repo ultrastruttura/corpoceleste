@@ -22,11 +22,18 @@ const shopEmail = siteSettings.shopEmail;
 
       <h2>{v.seller}</h2>
       <p>
-        {site.intestatario}<br />
+        {site.legalName || site.intestatario}<br />
         {site.indirizzo || site.sede}<br />
         {site.vatId ? <>{v.vatLabel} {site.vatId}<br /></> : <>{v.vatMissing}<br /></>}
         {site.rea && <>{v.reaLabel} {site.rea}<br /></>}
+        {site.sdiCode && <>{v.sdiLabel} {site.sdiCode}<br /></>}
         {site.telefono && <>{site.telefono}<br /></>}
+        {site.pec && (
+          <>
+            {v.pecLabel} <a href={`mailto:${site.pec}`}>{site.pec}</a>
+            <br />
+          </>
+        )}
         {v.contactLabel} <a href={`mailto:${shopEmail}`}>{shopEmail}</a>
       </p>
 
@@ -44,6 +51,15 @@ const shopEmail = siteSettings.shopEmail;
 
       <h2>{v.payment}</h2>
       <p>{v.paymentBody}</p>
+      {
+        site.iban && (
+          <p>
+            {v.ibanLabel} <span class="iban">{site.iban}</span>
+            <br />
+            {v.ibanHolderLabel} {site.intestatario}
+          </p>
+        )
+      }
 
       <h2>{v.shipping}</h2>
       <p>{v.shippingBody(site.shippingDays)}</p>

@@ -73,11 +73,12 @@ function pad(s: string, n: number, right = false) {
 
 export function buildOrderProformaPdf(order: ShopOrder): Buffer {
   const seller = [
-    site.name,
-    site.intestatario,
+    site.legalName || site.name,
     site.indirizzo || site.sede,
     site.vatId ? `P.IVA ${site.vatId}` : "",
     site.rea ? `REA ${site.rea}` : "",
+    site.sdiCode ? `SDI ${site.sdiCode}` : "",
+    site.pec ? `PEC ${site.pec}` : "",
     site.email,
     site.telefono ? `Tel. ${site.telefono}` : "",
   ].filter(Boolean);

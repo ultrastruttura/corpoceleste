@@ -13,8 +13,15 @@ export const site = {
   shippingEU: 0,
   /** Giorni lavorativi indicativi per la spedizione (info precontrattuale). */
   shippingDays: "5",
-  iban: "",
-  intestatario: "Andrea Baldelli",
+  /** Ragione sociale / ditta per le pagine legali. */
+  legalName: "Corpoceleste di Andrea Lorenzo Baldelli",
+  /** Intestatario IBAN / titolare. */
+  intestatario: "Andrea Lorenzo Baldelli",
+  iban: "IT02C03268223000EM002734005",
+  /** Codice destinatario SDI (fatturazione elettronica). */
+  sdiCode: "BA6ET11",
+  /** PEC. */
+  pec: "andrealorenzobaldelli@pec.it",
   /**
    * Email conto PayPal Business (riferimento). Il checkout usa solo il Client ID (SDK).
    */
@@ -30,11 +37,11 @@ export const site = {
    * Se vuoto, bonifico e recesso restano su FormSubmit. Con URL: mail transazionali da Vercel.
    */
   formApi: "https://corpoceleste.vercel.app",
-  sede: "Bergamo (BG), Italia",
+  sede: "Nembro (BG), Italia",
   /** Indirizzo completo della sede: obbligatorio nelle info precontrattuali. */
-  indirizzo: "",
-  /** Partita IVA. Da compilare se vendi come professionista. */
-  vatId: "",
+  indirizzo: "Via Moroni 51, 24027 Nembro (BG), Italia",
+  /** Partita IVA. */
+  vatId: "IT04952110163",
   /** Numero REA / iscrizione Registro imprese, se presente. */
   rea: "",
   /** Telefono di contatto, se lo pubblichi. */

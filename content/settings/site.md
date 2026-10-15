@@ -17,7 +17,7 @@ ogImage: ""
 # Token da Cloudflare → Analytics → Web Analytics → Add site (visibile nel beacon JS)
 cloudflareAnalyticsToken: ""
 lowStockThreshold: 10
-andreaName: Andrea Baldelli
+andreaName: Andrea Lorenzo Baldelli
 andreaBio:
   it: |-
     Serigrafo a Bergamo. Stampo e imballo le edizioni Corpoceleste: un colore, non print-on-demand — maglie, stampe, pezzi d’artista. Lo shop è qui sul sito.

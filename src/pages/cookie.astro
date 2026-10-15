@@ -38,7 +38,7 @@ const c = copy.cookiePolicy;
       </p>
       <p>
         {c.contact} <a href={`mailto:${site.email}`}>{site.email}</a>
-        ({site.intestatario}, {site.sede}).
+        ({site.legalName || site.intestatario}, {site.sede}).
       </p>
     </div>
   </div>

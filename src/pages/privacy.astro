@@ -21,8 +21,15 @@ const formSubmitFallback = !site.formApi;
 
       <h2>{p.controller}</h2>
       <p>
-        {p.controllerBody(site.intestatario, site.sede)}<br />
+        {p.controllerBody(site.legalName || site.intestatario, site.sede)}<br />
+        {site.indirizzo && <>{site.indirizzo}<br /></>}
         {site.vatId && <>{p.vat(site.vatId)}<br /></>}
+        {site.pec && (
+          <>
+            PEC: <a href={`mailto:${site.pec}`}>{site.pec}</a>
+            <br />
+          </>
+        )}
         {p.contact} <a href={`mailto:${site.email}`}>{site.email}</a>
       </p>
 
