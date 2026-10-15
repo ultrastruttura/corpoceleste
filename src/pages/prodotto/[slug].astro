@@ -18,6 +18,7 @@ import {
 import { artistById } from "../../data/artists";
 import { site, publicFormAction } from "../../data/site";
 import { siteSettings } from "../../data/settings";
+import { SHIP_COUNTRIES } from "../../lib/ship-countries";
 import { cardImageUrls, largeImageUrls } from "../../lib/paths";
 import { absoluteUrl, metaSnippet } from "../../lib/seo";
 import { currentLocale, pageAbs, pageUrl, t } from "../../i18n";
@@ -69,6 +70,11 @@ const availability = sold
     ? "https://schema.org/PreOrder"
     : "https://schema.org/InStock";
 
+/** Indicative rates for Merchant JSON-LD; checkout quotes live via Spedire. */
+const schemaShipIt = "6.90";
+const schemaShipEu = "14.90";
+const handlingDays = Math.max(1, Number.parseInt(site.shippingDays, 10) || 5);
+const euCountries = SHIP_COUNTRIES.filter((c) => c !== "IT");
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Product",
@@ -95,6 +101,77 @@ const jsonLd = {
     price: String(product.price),
     availability,
     itemCondition: "https://schema.org/NewCondition",
+    seller: {
+      "@type": "Organization",
+      name: "Corpoceleste",
+      url: pageAbs(locale),
+    },
+    shippingDetails: [
+      {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: schemaShipIt,
+          currency: "EUR",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "IT",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: handlingDays,
+            unitCode: "DAY",
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 2,
+            maxValue: 5,
+            unitCode: "DAY",
+          },
+        },
+      },
+      {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: schemaShipEu,
+          currency: "EUR",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: [...euCountries],
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: handlingDays,
+            unitCode: "DAY",
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 3,
+            maxValue: 8,
+            unitCode: "DAY",
+          },
+        },
+      },
+    ],
+    hasMerchantReturnPolicy: {
+      "@type": "MerchantReturnPolicy",
+      applicableCountry: [...SHIP_COUNTRIES],
+      returnPolicyCategory:
+        "https://schema.org/MerchantReturnFiniteReturnWindow",
+      merchantReturnDays: 14,
+      returnMethod: "https://schema.org/ReturnByMail",
+      returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
+      refundType: "https://schema.org/FullRefund",
+    },
   },
 };
 ---
