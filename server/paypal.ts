@@ -148,6 +148,9 @@ export async function createPayPalCheckoutOrder(
 ): Promise<string> {
   const token = await paypalAccessToken();
   const phone = digitsPhone(shipTo.phone);
+  // Prefer PayPal `items[].sku` for fulfillment. Only set custom_id when the full
+  // cart fits — never truncate (truncated custom_id drops trailing lines on fallback).
+  const customId = order.lines.map((l) => `${l.id}:${l.size}:${l.qty}`).join("|");
   const res = await fetch(`${paypalApiBase()}/v2/checkout/orders`, {
     method: "POST",
     headers: {
@@ -159,10 +162,7 @@ export async function createPayPalCheckoutOrder(
       purchase_units: [
         {
           description: "Corpoceleste",
-          custom_id: order.lines
-            .map((l) => `${l.id}:${l.size}:${l.qty}`)
-            .join("|")
-            .slice(0, 127),
+          ...(customId.length <= 127 ? { custom_id: customId } : {}),
           // Telefono checkout per il webhook Spedire (PayPal spesso non lo passa).
           invoice_id: `t:${phone}|e:${shipTo.email}`.slice(0, 127),
           amount: {

@@ -3,11 +3,15 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import { field, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { sendMail } from "../server/mail.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
+import { cors, requireSiteOrigin } from "../server/portal/http.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 import type { PricedOrder } from "../server/order-pricing.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  cors(req, res);
+  if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
+  if (!requireSiteOrigin(req, res)) return;
 
   const body = parseForm(req);
   const next = thanksUrl(body, "ordine");
@@ -34,31 +38,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
   if (!dest) return res.status(400).send("Invalid shipping destination");
 
-  let ordine = field(body, "ordine");
-  let pricedOrder: PricedOrder | null = null;
   const linesRaw = field(body, "lines");
-  if (linesRaw) {
-    try {
-      const parsed = JSON.parse(linesRaw) as OrderLine[];
-      const priced = await priceOrderLines(Array.isArray(parsed) ? parsed : [], dest);
-      if (priced.ok === false) return res.status(400).send(priced.error);
-      pricedOrder = priced.order;
-      const carrier = priced.order.packlink.carrier
-        ? ` · ${priced.order.packlink.carrier}`
-        : "";
-      ordine = [
-        ...priced.order.lines.map(
-          (l) => `${l.title} · ${l.size} · ×${l.qty} · ${money(l.lineTotal)}€`,
-        ),
-        `Spedizione ${money(priced.order.shipping)}€ (${priced.order.shipCountry} ${priced.order.shipZip}${carrier})`,
-        `Totale ${money(priced.order.total)}€`,
-      ].join("\n");
-    } catch {
-      return res.status(400).send("Invalid lines");
-    }
-  }
+  if (!linesRaw) return res.status(400).send("Missing cart lines");
 
-  if (!ordine) return res.status(400).send("Missing fields");
+  let ordine = "";
+  let pricedOrder: PricedOrder | null = null;
+  try {
+    const parsed = JSON.parse(linesRaw) as OrderLine[];
+    const priced = await priceOrderLines(Array.isArray(parsed) ? parsed : [], dest);
+    if (priced.ok === false) return res.status(400).send(priced.error);
+    pricedOrder = priced.order;
+    const carrier = priced.order.packlink.carrier
+      ? ` · ${priced.order.packlink.carrier}`
+      : "";
+    ordine = [
+      ...priced.order.lines.map(
+        (l) => `${l.title} · ${l.size} · ×${l.qty} · ${money(l.lineTotal)}€`,
+      ),
+      `Spedizione ${money(priced.order.shipping)}€ (${priced.order.shipCountry} ${priced.order.shipZip}${carrier})`,
+      `Totale ${money(priced.order.total)}€`,
+    ].join("\n");
+  } catch {
+    return res.status(400).send("Invalid lines");
+  }
 
   const shopTo = (process.env.SHOP_EMAIL || "").trim();
   const note = field(body, "note");

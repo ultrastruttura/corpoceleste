@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   applyStockDecrement,
   claimOrResumeLedger,
+  LedgerBusyError,
+  StockPartialError,
   writeLedger,
   type LedgerRecord,
 } from "../server/github-stock.js";
@@ -227,11 +229,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!lines.length && event.resource?.custom_id) {
+      // Fallback only — create-order omits custom_id when the cart would truncate.
       lines = parseOrderLines(event.resource.custom_id);
+      if (lines.length) {
+        console.warn("capture lines from custom_id fallback", captureId);
+      }
     }
 
     if (!lines.length) {
       console.warn("No order lines for capture", captureId);
+      await alertUnderpay(captureId, "No order lines (items/custom_id empty)", event.resource?.amount?.value);
       return res.status(200).json({ ok: true, skipped: "no lines" });
     }
 
@@ -253,6 +260,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       event.resource?.amount?.value ||
       order?.purchase_units?.[0]?.amount?.value ||
       "";
+    const paidCurrency = String(
+      event.resource?.amount?.currency_code ||
+        order?.purchase_units?.[0]?.amount?.currency_code ||
+        "",
+    )
+      .trim()
+      .toUpperCase();
     const paid = Number(paidRaw);
 
     if (priced.ok === false) {
@@ -260,6 +274,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await failLedger(captureId, lines, priced.error, paidRaw);
       await alertUnderpay(captureId, priced.error, paidRaw);
       return res.status(200).json({ ok: true, rejected: priced.error });
+    }
+
+    if (paidCurrency && paidCurrency !== "EUR") {
+      const msg = `WRONG_CURRENCY paid=${paidRaw} ${paidCurrency} expected=EUR`;
+      console.error(msg, captureId);
+      await failLedger(captureId, lines, msg, paidRaw, money(priced.order.total));
+      await alertUnderpay(captureId, msg, paidRaw);
+      return res.status(200).json({ ok: true, rejected: "wrong currency" });
     }
 
     if (!paymentCoversExpected(paid, priced.order.total)) {
@@ -270,29 +292,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, rejected: "underpay" });
     }
 
-    const claim = await claimOrResumeLedger(captureId, lines, {
-      expectedTotal: money(priced.order.total),
-      paidTotal: paidRaw,
-    });
+    let claim: Awaited<ReturnType<typeof claimOrResumeLedger>>;
+    try {
+      claim = await claimOrResumeLedger(captureId, lines, {
+        expectedTotal: money(priced.order.total),
+        paidTotal: paidRaw,
+      });
+    } catch (err) {
+      if (err instanceof LedgerBusyError) {
+        console.info("ledger busy", captureId);
+        return res.status(500).json({ error: "Ledger busy" });
+      }
+      throw err;
+    }
     if (claim.action === "skip") {
       return res.status(200).json({ ok: true, duplicate: true });
     }
 
-    let notes = claim.ledger.stockNotes || [];
+    let working: LedgerRecord = { ...claim.ledger };
+
+    let notes = working.stockNotes || [];
     if (!notes.length) {
       try {
         notes = await applyStockDecrement(lines);
+        working = {
+          ...working,
+          status: "processing",
+          stockNotes: notes,
+          error: undefined,
+          at: new Date().toISOString(),
+        };
+        // Checkpoint BEFORE Spedire/notify — retries must not re-decrement.
+        await writeLedger(working);
       } catch (err) {
+        const partial = err instanceof StockPartialError ? err.appliedNotes : [];
         const msg = err instanceof Error ? err.message : String(err);
         console.error("stock update failed", captureId, msg);
         const failed: LedgerRecord = {
-          ...claim.ledger,
+          ...working,
           status: "failed",
+          stockNotes: partial.length ? partial : working.stockNotes,
           error: msg,
           at: new Date().toISOString(),
         };
         await writeLedger(failed);
-        if (msg.startsWith("INSUFFICIENT_STOCK")) {
+        if (msg.includes("INSUFFICIENT_STOCK")) {
           await alertUnderpay(captureId, msg, paidRaw);
           return res.status(200).json({ ok: true, rejected: "insufficient stock" });
         }
@@ -300,12 +344,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    const packlink = await ensureSpedireShipment({
-      ledger: { ...claim.ledger, stockNotes: notes },
-      order,
-      priced: priced.order,
-      captureId,
-    });
+    let packlink: Pick<
+      LedgerRecord,
+      "packlinkRef" | "packlinkLabels" | "packlinkError" | "packlinkServiceId"
+    > = {
+      packlinkRef: working.packlinkRef,
+      packlinkLabels: working.packlinkLabels,
+      packlinkError: working.packlinkError,
+      packlinkServiceId: working.packlinkServiceId,
+    };
+    if (!working.packlinkRef) {
+      packlink = await ensureSpedireShipment({
+        ledger: { ...working, stockNotes: notes },
+        order,
+        priced: priced.order,
+        captureId,
+      });
+      working = {
+        ...working,
+        status: "processing",
+        stockNotes: notes,
+        at: new Date().toISOString(),
+        ...packlink,
+      };
+      // Checkpoint label ref so retries do not create a second paid shipment.
+      await writeLedger(working);
+    } else {
+      packlink = {
+        packlinkRef: working.packlinkRef,
+        packlinkLabels: working.packlinkLabels || [],
+        packlinkError: working.packlinkError,
+        packlinkServiceId: working.packlinkServiceId || priced.order.packlink.serviceId,
+      };
+    }
 
     const bits = order ? orderEmailBits(order) : { labels: [] as string[], total: undefined };
     const shopBody = formatShopOrderEmail({
@@ -329,7 +400,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     });
 
-    let emailed = Boolean(claim.ledger.emailed);
+    let emailed = Boolean(working.emailed);
     if (!emailed) {
       emailed = await notifyOrder({
         shopSubject: "Ordine shop Corpoceleste (PayPal)",
@@ -340,7 +411,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
       if (!emailed) {
         const pending: LedgerRecord = {
-          ...claim.ledger,
+          ...working,
           status: "pending",
           stockNotes: notes,
           emailed: false,
@@ -392,7 +463,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const done: LedgerRecord = {
-      ...claim.ledger,
+      ...working,
       status: "done",
       stockNotes: notes,
       emailed: true,

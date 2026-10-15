@@ -7,7 +7,7 @@ type GhFile = {
   path: string;
 };
 
-export type LedgerStatus = "pending" | "done" | "failed";
+export type LedgerStatus = "pending" | "processing" | "done" | "failed";
 
 export type LedgerRecord = {
   captureId: string;
@@ -24,6 +24,26 @@ export type LedgerRecord = {
   packlinkError?: string;
   packlinkServiceId?: string | number;
 };
+
+/** Another webhook delivery is mid-flight (soft lock via ledger status). */
+export class LedgerBusyError extends Error {
+  constructor(captureId: string) {
+    super(`Ledger busy for capture ${captureId}`);
+    this.name = "LedgerBusyError";
+  }
+}
+
+/** Stock decrement failed after some lines already applied. */
+export class StockPartialError extends Error {
+  appliedNotes: string[];
+  constructor(message: string, appliedNotes: string[]) {
+    super(message);
+    this.name = "StockPartialError";
+    this.appliedNotes = appliedNotes;
+  }
+}
+
+const PROCESSING_STALE_MS = 120_000;
 
 function repo() {
   const full = process.env.GITHUB_REPO || "ultrastruttura/corpoceleste";
@@ -116,11 +136,17 @@ export async function getLedger(captureId: string): Promise<LedgerRecord | null>
   }
 }
 
+function ledgerAgeMs(ledger: LedgerRecord) {
+  const t = Date.parse(ledger.at);
+  return Number.isFinite(t) ? Date.now() - t : Number.POSITIVE_INFINITY;
+}
+
 /**
  * Claim idempotency slot or resume incomplete work.
  * - done → skip
- * - pending/failed → resume
- * - missing → create pending
+ * - young processing → busy (caller should 5xx so PayPal retries)
+ * - pending/failed/stale processing → mark processing and continue
+ * - missing → create processing
  */
 export async function claimOrResumeLedger(
   captureId: string,
@@ -131,28 +157,45 @@ export async function claimOrResumeLedger(
   if (existing?.status === "done") {
     return { action: "skip", ledger: existing };
   }
-  if (existing && (existing.status === "pending" || existing.status === "failed")) {
-    return { action: "process", ledger: existing };
+  if (existing?.status === "processing" && ledgerAgeMs(existing) < PROCESSING_STALE_MS) {
+    throw new LedgerBusyError(captureId);
   }
 
+  const path = ledgerPath(captureId);
   const ledger: LedgerRecord = {
+    ...(existing || { captureId, lines, emailed: false }),
     captureId,
-    lines,
-    status: "pending",
+    lines: existing?.lines?.length ? existing.lines : lines,
+    status: "processing",
     at: new Date().toISOString(),
-    emailed: false,
     ...meta,
   };
-  const path = ledgerPath(captureId);
+  // Keep progress fields from existing resume.
+  if (existing?.stockNotes?.length) ledger.stockNotes = existing.stockNotes;
+  if (existing?.packlinkRef) ledger.packlinkRef = existing.packlinkRef;
+  if (existing?.packlinkLabels) ledger.packlinkLabels = existing.packlinkLabels;
+  if (existing?.packlinkError) ledger.packlinkError = existing.packlinkError;
+  if (existing?.packlinkServiceId != null) ledger.packlinkServiceId = existing.packlinkServiceId;
+  if (existing?.emailed) ledger.emailed = existing.emailed;
+
   const body = JSON.stringify(ledger, null, 2) + "\n";
   try {
-    await putRepoFile(path, undefined, body, `stock: claim capture ${safeId(captureId)}`);
+    const file = existing ? await getRepoFile(path) : null;
+    await putRepoFile(
+      path,
+      file?.sha,
+      body,
+      `stock: claim processing ${safeId(captureId)}`,
+    );
     return { action: "process", ledger };
   } catch (err) {
     const status = (err as { status?: number }).status;
-    if (status === 422) {
+    if (status === 409 || status === 422) {
       const again = await getLedger(captureId);
       if (again?.status === "done") return { action: "skip", ledger: again };
+      if (again?.status === "processing" && ledgerAgeMs(again) < PROCESSING_STALE_MS) {
+        throw new LedgerBusyError(captureId);
+      }
       if (again) return { action: "process", ledger: again };
     }
     throw err;
@@ -161,23 +204,43 @@ export async function claimOrResumeLedger(
 
 export async function writeLedger(ledger: LedgerRecord): Promise<void> {
   const path = ledgerPath(ledger.captureId);
-  const file = await getRepoFile(path);
-  const body = JSON.stringify(ledger, null, 2) + "\n";
-  await putRepoFile(
-    path,
-    file?.sha,
-    body,
-    `stock: ${ledger.status} capture ${safeId(ledger.captureId)}`,
-  );
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const file = await getRepoFile(path);
+      const body = JSON.stringify(ledger, null, 2) + "\n";
+      await putRepoFile(
+        path,
+        file?.sha,
+        body,
+        `stock: ${ledger.status} capture ${safeId(ledger.captureId)}`,
+      );
+      return;
+    } catch (err) {
+      lastErr = err;
+      const status = (err as { status?: number }).status;
+      if (status === 409) {
+        await sleep(100 * (attempt + 1));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
 }
 
 export async function applyStockDecrement(lines: OrderLine[]): Promise<string[]> {
   const notes: string[] = [];
-  for (const line of lines) {
-    const note = await decrementProduct(line);
-    notes.push(note);
+  try {
+    for (const line of lines) {
+      const note = await decrementProduct(line);
+      notes.push(note);
+    }
+    return notes;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new StockPartialError(msg, notes);
   }
-  return notes;
 }
 
 async function decrementProduct(line: OrderLine): Promise<string> {
@@ -221,7 +284,12 @@ async function decrementProduct(line: OrderLine): Promise<string> {
       lastErr = err;
       const status = (err as { status?: number }).status;
       const msg = err instanceof Error ? err.message : String(err);
-      if (msg.startsWith("INSUFFICIENT_STOCK") || msg.startsWith("missing product") || msg.startsWith("no stock")) {
+      if (
+        msg.startsWith("INSUFFICIENT_STOCK") ||
+        msg.startsWith("missing product") ||
+        msg.startsWith("no stock") ||
+        msg.startsWith("patch failed")
+      ) {
         throw err;
       }
       if (status === 409 || /409/.test(msg)) {
@@ -246,5 +314,5 @@ export async function ledgerExists(captureId: string): Promise<boolean> {
 /** @deprecated use claimOrResumeLedger */
 export async function createLedger(captureId: string, lines: OrderLine[]): Promise<boolean> {
   const result = await claimOrResumeLedger(captureId, lines);
-  return result.action === "process" && result.ledger.status === "pending" && !result.ledger.stockNotes;
+  return result.action === "process" && result.ledger.status === "processing" && !result.ledger.stockNotes;
 }
