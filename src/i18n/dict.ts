@@ -15,7 +15,7 @@ const it = {
     artists: "Artisti",
     news: "News",
     workshops: "Corsi",
-    consulting: "Consulenza",
+    bio: "Bio",
     contact: "Contatti",
     cart: "Carrello",
     menu: "Menu",
@@ -197,8 +197,8 @@ const it = {
     studioAlt:
       "Corso di serigrafia artistica Corpoceleste a Bergamo — workshop di stampa a mano su telaio, maglie e carta",
   },
-  consulting: {
-    title: "Consulenza",
+  bio: {
+    title: "Bio",
     print: "Stampa",
     printBody: "Impianti, inchiostri, flussi di lavoro, formazione.",
     printCv:
@@ -401,7 +401,7 @@ const en: typeof it = {
     artists: "Artists",
     news: "News",
     workshops: "Workshops",
-    consulting: "Consulting",
+    bio: "Bio",
     contact: "Contact",
     cart: "Cart",
     menu: "Menu",
@@ -580,8 +580,8 @@ const en: typeof it = {
     studioAlt:
       "Corpoceleste artist screen-printing workshop in Bergamo — hand-printing class on shirts and paper",
   },
-  consulting: {
-    title: "Consulting",
+  bio: {
+    title: "Bio",
     print: "Printing",
     printBody: "Setups, inks, workflow, training.",
     printCv:
@@ -784,7 +784,7 @@ const de: typeof it = {
     artists: "Künstler",
     news: "News",
     workshops: "Kurse",
-    consulting: "Beratung",
+    bio: "Bio",
     contact: "Kontakt",
     cart: "Warenkorb",
     menu: "Menü",
@@ -963,8 +963,8 @@ const de: typeof it = {
     studioAlt:
       "Corpoceleste Siebdruck-Workshop in Bergamo — Kurs für Handdruck auf Shirts und Papier",
   },
-  consulting: {
-    title: "Beratung",
+  bio: {
+    title: "Bio",
     print: "Druck",
     printBody: "Anlagen, Farben, Abläufe, Schulung.",
     printCv:

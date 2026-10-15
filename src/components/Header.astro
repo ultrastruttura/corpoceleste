@@ -28,6 +28,7 @@ function active(href: string) {
       <a class={active("artisti/")} href={pageUrl(locale, "artisti/")} data-nav={copy.nav.artists}><span class="nav-label">{copy.nav.artists}</span></a>
       <a class={active("news/")} href={pageUrl(locale, "news/")} data-nav={copy.nav.news}><span class="nav-label">{copy.nav.news}</span></a>
       <a class={active("corsi/")} href={pageUrl(locale, "corsi/")} data-nav={copy.nav.workshops}><span class="nav-label">{copy.nav.workshops}</span></a>
+      <a class={active("bio/")} href={pageUrl(locale, "bio/")} data-nav={copy.nav.bio}><span class="nav-label">{copy.nav.bio}</span></a>
       <a class={active("contatti/")} href={pageUrl(locale, "contatti/")} data-nav={copy.nav.contact}><span class="nav-label">{copy.nav.contact}</span></a>
     </nav>
     <div class="header-tools">
@@ -60,6 +61,7 @@ function active(href: string) {
   <a class={active("artisti/")} href={pageUrl(locale, "artisti/")}>{copy.nav.artists}</a>
   <a class={active("news/")} href={pageUrl(locale, "news/")}>{copy.nav.news}</a>
   <a class={active("corsi/")} href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
+  <a class={active("bio/")} href={pageUrl(locale, "bio/")}>{copy.nav.bio}</a>
   <a class={active("contatti/")} href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
   <a class={active("carrello/")} href={pageUrl(locale, "carrello/")} data-open-cart>{copy.nav.cart}</a>
   <LangSwitch />

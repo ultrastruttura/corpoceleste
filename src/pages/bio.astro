@@ -1,0 +1,86 @@
+---
+import Base from "../layouts/Base.astro";
+import PrivacyCheck from "../components/PrivacyCheck.astro";
+import FormHoney from "../components/FormHoney.astro";
+import { asset } from "../lib/paths";
+import { metaSnippet } from "../lib/seo";
+import { publicFormAction } from "../data/site";
+import { localizedSetting, siteSettings } from "../data/settings";
+import { currentLocale, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const andreaName = siteSettings.andreaName || "Andrea Baldelli";
+const andreaBio = localizedSetting("andreaBio", locale);
+const description = metaSnippet(andreaBio || copy.meta.description);
+const formAction = publicFormAction(siteSettings.shopEmail);
+---
+
+<Base
+  title={`${copy.bio.title} — Corpoceleste`}
+  description={description}
+  image="images/photos/andrea.jpg"
+>
+  <div class="wrap page-pad">
+    <header class="page-hero">
+      <h1>{copy.bio.title}</h1>
+    </header>
+
+    <div class="split">
+      <div class="prose">
+        <img
+          class="page-photo"
+          src={asset("images/photos/andrea.jpg")}
+          alt={andreaName}
+          width="1080"
+          height="1350"
+          loading="lazy"
+          decoding="async"
+        />
+        {
+          andreaBio && (
+            <>
+              <h2>{andreaName}</h2>
+              {andreaBio.split(/\n\n+/).map((para) => (
+                <p>{para}</p>
+              ))}
+            </>
+          )
+        }
+        <h2>{copy.bio.print}</h2>
+        <p>{copy.bio.printBody}</p>
+        <p>{copy.bio.printCv}</p>
+        <h2>{copy.bio.live}</h2>
+        <p>{copy.bio.liveBody}</p>
+      </div>
+      <form class="form" action={formAction} method="POST">
+        <input type="hidden" name="_subject" value="Richiesta da bio / stampa dal vivo" />
+        <input type="hidden" name="_next" data-next-grazie="bio" />
+        <FormHoney />
+        <div>
+          <label for="c-name">{copy.forms.name}</label>
+          <input id="c-name" name="nome" required />
+        </div>
+        <div>
+          <label for="c-email">{copy.forms.email}</label>
+          <input id="c-email" type="email" name="email" required />
+        </div>
+        <div>
+          <label for="c-tipo">{copy.bio.about}</label>
+          <select id="c-tipo" name="tipo">
+            <option>{copy.bio.optPrint}</option>
+            <option>{copy.bio.optStaff}</option>
+            <option>{copy.bio.optLive}</option>
+            <option>{copy.bio.optOther}</option>
+          </select>
+        </div>
+        <div>
+          <label for="c-msg">{copy.forms.message}</label>
+          <textarea id="c-msg" name="messaggio" required></textarea>
+        </div>
+        <PrivacyCheck id="c-privacy" />
+        <button class="btn" type="submit">{copy.forms.send}</button>
+      </form>
+    </div>
+  </div>
+</Base>

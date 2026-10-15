@@ -70,7 +70,7 @@ function guessFrom(subject: string, next: string) {
   const s = subject.toLowerCase();
   if (/newsletter/i.test(s)) return "newsletter";
   if (/ristampa/i.test(s)) return "ristampa";
-  if (/consulenza/i.test(s)) return "consulenza";
+  if (/\bbio\b/i.test(s)) return "bio";
   if (/workshop in studio|iscrizione workshop/i.test(s)) return "corsi";
   if (/workshop presso|proposta workshop/i.test(s)) return "workshop";
   if (/contatto/i.test(s)) return "contatto";

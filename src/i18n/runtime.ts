@@ -15,7 +15,7 @@ export function thanksMessage(locale: Locale, from: string) {
     contatto: { title: copy.received, body: copy.contact },
     newsletter: { title: copy.received, body: copy.newsletter },
     ristampa: { title: copy.received, body: copy.reprint },
-    consulenza: { title: copy.received, body: copy.contact },
+    bio: { title: copy.received, body: copy.contact },
     corsi: { title: copy.received, body: copy.waitlist },
     workshop: { title: copy.received, body: copy.contact },
     recesso: { title: copy.received, body: copy.withdrawal },
