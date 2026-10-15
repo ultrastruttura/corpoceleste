@@ -15,9 +15,10 @@ function parseShipTo(raw: Partial<CheckoutShipTo> | undefined, country: string, 
   const phone = String(raw.phone || "").trim();
   const street = String(raw.street || "").trim();
   const city = String(raw.city || "").trim();
-  const province = String(raw.province || "").trim();
-  if (!fullName || !email.includes("@") || !phone || !street || !city) return null;
-  if (country === "IT" && !/^[A-Z]{2}$/i.test(province)) return null;
+  let province = String(raw.province || "").trim();
+  if (country === "IT") province = province.slice(0, 2).toUpperCase();
+  // Phone and province optional — Spedire falls back via provinceForLabel / default phone.
+  if (!fullName || !email.includes("@") || !street || !city) return null;
   return {
     fullName,
     email,

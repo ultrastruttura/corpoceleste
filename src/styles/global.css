@@ -2052,8 +2052,7 @@ body.cart-open {
   color: var(--muted);
 }
 
-.pay-box.is-locked .pay-buttons,
-.pay-box.is-locked [data-applepay-hint] {
+.pay-box.is-locked .pay-buttons {
   opacity: 0.45;
   pointer-events: none;
 }

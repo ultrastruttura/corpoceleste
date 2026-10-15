@@ -68,7 +68,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         </div>
         <div class="field checkout-ship">
           <label class="field-label" for="ship-phone">{copy.checkout.phone}</label>
-          <input id="ship-phone" data-ship-phone type="tel" autocomplete="tel" required />
+          <input id="ship-phone" data-ship-phone type="tel" autocomplete="tel" />
         </div>
         <div class="field checkout-ship">
           <label class="field-label" for="ship-street">{copy.checkout.address}</label>
@@ -149,9 +149,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                     <div id="paypal-button" class="pay-buttons__slot"></div>
                     <div id="applepay-button" class="pay-buttons__slot" hidden data-applepay-slot></div>
                   </div>
-                  <p class="checkout-vat" data-applepay-hint hidden>
-                    {copy.checkout.applePayHint}
-                  </p>
                 </div>
               </>
             ) : (
@@ -288,8 +285,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       if (!provinceInput) return;
       provinceInput.placeholder = it ? "RM" : "";
       provinceInput.maxLength = it ? 2 : 40;
-      provinceInput.required = it;
-      provinceInput.setAttribute("aria-required", it ? "true" : "false");
+      provinceInput.required = false;
+      provinceInput.setAttribute("aria-required", "false");
     }
 
     function shipTo() {
@@ -308,9 +305,58 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
     function hasCompleteAddress() {
       const a = shipTo();
-      if (!a.fullName || !a.email.includes("@") || !a.phone || !a.street || !a.city) return false;
-      if (destCountry() === "IT" && !/^[A-Z]{2}$/.test(a.province)) return false;
-      return true;
+      return Boolean(a.fullName && a.email.includes("@") && a.street && a.city);
+    }
+
+    let zipLookupTimer: ReturnType<typeof setTimeout> | null = null;
+    let zipLookupSeq = 0;
+
+    async function lookupCityFromZip() {
+      const country = destCountry();
+      const zip = destZip();
+      if (country === "IT") {
+        if (!/^\d{5}$/.test(zip)) return;
+      } else if (zip.length < 3) {
+        return;
+      }
+      const seq = ++zipLookupSeq;
+      try {
+        const res = await fetch(
+          `https://api.zippopotam.us/${country.toLowerCase()}/${encodeURIComponent(zip)}`,
+        );
+        if (!res.ok || seq !== zipLookupSeq) return;
+        const data = (await res.json()) as {
+          places?: Array<{
+            "place name"?: string;
+            state?: string;
+            "state abbreviation"?: string;
+          }>;
+        };
+        const place = data.places?.[0];
+        if (!place || seq !== zipLookupSeq) return;
+        const placeName = String(place["place name"] || "").trim();
+        const abbr = String(place["state abbreviation"] || "").trim();
+        const state = String(place.state || "").trim();
+        if (cityInput && placeName) cityInput.value = placeName;
+        if (provinceInput) {
+          if (country === "IT" && /^[A-Za-z]{2}$/.test(abbr)) {
+            provinceInput.value = abbr.toUpperCase();
+          } else if (abbr || state) {
+            provinceInput.value = (abbr || state).slice(0, 40);
+          }
+        }
+        syncPage();
+        scheduleQuote();
+      } catch {
+        /* lookup best-effort */
+      }
+    }
+
+    function scheduleZipLookup() {
+      if (zipLookupTimer) clearTimeout(zipLookupTimer);
+      zipLookupTimer = setTimeout(() => {
+        void lookupCityFromZip();
+      }, 280);
     }
 
     function shippingAmount() {
@@ -337,9 +383,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           "",
           `Destinatario: ${a.fullName}`,
           a.street,
-          `${a.province} ${destZip()} ${a.city}`.trim(),
+          `${[a.province, destZip(), a.city].filter(Boolean).join(" ")}`,
           destCountry(),
-          a.phone,
+          ...(a.phone ? [a.phone] : []),
           a.email,
         );
       }
@@ -518,12 +564,17 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
     countrySel?.addEventListener("change", () => {
       syncProvinceField();
+      scheduleZipLookup();
       scheduleQuote();
       syncPage();
     });
     zipInput?.addEventListener("input", () => {
+      scheduleZipLookup();
       scheduleQuote();
       syncPage();
+    });
+    zipInput?.addEventListener("blur", () => {
+      void lookupCityFromZip();
     });
     for (const el of [nameInput, emailInput, phoneInput, streetInput, cityInput, provinceInput]) {
       el?.addEventListener("input", () => {
@@ -622,17 +673,13 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       }
 
       const appleSlot = document.querySelector<HTMLElement>("[data-applepay-slot]");
-      const appleHint = document.querySelector<HTMLElement>("[data-applepay-hint]");
       const appleBtn = paypal.Buttons({
         ...shared,
         fundingSource: paypal.FUNDING.APPLEPAY,
       });
       if (appleSlot && appleBtn.isEligible?.() && !appleSlot.hasChildNodes()) {
         appleSlot.hidden = false;
-        if (appleHint) appleHint.hidden = true;
         void appleBtn.render("#applepay-button");
-      } else if (appleHint) {
-        appleHint.hidden = false;
       }
     }
 
