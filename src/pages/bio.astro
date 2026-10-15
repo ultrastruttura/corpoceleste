@@ -20,7 +20,7 @@ const description = metaSnippet(body || copy.meta.description);
 <Base
   title={`${copy.bio.title} — Corpoceleste`}
   description={description}
-  image="images/photos/andrea.jpg"
+  image="images/photos/ultrastruttura.jpg"
 >
   <div class="wrap page-pad">
     <header class="page-hero">
@@ -31,20 +31,11 @@ const description = metaSnippet(body || copy.meta.description);
       <div class="bio-photos">
         <img
           class="page-photo"
-          src={asset("images/photos/andrea.jpg")}
-          alt={name}
-          width="1024"
-          height="1024"
-          loading="eager"
-          decoding="async"
-        />
-        <img
-          class="page-photo"
           src={asset("images/photos/ultrastruttura.jpg")}
           alt="Ultrastruttura — Se la luce ci prende"
           width="1080"
           height="1350"
-          loading="lazy"
+          loading="eager"
           decoding="async"
         />
       </div>
