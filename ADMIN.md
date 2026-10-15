@@ -9,7 +9,8 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 | **Maglie** | Aggiungere / togliere prodotti, prezzo, stato, taglie, **magazzino (pezzi per taglia)**, **2–3 foto**, descrizione IT/EN/DE, **meta SEO** |
 | **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO** |
 | **News** | Aggiungere / togliere / modificare articoli |
-| **SEO e home** | Meta description, H1 home, immagine Open Graph, **bio Andrea**, **email shop**, **token Cloudflare Web Analytics** |
+| **Bio** | Nome, testo bio IT/EN/DE, sezioni stampa e stampa dal vivo |
+| **SEO e home** | Meta description, H1 home, immagine Open Graph, **email shop**, **token Cloudflare Web Analytics** |
 
 Le foto vanno caricate dal pannello (finiscono in `public/uploads/`).
 

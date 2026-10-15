@@ -220,6 +220,28 @@ export default defineConfig({
         ],
       },
       {
+        name: "bio",
+        label: "Bio",
+        path: "content/bio",
+        format: "md",
+        ui: {
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
+        fields: [
+          { type: "string", name: "title", label: "Titolo interno", isTitle: true, required: true },
+          { type: "string", name: "name", label: "Nome", required: true },
+          localizedText("body", "Testo bio"),
+          localizedText("printTitle", "Titolo sezione stampa", false),
+          localizedText("printBody", "Testo sezione stampa"),
+          localizedText("printCv", "Curriculum / esperienza stampa"),
+          localizedText("liveTitle", "Titolo stampa dal vivo", false),
+          localizedText("liveBody", "Testo stampa dal vivo"),
+        ],
+      },
+      {
         name: "settings",
         label: "SEO e home",
         path: "content/settings",
@@ -261,8 +283,6 @@ export default defineConfig({
             description:
               "Se i pezzi rimasti (somma di tutte le taglie) sono ≤ questo numero, sul sito compare il badge “In esaurimento”. Default 10. Metti 0 per spegnere.",
           },
-          { type: "string", name: "andreaName", label: "Nome (bio studio)" },
-          localizedText("andreaBio", "Bio Andrea"),
         ],
       },
     ],

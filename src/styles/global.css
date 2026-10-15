@@ -1840,6 +1840,18 @@ body.cart-open {
   margin: 8px 0 32px;
 }
 
+.bio-photos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bio-photos .page-photo {
+  margin: 0;
+  width: 100%;
+  max-width: 420px;
+}
+
 .archive-note {
   font-size: 13px;
   color: var(--muted);

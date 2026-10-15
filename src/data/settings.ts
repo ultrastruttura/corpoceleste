@@ -46,15 +46,10 @@ export const siteSettings = {
     if (!Number.isFinite(n) || n < 0) return 10;
     return Math.floor(n);
   })(),
-  andreaName: String(data.andreaName ?? "Andrea Baldelli"),
-  andreaBio: asLocalized(data.andreaBio),
 };
 
 export function localizedSetting(
-  field: keyof Pick<
-    typeof siteSettings,
-    "metaDescription" | "homeTitle" | "homeLede" | "andreaBio"
-  >,
+  field: keyof Pick<typeof siteSettings, "metaDescription" | "homeTitle" | "homeLede">,
   locale: Locale,
 ) {
   const value = siteSettings[field];
