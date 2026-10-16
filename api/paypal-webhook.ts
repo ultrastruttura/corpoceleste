@@ -262,21 +262,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, rejected: "no shipping address" });
     }
 
-    let ignoreStock = false;
+    // Consume hold BEFORE pricing so cron cannot release units mid-webhook.
     const relatedOrderId = String(
       event.resource?.supplementary_data?.related_ids?.order_id || order?.id || "",
     ).trim();
+    let earlyHold: LedgerRecord | null = null;
     if (relatedOrderId && (process.env.GITHUB_TOKEN || "").trim()) {
       try {
-        const { getLedger, paypalHoldId } = await import("../server/github-stock.js");
-        const hold = await getLedger(paypalHoldId(relatedOrderId));
-        if (hold?.kind === "paypal_hold" && hold.stockComplete && !hold.releasedAt) {
-          ignoreStock = true;
-        }
-      } catch {
-        /* pricing without hold */
+        const { consumePaypalHold } = await import("../server/github-stock.js");
+        earlyHold = await consumePaypalHold(relatedOrderId, captureId);
+      } catch (err) {
+        console.warn("paypal-webhook: early consume hold failed", captureId, err);
       }
     }
+    // Any live hold (complete or partial): catalog already reflects reserved units.
+    const ignoreStock = Boolean(earlyHold && !earlyHold.releasedAt);
 
     const priced = await priceOrderLines(lines, dest, { ignoreStock });
     const paidRaw =
@@ -334,31 +334,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let working: LedgerRecord = { ...claim.ledger };
 
-    // If create-order already reserved stock, reuse that hold (no second decrement).
-    const paypalOrderId = String(
-      event.resource?.supplementary_data?.related_ids?.order_id ||
-        order?.id ||
-        "",
-    ).trim();
-    if (!working.stockComplete && paypalOrderId) {
-      try {
-        const { consumePaypalHold } = await import("../server/github-stock.js");
-        const hold = await consumePaypalHold(paypalOrderId, captureId);
-        if (hold?.stockComplete) {
-          working = {
-            ...working,
-            kind: "capture",
-            stockComplete: true,
-            stockNotes: hold.stockNotes || working.stockNotes,
-            stockAppliedKeys: hold.stockAppliedKeys || working.stockAppliedKeys,
-            status: "processing",
-            at: new Date().toISOString(),
-          };
-          await writeLedger(working);
-        }
-      } catch (err) {
-        console.warn("paypal-webhook: consume hold failed", captureId, err);
-      }
+    // Reuse create-order hold progress (complete or partial) — never double-decrement applied keys.
+    if (!working.stockComplete && earlyHold && !earlyHold.releasedAt) {
+      working = {
+        ...working,
+        kind: "capture",
+        stockNotes: earlyHold.stockNotes?.length
+          ? earlyHold.stockNotes
+          : working.stockNotes,
+        stockAppliedKeys: earlyHold.stockAppliedKeys?.length
+          ? earlyHold.stockAppliedKeys
+          : working.stockAppliedKeys,
+        stockComplete: Boolean(earlyHold.stockComplete),
+        status: "processing",
+        at: new Date().toISOString(),
+      };
+      await writeLedger(working);
     }
 
     let notes = working.stockNotes || [];

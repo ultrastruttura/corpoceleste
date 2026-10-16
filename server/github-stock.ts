@@ -521,7 +521,85 @@ export async function listLedgerSummaries(): Promise<
     }));
 }
 
-/** Mark hold consumed by a capture — stock stays decremented. */
+/**
+ * Reserve stock under a temporary hold id (before PayPal order exists).
+ * Throws LedgerBusyError / INSUFFICIENT_STOCK / StockPartialError.
+ */
+export async function reservePaypalHold(
+  holdId: string,
+  lines: OrderLine[],
+  meta?: { expectedTotal?: string },
+): Promise<LedgerRecord> {
+  const claim = await claimOrResumeLedger(holdId, lines, meta);
+  if (claim.action === "skip" && claim.ledger.stockComplete && !claim.ledger.releasedAt) {
+    return { ...claim.ledger, kind: "paypal_hold" };
+  }
+  if (claim.action === "skip") {
+    throw new Error(`Hold ${holdId} not reusable (${claim.ledger.status})`);
+  }
+  let held = claim.ledger;
+  if (!held.stockComplete) {
+    held = await applyStockDecrementCheckpointed(held, lines, writeLedger);
+  }
+  const done: LedgerRecord = {
+    ...held,
+    kind: "paypal_hold",
+    status: "done",
+    stockComplete: true,
+    at: new Date().toISOString(),
+  };
+  await writeLedger(done);
+  return done;
+}
+
+/** Restore units from a hold that never became a PayPal order (create failed). */
+export async function abandonPaypalHold(holdId: string): Promise<void> {
+  const hold = await getLedger(holdId);
+  if (!hold || hold.kind !== "paypal_hold") return;
+  if (hold.releasedAt || hold.consumedBy) return;
+  const applied = (hold.lines || []).filter((l) =>
+    (hold.stockAppliedKeys || []).includes(stockLineKey(l)),
+  );
+  const lines = applied.length ? applied : hold.stockComplete ? hold.lines || [] : [];
+  if (lines.length) await applyStockIncrement(lines);
+  await writeLedger({
+    ...hold,
+    releasedAt: new Date().toISOString(),
+    status: "done",
+    error: "abandoned before PayPal order",
+    at: new Date().toISOString(),
+  });
+}
+
+/** Rename tmp hold → hold_<paypalOrderId> after PayPal create succeeds. */
+export async function bindPaypalHold(
+  tmpHoldId: string,
+  paypalOrderId: string,
+): Promise<LedgerRecord | null> {
+  const tmp = await getLedger(tmpHoldId);
+  if (!tmp || tmp.kind !== "paypal_hold" || tmp.releasedAt) return null;
+  const finalId = paypalHoldId(paypalOrderId);
+  const finalLedger: LedgerRecord = {
+    ...tmp,
+    captureId: finalId,
+    kind: "paypal_hold",
+    status: "done",
+    at: new Date().toISOString(),
+  };
+  await writeLedger(finalLedger);
+  await writeLedger({
+    ...tmp,
+    consumedBy: finalId,
+    at: new Date().toISOString(),
+    error: "bound to paypal order",
+  });
+  return finalLedger;
+}
+
+/**
+ * Mark hold consumed by a capture — stock stays decremented.
+ * Works for complete or partial holds (partial: capture must finish remaining lines).
+ */
 export async function consumePaypalHold(
   paypalOrderId: string,
   captureId: string,
@@ -552,9 +630,14 @@ export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<strin
     const ledger = await getLedger(file.id);
     if (!ledger || ledger.kind !== "paypal_hold") continue;
     if (ledger.releasedAt || ledger.consumedBy) continue;
-    if (!ledger.stockComplete) continue;
     if (ledgerAgeMs(ledger) < PAYPAL_HOLD_TTL_MS) continue;
-    const notes = await applyStockIncrement(ledger.lines || []);
+    const applied = (ledger.lines || []).filter((l) =>
+      (ledger.stockAppliedKeys || []).includes(stockLineKey(l)),
+    );
+    const toRestore =
+      applied.length > 0 ? applied : ledger.stockComplete ? ledger.lines || [] : [];
+    if (!toRestore.length && !ledger.stockComplete) continue;
+    const notes = toRestore.length ? await applyStockIncrement(toRestore) : [];
     await writeLedger({
       ...ledger,
       releasedAt: new Date(now).toISOString(),

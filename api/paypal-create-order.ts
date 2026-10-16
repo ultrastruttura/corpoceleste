@@ -34,6 +34,7 @@ function parseShipTo(raw: Partial<CheckoutShipTo> | undefined, country: string, 
 
 /**
  * Server-side PayPal order create — prices, stock and Spedire shipping from server.
+ * Stock is reserved BEFORE creating the PayPal order; on failure units are restored.
  * POST { lines, country, zip, shipTo: { fullName, email, phone, street, city, province } }
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -77,8 +78,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shipTo = parseShipTo(body.shipTo, dest.country, dest.zip);
     if (!shipTo) return json(res, 400, { error: "Invalid shipping address" });
 
-    // Free abandoned create-order holds before pricing (last-unit race).
-    if ((process.env.GITHUB_TOKEN || "").trim()) {
+    const hasGithub = Boolean((process.env.GITHUB_TOKEN || "").trim());
+    if (hasGithub) {
       try {
         const { releaseExpiredPaypalHolds } = await import("../server/github-stock.js");
         await releaseExpiredPaypalHolds();
@@ -90,52 +91,60 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const priced = await priceOrderLines(lines, dest);
     if (priced.ok === false) return json(res, 400, { error: priced.error });
 
-    const orderId = await createPayPalCheckoutOrder(priced.order, shipTo);
+    const stockLines = priced.order.lines.map((l) => ({
+      id: l.id,
+      size: l.size,
+      qty: l.qty,
+    }));
 
-    // Reserve stock between create and capture (ledger hold_*).
-    if ((process.env.GITHUB_TOKEN || "").trim()) {
-      const stockLines = priced.order.lines.map((l) => ({
-        id: l.id,
-        size: l.size,
-        qty: l.qty,
-      }));
+    let tmpHoldId = "";
+    if (hasGithub) {
+      const {
+        paypalHoldId,
+        reservePaypalHold,
+        LedgerBusyError,
+      } = await import("../server/github-stock.js");
+      tmpHoldId = paypalHoldId(`tmp_${crypto.randomUUID()}`);
       try {
-        const {
-          paypalHoldId,
-          claimOrResumeLedger,
-          applyStockDecrementCheckpointed,
-          writeLedger,
-          LedgerBusyError,
-        } = await import("../server/github-stock.js");
-        const holdId = paypalHoldId(orderId);
-        const claim = await claimOrResumeLedger(holdId, stockLines, {
+        await reservePaypalHold(tmpHoldId, stockLines, {
           expectedTotal: money(priced.order.total),
         });
-        if (claim.action === "process" && !claim.ledger.stockComplete) {
-          const held = await applyStockDecrementCheckpointed(
-            claim.ledger,
-            stockLines,
-            writeLedger,
-          );
-          await writeLedger({
-            ...held,
-            kind: "paypal_hold",
-            status: "done",
-            stockComplete: true,
-            at: new Date().toISOString(),
-          });
-        }
       } catch (err) {
-        const { LedgerBusyError } = await import("../server/github-stock.js");
         if (err instanceof LedgerBusyError) {
           return json(res, 503, { error: "Stock busy, retry" });
         }
         const msg = err instanceof Error ? err.message : String(err);
-        console.error("paypal-create: stock hold failed", msg);
+        console.error("paypal-create: stock reserve failed", msg);
         if (msg.includes("INSUFFICIENT_STOCK")) {
           return json(res, 409, { error: "Out of stock" });
         }
-        // PayPal order already created — leave it; webhook may still fail on stock.
+        return json(res, 503, { error: "Stock unavailable, retry" });
+      }
+    }
+
+    let orderId: string;
+    try {
+      orderId = await createPayPalCheckoutOrder(priced.order, shipTo);
+    } catch (err) {
+      if (tmpHoldId) {
+        try {
+          const { abandonPaypalHold } = await import("../server/github-stock.js");
+          await abandonPaypalHold(tmpHoldId);
+        } catch (restoreErr) {
+          console.error("paypal-create: abandon hold failed", restoreErr);
+        }
+      }
+      throw err;
+    }
+
+    if (tmpHoldId) {
+      try {
+        const { bindPaypalHold } = await import("../server/github-stock.js");
+        await bindPaypalHold(tmpHoldId, orderId);
+      } catch (err) {
+        console.error("paypal-create: bind hold failed", err);
+        // Stock is already reserved under tmp; bind failure leaves units locked until TTL release.
+        // Still return the order — webhook can fall back to live decrement.
       }
     }
 
