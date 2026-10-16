@@ -63,6 +63,13 @@ const productUrl = pageAbs(locale, `prodotto/${product.slug}/`);
 const absImages = product.images
   .map((src) => absoluteUrl(largeImageUrls(src).jpg, Astro.site))
   .filter(Boolean);
+/** Google Product rich results require a non-empty image; placeholders have none yet. */
+const schemaImages =
+  absImages.length > 0
+    ? absImages
+    : [
+        absoluteUrl(product.print || cover?.jpg || siteSettings.ogImage || "brand/favicon.png", Astro.site),
+      ].filter(Boolean);
 
 const availability = sold
   ? "https://schema.org/OutOfStock"
@@ -80,7 +87,7 @@ const jsonLd = {
   "@type": "Product",
   name: product.title,
   description: seoDescription,
-  image: absImages,
+  image: schemaImages,
   sku: product.id,
   brand: {
     "@type": "Brand",
