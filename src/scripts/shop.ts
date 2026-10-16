@@ -2,9 +2,13 @@ import { addItem } from "./cart";
 import { bindCart, openCart } from "./cart-ui";
 import { applyLiveStock, catalogProduct } from "./catalog";
 import { bindNav } from "./nav";
-import { commerceApiBase } from "../data/commerce";
 
 const base = import.meta.env.BASE_URL;
+
+/** Browser-safe: do not import data/commerce (pulls gray-matter → Buffer). */
+function commerceApiBase() {
+  return (document.documentElement.dataset.api || "").replace(/\/$/, "");
+}
 
 async function refreshLiveStock() {
   const api = commerceApiBase();

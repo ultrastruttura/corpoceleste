@@ -87,7 +87,7 @@ const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
 ---
 
 <!doctype html>
-<html lang={locale} data-locale={locale} data-locale-prefix={prefix}>
+<html lang={locale} data-locale={locale} data-locale-prefix={prefix} data-api={commerce.formApi || undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
