@@ -3,7 +3,7 @@ title: Bio
 name: Andrea Lorenzo Baldelli
 body:
   it: |-
-    Sono serigrafo a Bergamo. In studio stampo e imballo le edizioni Corpoceleste: un solo colore, niente print-on-demand — maglie, stampe e pezzi d’artista. Lo shop è su questo sito.
+    Serigrafo a Bergamo. Qui stampo a mano le edizioni Corpoceleste — maglie e stampe, un colore per volta — e le preparo per la spedizione.
 
     Dal 2014 tengo corsi e workshop, sia in studio sia presso terzi. Porto i telai anche agli eventi: stampo dal vivo, con dimostrazioni e piccole produzioni fatte sul posto. Se ti serve una consulenza su impianti, inchiostri, flussi di lavoro o formazione, scrivimi: la costruisco caso per caso.
 
@@ -11,7 +11,7 @@ body:
 
     Prima di Corpoceleste ho costruito etichette e progetti di edizione indipendenti. Con Corpoc, tra il 2012 e il 2019, curavo, stampavo e distribuivo edizioni limitate — maglie serigrafate, stampe e uscite su cassetta — insieme ad artisti italiani e internazionali. Con Satellite Press mi occupavo di stampe d’artista in tiratura limitata; con TDD, etichetta indipendente ancora consultabile su Discogs, muovevo nello stesso circuito DIY edizioni e uscite musicali. Dipingo come Ultrastruttura.
   en: |-
-    I’m a screen printer in Bergamo. In the studio I print and pack the Corpoceleste editions: one colour only, no print-on-demand — shirts, prints and artist pieces. The shop is on this site.
+    Screen printer in Bergamo. Here I hand-print the Corpoceleste editions — shirts and prints, one colour at a time — and pack them for shipping.
 
     I’ve been running courses and workshops since 2014, both in the studio and on location. I also bring the screens to events and print live — demos and small runs made on the spot. If you need consulting on setups, inks, workflow or training, write to me: I build it case by case.
 
@@ -19,7 +19,7 @@ body:
 
     Before Corpoceleste I built independent labels and edition projects. With Corpoc, from 2012 to 2019, I curated, printed and distributed limited editions — screen-printed shirts, prints and cassette releases — with Italian and international artists. With Satellite Press I worked on limited artist prints; with TDD, an independent imprint still listed on Discogs, I moved in the same DIY circuit of editions and music releases. I paint as Ultrastruttura.
   de: |-
-    Ich bin Siebdrucker in Bergamo. Im Atelier drucke und verpacke ich die Corpoceleste-Editionen: nur eine Farbe, kein Print-on-Demand — Shirts, Drucke und Künstlerstücke. Der Shop ist auf dieser Website.
+    Siebdrucker in Bergamo. Hier drucke ich die Corpoceleste-Editionen von Hand — Shirts und Drucke, eine Farbe nach der anderen — und bereite sie für den Versand vor.
 
     Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich bringe die Siebe auch zu Events und drucke live — Demos und kleine Auflagen vor Ort. Wenn du Beratung zu Anlagen, Farben, Abläufen oder Schulung brauchst, schreib mir: ich baue sie Fall für Fall.
 
