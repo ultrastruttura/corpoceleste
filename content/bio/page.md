@@ -5,69 +5,45 @@ body:
   it: |-
     Serigrafo a Bergamo. Stampo e imballo le edizioni Corpoceleste: un colore, non print-on-demand — maglie, stampe, pezzi d’artista. Lo shop è qui sul sito.
 
-    Dal 2014 tengo corsi e workshop in studio e presso terzi. Stampo anche dal vivo a eventi, con i telai in sede. Su consulenza (impianti, inchiostri, flussi di lavoro, formazione) scrivimi: la presento caso per caso.
+    Dal 2014 tengo corsi e workshop in studio e presso terzi. Stampo anche dal vivo a eventi, con i telai in sede: dimostrazioni e piccole produzioni con l’attrezzatura dello studio. Su consulenza — impianti, inchiostri, flussi di lavoro, formazione — scrivimi: la presento caso per caso.
 
-    Prima di Corpoceleste ho costruito etichette e canali di edizione indipendenti: Corpoc (2012–2019), Satellite Press e TDD. Dipingo come Ultrastruttura.
+    Accanto alla pratica d’atelier ho lavorato sul lato industriale e formativo. Per Za.Er. ad Asmara ho seguito cinque missioni in Eritrea: avviamento di produzioni di camiceria e abbigliamento serigrafato, messa a punto dei flussi e formazione del personale, in loco e in studio. In Quaglia ho guidato il laboratorio di ricerca: test di inchiostri, soprattutto ad acqua, e sviluppo di formulazioni brevettate per clienti internazionali.
+
+    Prima di Corpoceleste ho costruito canali di edizione indipendenti. Con Corpoc (2012–2019) curavo, stampavo e distribuivo edizioni limitate — maglie serigrafate, stampe e uscite su cassetta — con artisti italiani e internazionali. Satellite Press era il progetto dedicato alle stampe d’artista in tiratura limitata; TDD, etichetta indipendente (catalogo su Discogs), muoveva nello stesso circuito DIY edizioni e uscite musicali. Dipingo come Ultrastruttura.
   en: |-
     Screen printer in Bergamo. I print and pack the Corpoceleste editions: one colour, not print-on-demand — shirts, prints, artist pieces. The shop is on this site.
 
-    I’ve run courses and workshops since 2014, in the studio and on location. I also print live at events, with screens on site. For consulting (setups, inks, workflow, training), write to me — I present it case by case.
+    I’ve run courses and workshops since 2014, in the studio and on location. I also print live at events, with screens on site — demos and small runs using studio equipment. For consulting — setups, inks, workflow, training — write to me: I present it case by case.
 
-    Before Corpoceleste I built independent labels and edition channels: Corpoc (2012–2019), Satellite Press and TDD. I paint as Ultrastruttura.
+    Alongside studio practice I’ve worked on the industrial and training side. For Za.Er. in Asmara I completed five assignments in Eritrea: starting up shirt and screen-printed apparel production, setting workflows and training staff, on site and in the studio. At Quaglia I led the research lab: testing inks, mainly water-based, and developing patented formulations for international clients.
+
+    Before Corpoceleste I built independent edition channels. With Corpoc (2012–2019) I curated, printed and distributed limited editions — screen-printed shirts, prints and cassette releases — with Italian and international artists. Satellite Press was the project for limited artist prints; TDD, an independent imprint (catalogue on Discogs), moved in the same DIY circuit of editions and music releases. I paint as Ultrastruttura.
   de: |-
     Siebdrucker in Bergamo. Ich drucke und verpacke die Corpoceleste-Editionen: eine Farbe, kein Print-on-Demand — Shirts, Drucke, Künstlerstücke. Der Shop ist auf dieser Website.
 
-    Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events, mit Sieben vor Ort. Für Beratung (Anlagen, Farben, Abläufe, Schulung) schreib mir — Fall für Fall.
+    Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events, mit Sieben vor Ort — Demos und kleine Auflagen mit Atelier-Ausstattung. Für Beratung — Anlagen, Farben, Abläufe, Schulung — schreib mir: Fall für Fall.
 
-    Vor Corpoceleste habe ich unabhängige Labels und Editionswege aufgebaut: Corpoc (2012–2019), Satellite Press und TDD. Ich male als Ultrastruttura.
+    Neben der Atelierpraxis habe ich auf der Industrie- und Schulungsseite gearbeitet. Für Za.Er. in Asmara habe ich fünf Einsätze in Eritrea begleitet: Anlauf von Hemden- und siebgedruckter Bekleidungsproduktion, Aufbau der Abläufe und Schulung des Personals, vor Ort und im Atelier. Bei Quaglia habe ich das Forschungslabor geleitet: Prüfung von Farben, vor allem wasserbasiert, und Entwicklung patentierter Formulierungen für internationale Kunden.
+
+    Vor Corpoceleste habe ich unabhängige Editionswege aufgebaut. Mit Corpoc (2012–2019) habe ich limitierte Editionen kuratiert, gedruckt und vertrieben — siebgedruckte Shirts, Drucke und Cassette-Releases — mit italienischen und internationalen Künstler:innen. Satellite Press war das Projekt für limitierte Künstlerdrucke; TDD, ein unabhängiges Label (Katalog auf Discogs), bewegte sich im selben DIY-Kreis aus Editionen und Musikveröffentlichungen. Ich male als Ultrastruttura.
 printTitle:
-  it: Stampa e industria
-  en: Print and industry
-  de: Druck und Industrie
+  it: ""
+  en: ""
+  de: ""
 printBody:
-  it: |-
-    Impianti, inchiostri, flussi di lavoro, formazione. Esperienza di avviamento produttivo e R&D su inchiostri serigrafici, oltre alla pratica d’atelier.
-  en: |-
-    Setups, inks, workflow, training. Experience in production start-up and R&D on screen-printing inks, alongside studio practice.
-  de: |-
-    Anlagen, Farben, Abläufe, Schulung. Erfahrung im Produktionsanlauf und in der F&E für Siebdruckfarben, neben der Atelierpraxis.
+  it: ""
+  en: ""
+  de: ""
 printCv:
-  it: |-
-    Eritrea — cinque missioni per conto di Za.Er. (Asmara): avviamento di produzioni di camiceria e abbigliamento serigrafato, allestimento flussi di lavoro e formazione del personale, in loco e in studio.
-
-    Quaglia — responsabile del laboratorio: test di inchiostri (principalmente ad acqua), sviluppo e messa a punto di formulazioni brevettate per clienti internazionali.
-
-    Corpoc (2012–2019) — shop e etichetta di edizioni limitate: maglie serigrafate, stampe e release su cassetta con artisti italiani e internazionali; cura, stampa e distribuzione.
-
-    Satellite Press — progetto editoriale di stampe d’artista in tiratura limitata: selezione, produzione e vendita di edizioni grafiche.
-
-    TDD — etichetta indipendente (catalogo su Discogs) nel circuito delle edizioni e delle uscite musicali legate allo stesso percorso DIY.
-  en: |-
-    Eritrea — five assignments for Za.Er. (Asmara): starting up shirt and screen-printed apparel production, setting workflows and training staff, on site and in the studio.
-
-    Quaglia — lab lead: testing inks (mainly water-based), developing and refining patented formulations for international clients.
-
-    Corpoc (2012–2019) — shop and label for limited editions: screen-printed shirts, prints and cassette releases with Italian and international artists; curation, printing and distribution.
-
-    Satellite Press — publishing project for limited artist prints: selection, production and sale of graphic editions.
-
-    TDD — independent imprint (catalogue on Discogs) in the same DIY circuit of editions and music releases.
-  de: |-
-    Eritrea — fünf Einsätze für Za.Er. (Asmara): Anlauf von Hemden- und siebgedruckter Bekleidungsproduktion, Aufbau der Abläufe und Schulung des Personals, vor Ort und im Atelier.
-
-    Quaglia — Laborleitung: Prüfung von Farben (vor allem wasserbasiert), Entwicklung und Feinabstimmung patentierter Formulierungen für internationale Kunden.
-
-    Corpoc (2012–2019) — Shop und Label für limitierte Editionen: siebgedruckte Shirts, Drucke und Cassette-Releases mit italienischen und internationalen Künstler:innen; Kuratierung, Druck und Vertrieb.
-
-    Satellite Press — Editionsprojekt für limitierte Künstlerdrucke: Auswahl, Produktion und Verkauf grafischer Editionen.
-
-    TDD — unabhängiges Label (Katalog auf Discogs) im selben DIY-Kreis aus Editionen und Musikveröffentlichungen.
+  it: ""
+  en: ""
+  de: ""
 liveTitle:
-  it: Stampa dal vivo
-  en: Live printing
-  de: Live-Druck
+  it: ""
+  en: ""
+  de: ""
 liveBody:
-  it: Telai in sede durante eventi: dimostrazioni e produzioni dal vivo con l’attrezzatura dello studio.
-  en: Screens on site at events: live demos and production with studio equipment.
-  de: Siebe vor Ort bei Veranstaltungen: Live-Demos und Produktion mit Atelier-Ausstattung.
+  it: ""
+  en: ""
+  de: ""
 ---

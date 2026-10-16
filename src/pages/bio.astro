@@ -9,11 +9,11 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const name = bioPage.name;
 const body = bioField("body", locale);
-const printTitle = bioField("printTitle", locale) || copy.bio.print;
-const printBody = bioField("printBody", locale) || copy.bio.printBody;
-const printCv = bioField("printCv", locale) || copy.bio.printCv;
-const liveTitle = bioField("liveTitle", locale) || copy.bio.live;
-const liveBody = bioField("liveBody", locale) || copy.bio.liveBody;
+const printTitle = bioField("printTitle", locale);
+const printBody = bioField("printBody", locale);
+const printCv = bioField("printCv", locale);
+const liveTitle = bioField("liveTitle", locale);
+const liveBody = bioField("liveBody", locale);
 const description = metaSnippet(body || copy.meta.description);
 ---
 
