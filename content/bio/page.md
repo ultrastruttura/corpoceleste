@@ -26,24 +26,4 @@ body:
     Neben dem Atelier habe ich auch in Produktionskontexten gearbeitet. Für Za.Er. in Asmara war ich fünfmal in Eritrea, um Hemden- und siebgedruckte Bekleidungsproduktionen anzufahren, Abläufe aufzusetzen und Personal zu schulen, vor Ort und im Atelier. Bei Quaglia war ich Laborleiter: ich betreute Farbtests, vor allem wasserbasierte, und die Entwicklung neuer patentierter Formulierungen für internationale Kunden.
 
     Vor Corpoceleste habe ich unabhängige Labels und Editionsprojekte aufgebaut. Mit Corpoc habe ich von 2012 bis 2019 limitierte Editionen kuratiert, gedruckt und vertrieben — siebgedruckte Shirts, Drucke und Cassette-Releases — mit italienischen und internationalen Künstler:innen. Mit Satellite Press habe ich mich um limitierte Künstlerdrucke gekümmert; mit TDD, einem unabhängigen Label, das noch auf Discogs steht, habe ich mich im selben DIY-Kreis aus Editionen und Musikveröffentlichungen bewegt. Ich male als Ultrastruttura.
-printTitle:
-  it: ""
-  en: ""
-  de: ""
-printBody:
-  it: ""
-  en: ""
-  de: ""
-printCv:
-  it: ""
-  en: ""
-  de: ""
-liveTitle:
-  it: ""
-  en: ""
-  de: ""
-liveBody:
-  it: ""
-  en: ""
-  de: ""
 ---
