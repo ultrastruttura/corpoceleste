@@ -9,7 +9,7 @@ body:
 
     Accanto all’atelier lavoro anche in contesti produttivi. Per conto di Za.Er. sono stato cinque volte ad Asmara, Eritrea, per avviare produzioni di camiceria e abbigliamento serigrafato, mettere a punto i flussi di lavoro e formare il personale, in sede e in studio. Nell’azienda Quaglia di Azzano San Paolo (Bergamo) sono responsabile del laboratorio: seguo i test sugli inchiostri — soprattutto quelli ad acqua — e lo sviluppo di nuove formulazioni brevettate per clienti internazionali. La collaborazione è in corso.
 
-    Prima di Corpoceleste ho costruito etichette e progetti di edizione indipendenti. Con Corpoc, tra il 2012 e il 2019, curavo, stampavo e distribuivo edizioni limitate — maglie serigrafate, stampe e uscite su cassetta — insieme ad artisti italiani e internazionali. Con Satellite Press mi occupavo di stampe d’artista in tiratura limitata; con TDD, etichetta indipendente, nel circuito DIY hardcore con edizioni e uscite musicali (lp, musicassette). Dipingo come Ultrastruttura.
+    Prima di Corpoceleste ho costruito etichette e progetti di edizione indipendenti. Con Corpoc, tra il 2012 e il 2019, curavo, stampavo e distribuivo edizioni limitate — maglie serigrafate, stampe e uscite su cassetta — insieme ad artisti italiani e internazionali. Con Satellite Press mi occupavo di stampe d’artista in tiratura limitata; con TDD, etichetta indipendente, nel circuito DIY hardcore con edizioni e uscite musicali (vinili, musicassette). Dipingo come Ultrastruttura.
   en: |-
     Screen printer in Bergamo. Here I hand-print the Corpoceleste editions (shirts and prints, one colour at a time) and pack them for shipping.
 
@@ -19,7 +19,7 @@ body:
 
     Before Corpoceleste I built independent labels and edition projects. With Corpoc, from 2012 to 2019, I curated, printed and distributed limited editions — screen-printed shirts, prints and cassette releases — with Italian and international artists. With Satellite Press I worked on limited artist prints; with TDD, an independent imprint, in the hardcore DIY circuit of editions and music releases (LPs, cassettes). I paint as Ultrastruttura.
   de: |-
-    Siebdrucker in Bergamo. Hier drucke ich die Corpoceleste-Editionen von Hand — Shirts und Drucke, eine Farbe nach der anderen — und bereite sie für den Versand vor.
+    Siebdrucker in Bergamo. Hier drucke ich die Corpoceleste-Editionen von Hand (Shirts und Drucke, eine Farbe nach der anderen) und bereite sie für den Versand vor.
 
     Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich bringe die Siebe auch zu Events und drucke live — Demos und kleine Auflagen vor Ort. Wenn du Beratung zu Anlagen, Farben, Abläufen oder Schulung brauchst, schreib mir: ich baue sie Fall für Fall.
 
