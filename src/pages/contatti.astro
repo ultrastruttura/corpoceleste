@@ -33,8 +33,10 @@ const bioParas = bioField("body", locale).split(/\n\n+/).filter(Boolean);
       />
 
       <div class="contact-bio">
-        <h2>{name}</h2>
-        {bioParas.map((p) => <p>{p}</p>)}
+        <h2 class="bio-name">{name}</h2>
+        <div class="bio-body">
+          {bioParas.map((p) => <p>{p}</p>)}
+        </div>
       </div>
 
       <form class="form" action={formAction} method="POST">

@@ -1858,6 +1858,25 @@ body.cart-open {
   max-width: 420px;
 }
 
+/* Name above bio copy — keep clear air so it isn’t a slogan under the heading. */
+.bio-name {
+  margin: 0 0 1.75rem;
+}
+
+.bio-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.bio-body > p {
+  margin: 0;
+}
+
+.prose .bio-body {
+  max-width: 48ch;
+}
+
 .archive-note {
   font-size: 13px;
   color: var(--muted);
@@ -2048,15 +2067,18 @@ body.cart-open {
   border: 1px solid var(--line);
 }
 
-.contact-bio h2 {
-  margin: 0 0 0.75rem;
+.contact-bio .bio-name {
+  margin: 0 0 1.5rem;
   font-size: 1.05rem;
   font-weight: 700;
 }
 
-.contact-bio p {
-  margin: 0 0 0.85rem;
+.contact-bio .bio-body {
   max-width: 48ch;
+}
+
+.contact-bio .bio-body p {
+  margin: 0;
   font-size: 15px;
   color: var(--muted);
 }

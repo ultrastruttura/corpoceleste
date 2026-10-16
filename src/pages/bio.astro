@@ -43,10 +43,12 @@ const description = metaSnippet(body || copy.meta.description);
         {
           body && (
             <>
-              <h2>{name}</h2>
-              {body.split(/\n\n+/).map((para) => (
-                <p>{para}</p>
-              ))}
+              <h2 class="bio-name">{name}</h2>
+              <div class="bio-body">
+                {body.split(/\n\n+/).map((para) => (
+                  <p>{para}</p>
+                ))}
+              </div>
             </>
           )
         }
