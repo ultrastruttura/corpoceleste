@@ -58,10 +58,16 @@ export const siteSettings = {
   indirizzo: String(data.indirizzo ?? "").trim(),
   paypalClientId: String(data.paypalClientId ?? "").trim(),
   formApi: String(data.formApi ?? "").trim(),
+  /** Short blurb on Contatti only — full bio lives in content/bio. */
+  andreaName: String(data.andreaName ?? "").trim() || "Andrea Baldelli",
+  andreaBio: asLocalized(data.andreaBio),
 };
 
 export function localizedSetting(
-  field: keyof Pick<typeof siteSettings, "metaDescription" | "homeTitle" | "homeLede">,
+  field: keyof Pick<
+    typeof siteSettings,
+    "metaDescription" | "homeTitle" | "homeLede" | "andreaBio"
+  >,
   locale: Locale,
 ) {
   const value = siteSettings[field];

@@ -3,16 +3,15 @@ import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { publicFormAction, site } from "../data/site";
-import { siteSettings } from "../data/settings";
-import { bioField, bioPage } from "../data/bio";
+import { localizedSetting, siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const formAction = publicFormAction(siteSettings.shopEmail);
-const name = bioPage.name || "Andrea Baldelli";
-const bioParas = bioField("body", locale).split(/\n\n+/).filter(Boolean);
+const name = siteSettings.andreaName || "Andrea Baldelli";
+const bioParas = localizedSetting("andreaBio", locale).split(/\n\n+/).filter(Boolean);
 ---
 
 <Base title={`${copy.contact.title} — Corpoceleste`}>

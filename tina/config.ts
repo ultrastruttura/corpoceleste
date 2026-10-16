@@ -265,6 +265,13 @@ export default defineConfig({
           localizedText("homeTitle", "H1 home", false),
           localizedText("homeLede", "Sottotitolo home"),
           {
+            type: "string",
+            name: "andreaName",
+            label: "Nome in Contatti",
+            description: "Compare solo nella pagina Contatti (non nella Bio lunga).",
+          },
+          localizedText("andreaBio", "Testo breve Contatti"),
+          {
             type: "image",
             name: "ogImage",
             label: "Immagine Open Graph (condivisione social)",
