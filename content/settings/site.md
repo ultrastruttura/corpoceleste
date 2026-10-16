@@ -14,20 +14,17 @@ homeLede:
   en: ""
   de: ""
 ogImage: ""
-# Token da Cloudflare → Analytics → Web Analytics → Add site (visibile nel beacon JS)
-# Senza token le visite non si vedono. Tina → SEO e home → Cloudflare Web Analytics.
-cloudflareAnalyticsToken: ""
+cloudflareAnalyticsToken: "94c7ecb4d9b44634aaefb9fee4f9f3b4"
 lowStockThreshold: 10
-# Commercio / legali (vuoto = fallback in src/data/site.ts)
-iban: ""
-intestatario: ""
-legalName: ""
-vatId: ""
+iban: "IT02C03268223000EM002734005"
+intestatario: "Andrea Baldelli Lorenzo"
+legalName: "Corpoceleste"
+vatId: "IT04952110163"
 rea: ""
 telefono: ""
-indirizzo: ""
-pec: ""
-sdiCode: ""
+indirizzo: "via Moroni 51 Lonno Nembro (BG)"
+pec: "andrealorenzobaldelli@pec.it"
+sdiCode: "BA6ET11"
 paypalClientId: ""
-formApi: ""
+formApi: "https://corpoceleste.vercel.app"
 ---
