@@ -17,7 +17,7 @@ body:
 
     Alongside the atelier I also work in production settings. For Za.Er. I have been to Asmara, Eritrea, five times to start up shirt and screen-printed apparel lines, set workflows and train staff, on site and in the studio. At Quaglia in Azzano San Paolo (Bergamo) I’m head of the lab: I run ink tests — mainly water-based — and develop new patented formulations for international clients. The collaboration is ongoing.
 
-    Before Corpoceleste I built independent labels and edition projects. With Corpoc, from 2012 to 2019, I curated, printed and distributed limited editions — screen-printed shirts, prints and cassette releases — with Italian and international artists. With Satellite Press I worked on limited artist prints; with TDD, an independent imprint, in the hardcore DIY circuit of editions and music releases (LPs, cassettes). I paint as Ultrastruttura.
+    Before Corpoceleste I built independent labels and edition projects. With Corpoc, from 2012 to 2019, I curated, printed and distributed limited editions — screen-printed shirts, prints and cassette releases — with Italian and international artists. With Satellite Press I worked on limited artist prints; with TDD, an independent imprint, in the hardcore DIY circuit of editions and music releases (vinyl, cassettes). I paint as Ultrastruttura.
   de: |-
     Siebdrucker in Bergamo. Hier drucke ich die Corpoceleste-Editionen von Hand (Shirts und Drucke, eine Farbe nach der anderen) und bereite sie für den Versand vor.
 
@@ -25,5 +25,5 @@ body:
 
     Neben dem Atelier arbeite ich auch in Produktionskontexten. Für Za.Er. war ich fünfmal in Asmara, Eritrea, um Hemden- und siebgedruckte Bekleidungsproduktionen anzufahren, Abläufe aufzusetzen und Personal zu schulen, vor Ort und im Atelier. Bei Quaglia in Azzano San Paolo (Bergamo) bin ich Laborleiter: ich betreue Farbtests — vor allem wasserbasierte — und die Entwicklung neuer patentierter Formulierungen für internationale Kunden. Die Zusammenarbeit läuft weiter.
 
-    Vor Corpoceleste habe ich unabhängige Labels und Editionsprojekte aufgebaut. Mit Corpoc habe ich von 2012 bis 2019 limitierte Editionen kuratiert, gedruckt und vertrieben — siebgedruckte Shirts, Drucke und Cassette-Releases — mit italienischen und internationalen Künstler:innen. Mit Satellite Press habe ich mich um limitierte Künstlerdrucke gekümmert; mit TDD, einem unabhängigen Label, im Hardcore-DIY-Kreis mit Editionen und Musikveröffentlichungen (LPs, Musikkassetten). Ich male als Ultrastruttura.
+    Vor Corpoceleste habe ich unabhängige Labels und Editionsprojekte aufgebaut. Mit Corpoc habe ich von 2012 bis 2019 limitierte Editionen kuratiert, gedruckt und vertrieben — siebgedruckte Shirts, Drucke und Cassette-Releases — mit italienischen und internationalen Künstler:innen. Mit Satellite Press habe ich mich um limitierte Künstlerdrucke gekümmert; mit TDD, einem unabhängigen Label, im Hardcore-DIY-Kreis mit Editionen und Musikveröffentlichungen (Vinyl, Musikkassetten). Ich male als Ultrastruttura.
 ---
