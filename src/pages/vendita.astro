@@ -1,6 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import { site } from "../data/site";
+import { commerce } from "../data/commerce";
 import { siteSettings } from "../data/settings";
 import { currentLocale, pageUrl, t } from "../i18n";
 
@@ -22,15 +22,15 @@ const shopEmail = siteSettings.shopEmail;
 
       <h2>{v.seller}</h2>
       <p>
-        {site.legalName || site.intestatario}<br />
-        {site.indirizzo || site.sede}<br />
-        {site.vatId ? <>{v.vatLabel} {site.vatId}<br /></> : <>{v.vatMissing}<br /></>}
-        {site.rea && <>{v.reaLabel} {site.rea}<br /></>}
-        {site.sdiCode && <>{v.sdiLabel} {site.sdiCode}<br /></>}
-        {site.telefono && <>{site.telefono}<br /></>}
-        {site.pec && (
+        {commerce.legalName || commerce.intestatario}<br />
+        {commerce.indirizzo || commerce.sede}<br />
+        {commerce.vatId ? <>{v.vatLabel} {commerce.vatId}<br /></> : <>{v.vatMissing}<br /></>}
+        {commerce.rea && <>{v.reaLabel} {commerce.rea}<br /></>}
+        {commerce.sdiCode && <>{v.sdiLabel} {commerce.sdiCode}<br /></>}
+        {commerce.telefono && <>{commerce.telefono}<br /></>}
+        {commerce.pec && (
           <>
-            {v.pecLabel} <a href={`mailto:${site.pec}`}>{site.pec}</a>
+            {v.pecLabel} <a href={`mailto:${commerce.pec}`}>{commerce.pec}</a>
             <br />
           </>
         )}
@@ -52,17 +52,17 @@ const shopEmail = siteSettings.shopEmail;
       <h2>{v.payment}</h2>
       <p>{v.paymentBody}</p>
       {
-        site.iban && (
+        commerce.iban && (
           <p>
-            {v.ibanLabel} <span class="iban">{site.iban}</span>
+            {v.ibanLabel} <span class="iban">{commerce.iban}</span>
             <br />
-            {v.ibanHolderLabel} {site.intestatario}
+            {v.ibanHolderLabel} {commerce.intestatario}
           </p>
         )
       }
 
       <h2>{v.shipping}</h2>
-      <p>{v.shippingBody(site.shippingDays)}</p>
+      <p>{v.shippingBody(commerce.shippingDays)}</p>
 
       <h2 id="recesso">{v.withdrawal}</h2>
       <p>{v.withdrawalBody}</p>

@@ -46,6 +46,18 @@ export const siteSettings = {
     if (!Number.isFinite(n) || n < 0) return 10;
     return Math.floor(n);
   })(),
+  /** Commerce / legal overrides (empty = use fallbacks in site.ts). */
+  iban: String(data.iban ?? "").trim(),
+  intestatario: String(data.intestatario ?? "").trim(),
+  legalName: String(data.legalName ?? "").trim(),
+  vatId: String(data.vatId ?? "").trim(),
+  pec: String(data.pec ?? "").trim(),
+  sdiCode: String(data.sdiCode ?? "").trim(),
+  telefono: String(data.telefono ?? "").trim(),
+  rea: String(data.rea ?? "").trim(),
+  indirizzo: String(data.indirizzo ?? "").trim(),
+  paypalClientId: String(data.paypalClientId ?? "").trim(),
+  formApi: String(data.formApi ?? "").trim(),
 };
 
 export function localizedSetting(

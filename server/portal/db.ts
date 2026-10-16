@@ -37,6 +37,7 @@ export async function ensureSchema() {
   for (const sql of [
     `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
     `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
+    `ALTER TABLE shop_orders ADD COLUMN paid_at TEXT`,
   ]) {
     try {
       await db.execute(sql);

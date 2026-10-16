@@ -2,10 +2,20 @@
   "framework": null,
   "buildCommand": "",
   "installCommand": "npm install --omit=dev",
+  "crons": [
+    {
+      "path": "/api/cron-stock-release",
+      "schedule": "0 6 * * *"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/spedire-webhook",
       "destination": "/api/form?spedire_hook=1"
+    },
+    {
+      "source": "/api/cron-stock-release",
+      "destination": "/api/form?job=stock_release"
     }
   ],
   "functions": {

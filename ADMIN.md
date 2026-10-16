@@ -53,10 +53,10 @@ In ogni maglia imposta i pezzi per taglia (S/M/L/XL). Taglia a 0 = non acquistab
 
 Badge **In esaurimento**: in Tina → **SEO e home** → *Soglia “in esaurimento”*. Se la somma dei pezzi di tutte le taglie è ≤ quel numero (default **10**), in griglia e scheda prodotto compare il badge come per Pre-order. Metti **0** per spegnerlo.
 
-Se è attivo il **webhook PayPal** (guida: [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)), dopo un pagamento PayPal lo stock si abbassa da solo e arriva una mail ordine (FormSubmit dal server Vercel).  
-**Bonifico:** aggiorna i numeri a mano qui dopo il pagamento; la mail parte dal form del sito.
+Se è attivo il **webhook PayPal** (guida: [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)), lo stock si prenota già alla creazione ordine PayPal e si conferma al pagamento; mail a te e al cliente via Resend.  
+**Bonifico:** stock in riserva subito; il cliente riceve email con IBAN + causale. In area riservata → **Pagato** quando arriva l’accredito. Se non segni pagato entro **5 giorni**, lo stock si libera da solo (cron Vercel).
 
-Email shop (form + fallback): **SEO e home** → *Email shop (ordini e form)*. Per le mail PayPal dal webhook imposta anche `SHOP_EMAIL` su Vercel.
+Email shop: **SEO e home** → *Email shop*. Su Vercel: `SHOP_EMAIL`, `RESEND_API_KEY`, `MAIL_FROM`, `CRON_SECRET` (per il rilascio stock).
 
 ### Cloudflare Web Analytics (gratis)
 
@@ -65,21 +65,19 @@ Email shop (form + fallback): **SEO e home** → *Email shop (ordini e form)*. P
 3. Copia il **token** dallo snippet JS (`token: "…"`).
 4. In Tina → **SEO e home** → *Cloudflare Web Analytics — token*, incolla e salva → push / publish.
 
-Senza token lo script non parte. Dashboard visitatori: stessa sezione Web Analytics su Cloudflare.
+**Senza token le visite non si vedono.** Dashboard: stessa sezione Web Analytics su Cloudflare.
 
 ## Dati legali (da compilare)
 
-Le pagine **Condizioni di vendita** (`/vendita/`) e **Recesso** (`/recesso/`) prendono i dati del venditore da `src/data/site.ts`:
+IBAN, P.IVA, REA, telefono, PayPal Client ID e URL Vercel si impostano in Tina → **SEO e home** (override dei default in `src/data/site.ts`).
 
-| Campo | Cosa metterci |
-|-------|---------------|
-| `vatId` | Partita IVA. Finché è vuoto la pagina scrive «in corso di attribuzione» |
-| `indirizzo` | Indirizzo completo della sede (obbligatorio nelle info precontrattuali) |
-| `rea` | Numero REA / Registro imprese, se c’è |
-| `telefono` | Telefono di contatto, se lo pubblichi |
-| `shippingDays` | Giorni lavorativi indicativi per la spedizione |
+| Campo Tina | Cosa metterci |
+|------------|---------------|
+| Partita IVA / IBAN / indirizzo | Obbligatori in pratica per vendere |
+| REA / telefono | Se ce li hai; altrimenti lascia vuoti |
+| PayPal Client ID / URL API Vercel | Solo se cambi rispetto al default |
 
-I testi delle pagine legali stanno in `src/i18n/dict.ts` (`terms` e `withdrawal`, in IT/EN/DE). Sono bozze operative: falle validare da un legale prima di vendere.
+I testi di **Condizioni** e **Recesso** stanno in `src/i18n/dict.ts` (IT/EN/DE): **falle firmare al commercialista/avvocato** prima di vendere.
 
 ## Mail di conferma (non FormSubmit)
 

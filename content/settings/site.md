@@ -15,6 +15,19 @@ homeLede:
   de: ""
 ogImage: ""
 # Token da Cloudflare → Analytics → Web Analytics → Add site (visibile nel beacon JS)
+# Senza token le visite non si vedono. Tina → SEO e home → Cloudflare Web Analytics.
 cloudflareAnalyticsToken: ""
 lowStockThreshold: 10
+# Commercio / legali (vuoto = fallback in src/data/site.ts)
+iban: ""
+intestatario: ""
+legalName: ""
+vatId: ""
+rea: ""
+telefono: ""
+indirizzo: ""
+pec: ""
+sdiCode: ""
+paypalClientId: ""
+formApi: ""
 ---

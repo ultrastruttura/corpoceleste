@@ -179,6 +179,7 @@ type ShopOrder = {
   shipping: number;
   total: number;
   lines: Array<{
+    id?: string;
     title: string;
     size: string;
     qty: number;
@@ -187,6 +188,7 @@ type ShopOrder = {
   }>;
   packlink_ref: string;
   notes: string;
+  paid_at: string | null;
   created_at: string;
 };
 
@@ -771,7 +773,7 @@ if (!root || !app) {
       el(
         "p",
         "account-lede",
-        "PayPal e bonifico compaiono qui in automatico. Scarica il PDF (documento di spedizione / proforma) per il pacco.",
+        "PayPal e bonifico compaiono qui in automatico. Per i bonifici: segna «Pagato» quando arriva l’accredito (altrimenti dopo 5 giorni lo stock si libera da solo). PDF per il pacco, CSV per il commercialista.",
       ),
     );
 
@@ -782,6 +784,28 @@ if (!root || !app) {
     const listHost = el("div", "");
     const msg = el("p", "account-msg");
     msg.hidden = true;
+
+    const csvBtn = el("button", "account-linkish", "Esporta CSV") as HTMLButtonElement;
+    csvBtn.type = "button";
+    csvBtn.addEventListener("click", async () => {
+      try {
+        const session = getSession();
+        const res = await fetch(
+          `${base}/api/account/orders?status=${encodeURIComponent(statusFilter)}&csv=1`,
+          { headers: session ? { Authorization: `Bearer ${session}` } : {} },
+        );
+        if (!res.ok) throw new Error("Export fallito");
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "corpoceleste-ordini.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        setMsg(msg, err instanceof Error ? err.message : "Errore CSV");
+      }
+    });
 
     mount.append(
       periodFilterBar(
@@ -805,6 +829,7 @@ if (!root || !app) {
           },
         },
       ),
+      csvBtn,
       summaryHost,
       listHost,
       msg,
@@ -847,11 +872,16 @@ if (!root || !app) {
           const num = el("span", "account-orders__num account-table__num", order.number || "—");
           const primary = el("span", "account-table__primary");
           const title = el("strong", undefined, order.customer_name || order.customer_email || order.id);
+          const paidLabel =
+            order.source === "paypal" || order.paid_at
+              ? "pagato"
+              : "in attesa bonifico";
           const meta = el(
             "small",
             undefined,
             [
               order.source === "paypal" ? "PayPal" : "Bonifico",
+              paidLabel,
               formatDayLabel(order.created_at.slice(0, 10)),
               order.ship_country && order.ship_zip
                 ? `${order.ship_zip} ${order.ship_country}`
@@ -899,6 +929,25 @@ if (!root || !app) {
               setMsg(msg, err instanceof Error ? err.message : "Errore aggiornamento");
             }
           });
+
+          if (order.source === "bank" && !order.paid_at) {
+            const paidBtn = el("button", "account-linkish", "Pagato") as HTMLButtonElement;
+            paidBtn.type = "button";
+            paidBtn.title = "Segna bonifico ricevuto (blocca il rilascio stock a 5 giorni)";
+            paidBtn.addEventListener("click", async () => {
+              if (!confirm(`Confermi l’accredito per ${order.number || order.id}?`)) return;
+              try {
+                await apiFetch(base, "orders", {
+                  method: "PATCH",
+                  body: JSON.stringify({ id: order.id, paid: true }),
+                });
+                await paint();
+              } catch (err) {
+                setMsg(msg, err instanceof Error ? err.message : "Errore pagamento");
+              }
+            });
+            actions.append(paidBtn);
+          }
 
           const delBtn = el("button", "account-linkish", "Elimina") as HTMLButtonElement;
           delBtn.type = "button";

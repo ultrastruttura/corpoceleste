@@ -1,12 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
-import { site } from "../data/site";
+import { commerce } from "../data/commerce";
+import { siteSettings } from "../data/settings";
 import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const p = copy.privacy;
-const formSubmitFallback = !site.formApi;
+const formSubmitFallback = !commerce.formApi;
+const shopEmail = siteSettings.shopEmail;
 ---
 
 <Base title={`${p.title} — Corpoceleste`}>
@@ -21,16 +23,16 @@ const formSubmitFallback = !site.formApi;
 
       <h2>{p.controller}</h2>
       <p>
-        {p.controllerBody(site.legalName || site.intestatario, site.sede)}<br />
-        {site.indirizzo && <>{site.indirizzo}<br /></>}
-        {site.vatId && <>{p.vat(site.vatId)}<br /></>}
-        {site.pec && (
+        {p.controllerBody(commerce.legalName || commerce.intestatario, commerce.sede)}<br />
+        {commerce.indirizzo && <>{commerce.indirizzo}<br /></>}
+        {commerce.vatId && <>{p.vat(commerce.vatId)}<br /></>}
+        {commerce.pec && (
           <>
-            PEC: <a href={`mailto:${site.pec}`}>{site.pec}</a>
+            PEC: <a href={`mailto:${commerce.pec}`}>{commerce.pec}</a>
             <br />
           </>
         )}
-        {p.contact} <a href={`mailto:${site.email}`}>{site.email}</a>
+        {p.contact} <a href={`mailto:${shopEmail}`}>{shopEmail}</a>
       </p>
 
       <h2>{p.cookies}</h2>
@@ -59,7 +61,7 @@ const formSubmitFallback = !site.formApi;
           <strong>{p.formsLabel}</strong> — {p.dataForms}
         </li>
         <li>
-          <strong>{p.newsletter}</strong> — {p.dataNewsletter(site.email)}
+          <strong>{p.newsletter}</strong> — {p.dataNewsletter(shopEmail)}
         </li>
       </ul>
       <p>{p.noProfiling}</p>
@@ -98,7 +100,7 @@ const formSubmitFallback = !site.formApi;
 
       <h2>{p.rights}</h2>
       <p>
-        {p.rightsBody} <a href={`mailto:${site.email}`}>{site.email}</a>. {p.rightsTail}
+        {p.rightsBody} <a href={`mailto:${shopEmail}`}>{shopEmail}</a>. {p.rightsTail}
         <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.
       </p>
     </div>

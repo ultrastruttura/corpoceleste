@@ -73,6 +73,7 @@ export function parseShipDest(input: {
 export async function priceOrderLines(
   rawLines: OrderLine[],
   dest: ShipDest,
+  opts?: { ignoreStock?: boolean },
 ): Promise<{ ok: true; order: PricedOrder } | { ok: false; error: string }> {
   if (!rawLines.length) return { ok: false, error: "Empty cart" };
 
@@ -110,7 +111,9 @@ export async function priceOrderLines(
       return { ok: false, error: `Invalid size ${line.id} ${line.size}` };
     }
     const stock = product.stock[line.size] ?? 0;
-    if (stock < line.qty) {
+    // Pre-order may sell at 0 stock; available items must have enough units.
+    // ignoreStock: PayPal webhook after create-order already reserved units.
+    if (!opts?.ignoreStock && product.status !== "preorder" && stock < line.qty) {
       return { ok: false, error: `Out of stock ${line.id} ${line.size}` };
     }
     if (!Number.isFinite(product.price) || product.price <= 0) {

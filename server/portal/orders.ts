@@ -6,6 +6,8 @@ export type ShopOrderStatus = "nuovo" | "evaso";
 export type ShopOrderSource = "paypal" | "bank";
 
 export type ShopOrderLine = {
+  /** Catalog product id (for artist deals). */
+  id?: string;
   title: string;
   size: string;
   qty: number;
@@ -37,6 +39,8 @@ export type ShopOrder = {
   lines: ShopOrderLine[];
   packlink_ref: string;
   notes: string;
+  /** ISO timestamp when payment confirmed; null = unpaid bank hold. */
+  paid_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -58,6 +62,8 @@ export type ShopOrderInput = {
   packlink_ref?: string;
   notes?: string;
   created_at?: string;
+  /** Pass null for unpaid bank; omit or ISO for paid (PayPal). */
+  paid_at?: string | null;
 };
 
 export function yearFromOrderDate(iso: string): number {
@@ -80,6 +86,7 @@ function parseLines(raw: unknown): ShopOrderLine[] {
     const data = typeof raw === "string" ? JSON.parse(raw) : raw;
     if (!Array.isArray(data)) return [];
     return data.map((row) => ({
+      id: String(row?.id || "").trim() || undefined,
       title: String(row?.title || "").trim() || "Articolo",
       size: String(row?.size || "").trim(),
       qty: Math.max(1, Math.floor(Number(row?.qty) || 1)),
@@ -118,6 +125,7 @@ function mapRow(r: Record<string, unknown>): ShopOrder {
     lines,
     packlink_ref: String(r.packlink_ref || ""),
     notes: String(r.notes || ""),
+    paid_at: r.paid_at ? String(r.paid_at) : null,
     created_at: created,
     updated_at: String(r.updated_at || ""),
   };
@@ -177,6 +185,15 @@ export async function upsertShopOrder(input: ShopOrderInput): Promise<ShopOrder 
   const year = yearFromOrderDate(created || new Date().toISOString());
   const seq = await nextSeqForYear(year);
 
+  const paidAt =
+    input.paid_at === null
+      ? null
+      : input.paid_at !== undefined
+        ? String(input.paid_at).trim() || null
+        : input.source === "paypal"
+          ? created || new Date().toISOString()
+          : null;
+
   if (created) {
     await db.execute({
       sql: `INSERT INTO shop_orders (
@@ -184,8 +201,8 @@ export async function upsertShopOrder(input: ShopOrderInput): Promise<ShopOrder 
         customer_name, customer_email, customer_phone,
         shipping_address, ship_country, ship_zip,
         merchandise, shipping, total, currency,
-        lines_json, packlink_ref, notes, created_at, updated_at
-      ) VALUES (?, ?, ?, 'nuovo', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        lines_json, packlink_ref, notes, paid_at, created_at, updated_at
+      ) VALUES (?, ?, ?, 'nuovo', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         id,
         external,
@@ -205,6 +222,7 @@ export async function upsertShopOrder(input: ShopOrderInput): Promise<ShopOrder 
         linesJson,
         String(input.packlink_ref || "").trim(),
         String(input.notes || "").trim(),
+        paidAt,
         created,
         created,
       ],
@@ -216,8 +234,8 @@ export async function upsertShopOrder(input: ShopOrderInput): Promise<ShopOrder 
         customer_name, customer_email, customer_phone,
         shipping_address, ship_country, ship_zip,
         merchandise, shipping, total, currency,
-        lines_json, packlink_ref, notes
-      ) VALUES (?, ?, ?, 'nuovo', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        lines_json, packlink_ref, notes, paid_at
+      ) VALUES (?, ?, ?, 'nuovo', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         id,
         external,
@@ -237,6 +255,7 @@ export async function upsertShopOrder(input: ShopOrderInput): Promise<ShopOrder 
         linesJson,
         String(input.packlink_ref || "").trim(),
         String(input.notes || "").trim(),
+        paidAt,
       ],
     });
   }
@@ -283,6 +302,31 @@ export async function updateShopOrderStatus(
     args: [status, id],
   });
   return getShopOrder(id);
+}
+
+/** Mark bank order as paid (stops 5-day stock auto-release). */
+export async function markShopOrderPaid(id: string): Promise<ShopOrder | null> {
+  await ensureSchema();
+  const db = getDb();
+  const now = new Date().toISOString();
+  await db.execute({
+    sql: `UPDATE shop_orders SET paid_at = COALESCE(paid_at, ?), updated_at = datetime('now') WHERE id = ?`,
+    args: [now, id],
+  });
+  return getShopOrder(id);
+}
+
+export async function isShopOrderPaidByExternalId(externalId: string): Promise<boolean> {
+  await ensureSchema();
+  const db = getDb();
+  const res = await db.execute({
+    sql: `SELECT paid_at, source FROM shop_orders WHERE external_id = ? LIMIT 1`,
+    args: [externalId],
+  });
+  const row = res.rows[0] as { paid_at?: string; source?: string } | undefined;
+  if (!row) return false;
+  if (row.source === "paypal") return true;
+  return Boolean(row.paid_at);
 }
 
 export async function deleteShopOrder(id: string): Promise<boolean> {

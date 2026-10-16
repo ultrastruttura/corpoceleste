@@ -9,6 +9,8 @@ type GhFile = {
 
 export type LedgerStatus = "pending" | "processing" | "done" | "failed";
 
+export type LedgerKind = "capture" | "paypal_hold" | "bank";
+
 export type LedgerRecord = {
   captureId: string;
   lines: OrderLine[];
@@ -27,6 +29,12 @@ export type LedgerRecord = {
   packlinkLabels?: string[];
   packlinkError?: string;
   packlinkServiceId?: string | number;
+  /** paypal_hold | bank | capture (default). */
+  kind?: LedgerKind;
+  /** Set when a PayPal hold was applied to a capture (no stock restore). */
+  consumedBy?: string;
+  /** Set when stock was restored after unpaid hold/bank expiry. */
+  releasedAt?: string;
 };
 
 export function stockLineKey(line: OrderLine): string {
@@ -103,19 +111,37 @@ function ledgerPath(captureId: string) {
   return `stock-ledger/${safeId(captureId)}.json`;
 }
 
-/** Only stock-ledger + product markdown — never arbitrary repo paths. */
-function assertWritableRepoPath(path: string) {
+function normalizeRepoPath(path: string) {
   const p = path.replace(/^\/+/, "");
   if (p.includes("..") || p.includes("\\")) {
     throw new Error(`Refusing unsafe GitHub path: ${path}`);
   }
+  return p;
+}
+
+/** Read: stock-ledger, products, site settings. */
+function assertReadableRepoPath(path: string) {
+  const p = normalizeRepoPath(path);
+  if (p.startsWith("stock-ledger/") && p.endsWith(".json")) return;
+  if (p.startsWith("content/products/") && p.endsWith(".md")) return;
+  if (p === "content/settings/site.md") return;
+  throw new Error(`Refusing GitHub read outside allowlist: ${path}`);
+}
+
+/** Write: stock-ledger + product markdown — never arbitrary repo paths. */
+function assertWritableRepoPath(path: string) {
+  const p = normalizeRepoPath(path);
   if (p.startsWith("stock-ledger/") && p.endsWith(".json")) return;
   if (p.startsWith("content/products/") && p.endsWith(".md")) return;
   throw new Error(`Refusing GitHub write outside allowlist: ${path}`);
 }
 
+export function paypalHoldId(paypalOrderId: string) {
+  return `hold_${safeId(paypalOrderId)}`;
+}
+
 export async function getRepoFile(path: string): Promise<GhFile | null> {
-  assertWritableRepoPath(path);
+  assertReadableRepoPath(path);
   const { owner, name, branch } = repo();
   const res = await gh(`/repos/${owner}/${name}/contents/${path}?ref=${encodeURIComponent(branch)}`);
   if (res.status === 404) return null;
@@ -366,6 +392,10 @@ async function decrementProduct(line: OrderLine): Promise<string> {
       }
       const before = Math.max(0, Math.floor(Number(currentMatch[2])));
       if (before < line.qty) {
+        // Pre-order may sell with 0 on hand — do not block or go negative.
+        if (/^status:\s*preorder\s*$/m.test(file.content)) {
+          return `${line.id} ${line.size} preorder (magazzino ${before}, non scalato)`;
+        }
         throw new Error(
           `INSUFFICIENT_STOCK ${line.id} ${line.size}: aveva ${before}, ordine ×${line.qty}`,
         );
@@ -408,6 +438,166 @@ async function decrementProduct(line: OrderLine): Promise<string> {
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+async function incrementProduct(line: OrderLine): Promise<string> {
+  const filePath = `content/products/${line.id}.md`;
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const file = await getRepoFile(filePath);
+      if (!file) {
+        throw new Error(`missing product ${line.id}`);
+      }
+
+      const sizeEsc = line.size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const currentMatch = file.content.match(
+        new RegExp(`^([ \\t]+${sizeEsc}:\\s*)(\\d+)\\s*$`, "m"),
+      );
+      if (!currentMatch) {
+        throw new Error(`no stock line ${line.id} ${line.size}`);
+      }
+      const before = Math.max(0, Math.floor(Number(currentMatch[2])));
+      const after = before + line.qty;
+      const patched = patchStockQty(file.content, line.size, after);
+      if (!patched) {
+        throw new Error(`patch failed ${line.id} ${line.size}`);
+      }
+      if (patched.content !== file.content) {
+        await putRepoFile(
+          filePath,
+          file.sha,
+          patched.content,
+          `stock: restore ${line.id} ${line.size} ${before}→${after} (+${line.qty})`,
+        );
+      }
+      return `${line.id} ${line.size} ${before}→${after} (+${line.qty})`;
+    } catch (err) {
+      lastErr = err;
+      const status = (err as { status?: number }).status;
+      const msg = err instanceof Error ? err.message : String(err);
+      if (
+        msg.startsWith("missing product") ||
+        msg.startsWith("no stock") ||
+        msg.startsWith("patch failed")
+      ) {
+        throw err;
+      }
+      if (status === 409 || /409/.test(msg)) {
+        await sleep(150 * (attempt + 1));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
+/** Restore stock previously decremented for the given lines (unpaid hold / bank expiry). */
+export async function applyStockIncrement(lines: OrderLine[]): Promise<string[]> {
+  const notes: string[] = [];
+  for (const line of lines) {
+    notes.push(await incrementProduct(line));
+  }
+  return notes;
+}
+
+export async function listLedgerSummaries(): Promise<
+  Array<{ id: string; path: string }>
+> {
+  const { owner, name, branch } = repo();
+  const res = await gh(
+    `/repos/${owner}/${name}/contents/stock-ledger?ref=${encodeURIComponent(branch)}`,
+  );
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`GitHub list stock-ledger: ${res.status}`);
+  const data = (await res.json()) as Array<{ name?: string; path?: string; type?: string }>;
+  if (!Array.isArray(data)) return [];
+  return data
+    .filter((f) => f.type === "file" && f.name?.endsWith(".json") && f.name !== "_index.json")
+    .map((f) => ({
+      id: String(f.name || "").replace(/\.json$/, ""),
+      path: String(f.path || `stock-ledger/${f.name}`),
+    }));
+}
+
+/** Mark hold consumed by a capture — stock stays decremented. */
+export async function consumePaypalHold(
+  paypalOrderId: string,
+  captureId: string,
+): Promise<LedgerRecord | null> {
+  const holdId = paypalHoldId(paypalOrderId);
+  const hold = await getLedger(holdId);
+  if (!hold || hold.kind !== "paypal_hold") return null;
+  if (hold.releasedAt) return null;
+  if (hold.consumedBy) return hold;
+  const next: LedgerRecord = {
+    ...hold,
+    consumedBy: captureId,
+    at: new Date().toISOString(),
+  };
+  await writeLedger(next);
+  return next;
+}
+
+const PAYPAL_HOLD_TTL_MS = 3 * 60 * 60 * 1000;
+const BANK_HOLD_TTL_MS = 5 * 24 * 60 * 60 * 1000;
+
+/** Restore stock for abandoned PayPal create-order holds (default 3h). */
+export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<string[]> {
+  const out: string[] = [];
+  const files = await listLedgerSummaries();
+  for (const file of files) {
+    if (!file.id.startsWith("hold_")) continue;
+    const ledger = await getLedger(file.id);
+    if (!ledger || ledger.kind !== "paypal_hold") continue;
+    if (ledger.releasedAt || ledger.consumedBy) continue;
+    if (!ledger.stockComplete) continue;
+    if (ledgerAgeMs(ledger) < PAYPAL_HOLD_TTL_MS) continue;
+    const notes = await applyStockIncrement(ledger.lines || []);
+    await writeLedger({
+      ...ledger,
+      releasedAt: new Date(now).toISOString(),
+      status: "done",
+      error: `released unpaid paypal hold; ${notes.join("; ")}`,
+      at: new Date(now).toISOString(),
+    });
+    out.push(file.id);
+  }
+  return out;
+}
+
+/**
+ * Restore stock for unpaid bank holds older than 5 days.
+ * `isPaid(externalId)` should return true when Andrea confirmed the transfer.
+ */
+export async function releaseExpiredBankHolds(
+  isPaid: (externalId: string) => Promise<boolean>,
+  now = Date.now(),
+): Promise<string[]> {
+  const out: string[] = [];
+  const files = await listLedgerSummaries();
+  for (const file of files) {
+    if (!file.id.startsWith("bank_")) continue;
+    const ledger = await getLedger(file.id);
+    if (!ledger) continue;
+    if (ledger.kind && ledger.kind !== "bank") continue;
+    if (ledger.releasedAt) continue;
+    if (!ledger.stockComplete) continue;
+    if (ledgerAgeMs(ledger) < BANK_HOLD_TTL_MS) continue;
+    if (await isPaid(file.id)) continue;
+    const notes = await applyStockIncrement(ledger.lines || []);
+    await writeLedger({
+      ...ledger,
+      kind: "bank",
+      releasedAt: new Date(now).toISOString(),
+      status: "done",
+      error: `released unpaid bank hold after 5 days; ${notes.join("; ")}`,
+      at: new Date(now).toISOString(),
+    });
+    out.push(file.id);
+  }
+  return out;
 }
 
 /** @deprecated use getLedger / claimOrResumeLedger */

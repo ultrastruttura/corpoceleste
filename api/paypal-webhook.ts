@@ -262,7 +262,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, rejected: "no shipping address" });
     }
 
-    const priced = await priceOrderLines(lines, dest);
+    let ignoreStock = false;
+    const relatedOrderId = String(
+      event.resource?.supplementary_data?.related_ids?.order_id || order?.id || "",
+    ).trim();
+    if (relatedOrderId && (process.env.GITHUB_TOKEN || "").trim()) {
+      try {
+        const { getLedger, paypalHoldId } = await import("../server/github-stock.js");
+        const hold = await getLedger(paypalHoldId(relatedOrderId));
+        if (hold?.kind === "paypal_hold" && hold.stockComplete && !hold.releasedAt) {
+          ignoreStock = true;
+        }
+      } catch {
+        /* pricing without hold */
+      }
+    }
+
+    const priced = await priceOrderLines(lines, dest, { ignoreStock });
     const paidRaw =
       event.resource?.amount?.value ||
       order?.purchase_units?.[0]?.amount?.value ||
@@ -317,6 +333,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     let working: LedgerRecord = { ...claim.ledger };
+
+    // If create-order already reserved stock, reuse that hold (no second decrement).
+    const paypalOrderId = String(
+      event.resource?.supplementary_data?.related_ids?.order_id ||
+        order?.id ||
+        "",
+    ).trim();
+    if (!working.stockComplete && paypalOrderId) {
+      try {
+        const { consumePaypalHold } = await import("../server/github-stock.js");
+        const hold = await consumePaypalHold(paypalOrderId, captureId);
+        if (hold?.stockComplete) {
+          working = {
+            ...working,
+            kind: "capture",
+            stockComplete: true,
+            stockNotes: hold.stockNotes || working.stockNotes,
+            stockAppliedKeys: hold.stockAppliedKeys || working.stockAppliedKeys,
+            status: "processing",
+            at: new Date().toISOString(),
+          };
+          await writeLedger(working);
+        }
+      } catch (err) {
+        console.warn("paypal-webhook: consume hold failed", captureId, err);
+      }
+    }
 
     let notes = working.stockNotes || [];
     if (!working.stockComplete) {
@@ -448,6 +491,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           shipping: priced.order.shipping,
           total: priced.order.total,
           lines: priced.order.lines.map((l) => ({
+            id: l.id,
             title: l.title,
             size: l.size,
             qty: l.qty,

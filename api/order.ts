@@ -1,9 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
+import { customerBankOrderText } from "../server/customer-mail.js";
 import { field, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { sendMail } from "../server/mail.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
+import { loadShopIdentity } from "../server/shop-identity.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 import type { PricedOrder } from "../server/order-pricing.js";
 
@@ -87,9 +89,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { newId, portalConfigured } = await import("../server/portal/db.js");
   const bankId = newId("bank");
 
-  // Hold GitHub stock before notifying the shop (parity with PayPal webhook).
-  // True OOS → reject. Infra/token errors → still take the order and warn in the shop mail
-  // (bonifico is not paid yet; losing the request is worse than a manual stock tweak).
+  // Hold GitHub stock before notifying (parity with PayPal). Released after 5 days if unpaid.
   let stockNote = "";
   if (pricedOrder && (process.env.GITHUB_TOKEN || "").trim()) {
     const stockLines = pricedOrder.lines.map((l) => ({
@@ -104,6 +104,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         writeLedger,
         LedgerBusyError,
       } = await import("../server/github-stock.js");
+      // Best-effort: free abandoned PayPal holds so this bank order can take last units.
+      try {
+        const { releaseExpiredPaypalHolds } = await import("../server/github-stock.js");
+        await releaseExpiredPaypalHolds();
+      } catch (err) {
+        console.warn("order: releaseExpiredPaypalHolds", err);
+      }
       const claim = await claimOrResumeLedger(bankId, stockLines, {
         expectedTotal: money(pricedOrder.total),
       });
@@ -115,6 +122,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         );
         await writeLedger({
           ...held,
+          kind: "bank",
           status: "done",
           stockComplete: true,
           at: new Date().toISOString(),
@@ -135,31 +143,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (msg.includes("INSUFFICIENT_STOCK")) {
         return res.status(409).send("Out of stock");
       }
-      // Do not block bonifico on GitHub/API failures — ask shop to adjust stock by hand.
       stockNote = `Magazzino: NON aggiornato automaticamente (${msg.slice(0, 200)}). Aggiorna a mano su Tina.`;
     }
   } else if (pricedOrder) {
     stockNote = "Magazzino: GITHUB_TOKEN assente — aggiorna a mano su Tina.";
   }
 
-  // Only mail the shop — no Resend to attacker-controlled customer email.
-  const shop = await sendMail({
-    to: shopTo,
-    subject: "Ordine shop Corpoceleste (bonifico)",
-    text: [recap, "", stockNote].filter(Boolean).join("\n"),
-  });
-  if (!shop.ok) {
-    console.error("order: mail failed");
-    return res.status(502).send("Mail failed");
-  }
-
+  let orderNumber = bankId;
   if (pricedOrder && portalConfigured()) {
     try {
       const { upsertShopOrder } = await import("../server/portal/orders.js");
       const shippingAddress = [address, `${dest.zip} ${city}`.trim(), dest.country]
         .filter(Boolean)
         .join("\n");
-      await upsertShopOrder({
+      const saved = await upsertShopOrder({
         external_id: bankId,
         source: "bank",
         customer_name: nome,
@@ -172,6 +169,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         shipping: pricedOrder.shipping,
         total: pricedOrder.total,
         lines: pricedOrder.lines.map((l) => ({
+          id: l.id,
           title: l.title,
           size: l.size,
           qty: l.qty,
@@ -179,10 +177,60 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           lineTotal: l.lineTotal,
         })),
         notes: note,
+        paid_at: null,
       });
+      if (saved?.number && saved.number !== "—") orderNumber = saved.number;
     } catch (err) {
       console.error("order: shop order save failed", err);
     }
+  }
+
+  const identity = await loadShopIdentity();
+  const totalStr = pricedOrder ? money(pricedOrder.total) : "";
+  const customerBody = customerBankOrderText({
+    orderRef: orderNumber,
+    iban: identity.iban,
+    intestatario: identity.intestatario,
+    total: totalStr,
+    ordine: [
+      `Riferimento ordine: ${orderNumber}`,
+      `Nome: ${nome}`,
+      "",
+      ordine,
+    ].join("\n"),
+  });
+
+  const shop = await sendMail({
+    to: shopTo,
+    subject: `Ordine shop Corpoceleste (bonifico) ${orderNumber}`,
+    text: [
+      recap,
+      "",
+      `Causale cliente: ${orderNumber}`,
+      `IBAN indicato: ${identity.iban}`,
+      "",
+      stockNote,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  });
+  if (!shop.ok) {
+    console.error("order: shop mail failed");
+    return res.status(502).send("Mail failed");
+  }
+
+  const customer = await sendMail({
+    to: email,
+    subject: `Conferma d’ordine ${orderNumber} — Corpoceleste`,
+    text: customerBody,
+  });
+  if (!customer.ok) {
+    console.error("order: customer mail failed", customer.error);
+    await sendMail({
+      to: shopTo,
+      subject: `ATTENZIONE: mail cliente fallita — ${orderNumber}`,
+      text: `Ordine ${orderNumber} salvato ma la conferma a ${email} non è partita: ${customer.error}\n\nInvia a mano IBAN + causale ${orderNumber}.`,
+    });
   }
 
   return res.redirect(303, next);

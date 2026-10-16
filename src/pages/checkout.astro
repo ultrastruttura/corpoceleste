@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import FormHoney from "../components/FormHoney.astro";
-import { site, formEndpoint } from "../data/site";
+import { commerce } from "../data/commerce";
 import { siteSettings } from "../data/settings";
 import { SHIP_COUNTRIES } from "../lib/ship-countries";
 import { currentLocale, pageUrl, paypalSdkLocale, t } from "../i18n";
@@ -9,8 +9,11 @@ import { currentLocale, pageUrl, paypalSdkLocale, t } from "../i18n";
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const shopEmail = siteSettings.shopEmail;
-const paypalSdk = Boolean(site.paypalClientId);
-const orderAction = formEndpoint("order") || `https://formsubmit.co/${shopEmail}`;
+const paypalClientId = commerce.paypalClientId;
+const paypalSdk = Boolean(paypalClientId);
+const orderAction = commerce.formApi
+  ? `${commerce.formApi}/api/order`
+  : `https://formsubmit.co/${shopEmail}`;
 const regionNames = new Intl.DisplayNames([locale, "en"], { type: "region" });
 const shipCountries = SHIP_COUNTRIES.map((code) => ({
   code,
@@ -214,7 +217,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
   {
     paypalSdk && (
-      <script define:vars={{ clientId: site.paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
+      <script define:vars={{ clientId: paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
         s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=card,credit,paylater,venmo`;
         document.head.append(s);
@@ -229,7 +232,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
   <script>
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
-    import { apiBase, site } from "../data/site";
+    import { commerce, commerceApiBase } from "../data/commerce";
+    const apiBase = () => commerceApiBase();
 
     const base = import.meta.env.BASE_URL;
     const prefix = document.documentElement.dataset.localePrefix || "";
@@ -969,7 +973,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       mountButtons();
     }
 
-    if (site.paypalClientId) {
+    if (commerce.paypalClientId) {
       const wait = () => {
         if ((window as unknown as { paypal?: unknown }).paypal) tryMountButtons();
         else setTimeout(wait, 80);

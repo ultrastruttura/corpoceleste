@@ -6,6 +6,7 @@ import { absoluteUrl } from "../lib/seo";
 import { llmsTxtUrl } from "../lib/llms";
 import { products, artistName, productImageAlt } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
+import { commerce } from "../data/commerce";
 import { site } from "../data/site";
 import { currentLocale, innerPath, localePrefix, locales, pageAbs, pageUrl, t } from "../i18n";
 import "../styles/global.css";
@@ -38,7 +39,7 @@ const {
 } = Astro.props;
 const apiOrigin = (() => {
   try {
-    return site.formApi ? new URL(site.formApi).origin : "";
+    return commerce.formApi ? new URL(commerce.formApi).origin : "";
   } catch {
     return "";
   }

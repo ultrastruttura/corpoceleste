@@ -70,6 +70,57 @@ export function customerOrderText(opts: {
   ].join("\n");
 }
 
+/** Bank-transfer confirmation with IBAN + payment reference (causale). */
+export function customerBankOrderText(opts: {
+  locale?: string;
+  ordine: string;
+  orderRef: string;
+  iban: string;
+  intestatario: string;
+  total: string;
+  when?: string;
+}) {
+  const locale = opts.locale || "it";
+  const when = opts.when || nowRome(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : "it-IT");
+  const payBlock =
+    locale === "en"
+      ? [
+          "Bank transfer details",
+          `IBAN: ${opts.iban}`,
+          `Account holder: ${opts.intestatario}`,
+          `Amount: ${opts.total} €`,
+          `Payment reference (required): ${opts.orderRef}`,
+          "",
+          "The order is confirmed when the payment arrives. I hold the piece for 5 days from this email.",
+        ]
+      : locale === "de"
+        ? [
+            "Überweisungsdaten",
+            `IBAN: ${opts.iban}`,
+            `Kontoinhaber: ${opts.intestatario}`,
+            `Betrag: ${opts.total} €`,
+            `Verwendungszweck (pflicht): ${opts.orderRef}`,
+            "",
+            "Die Bestellung gilt, wenn die Zahlung eingeht. Ich halte das Stück 5 Tage ab dieser E-Mail.",
+          ]
+        : [
+            "Dati per il bonifico",
+            `IBAN: ${opts.iban}`,
+            `Intestatario: ${opts.intestatario}`,
+            `Importo: ${opts.total} €`,
+            `Causale (obbligatoria): ${opts.orderRef}`,
+            "",
+            "L’ordine è confermato quando arriva il pagamento. Tengo il pezzo in riserva 5 giorni da questa email.",
+          ];
+
+  return customerOrderText({
+    locale,
+    metodo: locale === "en" ? "Bank transfer" : locale === "de" ? "Überweisung" : "Bonifico",
+    ordine: [opts.ordine, "", ...payBlock].join("\n"),
+    when,
+  });
+}
+
 export function customerWithdrawalText(opts: {
   locale?: string;
   name: string;

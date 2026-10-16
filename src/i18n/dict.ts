@@ -138,7 +138,7 @@ const it = {
     googlePay: "Google Pay",
     bank: "Bonifico",
     bankNote:
-      "Invia il modulo: ricevi l’IBAN via email. L’ordine è confermato quando arriva il pagamento; poi spedisco.",
+      "Invia il modulo: ti arriva subito una email con IBAN, importo e causale. L’ordine è confermato quando arriva il pagamento (riserva 5 giorni).",
     name: "Nome e cognome",
     email: "Email",
     phone: "Telefono (facoltativo)",
@@ -226,10 +226,10 @@ const it = {
     received: "Ricevuto",
     order: "Ordine ricevuto",
     contact: "Ti rispondo per email.",
-    newsletter: "Quando c’è una maglia nuova, scrivo.",
+    newsletter: "Ti ho mandato una email di conferma: clicca il link per attivare la newsletter.",
     reprint: "Se ristampo, ti avviso.",
     waitlist: "Quando il gruppo c’è, fisso la data.",
-    bank: "Ti scrivo per il bonifico. L’ordine vale quando arriva il pagamento.",
+    bank: "Controlla la email: trovi IBAN, importo e causale. L’ordine vale quando arriva il pagamento (riserva 5 giorni).",
     paypal:
       "Se PayPal ha confermato il pagamento, ti scrivo per la spedizione. Questa pagina da sola non è una ricevuta.",
     withdrawal:
@@ -522,7 +522,7 @@ const en: typeof it = {
     googlePay: "Google Pay",
     bank: "Bank transfer",
     bankNote:
-      "Send the form: you’ll get the IBAN by email. The order is confirmed when payment arrives; then I ship.",
+      "Send the form: you get an email right away with IBAN, amount and payment reference. The order is confirmed when payment arrives (5-day hold).",
     name: "Full name",
     email: "Email",
     phone: "Phone (optional)",
@@ -609,10 +609,10 @@ const en: typeof it = {
     received: "Received",
     order: "Order received",
     contact: "I’ll write back by email.",
-    newsletter: "When a new shirt is ready, I’ll write.",
+    newsletter: "I sent you a confirmation email: click the link to activate the newsletter.",
     reprint: "If I reprint, I’ll let you know.",
     waitlist: "When the group is together, I’ll set the date.",
-    bank: "I’ll write with the transfer details. The order stands when payment arrives.",
+    bank: "Check your email: IBAN, amount and payment reference are there. The order stands when payment arrives (5-day hold).",
     paypal:
       "If PayPal confirmed the payment, I’ll write about shipping. This page alone is not a receipt.",
     withdrawal:
@@ -905,7 +905,7 @@ const de: typeof it = {
     googlePay: "Google Pay",
     bank: "Überweisung",
     bankNote:
-      "Schick das Formular: du bekommst die IBAN per E-Mail. Die Bestellung gilt, wenn die Zahlung da ist; danach verschicke ich.",
+      "Schick das Formular: du bekommst sofort eine E-Mail mit IBAN, Betrag und Verwendungszweck. Die Bestellung gilt, wenn die Zahlung da ist (5 Tage Reserve).",
     name: "Vor- und Nachname",
     email: "E-Mail",
     phone: "Telefon (optional)",
@@ -992,10 +992,10 @@ const de: typeof it = {
     received: "Angekommen",
     order: "Bestellung angekommen",
     contact: "Ich antworte per E-Mail.",
-    newsletter: "Wenn ein neues Shirt da ist, schreibe ich.",
+    newsletter: "Ich habe dir eine Bestätigungs-E-Mail geschickt: Link klicken, um den Newsletter zu aktivieren.",
     reprint: "Wenn ich nachdrucke, gebe ich Bescheid.",
     waitlist: "Wenn die Gruppe steht, lege ich den Termin fest.",
-    bank: "Ich schreibe wegen der Überweisung. Die Bestellung gilt, wenn die Zahlung da ist.",
+    bank: "Prüfe deine E-Mail: IBAN, Betrag und Verwendungszweck stehen dort. Die Bestellung gilt, wenn die Zahlung da ist (5 Tage Reserve).",
     paypal:
       "Wenn PayPal die Zahlung bestätigt hat, schreibe ich zum Versand. Diese Seite allein ist keine Quittung.",
     withdrawal:

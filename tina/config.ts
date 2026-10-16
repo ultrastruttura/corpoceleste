@@ -274,7 +274,7 @@ export default defineConfig({
             name: "cloudflareAnalyticsToken",
             label: "Cloudflare Web Analytics — token",
             description:
-              "Da dash.cloudflare.com → Analytics & logs → Web Analytics → Add a site. Incolla solo il token (non tutto lo script). Vuoto = analytics spente.",
+              "OBBLIGATORIO per vedere le visite. dash.cloudflare.com → Analytics & logs → Web Analytics → Add a site → copia solo il token dallo snippet. Vuoto = analytics spente.",
           },
           {
             type: "number",
@@ -282,6 +282,66 @@ export default defineConfig({
             label: "Soglia “in esaurimento” (pezzi totali)",
             description:
               "Se i pezzi rimasti (somma di tutte le taglie) sono ≤ questo numero, sul sito compare il badge “In esaurimento”. Default 10. Metti 0 per spegnere.",
+          },
+          {
+            type: "string",
+            name: "iban",
+            label: "IBAN (bonifico)",
+            description: "Vuoto = resta il valore di default in codice.",
+          },
+          {
+            type: "string",
+            name: "intestatario",
+            label: "Intestatario IBAN",
+          },
+          {
+            type: "string",
+            name: "legalName",
+            label: "Ragione sociale / ditta",
+          },
+          {
+            type: "string",
+            name: "vatId",
+            label: "Partita IVA",
+          },
+          {
+            type: "string",
+            name: "rea",
+            label: "REA / Registro imprese",
+            description: "Se ce l’hai; altrimenti lascia vuoto.",
+          },
+          {
+            type: "string",
+            name: "telefono",
+            label: "Telefono contatto",
+            description: "Opzionale; compare in Condizioni di vendita se compilato.",
+          },
+          {
+            type: "string",
+            name: "indirizzo",
+            label: "Indirizzo sede completo",
+          },
+          {
+            type: "string",
+            name: "pec",
+            label: "PEC",
+          },
+          {
+            type: "string",
+            name: "sdiCode",
+            label: "Codice SDI",
+          },
+          {
+            type: "string",
+            name: "paypalClientId",
+            label: "PayPal Client ID",
+            description: "Da developer.paypal.com (Live). Vuoto = default in codice.",
+          },
+          {
+            type: "string",
+            name: "formApi",
+            label: "URL API Vercel",
+            description: "Es. https://corpoceleste.vercel.app — senza slash finale.",
           },
         ],
       },

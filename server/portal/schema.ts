@@ -100,8 +100,15 @@ CREATE TABLE IF NOT EXISTS shop_orders (
   lines_json TEXT NOT NULL DEFAULT '[]',
   packlink_ref TEXT NOT NULL DEFAULT '',
   notes TEXT NOT NULL DEFAULT '',
+  paid_at TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  email TEXT PRIMARY KEY,
+  confirmed_at TEXT NOT NULL DEFAULT (datetime('now')),
+  locale TEXT NOT NULL DEFAULT 'it'
 );
 
 CREATE INDEX IF NOT EXISTS idx_shop_orders_status ON shop_orders(status);
