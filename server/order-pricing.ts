@@ -6,7 +6,7 @@ import {
   normalizeCountry,
   normalizeZip,
   packagesForQty,
-  quoteCheapest,
+  quoteShipping,
   sendcloudConfigured,
   type ShippingQuote,
 } from "./sendcloud.js";
@@ -33,8 +33,14 @@ export type PricedOrder = {
   shipZone: "it" | "eu";
   shipCountry: string;
   shipZip: string;
-  /** Cheapest Sendcloud rate for destination (ledger still uses packlink* field names). */
+  /** Chosen Sendcloud rate (ledger still uses packlink* field names). */
   packlink: ShippingQuote;
+  /** Cheapest studio-pickup vs dropoff (raw Sendcloud €, before floor). */
+  shippingCompare?: {
+    pickup: number | null;
+    dropoff: number | null;
+    firstMile: ShippingQuote["firstMile"];
+  };
 };
 
 export function money(n: number) {
@@ -140,9 +146,9 @@ export async function priceOrderLines(
     return { ok: false, error: "Shipping not configured (Sendcloud keys)" };
   }
 
-  let packlink: ShippingQuote | null = null;
+  let selection: Awaited<ReturnType<typeof quoteShipping>> = null;
   try {
-    packlink = await quoteCheapest({
+    selection = await quoteShipping({
       toCountry: shipCountry,
       toZip: shipZip,
       toCity: dest.city,
@@ -154,13 +160,14 @@ export async function priceOrderLines(
     const msg = err instanceof Error ? err.message : String(err);
     return { ok: false, error: `Shipping quote failed: ${msg.slice(0, 160)}` };
   }
-  if (!packlink) {
+  if (!selection) {
     return {
       ok: false,
       error: "Shipping unavailable (Sendcloud: no home rate for this CAP — check FROM_* and carriers)",
     };
   }
 
+  const packlink = selection.chosen;
   const shipping = floorShippingEuro(packlink.price);
   const total = Math.round((merchandise + shipping) * 100) / 100;
   return {
@@ -174,6 +181,11 @@ export async function priceOrderLines(
       shipCountry,
       shipZip,
       packlink: { ...packlink, price: shipping },
+      shippingCompare: {
+        pickup: selection.cheapestPickup?.price ?? null,
+        dropoff: selection.cheapestDropoff?.price ?? null,
+        firstMile: packlink.firstMile,
+      },
     },
   };
 }

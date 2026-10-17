@@ -112,6 +112,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const priced = await priceOrderLines(lines, dest);
     if (priced.ok === false) return json(res, 400, { error: priced.error });
 
+    const cmp = priced.order.shippingCompare;
     return json(res, 200, {
       shipping: money(priced.order.shipping),
       merchandise: money(priced.order.merchandise),
@@ -120,8 +121,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       carrier: priced.order.packlink.carrier,
       serviceName: priced.order.packlink.serviceName,
       transitDays: priced.order.packlink.transitDays || "",
+      firstMile: priced.order.packlink.firstMile || "",
       country: priced.order.shipCountry,
       zip: priced.order.shipZip,
+      /** Raw Sendcloud € before customer floor — for ops / compare pickup vs dropoff. */
+      compare: cmp
+        ? {
+            pickup: cmp.pickup != null ? money(cmp.pickup) : null,
+            dropoff: cmp.dropoff != null ? money(cmp.dropoff) : null,
+            delta:
+              cmp.pickup != null && cmp.dropoff != null
+                ? money(cmp.pickup - cmp.dropoff)
+                : null,
+          }
+        : undefined,
     });
   } catch (err) {
     console.error("shipping-quote", err);

@@ -23,6 +23,14 @@ export type ShippingQuote = {
   serviceName: string;
   transitDays?: string;
   contractId?: number;
+  /** pickup = ritiro in studio; dropoff = Andrea porta al punto; either = entrambi. */
+  firstMile?: "pickup" | "dropoff" | "either" | "unknown";
+};
+
+export type QuoteSelection = {
+  chosen: ShippingQuote;
+  cheapestPickup: ShippingQuote | null;
+  cheapestDropoff: ShippingQuote | null;
 };
 
 export type ShipAddress = {
@@ -110,19 +118,24 @@ export function normalizeZip(zip: string | undefined | null, country?: string) {
 }
 
 /**
- * Sendcloud `state_province_code` when the carrier needs it.
- * Italy: omit — Sendcloud rejects bare sigle (BG) and IT does not require the field for quotes.
+ * Sendcloud `state_province_code` when useful (ISO 3166-2).
+ * IT: always omit (API rejects BG / IT-BG for domestic quotes).
+ * DE/US/CA/AU: prefer CC-XX. Other EU: omit unless already ISO-shaped.
  */
 export function provinceForLabel(country: string, province: string | undefined | null) {
   const cc = normalizeCountry(country) || "IT";
   if (cc === "IT") return "";
   let p = String(province || "")
     .trim()
-    .toUpperCase();
+    .toUpperCase()
+    .replace(/\s+/g, "-");
   if (!p) return "";
   if (p.startsWith(`${cc}-`)) return p.slice(0, 12);
-  if (/^[A-Z]{2}$/.test(p)) return `${cc}-${p}`.slice(0, 12);
-  return p.slice(0, 40);
+  const needsState = new Set(["DE", "US", "CA", "AU", "MX", "BR"]);
+  if (needsState.has(cc) && /^[A-Z]{2}$/.test(p)) return `${cc}-${p}`;
+  if (/^[A-Z]{2}-[A-Z0-9]{1,3}$/.test(p)) return p.slice(0, 12);
+  // Avoid sending raw Italian-style sigle / city names to EU carriers.
+  return "";
 }
 
 function clip(s: string, max: number) {
@@ -258,7 +271,7 @@ function addressPayload(
   return out;
 }
 
-function isHomeDelivery(option: Record<string, unknown>): boolean {
+function isParcelHomeDelivery(option: Record<string, unknown>): boolean {
   const req = asRecord(option.requirements);
   if (req?.is_service_point_required === true) return false;
   const funcs = asRecord(option.functionalities);
@@ -274,6 +287,29 @@ function isHomeDelivery(option: Record<string, unknown>): boolean {
   if (code.includes(":letter") || /\bletter\b/.test(name) || /\bunstamped\b/.test(name)) {
     return false;
   }
+  // Resi / return products non usati in checkout.
+  if (funcs?.returns === true || code.includes(":return") || /\breturn\b/.test(name)) {
+    return false;
+  }
+  return true;
+}
+
+function firstMileOf(option: Record<string, unknown>): ShippingQuote["firstMile"] {
+  const code = str(option.code).toLowerCase();
+  const funcs = asRecord(option.functionalities);
+  const fm = str(funcs?.first_mile).toLowerCase();
+  if (code.includes("/dropoff") || fm === "dropoff") return "dropoff";
+  if (code.includes("/pickup") || fm === "pickup") return "pickup";
+  if (fm === "pickup_dropoff") return "either";
+  return "unknown";
+}
+
+function weightFits(option: Record<string, unknown>, weightKg: number): boolean {
+  const w = asRecord(option.weight);
+  const min = num(asRecord(w?.min)?.value);
+  const max = num(asRecord(w?.max)?.value);
+  if (min != null && weightKg + 1e-9 < min) return false;
+  if (max != null && weightKg - 1e-9 > max) return false;
   return true;
 }
 
@@ -298,7 +334,12 @@ function pickCheapest(quotes: ShippingQuote[]): ShippingQuote | null {
   return best;
 }
 
-function parseShippingOptions(data: unknown): ShippingQuote[] {
+function preferPickup(): boolean {
+  // Default on: ritiro in studio quando Sendcloud lo offre.
+  return envStr("SENDCLOUD_PREFER_PICKUP", "1") !== "0";
+}
+
+function parseShippingOptions(data: unknown, weightKg: number): ShippingQuote[] {
   const root = asRecord(data);
   const list = Array.isArray(root?.data)
     ? root!.data
@@ -308,7 +349,8 @@ function parseShippingOptions(data: unknown): ShippingQuote[] {
   const out: ShippingQuote[] = [];
   for (const item of list) {
     const o = asRecord(item);
-    if (!o || !isHomeDelivery(o)) continue;
+    if (!o || !isParcelHomeDelivery(o)) continue;
+    if (!weightFits(o, weightKg)) continue;
     const code = str(o.code);
     const price = quotePrice(o);
     if (!code || price == null) continue;
@@ -325,9 +367,24 @@ function parseShippingOptions(data: unknown): ShippingQuote[] {
       transitDays:
         lead != null && lead > 0 ? String(Math.max(1, Math.ceil(lead / 24))) : undefined,
       contractId: num(contract?.id) ?? undefined,
+      firstMile: firstMileOf(o),
     });
   }
   return out;
+}
+
+function selectQuote(options: ShippingQuote[]): QuoteSelection | null {
+  if (!options.length) return null;
+  const pickupPool = options.filter((q) => q.firstMile === "pickup" || q.firstMile === "either");
+  const dropoffPool = options.filter((q) => q.firstMile === "dropoff");
+  const cheapestPickup = pickCheapest(pickupPool);
+  const cheapestDropoff = pickCheapest(dropoffPool);
+  const absoluteCheapest = pickCheapest(options);
+  let chosen: ShippingQuote | null = null;
+  if (preferPickup() && cheapestPickup) chosen = cheapestPickup;
+  else chosen = absoluteCheapest;
+  if (!chosen) return null;
+  return { chosen, cheapestPickup, cheapestDropoff };
 }
 
 export async function quoteCheapest(input: {
@@ -337,6 +394,18 @@ export async function quoteCheapest(input: {
   toProvince?: string;
   packages: ShipPackage[];
 }): Promise<ShippingQuote | null> {
+  const sel = await quoteShipping(input);
+  return sel?.chosen ?? null;
+}
+
+/** Full selection: preferred pickup vs dropoff comparison. */
+export async function quoteShipping(input: {
+  toCountry: string;
+  toZip: string;
+  toCity?: string;
+  toProvince?: string;
+  packages: ShipPackage[];
+}): Promise<QuoteSelection | null> {
   if (!sendcloudConfigured()) return null;
 
   const from = originFromEnv();
@@ -350,23 +419,23 @@ export async function quoteCheapest(input: {
   if (!toCountry || !toZip || !isSupportedShipCountry(toCountry)) return null;
   if (toCountry === "IT" && !/^\d{5}$/.test(toZip)) return null;
 
+  // Estero: città reale migliora i listini zonali; fallback CAP solo se manca.
   const toCity = (input.toCity || "").trim() || toZip;
   const toProvince = provinceForLabel(toCountry, input.toProvince);
+  const weightKg = input.packages.reduce((n, p) => n + p.weight, 0);
 
   const fromProvince = provinceForLabel(from.country, from.province);
+  const fromStreet = from.street1 ? splitStreetHouse(from.street1) : null;
   const body: Record<string, unknown> = {
     from_address: {
       country_code: from.country,
       postal_code: from.zip_code,
       city: from.city,
-      ...(from.street1
-        ? (() => {
-            const s = splitStreetHouse(from.street1);
-            return {
-              address_line_1: s.address,
-              house_number: s.house_number,
-            };
-          })()
+      ...(fromStreet
+        ? {
+            address_line_1: fromStreet.address,
+            house_number: fromStreet.house_number,
+          }
         : {}),
       ...(fromProvince ? { state_province_code: fromProvince } : {}),
     },
@@ -396,17 +465,30 @@ export async function quoteCheapest(input: {
   } catch {
     throw new Error("Sendcloud shipping-options: invalid JSON");
   }
-  const options = parseShippingOptions(parsed);
-  const best = pickCheapest(options);
-  if (!best) {
+  const options = parseShippingOptions(parsed, weightKg);
+  const selected = selectQuote(options);
+  if (!selected) {
     const root = asRecord(parsed);
     const rawCount = Array.isArray(root?.data) ? root!.data.length : 0;
     console.error("[SENDCLOUD] shipping-options: no priced home rates", {
       rawCount,
       parsedHome: options.length,
+      toCountry,
+      toZip,
+      weightKg,
     });
+    return null;
   }
-  return best;
+  console.info("[SENDCLOUD] quote", {
+    chosen: selected.chosen.serviceId,
+    price: selected.chosen.price,
+    firstMile: selected.chosen.firstMile,
+    pickup: selected.cheapestPickup?.price ?? null,
+    dropoff: selected.cheapestDropoff?.price ?? null,
+    toCountry,
+    toZip,
+  });
+  return selected;
 }
 
 function labelUrlsFromAnnounce(shipment: Record<string, unknown>): string[] {
