@@ -271,7 +271,7 @@ function isHomeDelivery(option: Record<string, unknown>): boolean {
   }
   const code = str(option.code).toLowerCase();
   const name = str(option.name).toLowerCase();
-  if (code.includes(":letter") || name.includes("letter") || name.includes("posta")) {
+  if (code.includes(":letter") || /\bletter\b/.test(name) || /\bunstamped\b/.test(name)) {
     return false;
   }
   return true;
@@ -284,7 +284,8 @@ function quotePrice(option: Record<string, unknown>): number | null {
     const price = asRecord(row?.price);
     const total = asRecord(price?.total);
     const n = num(total?.value);
-    if (n != null && n >= 0) return Math.round(n * 100) / 100;
+    // Skip free/empty quotes (letters, placeholders).
+    if (n != null && n > 0) return Math.round(n * 100) / 100;
   }
   return null;
 }
@@ -476,7 +477,7 @@ export async function createShipmentAndLabels(input: {
         phone: from.phone,
         email: from.email,
       },
-      from.province,
+      provinceForLabel(from.country, from.province),
     ),
     to_address: addressPayload(input.to, toProvince),
     ship_with: {
