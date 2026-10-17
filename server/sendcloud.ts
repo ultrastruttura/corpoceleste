@@ -110,20 +110,17 @@ export function normalizeZip(zip: string | undefined | null, country?: string) {
 }
 
 /**
- * Sendcloud `state_province_code` (ISO 3166-2 when possible, es. IT-BG).
- * Empty string = omit field.
+ * Sendcloud `state_province_code` when the carrier needs it.
+ * Italy: omit — Sendcloud rejects bare sigle (BG) and IT does not require the field for quotes.
  */
 export function provinceForLabel(country: string, province: string | undefined | null) {
   const cc = normalizeCountry(country) || "IT";
+  if (cc === "IT") return "";
   let p = String(province || "")
     .trim()
     .toUpperCase();
   if (!p) return "";
   if (p.startsWith(`${cc}-`)) return p.slice(0, 12);
-  if (cc === "IT") {
-    p = p.replace(/[^A-Z]/g, "").slice(0, 2);
-    return p ? `IT-${p}` : "";
-  }
   if (/^[A-Z]{2}$/.test(p)) return `${cc}-${p}`.slice(0, 12);
   return p.slice(0, 40);
 }
@@ -345,6 +342,7 @@ export async function quoteCheapest(input: {
   const toCity = (input.toCity || "").trim() || toZip;
   const toProvince = provinceForLabel(toCountry, input.toProvince);
 
+  const fromProvince = provinceForLabel(from.country, from.province);
   const body: Record<string, unknown> = {
     from_address: {
       country_code: from.country,
@@ -359,7 +357,7 @@ export async function quoteCheapest(input: {
             };
           })()
         : {}),
-      ...(from.province ? { state_province_code: from.province } : {}),
+      ...(fromProvince ? { state_province_code: fromProvince } : {}),
     },
     to_address: {
       country_code: toCountry,
