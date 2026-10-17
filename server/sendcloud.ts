@@ -264,6 +264,16 @@ function isHomeDelivery(option: Record<string, unknown>): boolean {
   const funcs = asRecord(option.functionalities);
   const lastMile = str(funcs?.last_mile).toLowerCase();
   if (lastMile === "service_point" || lastMile === "parcel_shop") return false;
+  // Maglie = pacco, non lettere/documenti (es. sendcloud:letter a 0 €).
+  const formFactor = str(funcs?.form_factor).toLowerCase();
+  if (formFactor === "letter" || formFactor === "document" || formFactor === "mailbox") {
+    return false;
+  }
+  const code = str(option.code).toLowerCase();
+  const name = str(option.name).toLowerCase();
+  if (code.includes(":letter") || name.includes("letter") || name.includes("posta")) {
+    return false;
+  }
   return true;
 }
 
