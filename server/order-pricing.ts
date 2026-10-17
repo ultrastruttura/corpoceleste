@@ -7,6 +7,7 @@ import {
   normalizeZip,
   packagesForQty,
   quoteCheapest,
+  sendcloudConfigured,
   type ShippingQuote,
 } from "./sendcloud.js";
 import type { OrderLine } from "./paypal.js";
@@ -135,6 +136,10 @@ export async function priceOrderLines(
 
   merchandise = Math.round(merchandise * 100) / 100;
 
+  if (!sendcloudConfigured()) {
+    return { ok: false, error: "Shipping not configured (Sendcloud keys)" };
+  }
+
   let packlink: ShippingQuote | null = null;
   try {
     packlink = await quoteCheapest({
@@ -146,8 +151,15 @@ export async function priceOrderLines(
     });
   } catch (err) {
     console.error("sendcloud quote", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `Shipping quote failed: ${msg.slice(0, 160)}` };
   }
-  if (!packlink) return { ok: false, error: "Shipping unavailable" };
+  if (!packlink) {
+    return {
+      ok: false,
+      error: "Shipping unavailable (Sendcloud: no home rate for this CAP — check FROM_* and carriers)",
+    };
+  }
 
   const shipping = floorShippingEuro(packlink.price);
   const total = Math.round((merchandise + shipping) * 100) / 100;

@@ -109,14 +109,23 @@ export function normalizeZip(zip: string | undefined | null, country?: string) {
   return z;
 }
 
-/** Provincia / state code for addresses when available. */
+/**
+ * Sendcloud `state_province_code` (ISO 3166-2 when possible, es. IT-BG).
+ * Empty string = omit field.
+ */
 export function provinceForLabel(country: string, province: string | undefined | null) {
   const cc = normalizeCountry(country) || "IT";
-  const p = String(province || "")
+  let p = String(province || "")
     .trim()
     .toUpperCase();
-  if (cc === "IT") return p.slice(0, 2) || "";
-  return (p || "").slice(0, 40);
+  if (!p) return "";
+  if (p.startsWith(`${cc}-`)) return p.slice(0, 12);
+  if (cc === "IT") {
+    p = p.replace(/[^A-Z]/g, "").slice(0, 2);
+    return p ? `IT-${p}` : "";
+  }
+  if (/^[A-Z]{2}$/.test(p)) return `${cc}-${p}`.slice(0, 12);
+  return p.slice(0, 40);
 }
 
 function clip(s: string, max: number) {
@@ -367,13 +376,26 @@ export async function quoteCheapest(input: {
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    console.error("[SENDCLOUD] shipping-options", res.status, await res.text());
-    return null;
+    const text = await res.text();
+    console.error("[SENDCLOUD] shipping-options", res.status, text);
+    throw new Error(`Sendcloud ${res.status}: ${text.slice(0, 180)}`);
   }
 
-  const best = pickCheapest(parseShippingOptions(await res.json()));
+  let parsed: unknown;
+  try {
+    parsed = await res.json();
+  } catch {
+    throw new Error("Sendcloud shipping-options: invalid JSON");
+  }
+  const options = parseShippingOptions(parsed);
+  const best = pickCheapest(options);
   if (!best) {
-    console.error("[SENDCLOUD] shipping-options: no home-delivery rates");
+    const root = asRecord(parsed);
+    const rawCount = Array.isArray(root?.data) ? root!.data.length : 0;
+    console.error("[SENDCLOUD] shipping-options: no priced home rates", {
+      rawCount,
+      parsedHome: options.length,
+    });
   }
   return best;
 }
