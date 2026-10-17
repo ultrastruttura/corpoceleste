@@ -10,8 +10,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/spedire-webhook",
-      "destination": "/api/form?spedire_hook=1"
+      "source": "/api/sendcloud-webhook",
+      "destination": "/api/form?sendcloud_hook=1"
     },
     {
       "source": "/api/cron-stock-release",

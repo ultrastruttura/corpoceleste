@@ -8,7 +8,7 @@ import {
   packagesForQty,
   quoteCheapest,
   type ShippingQuote,
-} from "./spedire.js";
+} from "./sendcloud.js";
 import type { OrderLine } from "./paypal.js";
 
 export type PricedLine = OrderLine & {
@@ -32,7 +32,7 @@ export type PricedOrder = {
   shipZone: "it" | "eu";
   shipCountry: string;
   shipZip: string;
-  /** Cheapest Spedire rate for destination (ledger still uses packlink* field names). */
+  /** Cheapest Sendcloud rate for destination (ledger still uses packlink* field names). */
   packlink: ShippingQuote;
 };
 
@@ -145,7 +145,7 @@ export async function priceOrderLines(
       packages: packagesForQty(pieceCount),
     });
   } catch (err) {
-    console.error("spedire quote", err);
+    console.error("sendcloud quote", err);
   }
   if (!packlink) return { ok: false, error: "Shipping unavailable" };
 

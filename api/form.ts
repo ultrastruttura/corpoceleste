@@ -8,9 +8,9 @@ import {
   verifyNewsletterConfirm,
 } from "../server/newsletter.js";
 import {
-  handleSpedireWebhook,
-  isSpedireWebhookRequest,
-} from "../server/spedire-webhook-handler.js";
+  handleSendcloudWebhook,
+  isSendcloudWebhookRequest,
+} from "../server/sendcloud-webhook-handler.js";
 
 const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newsletter"]);
 
@@ -53,11 +53,11 @@ async function runStockReleaseJob(res: VercelResponse) {
 
 /**
  * Generic site forms → Resend to shop. Contact, newsletter, workshops, consulting, reprint.
- * Also: Spedire webhook (?spedire_hook=1), newsletter confirm (?nl_confirm=), stock cron (?job=stock_release).
+ * Also: Sendcloud webhook (?sendcloud_hook=1), newsletter confirm (?nl_confirm=), stock cron (?job=stock_release).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (isSpedireWebhookRequest(req)) {
-    return handleSpedireWebhook(req, res);
+  if (isSendcloudWebhookRequest(req)) {
+    return handleSendcloudWebhook(req, res);
   }
 
   const job = queryFlag(req, "job");

@@ -284,7 +284,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       shipping: number;
       country: string;
       zip: string;
-      /** Alias corriere Spedire (es. UPS) o id numerico legacy. */
+      /** Sendcloud shipping_option_code (es. postnl:standard). */
       serviceId: string | number;
       carrier: string;
     };

@@ -117,19 +117,21 @@ Aggiungi queste (Environment: **Production**, e anche Preview se vuoi testare i 
 | `GITHUB_TOKEN` | il fine-grained token |
 | `GITHUB_REPO` | `ultrastruttura/corpoceleste` |
 | `GITHUB_BRANCH` | `main` |
-| `SPEDIRE_API_KEY` | Token da SpedirePRO → Impostazioni → App e Integrazioni → API (`X-Api-Key`) |
-| `SPEDIRE_API_BASE` | *(opzionale)* default `https://www.spedirepro.com/public-api` |
-| `SPEDIRE_FROM_COUNTRY` | `IT` |
-| `SPEDIRE_FROM_PROVINCE` | Sigla provincia mittente (es. `PU`) — obbligatoria per create-label |
-| `SPEDIRE_FROM_ZIP` | CAP del tuo studio (partenza) |
-| `SPEDIRE_FROM_CITY` | Città studio |
-| `SPEDIRE_FROM_ADDRESS` | Via e numero studio |
-| `SPEDIRE_FROM_NAME` | Nome mittente (es. Andrea Baldelli) |
-| `SPEDIRE_FROM_PHONE` | Telefono mittente |
-| `SPEDIRE_FROM_EMAIL` | Email mittente (es. `info@corpoceleste.eu`) |
-| `SPEDIRE_DEFAULT_TO_PHONE` | *(opzionale)* telefono destinazione se PayPal non lo passa |
+| `SENDCLOUD_PUBLIC_KEY` | Public key da Sendcloud → Settings → Integrations |
+| `SENDCLOUD_SECRET_KEY` | Secret key della stessa integrazione |
+| `SENDCLOUD_FROM_COUNTRY` | `IT` |
+| `SENDCLOUD_FROM_PROVINCE` | Sigla provincia mittente (es. `BG`) |
+| `SENDCLOUD_FROM_ZIP` | CAP del tuo studio (partenza) |
+| `SENDCLOUD_FROM_CITY` | Città studio |
+| `SENDCLOUD_FROM_ADDRESS` | Via e numero studio |
+| `SENDCLOUD_FROM_NAME` | Nome mittente (es. Andrea Baldelli) |
+| `SENDCLOUD_FROM_PHONE` | Telefono mittente |
+| `SENDCLOUD_FROM_EMAIL` | Email mittente (es. `info@corpoceleste.eu`) |
+| `SENDCLOUD_DEFAULT_TO_PHONE` | *(opzionale)* telefono destinazione se PayPal non lo passa |
+| `SENDCLOUD_CONTRACT_ID` | *(opzionale)* contract_id fisso su announce |
+| `SENDCLOUD_WEBHOOK_SECRET` | *(opzionale)* override HMAC webhook; di default usa `SENDCLOUD_SECRET_KEY` |
 
-Serve un account **SpedirePRO** con API abilitate e **wallet ricaricato** (create-label addebita il saldo). In Impostazioni API imposta il webhook su `https://TUO-PROGETTO.vercel.app/api/spedire-webhook`. Al pagamento PayPal il webhook PayPal crea la spedizione e, se pronta, mette il link etichetta nella mail shop.
+Serve un account **Sendcloud** con API keys e corrieri abilitati (quote + etichette). In integrazione: abilita Feedback Webhook → `https://corpoceleste.vercel.app/api/sendcloud-webhook` (firma `Sendcloud-Signature`). **Non** abilitare punti di ritiro (il checkout fa solo domicilio). Al pagamento PayPal il webhook PayPal crea la spedizione e, se pronta, mette tracking/etichetta nella mail shop.
 
 Salva, poi **Redeploy** l’ultimo deployment (Deployments → ⋮ → Redeploy), altrimenti le variabili non entrano in vigore.
 
@@ -177,10 +179,10 @@ Se `paypalClientId` è vuoto, vedi solo il bonifico.
 2. Account acquirente di test da developer.paypal.com → Sandbox → Accounts.
 3. Ordina una maglia, paga con l’account sandbox.
 4. Controlla:
-   - [ ] In checkout, con paese+CAP, compare il costo spedizione Spedire
-   - [ ] Repo GitHub: nuovo file in `stock-ledger/` (con `packlinkRef` se Spedire è configurato)
+   - [ ] In checkout, con paese+CAP, compare il costo spedizione Sendcloud
+   - [ ] Repo GitHub: nuovo file in `stock-ledger/` (con `packlinkRef` se Sendcloud è configurato)
    - [ ] File prodotto in `content/products/…`: numeri `stock` diminuiti
-   - [ ] Email a `SHOP_EMAIL` con totale + link etichetta Spedire
+   - [ ] Email a `SHOP_EMAIL` con totale + link tracking/etichetta Sendcloud
    - [ ] Dopo 1–3 minuti, sul sito la taglia aggiornata (o esaurita se a 0)
 
 ### Opzione B — Live
@@ -193,8 +195,8 @@ Stesso flusso con `PAYPAL_MODE=live`, Client ID Live, e un ordine reale piccolo.
 
 | Situazione | Cosa fare |
 |------------|-----------|
-| Vendita **PayPal** (bottone sul sito) | Niente: stock, mail e etichetta Spedire automatici |
-| Vendita **bonifico** | Quando arriva il soldi → Tina → Maglia → **Magazzino** → abbassa la taglia → Salva; etichetta Spedire a mano (non automatica) |
+| Vendita **PayPal** (bottone sul sito) | Niente: stock, mail e etichetta Sendcloud automatici |
+| Vendita **bonifico** | Quando arriva il soldi → Tina → Maglia → **Magazzino** → abbassa la taglia → Salva; etichetta Sendcloud a mano (non automatica) |
 | Nuova maglia | Tina: pezzi iniziali per S/M/L/XL |
 | Taglia a 0 | Non acquistabile da sola; se tutte a 0 → trattata come esaurita |
 | Mail “ATTENZIONE oversell” | Due ordini quasi insieme sulla stessa pezza: verifica a mano e scusa/ristorna se serve |
@@ -218,7 +220,7 @@ Stesso flusso con `PAYPAL_MODE=live`, Client ID Live, e un ordine reale piccolo.
 
 - Non sposta il sito su Vercel (resta Pages)
 - Non aggiorna lo stock per i bonifici
-- Non crea etichette Spedire sui bonifici
+- Non crea etichette Sendcloud sui bonifici
 - Non evita al 100% la doppia vendita nello stesso minuto (volume basso: ok; se cresci, serve altro)
 
 ---

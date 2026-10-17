@@ -6,7 +6,7 @@ import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.j
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
- * Preview Spedire cheapest rate for checkout UI.
+ * Preview Sendcloud cheapest rate for checkout UI.
  * POST { lines, country, zip, city?, province? }
  * GET ?live_stock=1 — stock snapshot from GitHub (overlay on static catalog).
  */

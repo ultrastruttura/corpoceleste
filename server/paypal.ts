@@ -187,7 +187,7 @@ export async function createPayPalCheckoutOrder(
         {
           description: "Corpoceleste",
           ...(customId.length <= 127 ? { custom_id: customId } : {}),
-          // Telefono checkout per il webhook Spedire (PayPal spesso non lo passa).
+          // Telefono checkout per il webhook Sendcloud (PayPal spesso non lo passa).
           invoice_id: `t:${phone}|e:${shipTo.email}`.slice(0, 127),
           amount: {
             currency_code: "EUR",

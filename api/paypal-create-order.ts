@@ -18,7 +18,7 @@ function parseShipTo(raw: Partial<CheckoutShipTo> | undefined, country: string, 
   const city = String(raw.city || "").trim();
   let province = String(raw.province || "").trim();
   if (country === "IT") province = province.slice(0, 2).toUpperCase();
-  // Phone and province optional — Spedire falls back via provinceForLabel / default phone.
+  // Phone and province optional — Sendcloud falls back via provinceForLabel / default phone.
   if (!fullName || !email.includes("@") || !street || !city) return null;
   return {
     fullName,
@@ -33,7 +33,7 @@ function parseShipTo(raw: Partial<CheckoutShipTo> | undefined, country: string, 
 }
 
 /**
- * Server-side PayPal order create — prices, stock and Spedire shipping from server.
+ * Server-side PayPal order create — prices, stock and Sendcloud shipping from server.
  * Stock is reserved BEFORE creating the PayPal order; on failure units are restored.
  * POST { lines, country, zip, shipTo: { fullName, email, phone, street, city, province } }
  */

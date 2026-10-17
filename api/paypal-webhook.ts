@@ -23,8 +23,8 @@ import {
   normalizeZip,
   packagesForQty,
   personFromFullName,
-  spedireConfigured,
-} from "../server/spedire.js";
+  sendcloudConfigured,
+} from "../server/sendcloud.js";
 import {
   fetchPayPalOrder,
   linesFromOrder,
@@ -83,7 +83,7 @@ function shippingAddressText(order: PayPalOrder | null): string {
     .join("\n");
 }
 
-async function ensureSpedireShipment(opts: {
+async function ensureSendcloudShipment(opts: {
   ledger: LedgerRecord;
   order: PayPalOrder | null;
   priced: Extract<Awaited<ReturnType<typeof priceOrderLines>>, { ok: true }>["order"];
@@ -98,8 +98,8 @@ async function ensureSpedireShipment(opts: {
     };
   }
 
-  if (!spedireConfigured()) {
-    return { packlinkError: "SPEDIRE_API_KEY missing" };
+  if (!sendcloudConfigured()) {
+    return { packlinkError: "SENDCLOUD_PUBLIC_KEY / SENDCLOUD_SECRET_KEY missing" };
   }
 
   const unit = opts.order?.purchase_units?.[0];
@@ -130,12 +130,12 @@ async function ensureSpedireShipment(opts: {
   const phone = (
     fromInvoice.phone ||
     paypalPhone ||
-    process.env.SPEDIRE_DEFAULT_TO_PHONE ||
-    process.env.SPEDIRE_FROM_PHONE ||
+    process.env.SENDCLOUD_DEFAULT_TO_PHONE ||
+    process.env.SENDCLOUD_FROM_PHONE ||
     ""
   ).trim();
   if (!email || !phone) {
-    return { packlinkError: "Missing recipient email/phone for Spedire" };
+    return { packlinkError: "Missing recipient email/phone for Sendcloud" };
   }
 
   const pieceCount = opts.priced.lines.reduce((n, l) => n + l.qty, 0);
@@ -143,10 +143,11 @@ async function ensureSpedireShipment(opts: {
   try {
     const created = await createShipmentAndLabels({
       serviceId: opts.priced.packlink.serviceId,
+      contractId: opts.priced.packlink.contractId,
       packages: packagesForQty(pieceCount),
       content: "Maglie serigrafate",
       contentValue: opts.priced.merchandise,
-      customReference: opts.captureId.slice(0, 50),
+      customReference: opts.captureId.slice(0, 40),
       to: {
         name: person.name,
         surname: person.surname,
@@ -168,7 +169,7 @@ async function ensureSpedireShipment(opts: {
     };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("spedire shipment", opts.captureId, msg);
+    console.error("sendcloud shipment", opts.captureId, msg);
     return { packlinkError: msg, packlinkServiceId: opts.priced.packlink.serviceId };
   }
 }
@@ -176,7 +177,7 @@ async function ensureSpedireShipment(opts: {
 /**
  * PayPal → Vercel webhook.
  * Event: PAYMENT.CAPTURE.COMPLETED
- * Verifies catalog prices + Spedire shipping, then stock + label + mail (resumable ledger).
+ * Verifies catalog prices + Sendcloud shipping, then stock + label + mail (resumable ledger).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
@@ -388,7 +389,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       packlinkServiceId: working.packlinkServiceId,
     };
     if (!working.packlinkRef) {
-      packlink = await ensureSpedireShipment({
+      packlink = await ensureSendcloudShipment({
         ledger: { ...working, stockNotes: notes },
         order,
         priced: priced.order,
@@ -490,7 +491,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             lineTotal: l.lineTotal,
           })),
           packlink_ref: packlink.packlinkRef || "",
-          notes: packlink.packlinkError ? `Spedire: ${packlink.packlinkError}` : "",
+          notes: packlink.packlinkError ? `Sendcloud: ${packlink.packlinkError}` : "",
         });
       }
     } catch (err) {
