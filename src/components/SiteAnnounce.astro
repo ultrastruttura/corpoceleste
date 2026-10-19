@@ -4,9 +4,11 @@ import { currentLocale } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const enabled = Boolean(siteSettings.announcementEnabled);
-const text = localizedSetting("announcementText", locale).trim();
+const raw = localizedSetting("announcementText", locale).trim();
 const href = siteSettings.announcementLink.trim();
-const show = enabled && Boolean(text);
+const show = enabled && Boolean(raw);
+/** Grind-style +++ crosses around the message when missing from CMS text. */
+const text = raw.includes("+++") ? raw : `+++ ${raw} +++`;
 ---
 
 {
