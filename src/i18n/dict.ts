@@ -138,7 +138,9 @@ const it = {
     googlePay: "Google Pay",
     bank: "Bonifico",
     bankNote:
-      "Invia il modulo: ti arriva subito una email con IBAN, importo e causale. L’ordine è confermato quando arriva il pagamento (riserva 5 giorni).",
+      "L’importo da bonificare include merce e spedizione (stessa quote Sendcloud di PayPal). Invia il modulo: ti arriva subito una email con IBAN, importo e causale. L’ordine è confermato quando arriva il pagamento (riserva 5 giorni).",
+    bankAmountDue: "Importo da bonificare",
+    bankAmountOfWhichShip: "di cui spedizione",
     name: "Nome e cognome",
     email: "Email",
     phone: "Telefono (facoltativo)",
@@ -522,7 +524,9 @@ const en: typeof it = {
     googlePay: "Google Pay",
     bank: "Bank transfer",
     bankNote:
-      "Send the form: you get an email right away with IBAN, amount and payment reference. The order is confirmed when payment arrives (5-day hold).",
+      "The amount to transfer includes goods and shipping (same Sendcloud quote as PayPal). Send the form: you get an email right away with IBAN, amount and payment reference. The order is confirmed when payment arrives (5-day hold).",
+    bankAmountDue: "Amount to transfer",
+    bankAmountOfWhichShip: "of which shipping",
     name: "Full name",
     email: "Email",
     phone: "Phone (optional)",
@@ -905,7 +909,9 @@ const de: typeof it = {
     googlePay: "Google Pay",
     bank: "Überweisung",
     bankNote:
-      "Schick das Formular: du bekommst sofort eine E-Mail mit IBAN, Betrag und Verwendungszweck. Die Bestellung gilt, wenn die Zahlung da ist (5 Tage Reserve).",
+      "Der Überweisungsbetrag enthält Ware und Versand (gleiche Sendcloud-Quote wie PayPal). Schick das Formular: du bekommst sofort eine E-Mail mit IBAN, Betrag und Verwendungszweck. Die Bestellung gilt, wenn die Zahlung da ist (5 Tage Reserve).",
+    bankAmountDue: "Zu überweisender Betrag",
+    bankAmountOfWhichShip: "davon Versand",
     name: "Vor- und Nachname",
     email: "E-Mail",
     phone: "Telefon (optional)",

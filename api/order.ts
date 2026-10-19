@@ -38,6 +38,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const dest = parseShipDest({
     country: field(body, "shipCountry"),
     zip: field(body, "shipZip"),
+    city: field(body, "citta"),
+    province: field(body, "provincia"),
   });
   if (!dest) return res.status(400).send("Invalid shipping destination");
 
@@ -136,12 +138,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const identity = await loadShopIdentity();
+  const locale = field(body, "locale") || "it";
   const totalStr = pricedOrder ? money(pricedOrder.total) : "";
+  const shippingStr = pricedOrder ? money(pricedOrder.shipping) : "";
+  const merchandiseStr = pricedOrder ? money(pricedOrder.merchandise) : "";
   const customerBody = customerBankOrderText({
+    locale,
     orderRef: orderNumber,
     iban: identity.iban,
     intestatario: identity.intestatario,
     total: totalStr,
+    shipping: shippingStr,
+    merchandise: merchandiseStr,
     ordine: [
       `Riferimento ordine: ${orderNumber}`,
       `Nome: ${nome}`,

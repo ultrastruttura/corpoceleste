@@ -78,17 +78,32 @@ export function customerBankOrderText(opts: {
   iban: string;
   intestatario: string;
   total: string;
+  /** Optional breakdown — same Sendcloud quote as PayPal checkout. */
+  merchandise?: string;
+  shipping?: string;
   when?: string;
 }) {
   const locale = opts.locale || "it";
   const when = opts.when || nowRome(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : "it-IT");
+  const amountLine =
+    opts.merchandise && opts.shipping
+      ? locale === "en"
+        ? `Amount: ${opts.total} € (goods ${opts.merchandise} € + shipping ${opts.shipping} €)`
+        : locale === "de"
+          ? `Betrag: ${opts.total} € (Ware ${opts.merchandise} € + Versand ${opts.shipping} €)`
+          : `Importo: ${opts.total} € (merce ${opts.merchandise} € + spedizione ${opts.shipping} €)`
+      : locale === "en"
+        ? `Amount: ${opts.total} €`
+        : locale === "de"
+          ? `Betrag: ${opts.total} €`
+          : `Importo: ${opts.total} €`;
   const payBlock =
     locale === "en"
       ? [
           "Bank transfer details",
           `IBAN: ${opts.iban}`,
           `Account holder: ${opts.intestatario}`,
-          `Amount: ${opts.total} €`,
+          amountLine,
           `Payment reference (required): ${opts.orderRef}`,
           "",
           "The order is confirmed when the payment arrives. I hold the piece for 5 days from this email.",
@@ -98,7 +113,7 @@ export function customerBankOrderText(opts: {
             "Überweisungsdaten",
             `IBAN: ${opts.iban}`,
             `Kontoinhaber: ${opts.intestatario}`,
-            `Betrag: ${opts.total} €`,
+            amountLine,
             `Verwendungszweck (pflicht): ${opts.orderRef}`,
             "",
             "Die Bestellung gilt, wenn die Zahlung eingeht. Ich halte das Stück 5 Tage ab dieser E-Mail.",
@@ -107,7 +122,7 @@ export function customerBankOrderText(opts: {
             "Dati per il bonifico",
             `IBAN: ${opts.iban}`,
             `Intestatario: ${opts.intestatario}`,
-            `Importo: ${opts.total} €`,
+            amountLine,
             `Causale (obbligatoria): ${opts.orderRef}`,
             "",
             "L’ordine è confermato quando arriva il pagamento. Tengo il pezzo in riserva 5 giorni da questa email.",

@@ -788,6 +788,12 @@ body.cart-open {
   font-size: 18px;
 }
 
+.checkout-bank-due {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
 .pay-methods {
   display: grid;
   gap: 10px;

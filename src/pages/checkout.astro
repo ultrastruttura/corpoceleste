@@ -27,6 +27,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     data-ship-need-zip={copy.checkout.shippingQuoteNeedZip}
     data-ship-loading={copy.checkout.shippingQuoteLoading}
     data-ship-error={copy.checkout.shippingQuoteError}
+    data-bank-amount-due={copy.checkout.bankAmountDue}
+    data-bank-amount-ship={copy.checkout.bankAmountOfWhichShip}
     data-paypal-client-id={paypalClientId || undefined}
   >
     <h1>{copy.checkout.title}</h1>
@@ -189,6 +191,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         <div data-method-panel="bonifico" hidden={paypalSdk}>
           <h3 class="checkout-bank-title">{copy.checkout.bank}</h3>
           <p>{copy.checkout.bankNote}</p>
+          <p class="checkout-bank-due" data-bank-due hidden></p>
           <form class="form is-locked" action={orderAction} method="POST" data-checkout-form>
             <input type="hidden" name="_subject" value="Ordine shop Corpoceleste (bonifico)" />
             <input type="hidden" name="_next" data-next-grazie="ordine" />
@@ -256,6 +259,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       needZip: page?.dataset.shipNeedZip || "",
       loading: page?.dataset.shipLoading || "",
       error: page?.dataset.shipError || "",
+      bankDue: page?.dataset.bankAmountDue || "",
+      bankShip: page?.dataset.bankAmountShip || "",
     };
     const emptyEl = document.querySelector("[data-checkout-empty]");
     const flowEl = document.querySelector("[data-checkout-flow]");
@@ -274,6 +279,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     const payBox = document.querySelector("[data-pay-box]");
     const bankForm = document.querySelector<HTMLFormElement>("[data-checkout-form]");
     const bankSubmit = document.querySelector<HTMLButtonElement>("[data-bank-submit]");
+    const bankDue = document.querySelector<HTMLElement>("[data-bank-due]");
     const lockHint = document.querySelector<HTMLElement>("[data-pay-lock-hint]");
     const orderField = document.querySelector<HTMLInputElement>("[data-order-field]");
     const linesField = document.querySelector<HTMLInputElement>("[data-lines-field]");
@@ -425,6 +431,17 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         if (bankCity) bankCity.value = a.city;
         if (bankProvince) bankProvince.value = a.province;
       }
+      if (bankDue) {
+        if (!empty && hasValidQuote()) {
+          const ship = shippingAmount();
+          const due = total() + ship;
+          bankDue.hidden = false;
+          bankDue.textContent = `${labels.bankDue}: ${due.toFixed(2)} € (${labels.bankShip} ${ship.toFixed(2)} €)`;
+        } else {
+          bankDue.hidden = true;
+          bankDue.textContent = "";
+        }
+      }
       syncLock();
       page?.classList.add("is-ready");
       tryMountButtons?.();
@@ -516,6 +533,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       panels.forEach((panel) => {
         panel.hidden = panel.dataset.methodPanel !== chosen;
       });
+      syncPage();
     }
 
     methods.forEach((radio) => radio.addEventListener("change", syncMethod));
