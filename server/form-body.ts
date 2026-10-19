@@ -7,6 +7,21 @@ export function field(body: Record<string, unknown>, name: string) {
   return String(v ?? "").trim();
 }
 
+/** When api.bodyParser is false, fill req.body from the raw stream once. */
+export async function bufferRequestBody(req: VercelRequest) {
+  if (req.body != null && req.body !== "") return;
+  const chunks: Buffer[] = [];
+  try {
+    const stream = req as unknown as AsyncIterable<Buffer | string>;
+    for await (const chunk of stream) {
+      chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+    }
+  } catch {
+    /* empty body */
+  }
+  (req as { body?: Buffer }).body = chunks.length ? Buffer.concat(chunks) : Buffer.alloc(0);
+}
+
 export function parseForm(req: VercelRequest): Record<string, unknown> {
   const raw = req.body;
   if (raw && typeof raw === "object" && !Buffer.isBuffer(raw) && !Array.isArray(raw)) {

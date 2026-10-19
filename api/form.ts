@@ -1,6 +1,13 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
-import { field, isHoney, parseForm, safeSubject, thanksUrl } from "../server/form-body.js";
+import {
+  bufferRequestBody,
+  field,
+  isHoney,
+  parseForm,
+  safeSubject,
+  thanksUrl,
+} from "../server/form-body.js";
 import { sendMail, siteBase } from "../server/mail.js";
 import {
   confirmNewsletterSubscriber,
@@ -8,6 +15,17 @@ import {
   verifyNewsletterConfirm,
 } from "../server/newsletter.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
+import {
+  handleSendcloudWebhook,
+  isSendcloudWebhookRequest,
+} from "../server/sendcloud-webhook-handler.js";
+
+/** Raw body for Sendcloud HMAC; form POSTs buffered then urlencoded-parsed. */
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newsletter"]);
 
@@ -51,9 +69,14 @@ async function runStockReleaseJob(res: VercelResponse) {
 /**
  * Generic site forms → Resend to shop. Contact, newsletter, workshops, consulting, reprint.
  * Also: newsletter confirm (?nl_confirm=), stock cron (?job=stock_release).
- * Sendcloud webhooks: /api/sendcloud-webhook (raw body + HMAC).
+ * Sendcloud: rewrite /api/sendcloud-webhook → here (Hobby function budget).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Must run before bufferRequestBody — HMAC needs the untouched stream/body.
+  if (isSendcloudWebhookRequest(req)) {
+    return handleSendcloudWebhook(req, res);
+  }
+
   const job = queryFlag(req, "job");
   if (job === "stock_release") {
     if (req.method !== "GET" && req.method !== "POST") {
@@ -99,6 +122,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   cors(req, res);
   if (!requireSiteOrigin(req, res)) return;
 
+  await bufferRequestBody(req);
   const body = parseForm(req);
   const subject = safeSubject(field(body, "_subject"), "Messaggio dal sito Corpoceleste");
   const fromKey = guessFrom(subject, field(body, "_next"));
