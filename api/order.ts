@@ -172,7 +172,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .filter(Boolean)
       .join("\n"),
   });
-  if (!shop.ok) {
+  if (shop.ok === false) {
     console.error("order: shop mail failed");
     return res.status(502).send("Mail failed");
   }
@@ -182,7 +182,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     subject: `Conferma d’ordine ${orderNumber} — Corpoceleste`,
     text: customerBody,
   });
-  if (!customer.ok) {
+  if (customer.ok === false) {
     console.error("order: customer mail failed", customer.error);
     await sendMail({
       to: shopTo,

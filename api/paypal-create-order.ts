@@ -93,7 +93,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const orderId = String(body.orderId || "").trim();
       if (!orderId) return json(res, 400, { error: "Missing orderId" });
       const allowed = await assertCapturableOrder(orderId);
-      if (!allowed.ok) return json(res, 403, { error: allowed.error });
+      if (allowed.ok === false) return json(res, 403, { error: allowed.error });
       const captured = await capturePayPalOrder(orderId);
       return json(res, 200, { ok: true, id: captured.id, status: captured.status });
     }
@@ -122,7 +122,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }));
 
     const reserved = await reservePaypalCheckoutHold(stockLines, priced.order.total);
-    if (!reserved.ok) {
+    if (reserved.ok === false) {
       return json(res, reserved.http, { error: reserved.error });
     }
     const tmpHoldId = reserved.tmpHoldId;
