@@ -1,15 +1,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import matter from "gray-matter";
 import { abuseLimit } from "../server/abuse-limit.js";
+import { listLiveCatalogProducts } from "../server/live-catalog.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
-import { parseProductFrontmatter } from "../src/lib/product-frontmatter.js";
 
 /**
  * Preview Sendcloud cheapest rate for checkout UI.
  * POST { lines, country, zip, city?, province? }
- * GET ?live_stock=1 — stock snapshot from GitHub (overlay on static catalog).
+ * GET ?live_stock=1 — deprecated alias → prefer /api/live-stock
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   cors(req, res);
@@ -19,48 +18,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!requireSiteOrigin(req, res)) return;
     const limited = await abuseLimit(req, "live-stock", 60, 15 * 60);
     if (!limited.ok) {
+      if (limited.unavailable) {
+        return json(res, 503, { error: "Service unavailable", retryAfterSec: limited.retryAfterSec });
+      }
       return json(res, 429, { error: "Too many requests", retryAfterSec: limited.retryAfterSec });
     }
     try {
       if (!(process.env.GITHUB_TOKEN || "").trim()) {
         return json(res, 503, { error: "Stock API unavailable" });
       }
-      const { owner, name, branch } = (() => {
-        const full = process.env.GITHUB_REPO || "ultrastruttura/corpoceleste";
-        const [o, n] = full.split("/");
-        return { owner: o, name: n, branch: process.env.GITHUB_BRANCH || "main" };
-      })();
-      const listRes = await fetch(
-        `https://api.github.com/repos/${owner}/${name}/contents/content/products?ref=${encodeURIComponent(branch)}`,
-        {
-          headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-            "X-GitHub-Api-Version": "2022-11-28",
-          },
-        },
-      );
-      if (!listRes.ok) return json(res, 502, { error: "Could not list products" });
-      const files = (await listRes.json()) as Array<{ name?: string; download_url?: string }>;
-      const products: Array<{
-        id: string;
-        stock: Record<string, number>;
-        status: string;
-        price: number;
-      }> = [];
-      for (const f of files) {
-        if (!f.name?.endsWith(".md") || !f.download_url) continue;
-        const id = f.name.replace(/\.md$/, "");
-        const raw = await fetch(f.download_url).then((r) => r.text());
-        const { data } = matter(raw);
-        const core = parseProductFrontmatter(data as Record<string, unknown>, id);
-        products.push({
-          id,
-          stock: core.stock,
-          status: core.status,
-          price: core.price,
-        });
-      }
+      const products = await listLiveCatalogProducts();
       res.setHeader("Cache-Control", "public, max-age=30");
       return json(res, 200, { products, at: new Date().toISOString() });
     } catch (err) {
@@ -74,6 +41,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const limited = await abuseLimit(req, "shipping-quote", 30, 15 * 60);
   if (!limited.ok) {
+    if (limited.unavailable) {
+      return json(res, 503, { error: "Service unavailable", retryAfterSec: limited.retryAfterSec });
+    }
     return json(res, 429, { error: "Too many requests", retryAfterSec: limited.retryAfterSec });
   }
 
@@ -109,7 +79,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       firstMile: priced.order.packlink.firstMile || "",
       country: priced.order.shipCountry,
       zip: priced.order.shipZip,
-      /** Raw Sendcloud € before customer floor — for ops / compare pickup vs dropoff. */
       compare: cmp
         ? {
             pickup: cmp.pickup != null ? money(cmp.pickup) : null,

@@ -234,6 +234,13 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
     import { normalizeZip } from "../lib/ship-normalize";
+    import {
+      buildShipTo,
+      hasCompleteAddress as addressComplete,
+      lookupCityFromZip,
+      requestShippingQuote,
+      type CheckoutQuote,
+    } from "../scripts/checkout-ship";
 
     /** Browser-safe: do not import data/commerce (gray-matter → Buffer). */
     const apiBase = () =>
@@ -281,16 +288,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     const methods = document.querySelectorAll<HTMLInputElement>("[data-method]");
     const panels = document.querySelectorAll<HTMLElement>("[data-method-panel]");
 
-    type Quote = {
-      shipping: number;
-      country: string;
-      zip: string;
-      /** Sendcloud shipping_option_code (es. postnl:standard). */
-      serviceId: string | number;
-      carrier: string;
-    };
-
-    let quote: Quote | null = null;
+    let quote: CheckoutQuote | null = null;
     let quoteError = false;
     let quoteLoading = false;
     let quoteSeq = 0;
@@ -314,72 +312,38 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     }
 
     function shipTo() {
-      const country = destCountry();
-      let province = String(provinceInput?.value || "").trim().toUpperCase();
-      if (country === "IT") province = province.slice(0, 2);
-      return {
-        fullName: String(nameInput?.value || "").trim(),
-        email: String(emailInput?.value || "").trim(),
-        phone: String(phoneInput?.value || "").trim(),
-        street: String(streetInput?.value || "").trim(),
-        city: String(cityInput?.value || "").trim(),
-        province,
-      };
+      return buildShipTo({
+        fullName: nameInput?.value || "",
+        email: emailInput?.value || "",
+        phone: phoneInput?.value || "",
+        street: streetInput?.value || "",
+        city: cityInput?.value || "",
+        province: provinceInput?.value || "",
+        country: destCountry(),
+      });
     }
 
     function hasCompleteAddress() {
-      const a = shipTo();
-      return Boolean(a.fullName && a.email.includes("@") && a.street && a.city);
+      return addressComplete(shipTo());
     }
 
     let zipLookupTimer: ReturnType<typeof setTimeout> | null = null;
     let zipLookupSeq = 0;
 
-    async function lookupCityFromZip() {
-      const country = destCountry();
-      const zip = destZip();
-      if (country === "IT") {
-        if (!/^\d{5}$/.test(zip)) return;
-      } else if (zip.length < 3) {
-        return;
-      }
+    async function runZipLookup() {
       const seq = ++zipLookupSeq;
-      try {
-        const res = await fetch(
-          `https://api.zippopotam.us/${country.toLowerCase()}/${encodeURIComponent(zip)}`,
-        );
-        if (!res.ok || seq !== zipLookupSeq) return;
-        const data = (await res.json()) as {
-          places?: Array<{
-            "place name"?: string;
-            state?: string;
-            "state abbreviation"?: string;
-          }>;
-        };
-        const place = data.places?.[0];
-        if (!place || seq !== zipLookupSeq) return;
-        const placeName = String(place["place name"] || "").trim();
-        const abbr = String(place["state abbreviation"] || "").trim();
-        const state = String(place.state || "").trim();
-        if (cityInput && placeName) cityInput.value = placeName;
-        if (provinceInput) {
-          if (country === "IT" && /^[A-Za-z]{2}$/.test(abbr)) {
-            provinceInput.value = abbr.toUpperCase();
-          } else if (abbr || state) {
-            provinceInput.value = (abbr || state).slice(0, 40);
-          }
-        }
-        syncPage();
-        scheduleQuote();
-      } catch {
-        /* lookup best-effort */
-      }
+      const hit = await lookupCityFromZip(destCountry(), destZip());
+      if (!hit || seq !== zipLookupSeq) return;
+      if (cityInput && hit.city) cityInput.value = hit.city;
+      if (provinceInput && hit.province) provinceInput.value = hit.province;
+      syncPage();
+      scheduleQuote();
     }
 
     function scheduleZipLookup() {
       if (zipLookupTimer) clearTimeout(zipLookupTimer);
       zipLookupTimer = setTimeout(() => {
-        void lookupCityFromZip();
+        void runZipLookup();
       }, 280);
     }
 
@@ -502,40 +466,16 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
       try {
         const a = shipTo();
-        const res = await fetch(`${createApi}/api/shipping-quote`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            country,
-            zip,
-            city: a.city || undefined,
-            province: a.province || undefined,
-            lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
-          }),
+        const next = await requestShippingQuote({
+          apiBase: createApi,
+          country,
+          zip,
+          city: a.city || undefined,
+          province: a.province || undefined,
+          lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
         });
         if (seq !== quoteSeq) return;
-        if (!res.ok) {
-          quoteError = true;
-          quote = null;
-          setStatus(labels.error);
-          syncPage();
-          return;
-        }
-        const data = (await res.json()) as {
-          shipping?: string;
-          country?: string;
-          zip?: string;
-          serviceId?: string | number;
-          carrier?: string;
-        };
-        const shipping = Number(data.shipping);
-        const serviceId =
-          data.serviceId == null || data.serviceId === ""
-            ? ""
-            : typeof data.serviceId === "number"
-              ? data.serviceId
-              : String(data.serviceId).trim();
-        if (!Number.isFinite(shipping) || serviceId === "" || serviceId === 0) {
+        if (!next) {
           quoteError = true;
           quote = null;
           setStatus(labels.error);
@@ -543,13 +483,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           syncPage();
           return;
         }
-        quote = {
-          shipping,
-          country: String(data.country || country).toUpperCase(),
-          zip: normalizeZip(String(data.zip || zip), country),
-          serviceId,
-          carrier: String(data.carrier || ""),
-        };
+        quote = next;
         quoteError = false;
         quoteLoading = false;
         const carrier = quote.carrier ? ` · ${quote.carrier}` : "";
@@ -599,7 +533,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       syncPage();
     });
     zipInput?.addEventListener("blur", () => {
-      void lookupCityFromZip();
+      void runZipLookup();
     });
     for (const el of [nameInput, emailInput, phoneInput, streetInput, cityInput, provinceInput]) {
       el?.addEventListener("input", () => {

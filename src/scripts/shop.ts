@@ -15,7 +15,7 @@ async function refreshLiveStock() {
   const api = commerceApiBase();
   if (!api) return;
   try {
-    const res = await fetch(`${api}/api/shipping-quote?live_stock=1`, {
+    const res = await fetch(`${api}/api/live-stock`, {
       credentials: "omit",
     });
     if (!res.ok) return;

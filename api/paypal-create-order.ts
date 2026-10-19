@@ -8,6 +8,12 @@ import {
 } from "../server/paypal.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import { abuseLimit } from "../server/abuse-limit.js";
+import {
+  abandonPaypalCheckoutHold,
+  bindPaypalCheckoutHold,
+  releaseExpiredPaypalHoldsBestEffort,
+  reservePaypalCheckoutHold,
+} from "../server/stock/reserve-paypal-checkout.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /** Only capture orders we created (stock hold) or APPROVED under our merchant. */
@@ -104,15 +110,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shipTo = parseShipTo(body.shipTo, dest.country, dest.zip);
     if (!shipTo) return json(res, 400, { error: "Invalid shipping address" });
 
-    const hasGithub = Boolean((process.env.GITHUB_TOKEN || "").trim());
-    if (hasGithub) {
-      try {
-        const { releaseExpiredPaypalHolds } = await import("../server/github-stock.js");
-        await releaseExpiredPaypalHolds();
-      } catch (err) {
-        console.warn("paypal-create: releaseExpiredPaypalHolds", err);
-      }
-    }
+    await releaseExpiredPaypalHoldsBestEffort();
 
     const priced = await priceOrderLines(lines, dest);
     if (priced.ok === false) return json(res, 400, { error: priced.error });
@@ -123,56 +121,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       qty: l.qty,
     }));
 
-    let tmpHoldId = "";
-    if (hasGithub) {
-      const {
-        paypalHoldId,
-        reservePaypalHold,
-        LedgerBusyError,
-      } = await import("../server/github-stock.js");
-      tmpHoldId = paypalHoldId(`tmp_${crypto.randomUUID()}`);
-      try {
-        await reservePaypalHold(tmpHoldId, stockLines, {
-          expectedTotal: money(priced.order.total),
-        });
-      } catch (err) {
-        if (err instanceof LedgerBusyError) {
-          return json(res, 503, { error: "Stock busy, retry" });
-        }
-        const msg = err instanceof Error ? err.message : String(err);
-        console.error("paypal-create: stock reserve failed", msg);
-        if (msg.includes("INSUFFICIENT_STOCK")) {
-          return json(res, 409, { error: "Out of stock" });
-        }
-        return json(res, 503, { error: "Stock unavailable, retry" });
-      }
+    const reserved = await reservePaypalCheckoutHold(stockLines, priced.order.total);
+    if (!reserved.ok) {
+      return json(res, reserved.http, { error: reserved.error });
     }
+    const tmpHoldId = reserved.tmpHoldId;
 
     let orderId: string;
     try {
       orderId = await createPayPalCheckoutOrder(priced.order, shipTo);
     } catch (err) {
-      if (tmpHoldId) {
-        try {
-          const { abandonPaypalHold } = await import("../server/github-stock.js");
-          await abandonPaypalHold(tmpHoldId);
-        } catch (restoreErr) {
-          console.error("paypal-create: abandon hold failed", restoreErr);
-        }
-      }
+      await abandonPaypalCheckoutHold(tmpHoldId);
       throw err;
     }
 
-    if (tmpHoldId) {
-      try {
-        const { bindPaypalHold } = await import("../server/github-stock.js");
-        await bindPaypalHold(tmpHoldId, orderId);
-      } catch (err) {
-        console.error("paypal-create: bind hold failed", err);
-        // Stock is already reserved under tmp; bind failure leaves units locked until TTL release.
-        // Still return the order — webhook can fall back to live decrement.
-      }
-    }
+    await bindPaypalCheckoutHold(tmpHoldId, orderId);
 
     return json(res, 200, {
       id: orderId,
