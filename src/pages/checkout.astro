@@ -223,7 +223,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     paypalSdk && (
       <script define:vars={{ clientId: paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
-        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=card,credit,paylater,venmo`;
+        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=paylater,venmo`;
         document.head.append(s);
         const g = document.createElement("script");
         g.src = "https://pay.google.com/gp/p/js/pay.js";

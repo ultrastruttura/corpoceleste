@@ -7,7 +7,7 @@ const it = {
   },
   home: {
     title: "Serigrafie d’autore",
-    lede: "",
+    lede: "Un colore, stampato a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand.",
   },
   nav: {
     main: "Principale",
@@ -133,7 +133,7 @@ const it = {
     paypal: "PayPal",
     paypalBack: "Torna a Corpoceleste",
     payTitle: "Scegli il pagamento",
-    methodPaypal: "PayPal / Apple Pay / Google Pay",
+    methodPaypal: "PayPal (carta) / Apple Pay / Google Pay",
     applePay: "Apple Pay",
     googlePay: "Google Pay",
     bank: "Bonifico",
@@ -395,7 +395,7 @@ const en: typeof it = {
   },
   home: {
     title: "Author’s screen prints",
-    lede: "",
+    lede: "One colour, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand.",
   },
   nav: {
     main: "Main",
@@ -519,7 +519,7 @@ const en: typeof it = {
     paypal: "PayPal",
     paypalBack: "Back to Corpoceleste",
     payTitle: "Choose how to pay",
-    methodPaypal: "PayPal / Apple Pay / Google Pay",
+    methodPaypal: "PayPal (card) / Apple Pay / Google Pay",
     applePay: "Apple Pay",
     googlePay: "Google Pay",
     bank: "Bank transfer",
@@ -780,7 +780,7 @@ const de: typeof it = {
   },
   home: {
     title: "Siebdrucke von Autoren",
-    lede: "",
+    lede: "Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand.",
   },
   nav: {
     main: "Hauptnavigation",
@@ -904,7 +904,7 @@ const de: typeof it = {
     paypal: "PayPal",
     paypalBack: "Zurück zu Corpoceleste",
     payTitle: "Zahlung wählen",
-    methodPaypal: "PayPal / Apple Pay / Google Pay",
+    methodPaypal: "PayPal (Karte) / Apple Pay / Google Pay",
     applePay: "Apple Pay",
     googlePay: "Google Pay",
     bank: "Überweisung",
