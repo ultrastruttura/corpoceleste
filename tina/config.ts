@@ -212,7 +212,8 @@ export default defineConfig({
             name: "images",
             label: "Galleria (altre immagini)",
             list: true,
-            description: "Opzionale. Mostrate sotto il testo, stile blog.",
+            description:
+              "Opzionale. Solo foto DI QUESTO pezzo, sotto il testo. Non mettere qui la cover (già sopra) né immagini di altre news: altrimenti compare una miniatura in fondo all’articolo.",
           },
           { type: "string", name: "body_it", label: "Testo (IT)", ui: { component: "textarea" }, required: true },
           { type: "string", name: "body_en", label: "Body (EN)", ui: { component: "textarea" }, required: true },

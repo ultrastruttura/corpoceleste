@@ -7,10 +7,8 @@ excerpt_it: Il guttuso ancora da aaaautenticare
 excerpt_en: Il guttuso ancora da aaaautenticare
 excerpt_de: Il guttuso ancora da aaaautenticare
 cover: /uploads/3.jpg
-images:
-  - /uploads/11280017.JPG
+images: []
 body_it: Il guttuso ancora da aaaautenticareeeee
 body_en: Il guttuso ancora da aaaautenticareeeee
 body_de: Il guttuso ancora da aaaautenticareeeee
 ---
-

@@ -7,12 +7,8 @@ excerpt_it: Prova di un post in news. Placeholder senza immagini. Prova di nuovo
 excerpt_en: News post placeholder. No images yet.
 excerpt_de: News-Platzhalter. Noch keine Bilder.
 cover: /uploads/11280017.JPG
-images:
-  - /uploads/Corpoceleste-logo-scritta.png
-  - /uploads/11280017.JPG
-  - ''
+images: []
 body_it: Prova di un post in news. Placeholder — contenuti e foto in aggiornamento. Prova aggiornata.
 body_en: News post placeholder. Content and photos coming soon.
 body_de: News-Platzhalter. Inhalte und Fotos folgen.
 ---
-
