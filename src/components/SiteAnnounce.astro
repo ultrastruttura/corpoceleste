@@ -1,0 +1,24 @@
+---
+import { localizedSetting, siteSettings } from "../data/settings";
+import { currentLocale } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const enabled = Boolean(siteSettings.announcementEnabled);
+const text = localizedSetting("announcementText", locale).trim();
+const href = siteSettings.announcementLink.trim();
+const show = enabled && Boolean(text);
+---
+
+{
+  show && (
+    <div class="site-announce" role="region" aria-label="Annuncio">
+      {href ? (
+        <a class="site-announce__text" href={href}>
+          {text}
+        </a>
+      ) : (
+        <p class="site-announce__text">{text}</p>
+      )}
+    </div>
+  )
+}

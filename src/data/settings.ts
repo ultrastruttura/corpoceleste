@@ -34,6 +34,10 @@ export const siteSettings = {
   metaDescription: asLocalized(data.metaDescription),
   homeTitle: asLocalized(data.homeTitle),
   homeLede: asLocalized(data.homeLede),
+  /** Top promo / shipping bar (Grind-style). Off when disabled or text empty. */
+  announcementEnabled: Boolean(data.announcementEnabled),
+  announcementText: asLocalized(data.announcementText),
+  announcementLink: String(data.announcementLink ?? "").trim(),
   ogImage: data.ogImage ? String(data.ogImage) : "",
   /** Cloudflare Web Analytics beacon token (public; empty = script off). */
   cloudflareAnalyticsToken: String(data.cloudflareAnalyticsToken ?? "").trim(),
@@ -66,7 +70,7 @@ export const siteSettings = {
 export function localizedSetting(
   field: keyof Pick<
     typeof siteSettings,
-    "metaDescription" | "homeTitle" | "homeLede" | "andreaBio"
+    "metaDescription" | "homeTitle" | "homeLede" | "andreaBio" | "announcementText"
   >,
   locale: Locale,
 ) {

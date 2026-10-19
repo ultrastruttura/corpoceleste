@@ -265,6 +265,20 @@ export default defineConfig({
           localizedText("homeTitle", "H1 home", false),
           localizedText("homeLede", "Sottotitolo home"),
           {
+            type: "boolean",
+            name: "announcementEnabled",
+            label: "Banner annuncio (barra in alto)",
+            description:
+              "Come su grindpromotionrecords: barra rossa sopra l’header. Se spento o senza testo, non compare.",
+          },
+          localizedText("announcementText", "Testo banner annuncio"),
+          {
+            type: "string",
+            name: "announcementLink",
+            label: "Link banner (opzionale)",
+            description: "Es. /vendita/ o https://… — se vuoto il testo non è cliccabile.",
+          },
+          {
             type: "string",
             name: "andreaName",
             label: "Nome in Contatti",
