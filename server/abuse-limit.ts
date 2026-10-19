@@ -1,10 +1,15 @@
-/** IP (+ optional email) abuse limits for public APIs (Turso when available, else memory). */
+/** IP (+ optional email) abuse limits for public APIs (Turso required on Vercel). */
 
 import type { VercelRequest } from "@vercel/node";
 import { portalConfigured } from "./portal/db.js";
 import { clientIp, rateLimit } from "./portal/rate-limit.js";
 
 const memory = new Map<string, { count: number; start: number }>();
+
+function vercelDeployed() {
+  const env = process.env.VERCEL_ENV || "";
+  return env === "production" || env === "preview";
+}
 
 function memoryRateLimit(
   key: string,
@@ -29,9 +34,14 @@ async function limitKey(
   key: string,
   limit: number,
   windowSeconds: number,
-): Promise<{ ok: boolean; retryAfterSec?: number }> {
+): Promise<{ ok: boolean; retryAfterSec?: number; unavailable?: boolean }> {
   if (portalConfigured()) {
     return rateLimit({ key, limit, windowSeconds, failOpen: false });
+  }
+  // Deployed shop without Turso: refuse (memory Map is per-instance / cold-start bypassable).
+  if (vercelDeployed()) {
+    console.error("[abuse-limit] TURSO_* missing on Vercel — refusing public write");
+    return { ok: false, unavailable: true, retryAfterSec: 120 };
   }
   return memoryRateLimit(key, limit, windowSeconds);
 }
@@ -42,7 +52,7 @@ export async function abuseLimit(
   limit: number,
   windowSeconds: number,
   opts?: { email?: string },
-): Promise<{ ok: boolean; retryAfterSec?: number }> {
+): Promise<{ ok: boolean; retryAfterSec?: number; unavailable?: boolean }> {
   const ip = clientIp(req.headers as Record<string, string | string[] | undefined>);
   const byIp = await limitKey(`${prefix}:${ip}`, limit, windowSeconds);
   if (!byIp.ok) return byIp;

@@ -304,7 +304,7 @@ export async function updateShopOrderStatus(
   return getShopOrder(id);
 }
 
-/** Mark bank order as paid (stops 5-day stock auto-release). */
+/** Mark bank order as paid (then decrement GitHub stock if still pending). */
 export async function markShopOrderPaid(id: string): Promise<ShopOrder | null> {
   await ensureSchema();
   const db = getDb();
@@ -314,6 +314,62 @@ export async function markShopOrderPaid(id: string): Promise<ShopOrder | null> {
     args: [now, id],
   });
   return getShopOrder(id);
+}
+
+/**
+ * Decrement GitHub stock for a bank order once (ledger id = external_id).
+ * Idempotent via claimOrResumeLedger / stockComplete.
+ */
+export async function applyBankStockOnPaid(order: ShopOrder): Promise<{ ok: boolean; note: string }> {
+  if (order.source !== "bank") return { ok: true, note: "not bank" };
+  if (!(process.env.GITHUB_TOKEN || "").trim()) {
+    return { ok: false, note: "GITHUB_TOKEN missing" };
+  }
+  const stockLines = order.lines
+    .filter((l) => l.id && l.size && l.qty > 0)
+    .map((l) => ({ id: String(l.id), size: l.size, qty: l.qty }));
+  if (!stockLines.length) return { ok: true, note: "no lines" };
+  try {
+    const {
+      claimOrResumeLedger,
+      applyStockDecrementCheckpointed,
+      writeLedger,
+      LedgerBusyError,
+    } = await import("../github-stock.js");
+    const claim = await claimOrResumeLedger(order.external_id, stockLines, {
+      expectedTotal: order.total.toFixed(2),
+    });
+    if (claim.action === "skip" && claim.ledger.stockComplete) {
+      return { ok: true, note: "already decremented" };
+    }
+    if (claim.action === "skip") {
+      return { ok: false, note: `ledger busy (${claim.ledger.status})` };
+    }
+    const held = await applyStockDecrementCheckpointed(
+      claim.ledger,
+      stockLines,
+      writeLedger,
+    );
+    await writeLedger({
+      ...held,
+      kind: "bank",
+      status: "done",
+      stockComplete: true,
+      at: new Date().toISOString(),
+    });
+    return {
+      ok: true,
+      note: held.stockNotes?.length ? held.stockNotes.join("; ") : "updated",
+    };
+  } catch (err: unknown) {
+    const { LedgerBusyError } = await import("../github-stock.js");
+    if (err instanceof LedgerBusyError) {
+      return { ok: false, note: "stock busy" };
+    }
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("applyBankStockOnPaid", msg);
+    return { ok: false, note: msg.slice(0, 200) };
+  }
 }
 
 export async function isShopOrderPaidByExternalId(externalId: string): Promise<boolean> {

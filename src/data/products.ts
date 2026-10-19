@@ -1,9 +1,16 @@
 import matter from "gray-matter";
+import { parseProductFrontmatter } from "../lib/product-frontmatter";
+import {
+  isPurchasableStatus,
+  maxQtyForStatus,
+  sizeSellable,
+  type ProductStatus,
+} from "../lib/product-status";
 import { artistName, artists } from "./artists";
 import { ui } from "../i18n/dict";
 import type { Locale } from "../i18n/locales";
 
-export type ProductStatus = "available" | "preorder" | "soldout";
+export type { ProductStatus };
 
 /** Forma dell’oggetto in vendita — guida alt immagine e (dopo) UI. */
 export type ProductKind = "shirt" | "print" | "edition";
@@ -56,33 +63,13 @@ function artistIdFromRef(ref: unknown): string {
   return match?.[1] ?? s;
 }
 
-function parseStatus(raw: unknown): ProductStatus {
-  if (raw === "soldout") return "soldout";
-  if (raw === "preorder") return "preorder";
-  return "available";
-}
-
 function parseKind(raw: unknown): ProductKind {
   if (raw === "print" || raw === "edition") return raw;
   return "shirt";
 }
 
 export function isPurchasable(status: ProductStatus) {
-  return status === "available" || status === "preorder";
-}
-
-function parseStock(raw: unknown, sizes: string[]): ProductStock {
-  const stock: ProductStock = {};
-  if (!raw || typeof raw !== "object") {
-    for (const size of sizes) stock[size] = 0;
-    return stock;
-  }
-  const o = raw as Record<string, unknown>;
-  for (const size of sizes) {
-    const n = Number(o[size]);
-    stock[size] = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
-  }
-  return stock;
+  return isPurchasableStatus(status);
 }
 
 /** Pezzi disponibili per taglia (0 = esaurita). */
@@ -108,11 +95,11 @@ export function isLowStock(product: Product, threshold: number) {
 }
 
 export function maxQtyFor(product: Product, size: string) {
-  return Math.min(99, stockOf(product, size));
+  return maxQtyForStatus(product.status, stockOf(product, size));
 }
 
 export function sizeInStock(product: Product, size: string) {
-  return stockOf(product, size) > 0;
+  return sizeSellable(product.status, stockOf(product, size));
 }
 
 /** Almeno una taglia con pezzi > 0 e stato acquistabile. */
@@ -130,13 +117,10 @@ const files = import.meta.glob("../../content/products/*.md", {
 export const products: Product[] = Object.entries(files).map(([path, raw]) => {
   const { data } = matter(raw);
   const slug = path.split("/").pop()!.replace(/\.md$/, "");
+  const core = parseProductFrontmatter(data as Record<string, unknown>, slug);
   const images = Array.isArray(data.images)
     ? data.images.map((x: unknown) => String(x)).filter(Boolean)
     : [];
-  const sizes = Array.isArray(data.sizes)
-    ? data.sizes.map((x: unknown) => String(x))
-    : ["S", "M", "L", "XL"];
-  const resolvedSizes = sizes.length ? sizes : ["S", "M", "L", "XL"];
   const created =
     data.createdAt instanceof Date
       ? data.createdAt.toISOString().slice(0, 10)
@@ -145,20 +129,20 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
   return {
     id: slug,
     slug,
-    title: String(data.title ?? slug),
+    title: core.title,
     artistId: artistIdFromRef(data.artist),
-    price: Number(data.price ?? 0),
+    price: core.price,
     nuovo: Boolean(data.nuovo),
     createdAt: created || "2017-01-01",
-    status: parseStatus(data.status),
+    status: core.status,
     kind: parseKind(data.kind),
     color: String(data.color ?? "#141414"),
     colorName: String(data.colorName ?? "Nero"),
     composition: String(data.composition ?? ""),
     images,
     print: images[0] ?? "",
-    sizes: resolvedSizes,
-    stock: parseStock(data.stock, resolvedSizes),
+    sizes: core.sizes,
+    stock: core.stock,
     description: asLocalized(data.description),
     seoDescription: asLocalized(data.seoDescription),
   };

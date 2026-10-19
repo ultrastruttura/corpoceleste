@@ -4,6 +4,7 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
+import { parseProductFrontmatter } from "../src/lib/product-frontmatter.js";
 
 /**
  * Preview Sendcloud cheapest rate for checkout UI.
@@ -52,28 +53,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const id = f.name.replace(/\.md$/, "");
         const raw = await fetch(f.download_url).then((r) => r.text());
         const { data } = matter(raw);
-        const sizes = Array.isArray(data.sizes)
-          ? data.sizes.map((x: unknown) => String(x))
-          : ["S", "M", "L", "XL"];
-        const stock: Record<string, number> = {};
-        const rawStock =
-          data.stock && typeof data.stock === "object"
-            ? (data.stock as Record<string, unknown>)
-            : {};
-        for (const size of sizes) {
-          const n = Number(rawStock[size]);
-          stock[size] = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
-        }
+        const core = parseProductFrontmatter(data as Record<string, unknown>, id);
         products.push({
           id,
-          stock,
-          status:
-            data.status === "soldout"
-              ? "soldout"
-              : data.status === "preorder"
-                ? "preorder"
-                : "available",
-          price: Number(data.price ?? 0),
+          stock: core.stock,
+          status: core.status,
+          price: core.price,
         });
       }
       res.setHeader("Cache-Control", "public, max-age=30");

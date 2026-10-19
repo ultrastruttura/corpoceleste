@@ -1,4 +1,10 @@
-import { parseOrderLines, parseSku, encodeSku, type OrderLine } from "../src/lib/paypal-lines.js";
+import {
+  mergeOrderLines,
+  parseOrderLines,
+  parseSku,
+  encodeSku,
+  type OrderLine,
+} from "../src/lib/paypal-lines.js";
 import type { PricedOrder } from "./order-pricing.js";
 import { money } from "./order-pricing.js";
 
@@ -13,6 +19,7 @@ type PayPalItem = {
 
 export type PayPalOrder = {
   id?: string;
+  status?: string;
   payer?: { email_address?: string };
   purchase_units?: Array<{
     custom_id?: string;
@@ -69,21 +76,10 @@ export function linesFromOrder(order: PayPalOrder): OrderLine[] {
     const qty = Math.max(1, Math.floor(Number(item.quantity) || 1));
     fromItems.push({ id: parsed.id, size: parsed.size, qty });
   }
-  if (fromItems.length) return mergeLines(fromItems);
+  if (fromItems.length) return mergeOrderLines(fromItems);
 
-  if (unit.custom_id) return mergeLines(parseOrderLines(unit.custom_id));
+  if (unit.custom_id) return mergeOrderLines(parseOrderLines(unit.custom_id));
   return [];
-}
-
-function mergeLines(lines: OrderLine[]): OrderLine[] {
-  const map = new Map<string, OrderLine>();
-  for (const line of lines) {
-    const key = `${line.id}::${line.size}`;
-    const prev = map.get(key);
-    if (prev) prev.qty += line.qty;
-    else map.set(key, { ...line });
-  }
-  return [...map.values()];
 }
 
 export function paypalApiBase() {

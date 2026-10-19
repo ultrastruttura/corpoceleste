@@ -28,9 +28,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).send("Missing fields");
   }
 
-  const limited = await abuseLimit(req, "order", 3, 60 * 60, { email });
+  const limited = await abuseLimit(req, "order", 2, 60 * 60, { email });
   if (!limited.ok) {
     res.setHeader("Retry-After", String(limited.retryAfterSec || 60));
+    if (limited.unavailable) return res.status(503).send("Service unavailable");
     return res.status(429).send("Too many requests");
   }
 
@@ -89,65 +90,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { newId, portalConfigured } = await import("../server/portal/db.js");
   const bankId = newId("bank");
 
-  // Hold GitHub stock before notifying (parity with PayPal). Released after 5 days if unpaid.
-  let stockNote = "";
-  if (pricedOrder && (process.env.GITHUB_TOKEN || "").trim()) {
-    const stockLines = pricedOrder.lines.map((l) => ({
-      id: l.id,
-      size: l.size,
-      qty: l.qty,
-    }));
-    try {
-      const {
-        claimOrResumeLedger,
-        applyStockDecrementCheckpointed,
-        writeLedger,
-        LedgerBusyError,
-      } = await import("../server/github-stock.js");
-      // Best-effort: free abandoned PayPal holds so this bank order can take last units.
-      try {
-        const { releaseExpiredPaypalHolds } = await import("../server/github-stock.js");
-        await releaseExpiredPaypalHolds();
-      } catch (err) {
-        console.warn("order: releaseExpiredPaypalHolds", err);
-      }
-      const claim = await claimOrResumeLedger(bankId, stockLines, {
-        expectedTotal: money(pricedOrder.total),
-      });
-      if (claim.action === "process" && !claim.ledger.stockComplete) {
-        const held = await applyStockDecrementCheckpointed(
-          claim.ledger,
-          stockLines,
-          writeLedger,
-        );
-        await writeLedger({
-          ...held,
-          kind: "bank",
-          status: "done",
-          stockComplete: true,
-          at: new Date().toISOString(),
-        });
-        stockNote = held.stockNotes?.length
-          ? `Magazzino:\n${held.stockNotes.join("\n")}`
-          : "Magazzino: aggiornato";
-      } else if (claim.action === "skip") {
-        stockNote = "Magazzino: già scalato (ledger)";
-      }
-    } catch (err) {
-      const { LedgerBusyError } = await import("../server/github-stock.js");
-      if (err instanceof LedgerBusyError) {
-        return res.status(503).send("Stock busy, retry");
-      }
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error("order: stock hold failed", msg);
-      if (msg.includes("INSUFFICIENT_STOCK")) {
-        return res.status(409).send("Out of stock");
-      }
-      stockNote = `Magazzino: NON aggiornato automaticamente (${msg.slice(0, 200)}). Aggiorna a mano su Tina.`;
-    }
-  } else if (pricedOrder) {
-    stockNote = "Magazzino: GITHUB_TOKEN assente — aggiorna a mano su Tina.";
-  }
+  // Soft-hold: stock is checked in priceOrderLines but only decremented when admin
+  // marks the bonifico paid (avoids unpaid orders locking inventory for days).
+  let stockNote =
+    pricedOrder && (process.env.GITHUB_TOKEN || "").trim()
+      ? "Magazzino: verrà scalato alla conferma bonifico (area personale)."
+      : pricedOrder
+        ? "Magazzino: GITHUB_TOKEN assente — aggiorna a mano su Tina alla conferma."
+        : "";
 
   let orderNumber = bankId;
   if (pricedOrder && portalConfigured()) {

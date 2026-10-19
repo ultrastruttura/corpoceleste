@@ -1,3 +1,4 @@
+import { isPurchasableStatus } from "../lib/product-status";
 import { addItem } from "./cart";
 import { bindCart, openCart } from "./cart-ui";
 import { applyLiveStock, catalogProduct } from "./catalog";
@@ -49,7 +50,7 @@ function bind() {
       const fd = new FormData(form);
       const id = String(fd.get("id") || "");
       const p = catalogProduct(id);
-      if (!p || (p.status !== "available" && p.status !== "preorder")) return;
+      if (!p || !isPurchasableStatus(p.status)) return;
       const ok = addItem({
         id,
         slug: String(fd.get("slug") || id),

@@ -3,11 +3,32 @@ import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.j
 import {
   capturePayPalOrder,
   createPayPalCheckoutOrder,
+  fetchPayPalOrder,
   type CheckoutShipTo,
 } from "../server/paypal.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import { abuseLimit } from "../server/abuse-limit.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
+
+/** Only capture orders we created (stock hold) or APPROVED under our merchant. */
+async function assertCapturableOrder(orderId: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  if ((process.env.GITHUB_TOKEN || "").trim()) {
+    try {
+      const { getLedger, paypalHoldId } = await import("../server/github-stock.js");
+      const hold = await getLedger(paypalHoldId(orderId));
+      if (hold?.kind === "paypal_hold" && !hold.releasedAt) return { ok: true };
+    } catch (err) {
+      console.warn("paypal-create: hold lookup for capture", err);
+    }
+  }
+  try {
+    const order = await fetchPayPalOrder(orderId);
+    if (String(order.status || "").toUpperCase() === "APPROVED") return { ok: true };
+    return { ok: false, error: "Order not approved" };
+  } catch {
+    return { ok: false, error: "Unknown order" };
+  }
+}
 
 function parseShipTo(raw: Partial<CheckoutShipTo> | undefined, country: string, zip: string): CheckoutShipTo | null {
   if (!raw) return null;
@@ -45,6 +66,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const limited = await abuseLimit(req, "paypal-create", 15, 15 * 60);
   if (!limited.ok) {
+    if (limited.unavailable) {
+      return json(res, 503, { error: "Service unavailable", retryAfterSec: limited.retryAfterSec });
+    }
     return json(res, 429, { error: "Too many requests", retryAfterSec: limited.retryAfterSec });
   }
 
@@ -62,6 +86,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (body.action === "capture") {
       const orderId = String(body.orderId || "").trim();
       if (!orderId) return json(res, 400, { error: "Missing orderId" });
+      const allowed = await assertCapturableOrder(orderId);
+      if (!allowed.ok) return json(res, 403, { error: allowed.error });
       const captured = await capturePayPalOrder(orderId);
       return json(res, 200, { ok: true, id: captured.id, status: captured.status });
     }

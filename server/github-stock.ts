@@ -619,7 +619,8 @@ export async function consumePaypalHold(
 }
 
 const PAYPAL_HOLD_TTL_MS = 3 * 60 * 60 * 1000;
-const BANK_HOLD_TTL_MS = 5 * 24 * 60 * 60 * 1000;
+/** Legacy bank holds that decremented stock before soft-hold; unpaid release after 48h. */
+const BANK_HOLD_TTL_MS = 2 * 24 * 60 * 60 * 1000;
 
 /** Restore stock for abandoned PayPal create-order holds (default 3h). */
 export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<string[]> {
@@ -651,7 +652,8 @@ export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<strin
 }
 
 /**
- * Restore stock for unpaid bank holds older than 5 days.
+ * Restore stock for unpaid bank holds older than BANK_HOLD_TTL (48h).
+ * New bank orders soft-hold (stock only on mark paid); this cleans legacy decrements.
  * `isPaid(externalId)` should return true when Andrea confirmed the transfer.
  */
 export async function releaseExpiredBankHolds(
@@ -675,7 +677,7 @@ export async function releaseExpiredBankHolds(
       kind: "bank",
       releasedAt: new Date(now).toISOString(),
       status: "done",
-      error: `released unpaid bank hold after 5 days; ${notes.join("; ")}`,
+      error: `released unpaid bank hold after 48h; ${notes.join("; ")}`,
       at: new Date(now).toISOString(),
     });
     out.push(file.id);

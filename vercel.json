@@ -10,10 +10,6 @@
   ],
   "rewrites": [
     {
-      "source": "/api/sendcloud-webhook",
-      "destination": "/api/form?sendcloud_hook=1"
-    },
-    {
       "source": "/api/cron-stock-release",
       "destination": "/api/form?job=stock_release"
     }
@@ -25,6 +21,7 @@
     "api/order.ts": { "memory": 256, "maxDuration": 20 },
     "api/withdrawal.ts": { "memory": 256, "maxDuration": 15 },
     "api/form.ts": { "memory": 256, "maxDuration": 15 },
+    "api/sendcloud-webhook.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/auth.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/users.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/deals.ts": { "memory": 256, "maxDuration": 15 },

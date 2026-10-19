@@ -7,10 +7,7 @@ import {
   sendNewsletterConfirmEmail,
   verifyNewsletterConfirm,
 } from "../server/newsletter.js";
-import {
-  handleSendcloudWebhook,
-  isSendcloudWebhookRequest,
-} from "../server/sendcloud-webhook-handler.js";
+import { cors, requireSiteOrigin } from "../server/portal/http.js";
 
 const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newsletter"]);
 
@@ -26,7 +23,7 @@ function cronAuthorized(req: VercelRequest) {
   return auth === `Bearer ${secret}`;
 }
 
-/** Release unpaid PayPal holds (3h) and bank holds (5 days). Cron or CRON_SECRET. */
+/** Release unpaid PayPal holds (3h) and legacy bank holds (48h). Cron or CRON_SECRET. */
 async function runStockReleaseJob(res: VercelResponse) {
   if (!(process.env.GITHUB_TOKEN || "").trim()) {
     return res.status(503).json({ error: "GITHUB_TOKEN missing" });
@@ -42,7 +39,7 @@ async function runStockReleaseJob(res: VercelResponse) {
       const { isShopOrderPaidByExternalId } = await import("../server/portal/orders.js");
       bank = await releaseExpiredBankHolds((id) => isShopOrderPaidByExternalId(id));
     } else {
-      // Without portal, treat all bank holds as unpaid after 5 days.
+      // Without portal, treat all bank holds as unpaid after TTL.
       bank = await releaseExpiredBankHolds(async () => false);
     }
   } catch (err) {
@@ -53,13 +50,10 @@ async function runStockReleaseJob(res: VercelResponse) {
 
 /**
  * Generic site forms → Resend to shop. Contact, newsletter, workshops, consulting, reprint.
- * Also: Sendcloud webhook (?sendcloud_hook=1), newsletter confirm (?nl_confirm=), stock cron (?job=stock_release).
+ * Also: newsletter confirm (?nl_confirm=), stock cron (?job=stock_release).
+ * Sendcloud webhooks: /api/sendcloud-webhook (raw body + HMAC).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (isSendcloudWebhookRequest(req)) {
-    return handleSendcloudWebhook(req, res);
-  }
-
   const job = queryFlag(req, "job");
   if (job === "stock_release") {
     if (req.method !== "GET" && req.method !== "POST") {
@@ -102,6 +96,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
+  cors(req, res);
+  if (!requireSiteOrigin(req, res)) return;
 
   const body = parseForm(req);
   const subject = safeSubject(field(body, "_subject"), "Messaggio dal sito Corpoceleste");
@@ -117,6 +113,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const limited = await abuseLimit(req, "form", 5, 60 * 60, { email });
   if (!limited.ok) {
     res.setHeader("Retry-After", String(limited.retryAfterSec || 60));
+    if (limited.unavailable) return res.status(503).send("Service unavailable");
     return res.status(429).send("Too many requests");
   }
 

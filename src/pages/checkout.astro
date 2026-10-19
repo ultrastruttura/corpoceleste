@@ -233,6 +233,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
   <script>
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
+    import { normalizeZip } from "../lib/ship-normalize";
 
     /** Browser-safe: do not import data/commerce (gray-matter → Buffer). */
     const apiBase = () =>
@@ -294,13 +295,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     let quoteLoading = false;
     let quoteSeq = 0;
     let quoteTimer: ReturnType<typeof setTimeout> | undefined;
-
-    function normalizeZip(z: string, country: string) {
-      let out = z.trim().toUpperCase().replace(/\s+/g, " ");
-      if (country === "IT") out = out.replace(/\s+/g, "").replace(/[^0-9]/g, "").slice(0, 5);
-      else out = out.replace(/[^A-Z0-9 -]/g, "").slice(0, 22);
-      return out;
-    }
 
     function destCountry() {
       return String(countrySel?.value || "IT").toUpperCase();

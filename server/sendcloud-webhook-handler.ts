@@ -3,14 +3,28 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 /**
  * Handler eventi Sendcloud (status / tracking).
- * Esposto come /api/sendcloud-webhook via rewrite → /api/form.
+ * Esposto come /api/sendcloud-webhook (bodyParser: false).
  * Verifica header `Sendcloud-Signature` = HMAC-SHA256(raw body, secret key).
  */
 
-function rawBody(req: VercelRequest): string {
+async function rawBody(req: VercelRequest): Promise<string> {
   if (typeof req.body === "string") return req.body;
   if (Buffer.isBuffer(req.body)) return req.body.toString("utf8");
-  if (req.body == null) return "";
+  // Prefer stream when bodyParser is disabled (Vercel may leave body unset).
+  if (req.body == null) {
+    const chunks: Buffer[] = [];
+    try {
+      const stream = req as unknown as AsyncIterable<Buffer | string>;
+      for await (const chunk of stream) {
+        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+      }
+    } catch {
+      return "";
+    }
+    if (chunks.length) return Buffer.concat(chunks).toString("utf8");
+    return "";
+  }
+  // Last resort — may fail HMAC if Vercel already parsed JSON.
   return JSON.stringify(req.body);
 }
 
@@ -46,7 +60,7 @@ export async function handleSendcloudWebhook(req: VercelRequest, res: VercelResp
 
   const headerRaw = req.headers["sendcloud-signature"];
   const signature = String(Array.isArray(headerRaw) ? headerRaw[0] : headerRaw || "");
-  const body = rawBody(req);
+  const body = await rawBody(req);
   if (!signatureOk(body, signature, secret)) {
     return res.status(401).json({ error: "Unauthorized" });
   }

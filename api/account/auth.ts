@@ -14,7 +14,18 @@ import {
 } from "../../server/portal/auth.js";
 import { portalConfigured } from "../../server/portal/db.js";
 import { mailConfigured } from "../../server/mail.js";
-import { bearer, cors, json, readJson, requireSiteOrigin, requireUser } from "../../server/portal/http.js";
+import {
+  cors,
+  json,
+  readJson,
+  requireSiteOrigin,
+  requireUser,
+  sessionToken,
+} from "../../server/portal/http.js";
+import {
+  clearSessionCookie,
+  setSessionCookie,
+} from "../../server/portal/session-cookie.js";
 import { clientIp, rateLimit } from "../../server/portal/rate-limit.js";
 
 const LOGIN_MSG =
@@ -49,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await ensureAdmin();
 
     if (req.method === "GET") {
-      const user = await sessionUser(bearer(req));
+      const user = await sessionUser(sessionToken(req));
       return json(res, 200, { user, configured: true });
     }
 
@@ -123,6 +134,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (allowDevMagicLinks()) {
         const session = await createSession(user.id);
         console.info("[portal] login instant (dev)", user.email);
+        setSessionCookie(res, session.token, session.expires_at);
         return json(res, 200, {
           ok: true,
           emailed: false,
@@ -213,9 +225,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       // If another user was logged in on this browser, kill that session so
       // opening an artist invite never leaves you as admin in other tabs.
-      const prev = String(body.replace_session || bearer(req) || "").trim();
+      const prev = String(body.replace_session || sessionToken(req) || "").trim();
       if (prev) await destroySession(prev);
       const session = await createSession(consumed.user.id);
+      setSessionCookie(res, session.token, session.expires_at);
       return json(res, 200, {
         ok: true,
         user: consumed.user,
@@ -225,13 +238,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (action === "logout") {
-      const t = bearer(req);
+      const t = sessionToken(req);
       if (t) await destroySession(t);
+      clearSessionCookie(res);
       return json(res, 200, { ok: true });
     }
 
     if (action === "me") {
-      const user = await sessionUser(bearer(req));
+      const user = await sessionUser(sessionToken(req));
       return json(res, user ? 200 : 401, {
         user,
         mailConfigured: user?.role === "admin" ? mailConfigured() : undefined,

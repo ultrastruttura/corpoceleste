@@ -2,15 +2,20 @@
 
 import { isPurchasableStatus, loadCatalogProduct } from "./catalog.js";
 import { isSupportedShipCountry } from "../src/lib/ship-countries.js";
+import { mergeOrderLines } from "../src/lib/paypal-lines.js";
+import { normalizeCountry, normalizeZip } from "../src/lib/ship-normalize.js";
 import {
-  normalizeCountry,
-  normalizeZip,
   packagesForQty,
   quoteShipping,
   sendcloudConfigured,
   type ShippingQuote,
 } from "./sendcloud.js";
 import type { OrderLine } from "./paypal.js";
+
+/** Server caps — client maxQty is UX only; APIs must enforce these. */
+export const MAX_ORDER_LINE_QTY = 99;
+export const MAX_ORDER_LINES = 20;
+export const MAX_ORDER_PIECES = 99;
 
 export type PricedLine = OrderLine & {
   title: string;
@@ -83,6 +88,9 @@ export async function priceOrderLines(
   opts?: { ignoreStock?: boolean },
 ): Promise<{ ok: true; order: PricedOrder } | { ok: false; error: string }> {
   if (!rawLines.length) return { ok: false, error: "Empty cart" };
+  if (rawLines.length > MAX_ORDER_LINES * 3) {
+    return { ok: false, error: "Too many lines" };
+  }
 
   const shipCountry = normalizeCountry(dest.country);
   const shipZip = normalizeZip(dest.zip, shipCountry);
@@ -93,22 +101,16 @@ export async function priceOrderLines(
     return { ok: false, error: "Invalid shipping destination" };
   }
 
-  const merged = new Map<string, OrderLine>();
-  for (const line of rawLines) {
-    const id = String(line.id || "").trim();
-    const size = String(line.size || "").trim();
-    const qty = Math.max(1, Math.floor(Number(line.qty) || 0));
-    if (!id || !size || qty < 1) return { ok: false, error: "Invalid line" };
-    const key = `${id}::${size}`;
-    const prev = merged.get(key);
-    if (prev) prev.qty += qty;
-    else merged.set(key, { id, size, qty });
+  const merged = mergeOrderLines(rawLines, { maxQty: MAX_ORDER_LINE_QTY });
+  if (!merged.length) return { ok: false, error: "Invalid line" };
+  if (merged.length > MAX_ORDER_LINES) {
+    return { ok: false, error: "Too many lines" };
   }
 
   const priced: PricedLine[] = [];
   let merchandise = 0;
   let pieceCount = 0;
-  for (const line of merged.values()) {
+  for (const line of merged) {
     const product = await loadCatalogProduct(line.id);
     if (!product) return { ok: false, error: `Unknown product ${line.id}` };
     if (!isPurchasableStatus(product.status)) {
@@ -118,7 +120,7 @@ export async function priceOrderLines(
       return { ok: false, error: `Invalid size ${line.id} ${line.size}` };
     }
     const stock = product.stock[line.size] ?? 0;
-    // Pre-order may sell at 0 stock; available items must have enough units.
+    // Pre-order may sell at 0 stock but still capped by MAX_ORDER_LINE_QTY.
     // ignoreStock: PayPal webhook after create-order already reserved units.
     if (!opts?.ignoreStock && product.status !== "preorder" && stock < line.qty) {
       return { ok: false, error: `Out of stock ${line.id} ${line.size}` };
@@ -130,6 +132,9 @@ export async function priceOrderLines(
     const lineTotal = Math.round(unitPrice * line.qty * 100) / 100;
     merchandise += lineTotal;
     pieceCount += line.qty;
+    if (pieceCount > MAX_ORDER_PIECES) {
+      return { ok: false, error: "Too many pieces" };
+    }
     priced.push({
       id: line.id,
       size: line.size,

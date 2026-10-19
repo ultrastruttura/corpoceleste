@@ -4,6 +4,7 @@ import {
   deleteShopOrder,
   getShopOrder,
   listShopOrders,
+  applyBankStockOnPaid,
   markShopOrderPaid,
   updateShopOrderStatus,
   type ShopOrder,
@@ -126,8 +127,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (body.paid === true) {
         const order = await markShopOrderPaid(body.id);
         if (!order) return json(res, 404, { error: "Order not found" });
-        // Book artist deal sales when bank payment is confirmed.
+        // Soft-hold: scale GitHub stock only when bonifico is confirmed.
         if (order.source === "bank") {
+          const stock = await applyBankStockOnPaid(order);
+          if (!stock.ok) {
+            console.error("orders: bank stock on paid failed", order.external_id, stock.note);
+            return json(res, 503, {
+              error: `Pagato, ma magazzino non aggiornato: ${stock.note}`,
+              order,
+            });
+          }
           try {
             const { recordSalesFromOrder } = await import("../../server/portal/deals.js");
             await recordSalesFromOrder({

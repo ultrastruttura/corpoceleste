@@ -14,13 +14,11 @@ function apiPublicBase() {
   return raw.replace(/\/$/, "");
 }
 
+/** Fail-closed: never fall back to CRON/RESEND keys or a hardcoded default. */
 function secret() {
-  return (
-    (process.env.NEWSLETTER_SECRET || "").trim() ||
-    (process.env.CRON_SECRET || "").trim() ||
-    (process.env.RESEND_API_KEY || "").trim() ||
-    "corpoceleste-newsletter-dev"
-  );
+  const s = (process.env.NEWSLETTER_SECRET || "").trim();
+  if (!s) throw new Error("Missing NEWSLETTER_SECRET");
+  return s;
 }
 
 function b64url(buf: Buffer) {
@@ -57,7 +55,14 @@ export async function sendNewsletterConfirmEmail(opts: {
   locale?: string;
 }): Promise<{ ok: boolean; error?: string }> {
   const locale = opts.locale || "it";
-  const token = signNewsletterConfirm(opts.email, locale);
+  let token: string;
+  try {
+    token = signNewsletterConfirm(opts.email, locale);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("newsletter: sign failed", msg);
+    return { ok: false, error: msg };
+  }
   const url = `${apiPublicBase()}/api/form?nl_confirm=${encodeURIComponent(token)}`;
   const text =
     locale === "en"

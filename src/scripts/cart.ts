@@ -1,12 +1,9 @@
+import { isPurchasableStatus } from "../lib/product-status";
 import {
   catalogMaxQty,
   catalogProduct,
   catalogSizeInStock,
 } from "./catalog";
-
-function canBuy(status: string | undefined) {
-  return status === "available" || status === "preorder";
-}
 
 const KEY = "corpoceleste-cart";
 export const LAST_ORDER_KEY = "cc-last-order";
@@ -48,7 +45,7 @@ export function sanitizeCart() {
 
   for (const item of raw) {
     const p = catalogProduct(item.id);
-    if (!p || !canBuy(p.status) || !catalogSizeInStock(p, item.size)) continue;
+    if (!p || !isPurchasableStatus(p.status) || !catalogSizeInStock(p, item.size)) continue;
     const size = p.sizes.includes(item.size) ? item.size : "";
     if (!size || !catalogSizeInStock(p, size)) continue;
     const max = catalogMaxQty(p, size);
@@ -92,7 +89,7 @@ export function total() {
 
 export function addItem(item: Omit<CartItem, "qty" | "price" | "title"> & { qty?: number; price?: number; title?: string }) {
   const p = catalogProduct(item.id);
-  if (!p || !canBuy(p.status)) return false;
+  if (!p || !isPurchasableStatus(p.status)) return false;
   const size = p.sizes.includes(item.size) ? item.size : p.sizes.find((s) => catalogSizeInStock(p, s));
   if (!size || !catalogSizeInStock(p, size)) return false;
 

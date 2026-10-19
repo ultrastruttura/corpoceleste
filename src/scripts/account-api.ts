@@ -56,11 +56,13 @@ export function apiRoot(el: HTMLElement) {
 export async function apiFetch(base: string, path: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers || {});
   headers.set("Content-Type", "application/json");
+  // Bearer kept as fallback when third-party cookies are blocked; HttpOnly cookie is primary.
   const session = getSession();
   if (session) headers.set("Authorization", `Bearer ${session}`);
   const res = await fetch(`${base}/api/account/${path.replace(/^\//, "")}`, {
     ...init,
     headers,
+    credentials: "include",
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

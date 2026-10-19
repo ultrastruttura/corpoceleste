@@ -1,5 +1,29 @@
 export type OrderLine = { id: string; size: string; qty: number };
 
+/** Merge duplicate id+size lines; optional per-line qty ceiling. */
+export function mergeOrderLines(
+  lines: OrderLine[],
+  opts?: { maxQty?: number },
+): OrderLine[] {
+  const maxQty = opts?.maxQty;
+  const map = new Map<string, OrderLine>();
+  for (const line of lines) {
+    const id = String(line.id || "").trim();
+    const size = String(line.size || "").trim();
+    let qty = Math.max(1, Math.floor(Number(line.qty) || 0));
+    if (!id || !size || qty < 1) continue;
+    if (maxQty != null) qty = Math.min(maxQty, qty);
+    const key = `${id}::${size}`;
+    const prev = map.get(key);
+    if (prev) {
+      prev.qty = maxQty != null ? Math.min(maxQty, prev.qty + qty) : prev.qty + qty;
+    } else {
+      map.set(key, { id, size, qty });
+    }
+  }
+  return [...map.values()];
+}
+
 /** Encode cart lines for PayPal custom_id (max 127 chars). */
 export function encodeOrderLines(lines: OrderLine[]): string {
   return lines

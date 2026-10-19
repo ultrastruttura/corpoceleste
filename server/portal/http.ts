@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sessionUser, type PortalUser } from "./auth.js";
 import { portalConfigured } from "./db.js";
+import { readSessionCookie } from "./session-cookie.js";
 
 function originOnly(value: string) {
   const v = value.trim();
@@ -107,6 +108,11 @@ export function bearer(req: VercelRequest) {
   return m?.[1]?.trim() || null;
 }
 
+/** Prefer Authorization Bearer; fall back to HttpOnly cookie. */
+export function sessionToken(req: VercelRequest) {
+  return bearer(req) || readSessionCookie(req);
+}
+
 export async function readJson<T = Record<string, unknown>>(req: VercelRequest): Promise<T> {
   if (Buffer.isBuffer(req.body)) {
     const raw = req.body.toString("utf8").trim();
@@ -162,7 +168,7 @@ export async function requireUser(
     json(res, 503, { error: "Portal DB not configured (TURSO_DATABASE_URL)" });
     return null;
   }
-  const user = await sessionUser(bearer(req));
+  const user = await sessionUser(sessionToken(req));
   if (!user) {
     json(res, 401, { error: "Unauthorized" });
     return null;

@@ -668,7 +668,7 @@ if (!root || !app) {
     if (session) headers.set("Authorization", `Bearer ${session}`);
     const res = await fetch(
       `${base}/api/account/orders?id=${encodeURIComponent(orderId)}&pdf=1`,
-      { headers },
+      { headers, credentials: "include" },
     );
     if (!res.ok) throw new Error("PDF non disponibile");
     const blob = await res.blob();
@@ -792,7 +792,10 @@ if (!root || !app) {
         const session = getSession();
         const res = await fetch(
           `${base}/api/account/orders?status=${encodeURIComponent(statusFilter)}&csv=1`,
-          { headers: session ? { Authorization: `Bearer ${session}` } : {} },
+          {
+            headers: session ? { Authorization: `Bearer ${session}` } : {},
+            credentials: "include",
+          },
         );
         if (!res.ok) throw new Error("Export fallito");
         const blob = await res.blob();

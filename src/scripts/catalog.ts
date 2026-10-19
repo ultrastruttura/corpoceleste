@@ -1,3 +1,9 @@
+import {
+  maxQtyForStatus,
+  sizeSellable,
+  type ProductStatus,
+} from "../lib/product-status";
+
 export type CatalogProduct = {
   id: string;
   title: string;
@@ -5,7 +11,7 @@ export type CatalogProduct = {
   sizes: string[];
   stock: Record<string, number>;
   price: number;
-  status: "available" | "preorder" | "soldout";
+  status: ProductStatus;
   print: string;
   imageAlt: string;
 };
@@ -30,13 +36,11 @@ export function catalogStock(p: CatalogProduct, size: string) {
 }
 
 export function catalogMaxQty(p: CatalogProduct, size: string) {
-  if (p.status === "preorder") return 99;
-  return Math.min(99, catalogStock(p, size));
+  return maxQtyForStatus(p.status, catalogStock(p, size));
 }
 
 export function catalogSizeInStock(p: CatalogProduct, size: string) {
-  if (p.status === "preorder") return true;
-  return catalogStock(p, size) > 0;
+  return sizeSellable(p.status, catalogStock(p, size));
 }
 
 /** Merge live GitHub stock into the build-time catalog (checkout / cart). */

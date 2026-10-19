@@ -3,9 +3,13 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import { customerWithdrawalText } from "../server/customer-mail.js";
 import { field, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { nowRome, sendMail } from "../server/mail.js";
+import { cors, requireSiteOrigin } from "../server/portal/http.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  cors(req, res);
+  if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
+  if (!requireSiteOrigin(req, res)) return;
 
   const body = parseForm(req);
   const next = thanksUrl(body, "recesso");
@@ -21,6 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const limited = await abuseLimit(req, "withdrawal", 3, 60 * 60, { email });
   if (!limited.ok) {
     res.setHeader("Retry-After", String(limited.retryAfterSec || 60));
+    if (limited.unavailable) return res.status(503).send("Service unavailable");
     return res.status(429).send("Too many requests");
   }
 
