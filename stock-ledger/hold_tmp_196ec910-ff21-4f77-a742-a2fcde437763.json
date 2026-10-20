@@ -8,8 +8,8 @@
     }
   ],
   "emailed": false,
-  "status": "processing",
-  "at": "2026-10-20T10:27:59.319Z",
+  "status": "done",
+  "at": "2026-10-20T10:28:00.648Z",
   "expectedTotal": "7.50",
   "stockNotes": [
     "daniele-de-batte M 3→2"
@@ -17,5 +17,6 @@
   "stockAppliedKeys": [
     "daniele-de-batte:M:1"
   ],
-  "stockComplete": true
+  "stockComplete": true,
+  "kind": "paypal_hold"
 }
