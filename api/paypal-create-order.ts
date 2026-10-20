@@ -123,7 +123,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const reserved = await reservePaypalCheckoutHold(stockLines, priced.order.total);
     if (reserved.ok === false) {
-      return json(res, reserved.http, { error: reserved.error });
+      return json(res, reserved.http, {
+        error: reserved.error,
+        ...(reserved.detail ? { detail: reserved.detail } : {}),
+      });
     }
     const tmpHoldId = reserved.tmpHoldId;
 

@@ -664,13 +664,21 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           const errText = await res.text();
           console.error("paypal-create-order failed", res.status, errText);
           let apiError = "";
+          let apiDetail = "";
           try {
-            apiError = String((JSON.parse(errText) as { error?: string }).error || "");
+            const parsed = JSON.parse(errText) as { error?: string; detail?: string };
+            apiError = String(parsed.error || "");
+            apiDetail = String(parsed.detail || "");
           } catch {
             /* ignore */
           }
+          if (apiDetail) console.error("paypal-create-order detail", apiDetail);
           if (apiError === "Out of stock" || res.status === 409) {
             window.alert("Uno o più articoli non sono più disponibili. Aggiorna il carrello e riprova.");
+          } else if (apiError === "Stock backend misconfigured") {
+            window.alert(
+              "Pagamento non disponibile: configurazione magazzino (GITHUB_TOKEN). Contatta lo shop.",
+            );
           } else if (apiError === "Stock busy, retry" || apiError === "Stock unavailable, retry") {
             window.alert("Magazzino momentaneamente occupato. Riprova tra qualche secondo.");
           } else {

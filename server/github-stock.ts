@@ -167,9 +167,49 @@ async function putRepoFile(path: string, sha: string | undefined, content: strin
   });
   if (!res.ok) {
     const text = await res.text();
-    const err = new Error(`GitHub put ${path}: ${res.status} ${text}`) as Error & { status?: number };
+    const brief = text.replace(/\s+/g, " ").slice(0, 180);
+    const hint =
+      res.status === 401 || res.status === 403
+        ? " — GITHUB_TOKEN needs Contents: Read and write on this repo"
+        : res.status === 422
+          ? " — branch protection or invalid sha?"
+          : "";
+    const err = new Error(`GitHub put ${path}: ${res.status} ${brief}${hint}`) as Error & {
+      status?: number;
+    };
     err.status = res.status;
     throw err;
+  }
+}
+
+/**
+ * Fail fast when the Vercel GITHUB_TOKEN cannot push (stock holds need Contents write).
+ * Classic PATs may omit `permissions`; then the real PUT error still surfaces.
+ */
+export async function assertGithubStockAccess(): Promise<void> {
+  const { owner, name } = repo();
+  const res = await gh(`/repos/${owner}/${name}`);
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(
+      `GITHUB_AUTH ${res.status}: token cannot access ${owner}/${name} (Contents Read and write)`,
+    );
+  }
+  if (!res.ok) {
+    throw new Error(`GitHub repo ${owner}/${name}: ${res.status}`);
+  }
+  const data = (await res.json()) as {
+    permissions?: { push?: boolean; maintain?: boolean; admin?: boolean };
+  };
+  const p = data.permissions;
+  if (
+    p &&
+    p.push !== true &&
+    p.maintain !== true &&
+    p.admin !== true
+  ) {
+    throw new Error(
+      `GITHUB_AUTH 403: GITHUB_TOKEN has no push on ${owner}/${name} — set Contents: Read and write`,
+    );
   }
 }
 

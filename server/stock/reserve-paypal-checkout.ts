@@ -5,7 +5,11 @@ import type { OrderLine } from "../../src/lib/paypal-lines.js";
 
 export type ReservePaypalResult =
   | { ok: true; tmpHoldId: string }
-  | { ok: false; http: 409 | 503; error: string };
+  | { ok: false; http: 409 | 503; error: string; detail?: string };
+
+function sanitizeDetail(msg: string): string {
+  return msg.replace(/\s+/g, " ").trim().slice(0, 220);
+}
 
 export async function releaseExpiredPaypalHoldsBestEffort(): Promise<void> {
   if (!(process.env.GITHUB_TOKEN || "").trim()) return;
@@ -24,11 +28,11 @@ export async function reservePaypalCheckoutHold(
   if (!(process.env.GITHUB_TOKEN || "").trim()) {
     return { ok: true, tmpHoldId: "" };
   }
-  const { paypalHoldId, reservePaypalHold, LedgerBusyError } = await import(
-    "../github-stock.js"
-  );
+  const { paypalHoldId, reservePaypalHold, LedgerBusyError, assertGithubStockAccess } =
+    await import("../github-stock.js");
   const tmpHoldId = paypalHoldId(`tmp_${crypto.randomUUID()}`);
   try {
+    await assertGithubStockAccess();
     await reservePaypalHold(tmpHoldId, lines, {
       expectedTotal: money(expectedTotal),
     });
@@ -45,9 +49,22 @@ export async function reservePaypalCheckoutHold(
       msg.startsWith("missing product") ||
       msg.startsWith("patch failed")
     ) {
-      return { ok: false, http: 409, error: "Out of stock" };
+      return { ok: false, http: 409, error: "Out of stock", detail: sanitizeDetail(msg) };
     }
-    return { ok: false, http: 503, error: "Stock unavailable, retry" };
+    if (msg.includes("GITHUB_AUTH") || /GitHub put .*: (401|403)/.test(msg)) {
+      return {
+        ok: false,
+        http: 503,
+        error: "Stock backend misconfigured",
+        detail: sanitizeDetail(msg),
+      };
+    }
+    return {
+      ok: false,
+      http: 503,
+      error: "Stock unavailable, retry",
+      detail: sanitizeDetail(msg),
+    };
   }
 }
 
