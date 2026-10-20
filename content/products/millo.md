@@ -19,7 +19,8 @@ stock:
   M: 0
   L: 0
   XL: 0
-images: []
+images:
+  - /uploads/prints/ultrastruttura-demo.jpg
 seoDescription:
   it: Maglia 7 di Artista 7 — placeholder Corpoceleste.
   en: Maglia 7 by Artist 7 — Corpoceleste placeholder.
