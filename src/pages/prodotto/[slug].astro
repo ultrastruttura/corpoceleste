@@ -193,7 +193,7 @@ const jsonLd = {
   preloadImageType="image/webp"
 >
   <div class="wrap product-layout">
-    <div class="product-stage" data-gallery={multi ? "" : undefined}>
+    <div class:list={["product-stage", sold && "is-sold"]} data-gallery={multi ? "" : undefined}>
       {
         cover ? (
           <div class="product-stage-frame" data-gallery-frame>
