@@ -1,5 +1,5 @@
 import type { OrderLine } from "./paypal.js";
-import { patchStockQty } from "./stock-patch.js";
+import { patchStockQty, stockQtyLineRe } from "./stock-patch.js";
 
 type GhFile = {
   content: string;
@@ -383,14 +383,11 @@ async function decrementProduct(line: OrderLine): Promise<string> {
         throw new Error(`missing product ${line.id}`);
       }
 
-      const sizeEsc = line.size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const currentMatch = file.content.match(
-        new RegExp(`^([ \\t]+${sizeEsc}:\\s*)(\\d+)\\s*$`, "m"),
-      );
+      const currentMatch = file.content.match(stockQtyLineRe(line.size));
       if (!currentMatch) {
         throw new Error(`no stock line ${line.id} ${line.size}`);
       }
-      const before = Math.max(0, Math.floor(Number(currentMatch[2])));
+      const before = Math.max(0, Math.floor(Number(currentMatch[3])));
       if (before < line.qty) {
         // Pre-order may sell with 0 on hand — do not block or go negative.
         if (/^status:\s*preorder\s*$/m.test(file.content)) {
@@ -450,14 +447,11 @@ async function incrementProduct(line: OrderLine): Promise<string> {
         throw new Error(`missing product ${line.id}`);
       }
 
-      const sizeEsc = line.size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const currentMatch = file.content.match(
-        new RegExp(`^([ \\t]+${sizeEsc}:\\s*)(\\d+)\\s*$`, "m"),
-      );
+      const currentMatch = file.content.match(stockQtyLineRe(line.size));
       if (!currentMatch) {
         throw new Error(`no stock line ${line.id} ${line.size}`);
       }
-      const before = Math.max(0, Math.floor(Number(currentMatch[2])));
+      const before = Math.max(0, Math.floor(Number(currentMatch[3])));
       const after = before + line.qty;
       const patched = patchStockQty(file.content, line.size, after);
       if (!patched) {

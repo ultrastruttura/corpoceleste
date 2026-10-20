@@ -39,7 +39,12 @@ export async function reservePaypalCheckoutHold(
     }
     const msg = err instanceof Error ? err.message : String(err);
     console.error("reserve-paypal: stock reserve failed", msg);
-    if (msg.includes("INSUFFICIENT_STOCK")) {
+    if (
+      msg.includes("INSUFFICIENT_STOCK") ||
+      msg.startsWith("no stock line") ||
+      msg.startsWith("missing product") ||
+      msg.startsWith("patch failed")
+    ) {
       return { ok: false, http: 409, error: "Out of stock" };
     }
     return { ok: false, http: 503, error: "Stock unavailable, retry" };
