@@ -16,14 +16,14 @@ sizes:
   - XL
 stock:
   S: 2
-  M: 3
+  M: 2
   L: 2
   XL: 2
 images: []
 seoDescription:
-  it: Maglia 2 di Artista 2 — placeholder Corpoceleste.
-  en: Maglia 2 by Artist 2 — Corpoceleste placeholder.
-  de: Maglia 2 von Künstler 2 — Corpoceleste-Platzhalter.
+  it: Maglia 2 di Artista 2 â€” placeholder Corpoceleste.
+  en: Maglia 2 by Artist 2 â€” Corpoceleste placeholder.
+  de: Maglia 2 von KÃ¼nstler 2 â€” Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.
