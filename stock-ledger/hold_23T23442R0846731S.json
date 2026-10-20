@@ -1,0 +1,22 @@
+{
+  "captureId": "hold_23T23442R0846731S",
+  "lines": [
+    {
+      "id": "daniele-de-batte",
+      "size": "M",
+      "qty": 1
+    }
+  ],
+  "emailed": false,
+  "status": "done",
+  "at": "2026-10-20T10:28:02.426Z",
+  "expectedTotal": "7.50",
+  "stockNotes": [
+    "daniele-de-batte M 3→2"
+  ],
+  "stockAppliedKeys": [
+    "daniele-de-batte:M:1"
+  ],
+  "stockComplete": true,
+  "kind": "paypal_hold"
+}
