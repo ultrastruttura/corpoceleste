@@ -16,7 +16,7 @@ sizes:
   - XL
 stock:
   S: 2
-  M: 2
+  M: 3
   L: 2
   XL: 2
 images: []
