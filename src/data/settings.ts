@@ -34,7 +34,7 @@ export const siteSettings = {
   metaDescription: asLocalized(data.metaDescription),
   homeTitle: asLocalized(data.homeTitle),
   homeLede: asLocalized(data.homeLede),
-  /** Top promo / shipping bar (Grind-style). Off when disabled or text empty. */
+  /** Top promo bar. Off when disabled or text empty — toggle in Tina. */
   announcementEnabled: Boolean(data.announcementEnabled),
   announcementText: asLocalized(data.announcementText),
   announcementLink: String(data.announcementLink ?? "").trim(),

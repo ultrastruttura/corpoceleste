@@ -13,7 +13,7 @@ homeLede:
   it: ""
   en: ""
   de: ""
-announcementEnabled: true
+announcementEnabled: false
 announcementText:
   it: "+++ Spedizione in Italia e in Europa — costo calcolato in checkout +++ Scrivi a info@corpoceleste.eu per ordini e tempistiche +++"
   en: "+++ Shipping in Italy and across Europe — cost calculated at checkout +++ Write to info@corpoceleste.eu for orders and timing +++"

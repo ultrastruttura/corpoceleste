@@ -171,6 +171,13 @@ export default defineConfig({
         },
         fields: [
           { type: "string", name: "name", label: "Nome", isTitle: true, required: true },
+          {
+            type: "string",
+            name: "sortAs",
+            label: "Ordina sotto (opzionale)",
+            description:
+              "Per l’elenco A–Z. Vuoto = prima parola del nome (Lapis Niger → L, Dottor Pira → D). Nome+cognome reale: metti il cognome (Rudy Fritsch → Fritsch).",
+          },
           localizedText("bio", "Bio"),
           localizedText("seoDescription", "Meta SEO (max ~160 caratteri)"),
           { type: "string", name: "instagram", label: "Instagram (URL)" },
@@ -268,16 +275,16 @@ export default defineConfig({
           {
             type: "boolean",
             name: "announcementEnabled",
-            label: "Banner annuncio (barra in alto)",
+            label: "Mostra barra annuncio in alto",
             description:
-              "Come su grindpromotionrecords: barra rossa sopra l’header. Se spento o senza testo, non compare.",
+              "Accendi solo quando hai una comunicazione extra (spedizioni, chiusure, eventi). Se spento o senza testo, non compare.",
           },
-          localizedText("announcementText", "Testo banner annuncio"),
+          localizedText("announcementText", "Testo barra annuncio"),
           {
             type: "string",
             name: "announcementLink",
-            label: "Link banner (opzionale)",
-            description: "Es. /vendita/ o https://… — se vuoto il testo non è cliccabile.",
+            label: "Link barra (opzionale)",
+            description: "Es. /news/ o https://… — se vuoto il testo non è cliccabile.",
           },
           {
             type: "string",

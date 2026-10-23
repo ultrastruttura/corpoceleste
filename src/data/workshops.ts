@@ -18,7 +18,14 @@ export type UpcomingWorkshop = {
  * Esempio:
  * { when: "12 ottobre 2026", where: "Bergamo, …", organizer: "Nome spazio", signupUrl: "https://…" }
  */
-export const upcomingWorkshops: UpcomingWorkshop[] = [];
+export const upcomingWorkshops: UpcomingWorkshop[] = [
+  {
+    when: "14 novembre 2026",
+    where: "Alzano Lombardo (BG)",
+    organizer: "Arte Factum",
+    signupUrl: "https://www.arte-factum.it/",
+  },
+];
 
 export const pastWorkshops: PastWorkshop[] = [
   {

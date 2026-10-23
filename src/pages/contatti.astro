@@ -22,7 +22,7 @@ const bioParas = localizedSetting("andreaBio", locale).split(/\n\n+/).filter(Boo
 
     <div class="contact-board">
       <img
-        class="contact-photo"
+        class="page-intro__photo contact-photo"
         src={asset("images/photos/andrea.jpg")}
         alt={copy.contact.photoAlt(name)}
         width="900"
@@ -31,9 +31,9 @@ const bioParas = localizedSetting("andreaBio", locale).split(/\n\n+/).filter(Boo
         decoding="async"
       />
 
-      <div class="contact-bio">
-        <h2 class="bio-name">{name}</h2>
-        <div class="bio-body">
+      <div class="page-intro__copy contact-bio">
+        <h2 class="page-intro__title bio-name">{name}</h2>
+        <div class="page-intro__body bio-body">
           {bioParas.map((p) => <p>{p}</p>)}
         </div>
       </div>

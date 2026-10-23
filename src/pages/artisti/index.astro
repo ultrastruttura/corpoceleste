@@ -1,17 +1,17 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { artists, artistSortKey } from "../../data/artists";
+import { artists, artistSortKeyFor } from "../../data/artists";
 import { currentLocale, pageUrl, t } from "../../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const listed = [...artists].sort((a, b) =>
-  artistSortKey(a.name).localeCompare(artistSortKey(b.name), locale, { sensitivity: "base" }),
+  artistSortKeyFor(a).localeCompare(artistSortKeyFor(b), locale, { sensitivity: "base" }),
 );
 
 const groups = new Map<string, typeof listed>();
 for (const a of listed) {
-  const letter = artistSortKey(a.name)
+  const letter = artistSortKeyFor(a)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .charAt(0)

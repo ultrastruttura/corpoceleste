@@ -20,19 +20,21 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
       <h1>{copy.workshops.title}</h1>
     </header>
 
-    <section class="workshops-intro">
+    <section class="page-intro">
       <img
-        class="page-photo"
+        class="page-intro__photo"
         src={asset("images/photos/corsi.jpg")}
         alt={copy.workshops.studioAlt}
-        width="1080"
-        height="1080"
+        width="900"
+        height="1125"
         loading="lazy"
         decoding="async"
       />
-      <div class="workshops-intro__text">
-        <h2>{copy.workshops.introTitle}</h2>
-        {introParas.map((p) => <p>{p}</p>)}
+      <div class="page-intro__copy">
+        {copy.workshops.introTitle ? <h2 class="page-intro__title">{copy.workshops.introTitle}</h2> : null}
+        <div class="page-intro__body">
+          {introParas.map((p) => <p>{p}</p>)}
+        </div>
       </div>
     </section>
 
@@ -40,6 +42,9 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
       <div class="section-head">
         <h2>{copy.workshops.upcoming}</h2>
       </div>
+      {copy.workshops.upcomingLead ? (
+        <p class="workshops-upcoming__lead">{copy.workshops.upcomingLead}</p>
+      ) : null}
       {
         upcomingWorkshops.length > 0 ? (
           <ul class="upcoming-list">
@@ -49,7 +54,10 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
                   <p class="upcoming-item__when">{w.when}</p>
                   <p class="upcoming-item__where">{w.where}</p>
                   <p class="upcoming-item__org">
-                    {copy.workshops.organizedBy} {w.organizer}
+                    {copy.workshops.organizedBy}{" "}
+                    <a href={w.signupUrl} rel="noopener noreferrer" target="_blank">
+                      {w.organizer}
+                    </a>
                   </p>
                   {w.note && <p class="upcoming-item__note">{w.note}</p>}
                 </div>

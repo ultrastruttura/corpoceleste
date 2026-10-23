@@ -21,7 +21,6 @@ function active(href: string) {
         <img class="logo-mark" src={asset("brand/logo-stella.png")} alt={copy.nav.brandMark} width="32" height="32" decoding="async" fetchpriority="low" />
         <img class="logo-word" src={asset("brand/logo-scritta-sm.png")} alt={copy.nav.brandWord} width="180" height="14" decoding="async" fetchpriority="low" />
       </a>
-      <p class="brand-tagline">{copy.nav.tagline}</p>
     </div>
     <nav class="nav" aria-label={copy.nav.main}>
       <a class={active("")} href={pageUrl(locale)} data-nav={copy.nav.shop}><span class="nav-label">{copy.nav.shop}</span></a>

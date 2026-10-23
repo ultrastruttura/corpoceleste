@@ -146,7 +146,7 @@ p:last-child {
 }
 
 .site-announce {
-  background: #ff0a3b;
+  background: var(--danger);
   color: var(--white);
   text-align: center;
   padding: max(12px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) 12px
@@ -168,7 +168,6 @@ p:last-child {
   color: inherit;
   text-decoration: none;
   display: block;
-  text-transform: uppercase;
 }
 
 a.site-announce__text:hover {
@@ -908,17 +907,72 @@ body.cart-open {
   margin-top: 3px;
 }
 
-/* Split layout */
+/* Shared photo + copy block (bio, corsi, contatti) */
+.page-intro {
+  display: grid;
+  gap: 32px;
+  padding: 8px 0 48px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .page-intro {
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    gap: 40px 56px;
+  }
+}
+
+.page-intro__photo {
+  width: min(100%, 320px);
+  height: auto;
+  display: block;
+  margin: 0;
+  border: 1px solid var(--line);
+}
+
+.page-intro__title {
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.page-intro__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 48ch;
+}
+
+.page-intro__body > p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.page-intro__copy h2:not(.page-intro__title) {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.page-intro__copy > p {
+  margin: 0 0 0.85rem;
+  max-width: 48ch;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* Split layout (legacy / other pages) */
 .split {
   display: grid;
-  gap: 48px;
-  padding: 20px 0 80px;
+  gap: 32px;
+  padding: 8px 0 48px;
 }
 
 @media (min-width: 900px) {
   .split {
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    gap: 40px 56px;
     align-items: start;
   }
 }
@@ -1906,84 +1960,37 @@ body.cart-open {
 }
 
 .page-photo {
-  width: min(100%, 420px);
+  width: min(100%, 320px);
   height: auto;
   display: block;
-  margin: 8px 0 32px;
-}
-
-.bio-photos {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.bio-photos .page-photo {
   margin: 0;
-  width: 100%;
-  max-width: 420px;
+  border: 1px solid var(--line);
 }
 
 /* Name above bio copy — keep clear air so it isn’t a slogan under the heading. */
 .bio-name {
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .bio-body {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+  max-width: 48ch;
 }
 
 .bio-body > p {
   margin: 0;
-}
-
-.prose .bio-body {
-  max-width: 48ch;
+  font-size: 15px;
+  color: var(--muted);
 }
 
 .archive-note {
   font-size: 13px;
   color: var(--muted);
   margin: 0 0 4px;
-}
-
-.workshops-intro {
-  display: grid;
-  gap: 28px;
-  padding: 8px 0 36px;
-  align-items: start;
-}
-
-.workshops-intro .page-photo {
-  width: min(100%, 300px);
-  margin: 0 0 8px;
-}
-
-@media (min-width: 900px) {
-  .workshops-intro {
-    grid-template-columns: 300px minmax(0, 1fr);
-    gap: 40px;
-  }
-
-  .workshops-intro .page-photo {
-    margin: 0;
-    width: 300px;
-  }
-}
-
-.workshops-intro__text h2 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-}
-
-.workshops-intro__text p {
-  margin: 0 0 0.85rem;
-  max-width: 48ch;
-  color: var(--muted);
-  font-size: 15px;
 }
 
 .workshop-slots {
@@ -2057,6 +2064,13 @@ body.cart-open {
   text-transform: uppercase;
 }
 
+.workshops-upcoming__lead {
+  margin: 0 0 16px;
+  max-width: 48ch;
+  font-size: 15px;
+  color: var(--muted);
+}
+
 .upcoming-list {
   list-style: none;
   margin: 12px 0 0;
@@ -2121,8 +2135,13 @@ body.cart-open {
 
 @media (min-width: 900px) {
   .contact-board {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
     gap: 40px 56px;
+  }
+
+  .contact-board > .form,
+  .contact-board > .contact-aside {
+    grid-column: span 1;
   }
 }
 
@@ -2131,22 +2150,6 @@ body.cart-open {
   height: auto;
   display: block;
   border: 1px solid var(--line);
-}
-
-.contact-bio .bio-name {
-  margin: 0 0 1.5rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.contact-bio .bio-body {
-  max-width: 48ch;
-}
-
-.contact-bio .bio-body p {
-  margin: 0;
-  font-size: 15px;
-  color: var(--muted);
 }
 
 .contact-aside h2 {

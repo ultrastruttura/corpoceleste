@@ -27,24 +27,22 @@ const description = metaSnippet(body || copy.meta.description);
       <h1>{copy.bio.title}</h1>
     </header>
 
-    <div class="split">
-      <div class="bio-photos">
-        <img
-          class="page-photo"
-          src={asset("images/photos/ultrastruttura.jpg")}
-          alt="Ultrastruttura — Se la luce ci prende"
-          width="1080"
-          height="1350"
-          loading="eager"
-          decoding="async"
-        />
-      </div>
-      <div class="prose">
+    <div class="page-intro">
+      <img
+        class="page-intro__photo"
+        src={asset("images/photos/ultrastruttura.jpg")}
+        alt="Ultrastruttura — Se la luce ci prende"
+        width="900"
+        height="1125"
+        loading="eager"
+        decoding="async"
+      />
+      <div class="page-intro__copy">
         {
           body && (
             <>
-              <h2 class="bio-name">{name}</h2>
-              <div class="bio-body">
+              <h2 class="page-intro__title">{name}</h2>
+              <div class="page-intro__body">
                 {body.split(/\n\n+/).map((para) => (
                   <p>{para}</p>
                 ))}
