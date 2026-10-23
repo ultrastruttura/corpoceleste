@@ -29,6 +29,7 @@ function active(href: string) {
       <a class={active("news/")} href={pageUrl(locale, "news/")} data-nav={copy.nav.news}><span class="nav-label">{copy.nav.news}</span></a>
       <a class={active("corsi/")} href={pageUrl(locale, "corsi/")} data-nav={copy.nav.workshops}><span class="nav-label">{copy.nav.workshops}</span></a>
       <a class={active("contatti/")} href={pageUrl(locale, "contatti/")} data-nav={copy.nav.contact}><span class="nav-label">{copy.nav.contact}</span></a>
+      <a class={active("bio/")} href={pageUrl(locale, "bio/")} data-nav={copy.nav.bio}><span class="nav-label">{copy.nav.bio}</span></a>
       <a
         class="nav-ig"
         href={site.instagram}
@@ -43,7 +44,6 @@ function active(href: string) {
           <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"></circle>
         </svg>
       </a>
-      <a class={active("bio/")} href={pageUrl(locale, "bio/")} data-nav={copy.nav.bio}><span class="nav-label">{copy.nav.bio}</span></a>
     </nav>
     <div class="header-tools">
       <LangSwitch />
@@ -76,8 +76,8 @@ function active(href: string) {
   <a class={active("news/")} href={pageUrl(locale, "news/")}>{copy.nav.news}</a>
   <a class={active("corsi/")} href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
   <a class={active("contatti/")} href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
-  <a href={site.instagram} rel="noopener noreferrer" target="_blank">Instagram</a>
   <a class={active("bio/")} href={pageUrl(locale, "bio/")}>{copy.nav.bio}</a>
+  <a href={site.instagram} rel="noopener noreferrer" target="_blank">Instagram</a>
   <a class={active("carrello/")} href={pageUrl(locale, "carrello/")} data-open-cart>{copy.nav.cart}</a>
   <LangSwitch />
 </nav>

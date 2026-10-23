@@ -293,6 +293,7 @@ a.site-announce__text:hover {
   display: inline-flex;
   align-items: center;
   text-transform: none;
+  margin-left: 12px;
 }
 
 .nav a.nav-ig::after {
