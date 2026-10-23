@@ -1,5 +1,5 @@
 ---
-import { site, publicFormAction } from "../data/site";
+import { publicFormAction } from "../data/site";
 import { siteSettings } from "../data/settings";
 import PrivacyCheck from "./PrivacyCheck.astro";
 import FormHoney from "./FormHoney.astro";
@@ -34,8 +34,8 @@ const formAction = publicFormAction(siteSettings.shopEmail);
       <h3>{copy.footer.studio}</h3>
       <div class="footer-menu">
         <a href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
-        <a href={pageUrl(locale, "bio/")}>{copy.nav.bio}</a>
         <a href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
+        <a href={pageUrl(locale, "bio/")}>{copy.nav.bio}</a>
       </div>
     </div>
     <div>
@@ -47,15 +47,6 @@ const formAction = publicFormAction(siteSettings.shopEmail);
     </div>
   </div>
   <div class="wrap footer-bar">
-    <nav class="footer-social" aria-label={copy.footer.social}>
-      <a href={site.instagram} rel="noopener noreferrer" target="_blank" aria-label="Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-          <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect>
-          <circle cx="12" cy="12" r="4"></circle>
-          <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"></circle>
-        </svg>
-      </a>
-    </nav>
     <div class="footer-made">
       <p>
         <a href={pageUrl(locale, "vendita/")}>{copy.footer.terms}</a>

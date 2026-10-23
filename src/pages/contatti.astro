@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import PrivacyCheck from "../components/PrivacyCheck.astro";
 import FormHoney from "../components/FormHoney.astro";
 import { publicFormAction, site } from "../data/site";
-import { localizedSetting, siteSettings } from "../data/settings";
+import { siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
 import { currentLocale, t } from "../i18n";
 
@@ -11,7 +11,7 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const formAction = publicFormAction(siteSettings.shopEmail);
 const name = siteSettings.andreaName || "Andrea Baldelli";
-const bioParas = localizedSetting("andreaBio", locale).split(/\n\n+/).filter(Boolean);
+const email = siteSettings.shopEmail || site.email;
 ---
 
 <Base title={`${copy.contact.title} — Corpoceleste`}>
@@ -31,14 +31,45 @@ const bioParas = localizedSetting("andreaBio", locale).split(/\n\n+/).filter(Boo
         decoding="async"
       />
 
-      <div class="page-intro__copy contact-bio">
-        <h2 class="page-intro__title bio-name">{name}</h2>
-        <div class="page-intro__body bio-body">
-          {bioParas.map((p) => <p>{p}</p>)}
+      <div class="page-intro__copy bio-aside">
+        <a
+          class="bio-ig"
+          href={site.instagram}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <svg class="bio-ig__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect>
+            <circle cx="12" cy="12" r="4"></circle>
+            <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"></circle>
+          </svg>
+          <span class="bio-ig__label">Instagram</span>
+        </a>
+        <p class="bio-aside__email">
+          <a href={`mailto:${email}`}>{email}</a>
+        </p>
+        <div class="bio-aside__newsletter">
+          <h2 class="page-intro__title">{copy.privacy.newsletter}</h2>
+          <form class="newsletter-form newsletter-form--block" action={formAction} method="POST">
+            <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
+            <input type="hidden" name="_next" data-next-grazie="newsletter" />
+            <FormHoney />
+            <div class="newsletter-row">
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder={copy.forms.email}
+                aria-label={copy.forms.newsletterEmail}
+              />
+              <button type="submit">{copy.forms.subscribe}</button>
+            </div>
+            <PrivacyCheck id="ct-nl-privacy" newsletter />
+          </form>
         </div>
       </div>
 
-      <form class="form" action={formAction} method="POST">
+      <form class="form contact-form" action={formAction} method="POST">
         <input type="hidden" name="_subject" value="Contatto dal sito Corpoceleste" />
         <input type="hidden" name="_next" data-next-grazie="contatto" />
         <FormHoney />
@@ -59,56 +90,23 @@ const bioParas = localizedSetting("andreaBio", locale).split(/\n\n+/).filter(Boo
       </form>
 
       <aside class="contact-aside">
-        <h2>Newsletter</h2>
-        <form class="newsletter-form newsletter-form--block" action={formAction} method="POST">
-          <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
-          <input type="hidden" name="_next" data-next-grazie="newsletter" />
-          <FormHoney />
-          <div class="newsletter-row">
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder={copy.forms.email}
-              aria-label={copy.forms.newsletterEmail}
-            />
-            <button type="submit">{copy.forms.subscribe}</button>
-          </div>
-          <PrivacyCheck id="ct-nl-privacy" newsletter />
-        </form>
-
-        <h3>{copy.contact.linksTitle}</h3>
-        <ul>
-          <li>
-            <a href={`mailto:${site.email}`}>{site.email}</a>
-          </li>
-          <li>
-            <a href={site.instagram} rel="noopener noreferrer" target="_blank">Instagram</a>
-          </li>
-        </ul>
-
         <h3>Ultrastruttura</h3>
-        <p>{copy.contact.paintings}</p>
         <ul>
           <li>
             <a href={site.ultrastruttura} rel="noopener noreferrer" target="_blank">ultrastruttura.com</a>
           </li>
-          <li>
-            <a href={site.instagram} rel="noopener noreferrer" target="_blank">Instagram</a>
-          </li>
         </ul>
 
-        <h3>{copy.contact.pastTitle}</h3>
-        <ul>
+        <ul class="contact-aside__past">
           <li>
-            Corpoc (2012–2019) —
+            Corpoc —
             <a href={site.corpoc} rel="noopener noreferrer" target="_blank">sito</a>
           </li>
           {
             site.satellite && (
               <li>
                 Satellite Press —
-                <a href={site.satellite} rel="noopener noreferrer" target="_blank">archivio</a>
+                <a href={site.satellite} rel="noopener noreferrer" target="_blank">Instagram</a>
               </li>
             )
           }

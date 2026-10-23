@@ -1,5 +1,6 @@
 ---
 import { asset } from "../lib/paths";
+import { site } from "../data/site";
 import { currentLocale, pageUrl, t } from "../i18n";
 import LangSwitch from "./LangSwitch.astro";
 
@@ -27,8 +28,22 @@ function active(href: string) {
       <a class={active("artisti/")} href={pageUrl(locale, "artisti/")} data-nav={copy.nav.artists}><span class="nav-label">{copy.nav.artists}</span></a>
       <a class={active("news/")} href={pageUrl(locale, "news/")} data-nav={copy.nav.news}><span class="nav-label">{copy.nav.news}</span></a>
       <a class={active("corsi/")} href={pageUrl(locale, "corsi/")} data-nav={copy.nav.workshops}><span class="nav-label">{copy.nav.workshops}</span></a>
-      <a class={active("bio/")} href={pageUrl(locale, "bio/")} data-nav={copy.nav.bio}><span class="nav-label">{copy.nav.bio}</span></a>
       <a class={active("contatti/")} href={pageUrl(locale, "contatti/")} data-nav={copy.nav.contact}><span class="nav-label">{copy.nav.contact}</span></a>
+      <a
+        class="nav-ig"
+        href={site.instagram}
+        rel="noopener noreferrer"
+        target="_blank"
+        aria-label="Instagram"
+        data-nav="Instagram"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect>
+          <circle cx="12" cy="12" r="4"></circle>
+          <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </a>
+      <a class={active("bio/")} href={pageUrl(locale, "bio/")} data-nav={copy.nav.bio}><span class="nav-label">{copy.nav.bio}</span></a>
     </nav>
     <div class="header-tools">
       <LangSwitch />
@@ -60,8 +75,9 @@ function active(href: string) {
   <a class={active("artisti/")} href={pageUrl(locale, "artisti/")}>{copy.nav.artists}</a>
   <a class={active("news/")} href={pageUrl(locale, "news/")}>{copy.nav.news}</a>
   <a class={active("corsi/")} href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
-  <a class={active("bio/")} href={pageUrl(locale, "bio/")}>{copy.nav.bio}</a>
   <a class={active("contatti/")} href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
+  <a href={site.instagram} rel="noopener noreferrer" target="_blank">Instagram</a>
+  <a class={active("bio/")} href={pageUrl(locale, "bio/")}>{copy.nav.bio}</a>
   <a class={active("carrello/")} href={pageUrl(locale, "carrello/")} data-open-cart>{copy.nav.cart}</a>
   <LangSwitch />
 </nav>

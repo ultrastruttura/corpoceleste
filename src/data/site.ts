@@ -6,7 +6,7 @@ export const site = {
   corpoc: "https://ccoorrppoocc.wordpress.com/",
   ultrastruttura: "https://ultrastruttura.com/",
   /** Vecchi progetti (pagina Contatti). */
-  satellite: "https://web.archive.org/web/20161107120751/http://satellitepress.it/",
+  satellite: "https://www.instagram.com/satellitepress/",
   tddDiscogs: "https://www.discogs.com/search/?q=TDD&type=label",
   /** Legacy UI fallback; checkout usa Sendcloud (paese + codice postale UE). */
   shippingItaly: 0,

@@ -289,6 +289,21 @@ a.site-announce__text:hover {
   font-weight: 700;
 }
 
+.nav a.nav-ig {
+  display: inline-flex;
+  align-items: center;
+  text-transform: none;
+}
+
+.nav a.nav-ig::after {
+  content: none;
+}
+
+.nav a.nav-ig:hover {
+  font-weight: 400;
+  opacity: 0.55;
+}
+
 .header-tools {
   display: flex;
   align-items: center;
@@ -922,9 +937,13 @@ body.cart-open {
   }
 }
 
-.page-intro__photo {
+.page-intro__photo,
+.contact-photo {
   width: min(100%, 320px);
+  aspect-ratio: 4 / 5;
   height: auto;
+  object-fit: cover;
+  object-position: center;
   display: block;
   margin: 0;
   border: 1px solid var(--line);
@@ -960,6 +979,67 @@ body.cart-open {
   max-width: 48ch;
   font-size: 15px;
   color: var(--muted);
+}
+
+.bio-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  max-width: 28rem;
+}
+
+.bio-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.bio-ig:hover {
+  opacity: 0.55;
+  text-decoration: none;
+}
+
+.bio-ig__icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.bio-ig__label {
+  letter-spacing: 0.02em;
+}
+
+.bio-aside__email {
+  margin: 0;
+  font-size: 15px;
+}
+
+.bio-aside__email a {
+  color: var(--ink);
+}
+
+.bio-aside__newsletter {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.bio-aside__newsletter .newsletter-form--block {
+  margin-bottom: 0;
+}
+
+.bio-page-body {
+  max-width: 48ch;
+  padding: 0 0 48px;
+}
+
+.bio-page-body .page-intro__title {
+  margin-bottom: 1.25rem;
 }
 
 /* Split layout (legacy / other pages) */
@@ -1961,7 +2041,10 @@ body.cart-open {
 
 .page-photo {
   width: min(100%, 320px);
+  aspect-ratio: 4 / 5;
   height: auto;
+  object-fit: cover;
+  object-position: center;
   display: block;
   margin: 0;
   border: 1px solid var(--line);
@@ -2145,11 +2228,10 @@ body.cart-open {
   }
 }
 
-.contact-photo {
-  width: min(100%, 320px);
-  height: auto;
-  display: block;
-  border: 1px solid var(--line);
+/* .contact-photo sizing shared with .page-intro__photo above */
+
+.contact-form {
+  max-width: 28rem;
 }
 
 .contact-aside h2 {
@@ -2159,7 +2241,7 @@ body.cart-open {
 }
 
 .contact-aside h3 {
-  margin: 1.35rem 0 0.4rem;
+  margin: 0 0 0.4rem;
   font-size: 0.8rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2177,6 +2259,10 @@ body.cart-open {
 .contact-aside ul {
   list-style: none;
   padding: 0;
+}
+
+.contact-aside__past {
+  margin-top: 1.75rem;
 }
 
 .contact-aside li {
