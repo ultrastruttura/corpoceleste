@@ -20,7 +20,7 @@ export type UpcomingWorkshop = {
  */
 export const upcomingWorkshops: UpcomingWorkshop[] = [
   {
-    when: "14 novembre 2026",
+    when: "14 Novembre",
     where: "Alzano Lombardo (BG)",
     organizer: "Arte Factum",
     signupUrl: "https://www.arte-factum.it/",

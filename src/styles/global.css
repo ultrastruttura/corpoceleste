@@ -1034,14 +1034,6 @@ body.cart-open {
   margin-bottom: 0;
 }
 
-.bio-page-body {
-  max-width: 48ch;
-  padding: 0 0 48px;
-}
-
-.bio-page-body .page-intro__title {
-  margin-bottom: 1.25rem;
-}
 
 /* Split layout (legacy / other pages) */
 .split {
@@ -2159,38 +2151,13 @@ body.cart-open {
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
-}
-
-.upcoming-item {
-  display: grid;
-  gap: 1rem;
-  padding: 1rem 0;
-  border-top: 1px solid var(--line);
-  align-items: start;
-}
-
-@media (min-width: 700px) {
-  .upcoming-item {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-  }
-}
-
-.upcoming-item__when {
-  margin: 0 0 0.2rem;
-  font-weight: 700;
-}
-
-.upcoming-item__where,
-.upcoming-item__org,
-.upcoming-item__note {
-  margin: 0.15rem 0 0;
-  font-size: 14px;
+  max-width: 48ch;
+  font-size: 15px;
   color: var(--muted);
 }
 
-.upcoming-item__btn {
-  justify-self: start;
+.upcoming-list li {
+  padding: 0.2rem 0;
 }
 
 .upcoming-empty {

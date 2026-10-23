@@ -49,26 +49,12 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
         upcomingWorkshops.length > 0 ? (
           <ul class="upcoming-list">
             {upcomingWorkshops.map((w) => (
-              <li class="upcoming-item">
-                <div class="upcoming-item__main">
-                  <p class="upcoming-item__when">{w.when}</p>
-                  <p class="upcoming-item__where">{w.where}</p>
-                  <p class="upcoming-item__org">
-                    {copy.workshops.organizedBy}{" "}
-                    <a href={w.signupUrl} rel="noopener noreferrer" target="_blank">
-                      {w.organizer}
-                    </a>
-                  </p>
-                  {w.note && <p class="upcoming-item__note">{w.note}</p>}
-                </div>
-                <a
-                  class="btn upcoming-item__btn"
-                  href={w.signupUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {copy.workshops.signup}
+              <li>
+                {w.when} - {w.where},{" "}
+                <a href={w.signupUrl} rel="noopener noreferrer" target="_blank">
+                  {w.organizer}
                 </a>
+                {w.note ? ` (${w.note})` : ""}
               </li>
             ))}
           </ul>
