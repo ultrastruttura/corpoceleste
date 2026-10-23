@@ -289,22 +289,6 @@ a.site-announce__text:hover {
   font-weight: 700;
 }
 
-.nav a.nav-ig {
-  display: inline-flex;
-  align-items: center;
-  text-transform: none;
-  margin-left: 12px;
-}
-
-.nav a.nav-ig::after {
-  content: none;
-}
-
-.nav a.nav-ig:hover {
-  font-weight: 400;
-  opacity: 0.55;
-}
-
 .header-tools {
   display: flex;
   align-items: center;

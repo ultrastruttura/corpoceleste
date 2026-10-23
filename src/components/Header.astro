@@ -30,23 +30,22 @@ function active(href: string) {
       <a class={active("corsi/")} href={pageUrl(locale, "corsi/")} data-nav={copy.nav.workshops}><span class="nav-label">{copy.nav.workshops}</span></a>
       <a class={active("bio/")} href={pageUrl(locale, "bio/")} data-nav={copy.nav.bio}><span class="nav-label">{copy.nav.bio}</span></a>
       <a class={active("contatti/")} href={pageUrl(locale, "contatti/")} data-nav={copy.nav.contact}><span class="nav-label">{copy.nav.contact}</span></a>
+    </nav>
+    <div class="header-tools">
+      <LangSwitch />
       <a
-        class="nav-ig"
+        class="icon-btn"
         href={site.instagram}
         rel="noopener noreferrer"
         target="_blank"
         aria-label="Instagram"
-        data-nav="Instagram"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
           <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect>
           <circle cx="12" cy="12" r="4"></circle>
           <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"></circle>
         </svg>
       </a>
-    </nav>
-    <div class="header-tools">
-      <LangSwitch />
       <a class="icon-btn" href={pageUrl(locale, "carrello/")} aria-label={copy.nav.cart} data-open-cart>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
           <path d="M6 7h15l-1.5 9h-12z"></path>
