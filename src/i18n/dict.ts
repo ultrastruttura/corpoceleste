@@ -22,8 +22,8 @@ const it = {
     language: "Lingua",
     skip: "Vai al contenuto",
     tagline: "Serigrafie d’autore",
-    brandMark: "Corpoceleste — serigrafie d'autore e maglie stampate a mano a Bergamo",
-    brandWord: "Corpoceleste, shop di maglie serigrafate e stampe d'artista",
+    brandMark: "Corpoceleste",
+    brandWord: "Corpoceleste",
   },
   footer: {
     studio: "Studio",
@@ -410,8 +410,8 @@ const en: typeof it = {
     language: "Language",
     skip: "Skip to content",
     tagline: "Author’s screen prints",
-    brandMark: "Corpoceleste — author’s screen prints and hand-printed shirts in Bergamo",
-    brandWord: "Corpoceleste, shop for screen-printed shirts and artist prints",
+    brandMark: "Corpoceleste",
+    brandWord: "Corpoceleste",
   },
   footer: {
     studio: "Studio",
@@ -796,8 +796,8 @@ const de: typeof it = {
     language: "Sprache",
     skip: "Zum Inhalt",
     tagline: "Siebdrucke von Autoren",
-    brandMark: "Corpoceleste — Siebdrucke von Autoren und handgedruckte Shirts in Bergamo",
-    brandWord: "Corpoceleste, Shop für siebgedruckte Shirts und Künstlerdrucke",
+    brandMark: "Corpoceleste",
+    brandWord: "Corpoceleste",
   },
   footer: {
     studio: "Atelier",

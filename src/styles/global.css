@@ -55,8 +55,13 @@ html {
   position: absolute;
   width: 1px;
   height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
 }
 
 html,
@@ -295,6 +300,17 @@ a.site-announce__text:hover {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .header-tools {
+    gap: 0;
+  }
+
+  .header-tools > a.icon-btn {
+    width: 32px;
+    min-width: 32px;
+  }
 }
 
 .lang {
@@ -1412,34 +1428,37 @@ body.cart-open {
   margin-bottom: 0;
 }
 
-/* Letter headings + max 10 rows per column, then continue to the right */
+/* Letter + names stay together; columns only break between groups */
 .artist-directory {
+  margin-bottom: 48px;
+}
+
+.artist-directory__group {
+  margin-top: 1.25rem;
+}
+
+.artist-directory__group:first-child {
+  margin-top: 0;
+}
+
+.artist-directory__group .artist-letter {
+  margin: 0 0 0.35rem;
+}
+
+.artist-directory__group .name-list {
   margin-bottom: 0;
-}
-
-.name-list > .artist-directory__letter {
-  list-style: none;
-  padding: 1.25rem 0 0.35rem;
-  border-top: none;
-}
-
-.name-list > .artist-directory__letter:first-child {
-  padding-top: 0;
-}
-
-.name-list > .artist-directory__letter .artist-letter {
-  display: block;
-  margin: 0;
 }
 
 @media (min-width: 640px) {
   .artist-directory {
-    display: grid;
-    grid-template-rows: repeat(10, auto);
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(11rem, 1fr);
+    column-width: 11rem;
     column-gap: 2.5rem;
-    align-content: start;
+  }
+
+  .artist-directory__group {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
 

@@ -28,21 +28,21 @@ for (const a of listed) {
     <header class="page-hero">
       <h1>{copy.artists.title}</h1>
     </header>
-    <ul class="artist-directory name-list">
+    <div class="artist-directory">
       {
         [...groups.entries()].map(([letter, items]) => (
-          <>
-            <li class="artist-directory__letter">
-              <span class="artist-letter">{letter}</span>
-            </li>
-            {items.map((a) => (
-              <li>
-                <a href={pageUrl(locale, `artisti/${a.slug}/`)}>{a.name}</a>
-              </li>
-            ))}
-          </>
+          <section class="artist-directory__group">
+            <h2 class="artist-letter">{letter}</h2>
+            <ul class="name-list">
+              {items.map((a) => (
+                <li>
+                  <a href={pageUrl(locale, `artisti/${a.slug}/`)}>{a.name}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
         ))
       }
-    </ul>
+    </div>
   </div>
 </Base>

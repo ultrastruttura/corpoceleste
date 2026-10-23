@@ -333,9 +333,19 @@ export default defineConfig({
             description:
               "Destinazione FormSubmit: ordini (bonifico / PayPal), contatti, newsletter, corsi, consulenza, ristampe. Se vuoto, usa il fallback in codice.",
           },
-          localizedText("metaDescription", "Meta description sito (home e fallback)"),
-          localizedText("homeTitle", "H1 home", false),
-          localizedText("homeLede", "Sottotitolo home"),
+          localizedText(
+            "metaDescription",
+            "Meta description (SEO + anteprima link; non visibile in pagina)",
+          ),
+          localizedText(
+            "homeTitle",
+            "H1 SEO home (es. Serigrafie d’autore — solo nascosto in pagina, non in anteprima link)",
+            false,
+          ),
+          localizedText(
+            "homeLede",
+            "Sottotitolo home (vuoto = nascosto; non usato se vuoto)",
+          ),
           {
             type: "boolean",
             name: "announcementEnabled",
