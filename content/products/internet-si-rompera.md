@@ -4,6 +4,7 @@ artist: content/artists/artista-5.md
 price: 1
 status: available
 kind: shirt
+fitModel: content/fit-models/tee-default.md
 nuovo: false
 createdAt: 2017-05-14T00:00:00.000Z
 color: "#141414"

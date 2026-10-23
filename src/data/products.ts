@@ -7,6 +7,7 @@ import {
   type ProductStatus,
 } from "../lib/product-status";
 import { artistName, artists } from "./artists";
+import { fitModelIdFromRef } from "./fit-models";
 import { ui } from "../i18n/dict";
 import type { Locale } from "../i18n/locales";
 
@@ -39,6 +40,8 @@ export type Product = {
   print: string;
   sizes: string[];
   stock: ProductStock;
+  /** Fit-model id for size chart (`content/fit-models/<id>.md`). Empty = site fallback. */
+  fitModelId: string;
   description: Localized;
   seoDescription: Localized;
 };
@@ -143,6 +146,7 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     print: images[0] ?? "",
     sizes: core.sizes,
     stock: core.stock,
+    fitModelId: fitModelIdFromRef(data.fitModel),
     description: asLocalized(data.description),
     seoDescription: asLocalized(data.seoDescription),
   };

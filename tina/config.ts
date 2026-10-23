@@ -102,6 +102,14 @@ export default defineConfig({
               { value: "edition", label: "Edizione / pezzo" },
             ],
           },
+          {
+            type: "reference",
+            name: "fitModel",
+            label: "Modello misure (tabella taglie)",
+            description:
+              "Solo maglie/felpe. Scegli un modello capo (Tina → Modelli capo). Se vuoto, usa la tabella di fallback del sito.",
+            collections: ["fitModel"],
+          },
           { type: "boolean", name: "nuovo", label: "Nuovo (in cima allo shop)" },
           { type: "datetime", name: "createdAt", label: "Data", required: true },
           { type: "string", name: "color", label: "Colore (hex)", required: true },
@@ -150,6 +158,62 @@ export default defineConfig({
           },
           localizedText("description", "Descrizione (pagina prodotto)"),
           localizedText("seoDescription", "Meta SEO (max ~160 caratteri)"),
+        ],
+      },
+      {
+        name: "fitModel",
+        label: "Modelli capo",
+        path: "content/fit-models",
+        format: "md",
+        ui: {
+          filename: {
+            slugify: (values) =>
+              (values?.name || "modello")
+                .toString()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, ""),
+          },
+        },
+        fields: [
+          { type: "string", name: "name", label: "Nome modello", isTitle: true, required: true },
+          {
+            type: "string",
+            name: "kind",
+            label: "Tipo capo",
+            required: true,
+            options: [
+              { value: "shirt", label: "T-shirt / maglia" },
+              { value: "hoodie", label: "Felpa" },
+            ],
+          },
+          {
+            type: "object",
+            name: "rows",
+            label: "Misure (cm, capo disteso)",
+            list: true,
+            description:
+              "chest = ½ petto (ascella–ascella). length = spalla–orlo. sleeve = spalla–polsino.",
+            ui: {
+              itemProps: (item: { size?: string }) => ({
+                label: item?.size ? `Taglia ${item.size}` : "Taglia",
+              }),
+            },
+            fields: [
+              {
+                type: "string",
+                name: "size",
+                label: "Taglia",
+                required: true,
+                options: ["S", "M", "L", "XL"],
+              },
+              { type: "number", name: "chest", label: "½ petto (cm)", required: true },
+              { type: "number", name: "length", label: "Lunghezza (cm)", required: true },
+              { type: "number", name: "sleeve", label: "Manica (cm)", required: true },
+            ],
+          },
         ],
       },
       {

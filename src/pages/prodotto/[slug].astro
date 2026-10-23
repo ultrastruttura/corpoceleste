@@ -17,6 +17,7 @@ import {
 } from "../../data/products";
 import { artistById } from "../../data/artists";
 import { site, publicFormAction } from "../../data/site";
+import { sizeChartForProduct } from "../../data/fit-models";
 import { siteSettings } from "../../data/settings";
 import { SHIP_COUNTRIES } from "../../lib/ship-countries";
 import { asset, cardImageUrls, largeImageUrls } from "../../lib/paths";
@@ -41,6 +42,7 @@ const preorder = product.status === "preorder" && !sold;
 const alt = productImageAlt(product, artist, locale);
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
+const sizeChart = sizeChartForProduct(product.fitModelId);
 const formAction = publicFormAction(siteSettings.shopEmail);
 const defaultSize = inStockSizes.includes("M")
   ? "M"
@@ -382,9 +384,12 @@ const jsonLd = {
         <li>{copy.product.vatIncluded}</li>
       </ul>
       {
-        product.kind === "shirt" && (
+        product.kind === "shirt" && sizeChart.rows.length > 0 && (
           <details class="size-chart">
-            <summary>{copy.product.sizeChart} ({copy.product.sizeUnit})</summary>
+            <summary>
+              {copy.product.sizeChart}
+              {sizeChart.name ? ` · ${sizeChart.name}` : ""} ({copy.product.sizeUnit})
+            </summary>
             <table>
               <thead>
                 <tr>
@@ -395,7 +400,7 @@ const jsonLd = {
                 </tr>
               </thead>
               <tbody>
-                {site.sizeChart.map((row) => (
+                {sizeChart.rows.map((row) => (
                   <tr>
                     <th scope="row">{row.size}</th>
                     <td>{row.chest}</td>

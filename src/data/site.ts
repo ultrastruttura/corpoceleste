@@ -48,8 +48,9 @@ export const site = {
   telefono: "",
   sizes: ["S", "M", "L", "XL"] as const,
   /**
-   * Misure in cm, capo disteso. Indicative finché non misuri i blank reali.
-   * chest = ½ petto (ascella–ascella). length = spalla–orlo. sleeve = spalla–polsino.
+   * Fallback tabella taglie se il prodotto non ha `fitModel`.
+   * Preferisci content/fit-models/*.md (Tina → Modelli capo).
+   * chest = ½ petto. length = spalla–orlo. sleeve = spalla–polsino.
    */
   sizeChart: [
     { size: "S", chest: 49, length: 69, sleeve: 20 },
