@@ -31,24 +31,22 @@ const email = siteSettings.shopEmail || site.email;
         decoding="async"
       />
 
-      <div class="page-intro__copy bio-aside">
+      <div class="page-intro__copy contact-meta">
         <a
-          class="bio-ig"
+          class="contact-meta__ig"
           href={site.instagram}
           rel="noopener noreferrer"
           target="_blank"
         >
-          <svg class="bio-ig__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
             <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect>
             <circle cx="12" cy="12" r="4"></circle>
             <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"></circle>
           </svg>
-          <span class="bio-ig__label">Instagram</span>
+          Instagram
         </a>
-        <p class="bio-aside__email">
-          <a href={`mailto:${email}`}>{email}</a>
-        </p>
-        <div class="bio-aside__newsletter">
+        <a class="contact-meta__email" href={`mailto:${email}`}>{email}</a>
+        <div class="contact-meta__newsletter">
           <h2 class="page-intro__title">{copy.privacy.newsletter}</h2>
           <form class="newsletter-form newsletter-form--block" action={formAction} method="POST">
             <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />

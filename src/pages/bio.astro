@@ -52,7 +52,7 @@ function linkifyBio(s: string) {
       />
       <div class="page-intro__copy">
         {name ? <h2 class="page-intro__title">{name}</h2> : null}
-        <div class="page-intro__body">
+        <div class="page-intro__body bio-body">
           {bodyParas.map((para) => (
             <p set:html={linkifyBio(para)} />
           ))}

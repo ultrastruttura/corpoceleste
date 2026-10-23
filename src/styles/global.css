@@ -83,6 +83,7 @@ img {
 
 a {
   color: inherit;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -323,6 +324,7 @@ a.site-announce__text:hover {
   min-height: 44px;
   padding: 0 4px;
   color: var(--muted);
+  font-weight: 400;
   text-decoration: none;
 }
 
@@ -453,6 +455,7 @@ a.site-announce__text:hover {
   align-items: center;
   min-height: 48px;
   font-size: 18px;
+  font-weight: 400;
   letter-spacing: 0.01em;
   text-decoration: none;
   border-bottom: 1px solid var(--line);
@@ -953,6 +956,10 @@ body.cart-open {
   color: var(--muted);
 }
 
+.bio-body a {
+  color: var(--ink);
+}
+
 .page-intro__copy h2:not(.page-intro__title) {
   margin: 1.75rem 0 0.75rem;
   font-size: 1.05rem;
@@ -966,55 +973,59 @@ body.cart-open {
   color: var(--muted);
 }
 
-.bio-aside {
+.contact-meta {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.25rem;
+  gap: 0.85rem;
   max-width: 28rem;
 }
 
-.bio-ig {
+.contact-meta__ig {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
   color: var(--ink);
   text-decoration: none;
   font-size: 1.05rem;
   font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
 }
 
-.bio-ig:hover {
-  opacity: 0.55;
-  text-decoration: none;
-}
-
-.bio-ig__icon {
-  width: 36px;
-  height: 36px;
+.contact-meta__ig svg {
+  width: 1.15em;
+  height: 1.15em;
   flex-shrink: 0;
   display: block;
 }
 
-.bio-ig__label {
-  letter-spacing: 0.02em;
+.contact-meta__ig:hover {
+  opacity: 0.55;
+  text-decoration: none;
 }
 
-.bio-aside__email {
+.contact-meta__email {
   margin: 0;
+  padding: 0;
   font-size: 15px;
-}
-
-.bio-aside__email a {
+  line-height: 1.3;
   color: var(--ink);
+  text-decoration: none;
 }
 
-.bio-aside__newsletter {
+.contact-meta__email:hover {
+  opacity: 0.55;
+}
+
+.contact-meta__newsletter {
   width: 100%;
-  margin-top: 0.5rem;
+  margin-top: 0.65rem;
 }
 
-.bio-aside__newsletter .newsletter-form--block {
+.contact-meta__newsletter .newsletter-form--block {
   margin-bottom: 0;
 }
 
