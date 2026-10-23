@@ -16,9 +16,7 @@ const email = siteSettings.shopEmail || site.email;
 
 <Base title={`${copy.contact.title} — Corpoceleste`}>
   <div class="wrap page-pad">
-    <header class="page-hero">
-      <h1>{copy.contact.title}</h1>
-    </header>
+    <h1 class="visually-hidden">{copy.contact.title}</h1>
 
     <div class="contact-board">
       <img
@@ -47,7 +45,7 @@ const email = siteSettings.shopEmail || site.email;
         </a>
         <a class="contact-meta__email" href={`mailto:${email}`}>{email}</a>
         <div class="contact-meta__newsletter">
-          <h2 class="page-intro__title">{copy.privacy.newsletter}</h2>
+          <p class="page-intro__title">{copy.privacy.newsletter}</p>
           <form class="newsletter-form newsletter-form--block" action={formAction} method="POST">
             <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
             <input type="hidden" name="_next" data-next-grazie="newsletter" />
@@ -88,7 +86,7 @@ const email = siteSettings.shopEmail || site.email;
       </form>
 
       <aside class="contact-aside">
-        <h3>Ultrastruttura</h3>
+        <p class="contact-aside__label">Ultrastruttura</p>
         <ul>
           <li>
             <a href={site.ultrastruttura} rel="noopener noreferrer" target="_blank">ultrastruttura.com</a>

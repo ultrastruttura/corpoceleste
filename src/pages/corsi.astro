@@ -16,9 +16,7 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
 
 <Base title={`${copy.workshops.title} — Corpoceleste`}>
   <div class="wrap page-pad">
-    <header class="page-hero">
-      <h1>{copy.workshops.title}</h1>
-    </header>
+    <h1 class="visually-hidden">{copy.workshops.title}</h1>
 
     <section class="page-intro">
       <img
@@ -31,7 +29,7 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
         decoding="async"
       />
       <div class="page-intro__copy">
-        {copy.workshops.introTitle ? <h2 class="page-intro__title">{copy.workshops.introTitle}</h2> : null}
+        {copy.workshops.introTitle ? <p class="page-intro__title">{copy.workshops.introTitle}</p> : null}
         <div class="page-intro__body">
           {introParas.map((p) => <p>{p}</p>)}
         </div>
@@ -40,7 +38,7 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
 
     <section class="workshops-upcoming">
       <div class="section-head">
-        <h2>{copy.workshops.upcoming}</h2>
+        <p class="section-head__title">{copy.workshops.upcoming}</p>
       </div>
       {copy.workshops.upcomingLead ? (
         <p class="workshops-upcoming__lead">{copy.workshops.upcomingLead}</p>
@@ -66,7 +64,7 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
 
     <section class="workshop-slots">
       <div class="workshop-slot">
-        <h2>{copy.workshops.waitlist}</h2>
+        <p class="workshop-slot__title">{copy.workshops.waitlist}</p>
         <p>{copy.workshops.waitlistBody}</p>
         <form class="form" action={formAction} method="POST">
           <input type="hidden" name="_subject" value="Iscrizione workshop in studio" />
@@ -89,7 +87,7 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
         </form>
       </div>
       <div class="workshop-slot">
-        <h2>{copy.workshops.onSite}</h2>
+        <p class="workshop-slot__title">{copy.workshops.onSite}</p>
         <p>{copy.workshops.onSiteBody}</p>
         <form class="form" action={formAction} method="POST">
           <input type="hidden" name="_subject" value="Proposta workshop presso di voi" />
@@ -119,13 +117,13 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
 
     <section class="workshops-archive">
       <div class="section-head">
-        <h2>{copy.workshops.archive}</h2>
+        <p class="section-head__title">{copy.workshops.archive}</p>
       </div>
       <p class="archive-note">{copy.workshops.since}</p>
       {
         pastWorkshops.map((block) => (
           <section class="year-block">
-            <h3>{block.year}</h3>
+            <p class="year-block__year">{block.year}</p>
             <ul>
               {block.items.map((item) => (
                 <li>{item}</li>

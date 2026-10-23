@@ -499,7 +499,9 @@ body.cart-open {
   margin: 48px 0 20px;
 }
 
-.section-head h2 {
+.section-head h2,
+.section-head__title {
+  margin: 0;
   font-size: 16px;
 }
 
@@ -1539,7 +1541,9 @@ body.cart-open {
   }
 }
 
-.year-block h3 {
+.year-block h3,
+.year-block__year {
+  margin: 0;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -2086,7 +2090,8 @@ body.cart-open {
   min-height: 100%;
 }
 
-.workshop-slot h2 {
+.workshop-slot h2,
+.workshop-slot__title {
   margin: 0 0 0.5rem;
   font-size: 1.05rem;
   font-weight: 700;
@@ -2128,7 +2133,9 @@ body.cart-open {
 }
 
 .workshops-upcoming .section-head h2,
-.workshops-archive .section-head h2 {
+.workshops-upcoming .section-head__title,
+.workshops-archive .section-head h2,
+.workshops-archive .section-head__title {
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -2166,7 +2173,8 @@ body.cart-open {
   margin: 24px 0 8px;
 }
 
-.workshops-archive .section-head h2 {
+.workshops-archive .section-head h2,
+.workshops-archive .section-head__title {
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -2203,12 +2211,14 @@ body.cart-open {
   font-weight: 700;
 }
 
-.contact-aside h3 {
+.contact-aside h3,
+.contact-aside__label {
   margin: 0 0 0.4rem;
   font-size: 0.8rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   font-weight: 700;
+  color: var(--ink);
 }
 
 .contact-aside p,

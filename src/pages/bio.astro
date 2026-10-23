@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { asset } from "../lib/paths";
-import { metaSnippet } from "../lib/seo";
+import { metaSnippet, personJsonLd } from "../lib/seo";
 import { bioField, bioPage } from "../data/bio";
 import { currentLocale, t } from "../i18n";
 
@@ -11,6 +11,7 @@ const name = bioPage.name;
 const body = bioField("body", locale);
 const description = metaSnippet(body || copy.meta.description);
 const bodyParas = body.split(/\n\n+/).filter(Boolean);
+const photo = "images/photos/ultrastruttura.jpg";
 
 function escapeHtml(s: string) {
   return s
@@ -33,25 +34,29 @@ function linkifyBio(s: string) {
 <Base
   title={`${copy.bio.title} — Corpoceleste`}
   description={description}
-  image="images/photos/ultrastruttura.jpg"
+  image={photo}
+  jsonLd={personJsonLd({
+    siteUrl: Astro.site,
+    name: name || "Andrea Lorenzo Baldelli",
+    description: body,
+    image: photo,
+  })}
 >
   <div class="wrap page-pad">
-    <header class="page-hero">
-      <h1>{copy.bio.title}</h1>
-    </header>
+    <h1 class="visually-hidden">{copy.bio.title}</h1>
 
     <section class="page-intro">
       <img
         class="page-intro__photo"
-        src={asset("images/photos/ultrastruttura.jpg")}
-        alt="Ultrastruttura — Se la luce ci prende"
+        src={asset(photo)}
+        alt={`${name || "Andrea Lorenzo Baldelli"} — serigrafo Corpoceleste, Bergamo`}
         width="900"
         height="1125"
         loading="eager"
         decoding="async"
       />
       <div class="page-intro__copy">
-        {name ? <h2 class="page-intro__title">{name}</h2> : null}
+        {name ? <p class="page-intro__title">{name}</p> : null}
         <div class="page-intro__body bio-body">
           {bodyParas.map((para) => (
             <p set:html={linkifyBio(para)} />

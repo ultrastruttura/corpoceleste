@@ -3,7 +3,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import SiteAnnounce from "../components/SiteAnnounce.astro";
 import { asset } from "../lib/paths";
-import { absoluteUrl } from "../lib/seo";
+import { absoluteUrl, organizationJsonLd } from "../lib/seo";
 import { llmsTxtUrl } from "../lib/llms";
 import { products, artistName, productImageAlt } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
@@ -81,7 +81,8 @@ const catalog = {
     imageAlt: productImageAlt(p, artistName(p.artistId), locale),
   })),
 };
-const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const pageJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const jsonLdBlocks = [organizationJsonLd(Astro.site), ...pageJsonLd];
 const llmsHref = llmsTxtUrl(locale === "en" ? "en" : "it");
 const cfToken = siteSettings.cloudflareAnalyticsToken;
 const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
