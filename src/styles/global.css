@@ -2009,6 +2009,14 @@ body:has(.site-announce) .shop-home-stage {
   );
 }
 
+@media (max-width: 899px) {
+  .shop-home-stage__video,
+  .shop-home-stage__fallback {
+    transform: scale(1.1);
+    transform-origin: center center;
+  }
+}
+
 .shop-home-stage__fallback {
   display: none;
 }
