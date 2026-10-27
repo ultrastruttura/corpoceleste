@@ -12,7 +12,9 @@ import { sendMail, siteBase } from "../server/mail.js";
 import {
   confirmNewsletterSubscriber,
   sendNewsletterConfirmEmail,
+  unsubscribeNewsletterSubscriber,
   verifyNewsletterConfirm,
+  verifyNewsletterUnsub,
 } from "../server/newsletter.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
 import {
@@ -68,7 +70,7 @@ async function runStockReleaseJob(res: VercelResponse) {
 
 /**
  * Generic site forms → Resend to shop. Contact, newsletter, workshops, consulting, reprint.
- * Also: newsletter confirm (?nl_confirm=), stock cron (?job=stock_release).
+ * Also: newsletter confirm (?nl_confirm=), unsubscribe (?nl_unsub=), stock cron (?job=stock_release).
  * Sendcloud: rewrite /api/sendcloud-webhook → here (Hobby function budget).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -93,6 +95,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
+  const nlUnsub = queryFlag(req, "nl_unsub");
+  if (nlUnsub) {
+    if (req.method !== "GET") return res.status(405).send("Method not allowed");
+    const parsed = verifyNewsletterUnsub(nlUnsub);
+    if (!parsed) {
+      return res.status(400).send("Link non valido o scaduto");
+    }
+    try {
+      await unsubscribeNewsletterSubscriber(parsed.email);
+    } catch (err) {
+      console.error("form: nl unsub", err);
+    }
+    return res
+      .status(200)
+      .setHeader("Content-Type", "text/html; charset=utf-8")
+      .send(
+        `<!doctype html><html lang="it"><meta charset="utf-8"><title>Disiscritto</title><body style="font-family:sans-serif;max-width:32rem;margin:3rem auto;padding:0 1rem"><h1>Disiscritto</h1><p>Non riceverai più la newsletter Corpoceleste.</p><p><a href="${siteBase()}/">Torna al sito</a></p></body></html>`,
+      );
+  }
+
   const nlToken = queryFlag(req, "nl_confirm");
   if (nlToken) {
     if (req.method !== "GET") return res.status(405).send("Method not allowed");
@@ -109,7 +131,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await sendMail({
           to: shopTo,
           subject: "Newsletter confermata — Corpoceleste",
-          text: `Email: ${parsed.email}\nLocale: ${parsed.locale}\nLista Turso: ${result.stored ? "sì" : "no (portal off)"}`,
+          text: [
+            `Email: ${parsed.email}`,
+            `Locale: ${parsed.locale}`,
+            `Lista Turso: ${result.stored ? "sì" : "no (portal off)"}`,
+            `Resend Segment: ${result.resend ? "sì" : result.resendError || "no"}`,
+          ].join("\n"),
         });
       }
     } catch (err) {

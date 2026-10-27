@@ -38,6 +38,8 @@ export async function ensureSchema() {
     `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
     `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
     `ALTER TABLE shop_orders ADD COLUMN paid_at TEXT`,
+    `ALTER TABLE newsletter_subscribers ADD COLUMN unsubscribed_at TEXT`,
+    `ALTER TABLE newsletter_subscribers ADD COLUMN resend_contact_id TEXT`,
   ]) {
     try {
       await db.execute(sql);

@@ -1,5 +1,4 @@
 import { getAbsoluteLocaleUrl } from "astro:i18n";
-import { artists, artistSeoDescription } from "../data/artists";
 import { news, newsField } from "../data/news";
 import {
   artistName,
@@ -139,10 +138,6 @@ export function buildLlmsTxt(locale: LlmLocale) {
 
   lines.push("", `## ${t.artists}`, "");
   lines.push(`- [${t.artistsIndex}](${abs(locale, "artisti/")}): ${t.artistsNote}`);
-  for (const a of [...artists].sort((x, y) => x.name.localeCompare(y.name, locale))) {
-    const desc = note(artistSeoDescription(a, locale) || a.name);
-    lines.push(`- [${a.name}](${abs(locale, `artisti/${a.slug}/`)}): ${desc}`);
-  }
 
   if (news.length) {
     lines.push("", `## ${t.news}`, "");

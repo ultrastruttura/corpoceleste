@@ -160,6 +160,7 @@ type AdminRoute =
   | { name: "artists" }
   | { name: "artist"; id: string }
   | { name: "orders" }
+  | { name: "newsletter" }
   | { name: "settings" };
 
 type ShopOrder = {
@@ -645,6 +646,7 @@ if (!root || !app) {
       if (id) return { name: "artist", id };
     }
     if (raw === "ordini") return { name: "orders" };
+    if (raw === "newsletter") return { name: "newsletter" };
     if (raw === "impostazioni") return { name: "settings" };
     return { name: "artists" };
   }
@@ -655,9 +657,11 @@ if (!root || !app) {
         ? "#artisti"
         : route.name === "orders"
           ? "#ordini"
-          : route.name === "settings"
-            ? "#impostazioni"
-            : `#artista/${encodeURIComponent(route.id)}`;
+          : route.name === "newsletter"
+            ? "#newsletter"
+            : route.name === "settings"
+              ? "#impostazioni"
+              : `#artista/${encodeURIComponent(route.id)}`;
     if (location.hash === next) return;
     location.hash = next;
   }
@@ -742,6 +746,9 @@ if (!root || !app) {
       mkTab("Artisti", route.name === "artists" || route.name === "artist", () => {
         setAdminRoute({ name: "artists" });
       }),
+      mkTab("Newsletter", route.name === "newsletter", () => {
+        setAdminRoute({ name: "newsletter" });
+      }),
       mkTab("Impostazioni", route.name === "settings", () => {
         setAdminRoute({ name: "settings" });
       }),
@@ -750,6 +757,7 @@ if (!root || !app) {
 
     const main = el("div", "account-shell__main");
     if (route.name === "orders") await renderAdminOrders(main);
+    else if (route.name === "newsletter") await renderAdminNewsletter(main);
     else if (route.name === "artists") await renderAdminArtists(main, user, artists, dealsData.deals);
     else if (route.name === "artist") {
       const artist = artists.find((a) => a.id === route.id);
@@ -765,6 +773,147 @@ if (!root || !app) {
 
     shell.append(main);
     app!.append(shell);
+  }
+
+  async function renderAdminNewsletter(mount: HTMLElement) {
+    mount.append(
+      el("h2", "account-section-title", "Newsletter"),
+      el(
+        "p",
+        "account-lede",
+        "Iscrizioni dal footer (double opt-in). Lista su Turso; invii via Resend Broadcast. Puoi anche scrivere e mandare dalla dashboard Resend (piano free fino a 1.000 contatti).",
+      ),
+    );
+
+    const msg = el("p", "account-msg");
+    msg.hidden = true;
+    mount.append(msg);
+
+    type NlRow = {
+      email: string;
+      confirmed_at: string;
+      locale: string;
+      unsubscribed_at: string | null;
+    };
+
+    let data: {
+      subscribers: NlRow[];
+      activeCount: number;
+      marketingConfigured: boolean;
+    };
+    try {
+      data = (await apiFetch(base, "newsletter?include=all")) as typeof data;
+    } catch (err) {
+      setMsg(msg, err instanceof Error ? err.message : "Errore caricamento");
+      return;
+    }
+
+    if (!data.marketingConfigured) {
+      mount.append(
+        el(
+          "p",
+          "account-banner account-banner--warn",
+          "Manca RESEND_NEWSLETTER_SEGMENT_ID su Vercel (e/o RESEND_API_KEY / MAIL_FROM). Crea un Segment «Newsletter» in Resend, incolla l’ID, Redeploy. Le iscrizioni restano su Turso comunque.",
+        ),
+      );
+    }
+
+    const meta = el("p", "account-lede");
+    meta.textContent = `${data.activeCount} iscritti attivi · ${data.subscribers.length} in elenco`;
+    mount.append(meta);
+
+    const tools = el("div", "account-actions");
+    const syncBtn = el("button", "btn", "Sincronizza → Resend") as HTMLButtonElement;
+    syncBtn.type = "button";
+    syncBtn.disabled = !data.marketingConfigured;
+    syncBtn.addEventListener("click", async () => {
+      syncBtn.disabled = true;
+      try {
+        const r = (await apiFetch(base, "newsletter", {
+          method: "POST",
+          body: JSON.stringify({ action: "sync" }),
+        })) as { synced: number; failed: number; total: number };
+        setMsg(msg, `Sync ok: ${r.synced}/${r.total} (falliti: ${r.failed})`);
+        mount.replaceChildren();
+        await renderAdminNewsletter(mount);
+      } catch (err) {
+        setMsg(msg, err instanceof Error ? err.message : "Sync fallita");
+        syncBtn.disabled = !data.marketingConfigured;
+      }
+    });
+    tools.append(syncBtn);
+    mount.append(tools);
+
+    const compose = el("section", "account-card");
+    compose.append(el("h3", "", "Nuova newsletter"));
+    const form = el("form", "account-stack-form") as HTMLFormElement;
+    form.innerHTML = `
+      <label class="account-stack-form__field"><span>Oggetto</span>
+        <input name="subject" type="text" required maxlength="200" placeholder="Es. Nuove edizioni in stampa" />
+      </label>
+      <label class="account-stack-form__field"><span>Testo</span>
+        <textarea name="text" required rows="10" placeholder="Scrivi qui. Due a capo = nuovo paragrafo. In coda verrà aggiunto il link Disiscriviti di Resend."></textarea>
+      </label>
+      <button class="btn account-action-form__btn" type="submit">Invia a tutti gli iscritti Resend</button>
+    `;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!data.marketingConfigured) {
+        setMsg(msg, "Configura RESEND_NEWSLETTER_SEGMENT_ID prima di inviare.");
+        return;
+      }
+      const fd = new FormData(form);
+      const subject = String(fd.get("subject") || "").trim();
+      const text = String(fd.get("text") || "").trim();
+      if (!confirm(`Inviare «${subject}» a tutti i contatti del segmento Resend?`)) return;
+      const submit = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      submit.disabled = true;
+      try {
+        const r = (await apiFetch(base, "newsletter", {
+          method: "POST",
+          body: JSON.stringify({ action: "send", subject, text }),
+        })) as { broadcastId?: string };
+        setMsg(
+          msg,
+          r.broadcastId
+            ? `Inviata (broadcast ${r.broadcastId}). Controlla Resend → Broadcasts.`
+            : "Inviata.",
+        );
+        form.reset();
+      } catch (err) {
+        setMsg(msg, err instanceof Error ? err.message : "Invio fallito");
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    compose.append(form);
+    mount.append(compose);
+
+    if (data.subscribers.length) {
+      const table = el("div", "account-table account-table--roster");
+      table.append(
+        (() => {
+          const head = el("div", "account-table__head");
+          head.append(el("span", "", "Email"), el("span", "", "Lingua"), el("span", "", "Stato"));
+          return head;
+        })(),
+      );
+      for (const s of data.subscribers.slice(0, 200)) {
+        const row = el("div", "account-table__row account-table__row--roster");
+        row.append(
+          el("span", "", s.email),
+          el("span", "", s.locale || "it"),
+          el("span", "", s.unsubscribed_at ? "disiscritto" : "attivo"),
+        );
+        table.append(row);
+      }
+      if (data.subscribers.length > 200) {
+        mount.append(el("p", "account-lede", `Mostrate le prime 200 di ${data.subscribers.length}.`));
+      }
+      mount.append(table);
+    } else {
+      mount.append(el("p", "account-lede", "Nessun iscritto ancora."));
+    }
   }
 
   async function renderAdminOrders(mount: HTMLElement) {

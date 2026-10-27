@@ -108,7 +108,9 @@ CREATE TABLE IF NOT EXISTS shop_orders (
 CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   email TEXT PRIMARY KEY,
   confirmed_at TEXT NOT NULL DEFAULT (datetime('now')),
-  locale TEXT NOT NULL DEFAULT 'it'
+  locale TEXT NOT NULL DEFAULT 'it',
+  unsubscribed_at TEXT,
+  resend_contact_id TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_shop_orders_status ON shop_orders(status);

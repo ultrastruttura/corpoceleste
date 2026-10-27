@@ -2,7 +2,7 @@
 
 export type SendMailResult = { ok: true } | { ok: false; error: string };
 
-function fromAddress() {
+export function fromAddress() {
   const raw = (process.env.MAIL_FROM || process.env.SHOP_EMAIL || "").trim();
   if (!raw) return "";
   return raw.includes("<") ? raw : `Corpoceleste <${raw}>`;

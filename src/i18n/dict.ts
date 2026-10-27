@@ -223,6 +223,7 @@ const it = {
   },
   artists: {
     title: "Artisti",
+    closed: "Elenco in aggiornamento — intanto Bio, Corsi o Contatti.",
   },
   thanks: {
     received: "Ricevuto",
@@ -609,6 +610,7 @@ const en: typeof it = {
   },
   artists: {
     title: "Artists",
+    closed: "List coming soon — for now see Bio, Workshops or Contact.",
   },
   thanks: {
     received: "Received",
@@ -995,6 +997,7 @@ const de: typeof it = {
   },
   artists: {
     title: "Künstler",
+    closed: "Liste in Vorbereitung — vorerst Bio, Kurse oder Kontakt.",
   },
   thanks: {
     received: "Angekommen",

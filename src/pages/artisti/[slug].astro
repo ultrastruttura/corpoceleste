@@ -1,35 +1,12 @@
 ---
-import Base from "../../layouts/Base.astro";
-import ProductGrid from "../../components/ProductGrid.astro";
-import { artists, artistBySlug, artistBio, artistSeoDescription } from "../../data/artists";
-import { productsByArtist } from "../../data/products";
-import { metaSnippet } from "../../lib/seo";
-import { currentLocale, pageUrl, t } from "../../i18n";
+import { artists } from "../../data/artists";
+import { currentLocale, pageUrl } from "../../i18n";
 
+/** Paths kept so old URLs exist as redirects; pages stay closed for launch. */
 export function getStaticPaths() {
   return artists.map((a) => ({ params: { slug: a.slug } }));
 }
 
 const locale = currentLocale(Astro.currentLocale);
-const copy = t(locale);
-const artist = artistBySlug(Astro.params.slug!);
-if (!artist) return Astro.redirect(pageUrl(locale, "artisti/"));
-const works = productsByArtist(artist.id);
-const bio = artistBio(artist, locale);
-const description = metaSnippet(artistSeoDescription(artist, locale) || bio || copy.meta.description);
-const cover = works[0]?.print;
+return Astro.redirect(pageUrl(locale, "artisti/"));
 ---
-
-<Base title={`${artist.name} — Corpoceleste`} description={description} image={cover}>
-  <div class="wrap page-main">
-    <header class="page-hero">
-      <p class="card-artist"><a href={pageUrl(locale, "artisti/")}>{copy.artists.title}</a></p>
-      <h1>{artist.name}</h1>
-      {
-        bio &&
-          bio.split(/\n\n+/).map((para) => <p class="lede">{para}</p>)
-      }
-    </header>
-    <ProductGrid products={works} />
-  </div>
-</Base>

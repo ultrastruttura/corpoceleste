@@ -15,7 +15,6 @@ import {
   sizeInStock,
   stockOf,
 } from "../../data/products";
-import { artistById } from "../../data/artists";
 import { site, publicFormAction } from "../../data/site";
 import { sizeChartForProduct } from "../../data/fit-models";
 import { siteSettings } from "../../data/settings";
@@ -35,7 +34,6 @@ const product = productBySlug(slug!);
 if (!product) return Astro.redirect(pageUrl(locale));
 
 const artist = artistName(product.artistId);
-const artistSlug = artistById(product.artistId)?.slug ?? "corpoceleste";
 const sold = !isInStock(product);
 const lowStock = !sold && isLowStock(product, siteSettings.lowStockThreshold);
 const preorder = product.status === "preorder" && !sold;
@@ -272,9 +270,7 @@ const jsonLd = {
     <div class="product-info">
       {
         product.artistId !== "studio" && artist !== product.title && (
-          <a class="card-artist" href={pageUrl(locale, `artisti/${artistSlug}/`)}>
-            {artist}
-          </a>
+          <p class="card-artist">{artist}</p>
         )
       }
       <h1>{product.title}</h1>
