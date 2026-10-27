@@ -7,12 +7,6 @@ export function bindAutoplayVideos(root: ParentNode = document) {
 }
 
 function prime(video: HTMLVideoElement) {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    video.removeAttribute("autoplay");
-    video.pause();
-    return;
-  }
-
   video.muted = true;
   video.defaultMuted = true;
   video.playsInline = true;

@@ -2013,8 +2013,7 @@ body:has(.site-announce) .shop-home-stage {
   }
 }
 
-.shop-home-stage__video,
-.shop-home-stage__fallback {
+.shop-home-stage__video {
   display: block;
   width: 100%;
   height: 100%;
@@ -2023,20 +2022,6 @@ body:has(.site-announce) .shop-home-stage {
   border: 0;
   outline: none;
   background: var(--stage-ink);
-}
-
-.shop-home-stage__fallback {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shop-home-stage__video {
-    display: none;
-  }
-
-  .shop-home-stage__fallback {
-    display: block;
-  }
 }
 
 .artist-directory--closed {
