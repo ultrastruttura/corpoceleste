@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { localizedSetting, siteSettings } from "../data/settings";
+import { asset } from "../lib/paths";
 import { metaSnippet } from "../lib/seo";
 import { currentLocale, t } from "../i18n";
 
@@ -10,15 +11,30 @@ const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
 const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
+const stageSrc = asset("images/photos/la-parte-a-maggese.webp");
+const ogImage = siteSettings.ogImage || "images/photos/la-parte-a-maggese.webp";
 ---
 
 <Base
   title="Corpoceleste"
   description={seoDescription}
-  image={siteSettings.ogImage}
+  image={ogImage}
+  preloadImage={stageSrc}
+  preloadImageType="image/webp"
 >
-  <div class="wrap shop-home shop-home--closed">
+  <div class="shop-home shop-home--closed">
     <h1 class="visually-hidden">{homeTitle}</h1>
     <p class="visually-hidden">{seoDescription}</p>
+    <figure class="shop-home-stage">
+      <img
+        class="shop-home-stage__img"
+        src={stageSrc}
+        alt={copy.home.stageAlt}
+        width="2400"
+        height="1600"
+        decoding="async"
+        fetchpriority="high"
+      />
+    </figure>
   </div>
 </Base>

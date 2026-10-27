@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tinacms dev -c \"astro dev\"",
+    "dev": "node --disable-warning=DEP0190 ./node_modules/@tinacms/cli/bin/tinacms dev -c \"astro dev\"",
     "build": "tinacms build --local --skip-cloud-checks && astro build",
     "build:cloud": "tinacms build && astro build",
     "build:site": "astro build",

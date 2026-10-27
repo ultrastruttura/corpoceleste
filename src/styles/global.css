@@ -1958,7 +1958,29 @@ body.cart-open {
 }
 
 .shop-home--closed {
-  min-height: 40vh;
+  padding: 0;
+  margin: 0;
+}
+
+/* First viewport = only the painting (header + announce stay above). */
+.shop-home-stage {
+  margin: 0;
+  width: 100%;
+  height: calc(100dvh - var(--header) - env(safe-area-inset-top, 0px));
+  overflow: hidden;
+  background: var(--ink);
+}
+
+body:has(.site-announce) .shop-home-stage {
+  height: calc(100dvh - var(--header) - 2.75rem - env(safe-area-inset-top, 0px));
+}
+
+.shop-home-stage__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .artist-directory--closed {
