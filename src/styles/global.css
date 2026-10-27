@@ -1974,33 +1974,6 @@ body:has(.site-announce) .shop-home-stage {
 }
 
 /*
-  CRT / tubo catodico (from video radial profile):
-  content still open ~0–45%, crush begins ~55–60%, letterbox by ~75%+.
-  Mid stop keeps a faint teal phosphor so flat CSS bars don't read as a hard step.
-*/
-.shop-home-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 74% 74% at 50% 48%,
-      transparent 0%,
-      transparent 42%,
-      rgba(14, 22, 22, 0.22) 58%,
-      rgba(13, 12, 15, 0.72) 76%,
-      var(--stage-ink) 100%
-    ),
-    radial-gradient(
-      ellipse 100% 100% at 50% 50%,
-      transparent 58%,
-      rgba(0, 0, 0, 0.5) 100%
-    );
-}
-
-/*
   Layout-only wrapper. No mask/filter/transform here either — masking a
   parent of <video> still freezes decoded frames on some iOS GPUs.
 */
@@ -2008,6 +1981,26 @@ body:has(.site-announce) .shop-home-stage {
   position: absolute;
   inset: 0;
   display: block;
+}
+
+/*
+  CRT tube fade. `closest-side` = half the short side = half the contained
+  square video, so it reaches solid ink exactly at the video edge — browsers
+  render the video rim slightly teal (~#101215), which otherwise shows as a step.
+*/
+.shop-home-stage__crt {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle closest-side at 50% 50%,
+    transparent 0%,
+    transparent 58%,
+    rgba(13, 12, 15, 0.45) 76%,
+    rgba(13, 12, 15, 0.85) 90%,
+    var(--stage-ink) 100%
+  );
 }
 
 @media (max-width: 899px) {
