@@ -2009,13 +2009,7 @@ body:has(.site-announce) .shop-home-stage {
     object-fit cropping would otherwise cut off (avoids the flat/video step).
   */
   .shop-home-stage__media {
-    inset: auto;
-    width: 110%;
-    height: 110%;
-    left: 50%;
-    top: 50%;
-    margin-left: -55%;
-    margin-top: -55%;
+    inset: -5%;
   }
 }
 
