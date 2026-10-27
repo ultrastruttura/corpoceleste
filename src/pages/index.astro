@@ -11,7 +11,9 @@ const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
 const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
-const stageSrc = asset("images/photos/la-parte-a-maggese.webp");
+const posterSrc = asset("images/photos/la-parte-a-maggese.webp");
+const videoMp4 = asset("videos/home-stage.mp4");
+const videoWebm = asset("videos/home-stage.webm");
 const ogImage = siteSettings.ogImage || "images/photos/la-parte-a-maggese.webp";
 ---
 
@@ -19,21 +21,33 @@ const ogImage = siteSettings.ogImage || "images/photos/la-parte-a-maggese.webp";
   title="Corpoceleste"
   description={seoDescription}
   image={ogImage}
-  preloadImage={stageSrc}
+  preloadImage={posterSrc}
   preloadImageType="image/webp"
 >
   <div class="shop-home shop-home--closed">
     <h1 class="visually-hidden">{homeTitle}</h1>
     <p class="visually-hidden">{seoDescription}</p>
     <figure class="shop-home-stage">
+      <video
+        class="shop-home-stage__video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster={posterSrc}
+        aria-label={copy.home.stageAlt}
+      >
+        <source src={videoMp4} type="video/mp4" />
+        <source src={videoWebm} type="video/webm" />
+      </video>
       <img
-        class="shop-home-stage__img"
-        src={stageSrc}
+        class="shop-home-stage__fallback"
+        src={posterSrc}
         alt={copy.home.stageAlt}
         width="2400"
         height="1600"
         decoding="async"
-        fetchpriority="high"
       />
     </figure>
   </div>

@@ -10,3 +10,5 @@ tina/__generated__/
 !.env.example
 .vercel
 bug.jpg
+*.mov
+ScreenRecording_*
