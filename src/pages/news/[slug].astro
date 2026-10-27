@@ -14,13 +14,14 @@ function linkify(text: string) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
   return escaped.replace(
-    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    /\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+)\)/g,
     (_match, label: string, url: string) => {
       if (/["'<>`]/.test(url) || /javascript:/i.test(url)) {
         return `[${label}](${url})`;
       }
       const href = url.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-      return `<a href="${href}" rel="noopener noreferrer">${label}</a>`;
+      const rel = url.startsWith("mailto:") ? "" : ' rel="noopener noreferrer"';
+      return `<a href="${href}"${rel}>${label}</a>`;
     },
   );
 }
