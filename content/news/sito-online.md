@@ -6,7 +6,7 @@ title_de: Die Website ist online
 excerpt_it: Shop e elenco artisti arriveranno. Intanto puoi iscriverti alla newsletter o scrivere.
 excerpt_en: Shop and artists list will follow. For now you can subscribe to the newsletter or write.
 excerpt_de: Shop und Künstlerliste kommen. Vorerst Newsletter oder schreiben.
-cover: /videos/home-og.jpg
+cover: /images/photos/og-home.jpg
 video: /videos/home-stage.mp4
 body_it: |-
   Il sito Corpoceleste è online.
