@@ -10,6 +10,8 @@ export type NewsItem = {
   excerpt: Localized;
   body: Localized;
   cover: string;
+  /** Optional muted loop for the article (cover stays the list thumb / poster). */
+  video: string;
   images: string[];
 };
 
@@ -51,6 +53,7 @@ export const news: NewsItem[] = Object.entries(files)
         de: String(data.body_de ?? ""),
       },
       cover: String(data.cover ?? "").trim(),
+      video: String(data.video ?? "").trim(),
       images: asImages(data.images),
     };
   })

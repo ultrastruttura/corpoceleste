@@ -1442,12 +1442,37 @@ body.cart-open {
   background: var(--paper);
 }
 
+.news-feature {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 0;
+}
+
+@media (min-width: 800px) {
+  .news-feature--split {
+    grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+    align-items: start;
+    gap: 2rem;
+  }
+}
+
 .news-cover {
   width: min(100%, 720px);
   height: auto;
   display: block;
-  margin: 0 0 1.5rem;
+  margin: 0;
   border: 1px solid var(--line);
+  background: #0b0d0f;
+}
+
+.news-feature--split .news-cover {
+  width: 100%;
+  max-width: none;
+}
+
+.news-cover--video {
+  aspect-ratio: 1;
+  object-fit: contain;
 }
 
 .news-gallery {
