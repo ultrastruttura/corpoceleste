@@ -156,19 +156,7 @@ export function productBySlug(slug: string) {
   return products.find((p) => p.slug === slug);
 }
 
-export function productsByArtist(artistId: string) {
-  return products.filter((p) => p.artistId === artistId);
-}
-
 export { artistName, artists };
-
-export function availableProducts() {
-  return products.filter((p) => isInStock(p));
-}
-
-export function soldOutProducts() {
-  return products.filter((p) => !isInStock(p));
-}
 
 export function formatPrice(n: number) {
   return `${n} €`;

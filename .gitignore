@@ -12,3 +12,5 @@ tina/__generated__/
 bug.jpg
 *.mov
 ScreenRecording_*
+stock-ledger/*.json
+!stock-ledger/.gitkeep

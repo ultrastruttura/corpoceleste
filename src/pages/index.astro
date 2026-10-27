@@ -13,7 +13,6 @@ const seoDescription = metaSnippet(
 );
 const posterSrc = asset("images/photos/la-parte-a-maggese.webp");
 const videoMp4 = asset("videos/home-stage.mp4");
-const videoWebm = asset("videos/home-stage.webm");
 const ogImage = siteSettings.ogImage || "images/photos/la-parte-a-maggese.webp";
 ---
 
@@ -39,7 +38,6 @@ const ogImage = siteSettings.ogImage || "images/photos/la-parte-a-maggese.webp";
         aria-label={copy.home.stageAlt}
       >
         <source src={videoMp4} type="video/mp4" />
-        <source src={videoWebm} type="video/webm" />
       </video>
       <img
         class="shop-home-stage__fallback"

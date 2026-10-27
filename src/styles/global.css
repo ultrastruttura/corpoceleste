@@ -1380,88 +1380,6 @@ body.cart-open {
   height: auto;
 }
 
-.name-list {
-  list-style: none;
-  margin: 0 0 48px;
-  padding: 0;
-}
-
-.name-list li {
-  padding: 6px 0;
-  border-top: 1px solid var(--line);
-}
-
-.name-list a {
-  text-decoration: none;
-  font-size: 15px;
-}
-
-.name-list a:hover {
-  text-decoration: underline;
-}
-
-.name-list .date {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.artist-block {
-  margin-top: 2.75rem;
-}
-
-.artist-block:first-of-type {
-  margin-top: 0;
-}
-
-.artist-letter {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--ink);
-  font-weight: 700;
-  line-height: 1;
-}
-
-.artist-block .name-list {
-  margin-bottom: 0;
-}
-
-/* Letter + names stay together; columns only break between groups */
-.artist-directory {
-  margin-bottom: 48px;
-}
-
-.artist-directory__group {
-  margin-top: 1.25rem;
-}
-
-.artist-directory__group:first-child {
-  margin-top: 0;
-}
-
-.artist-directory__group .artist-letter {
-  margin: 0 0 0.35rem;
-}
-
-.artist-directory__group .name-list {
-  margin-bottom: 0;
-}
-
-@media (min-width: 640px) {
-  .artist-directory {
-    column-width: 11rem;
-    column-gap: 2.5rem;
-  }
-
-  .artist-directory__group {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-  }
-}
-
 .news-list {
   list-style: none;
   margin: 0 0 80px;
@@ -1953,10 +1871,6 @@ body.cart-open {
   margin-bottom: 10px;
 }
 
-.shop-home {
-  padding-top: 16px;
-}
-
 .shop-home--closed {
   padding: 0;
   margin: 0;
@@ -1971,7 +1885,7 @@ body:has(.shop-home--closed) .footer {
   border-top: none;
 }
 
-/* First viewport = only the painting (header + announce stay above). */
+/* First viewport = only the stage (header + announce stay above). */
 .shop-home-stage {
   margin: 0 0 -2px;
   width: 100%;
@@ -2020,99 +1934,6 @@ body:has(.site-announce) .shop-home-stage {
   margin: 0;
   color: var(--muted);
   font-size: 15px;
-}
-
-.shop-home-hero {
-  margin-bottom: 16px;
-  padding-top: 8px;
-  padding-bottom: 0;
-}
-
-.shop-home-hero h1 {
-  font-size: 1.25rem;
-  line-height: 1.25;
-  margin-bottom: 6px;
-}
-
-.shop-home-hero .lede {
-  max-width: 34rem;
-  font-size: 14px;
-  line-height: 1.45;
-  margin-bottom: 0;
-}
-
-.shop-home .grid {
-  gap: 10px;
-  margin-bottom: 28px;
-}
-
-.shop-home-sold {
-  margin-top: 12px;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
-}
-
-.shop-home-sold-title {
-  margin: 0 0 16px;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.shop-home-sold .grid {
-  margin-bottom: 0;
-}
-
-.shop-home .card-frame {
-  aspect-ratio: 0.92;
-}
-
-.shop-home .card-meta {
-  padding: 8px 2px 2px;
-}
-
-.shop-home .card-artist {
-  font-size: 11px;
-}
-
-.shop-home .card-title {
-  font-size: 13px;
-  margin-bottom: 2px;
-}
-
-.shop-home .card-price {
-  font-size: 12px;
-}
-
-@media (max-width: 899px) {
-  .shop-home {
-    padding-top: 8px;
-  }
-
-  .shop-home-hero {
-    margin-bottom: 12px;
-    padding-top: 0;
-  }
-
-  .shop-home-hero h1 {
-    font-size: 1.15rem;
-  }
-
-  .shop-home-hero .lede {
-    font-size: 13px;
-    max-width: 34ch;
-  }
-
-  .shop-home .grid {
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-}
-
-@media (max-width: 419px) {
-  .shop-home .grid {
-    gap: 16px;
-  }
 }
 
 .page-photo {
