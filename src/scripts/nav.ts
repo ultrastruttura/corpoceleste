@@ -3,7 +3,19 @@ export function bindNav() {
   const nav = document.querySelector<HTMLElement>("[data-mobile-nav]");
   if (!btn || !nav) return;
 
+  const syncTop = () => {
+    const chrome = document.querySelector<HTMLElement>(".site-chrome");
+    if (!chrome) return;
+    const announce = chrome.querySelector<HTMLElement>(".site-announce");
+    const header = chrome.querySelector<HTMLElement>(".header");
+    const h =
+      (announce?.getBoundingClientRect().height ?? 0) +
+      (header?.getBoundingClientRect().height ?? 0);
+    nav.style.top = `${Math.round(h)}px`;
+  };
+
   const setOpen = (open: boolean) => {
+    syncTop();
     nav.classList.toggle("is-open", open);
     document.body.classList.toggle("nav-open", open);
     btn.setAttribute("aria-expanded", String(open));
@@ -32,5 +44,7 @@ export function bindNav() {
     btn.focus();
   });
 
+  window.addEventListener("resize", syncTop, { passive: true });
+  syncTop();
   setOpen(false);
 }

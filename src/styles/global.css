@@ -480,16 +480,13 @@ a.site-announce__text:hover {
 .mobile-nav {
   display: none;
   position: fixed;
-  /* Sit under sticky chrome (announce + header). --announce is 0 when the bar is off. */
-  top: calc(
-    var(--header) + var(--announce) +
-      max(0px, env(safe-area-inset-top, 0px) - var(--announce-pad-top))
-  );
+  /* Fallback; nav.ts overwrites top from measured announce + header */
+  top: calc(var(--header) + var(--announce) + env(safe-area-inset-top, 0px));
   right: 0;
   bottom: 0;
   left: 0;
   background: var(--white);
-  z-index: 39;
+  z-index: 35;
   padding: 28px max(20px, env(safe-area-inset-right, 0px)) max(48px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
   border-top: 1px solid var(--line);
   overflow: auto;
