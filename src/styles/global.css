@@ -1968,6 +1968,7 @@ body.cart-open {
   width: 100%;
   height: calc(100dvh - var(--header) - env(safe-area-inset-top, 0px));
   overflow: hidden;
+  line-height: 0;
   /* Sampled from video letterbox: rgb(11,13,15) */
   background: #0b0d0f;
 }
@@ -1983,6 +1984,9 @@ body:has(.site-announce) .shop-home-stage {
   height: 100%;
   object-fit: contain;
   object-position: center;
+  /* Crop 1px compositor fringe on the video edge */
+  clip-path: inset(1px);
+  background: #0b0d0f;
 }
 
 .shop-home-stage__fallback {
