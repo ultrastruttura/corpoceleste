@@ -1957,6 +1957,10 @@ body.cart-open {
   padding-top: 16px;
 }
 
+.shop-home--closed {
+  min-height: 40vh;
+}
+
 .shop-home-hero {
   margin-bottom: 16px;
   padding-top: 8px;

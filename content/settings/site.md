@@ -13,12 +13,12 @@ homeLede:
   it: ""
   en: ""
   de: ""
-announcementEnabled: false
+announcementEnabled: true
 announcementText:
-  it: "+++ Spedizione in Italia e in Europa — costo calcolato in checkout +++ Scrivi a info@corpoceleste.eu per ordini e tempistiche +++"
-  en: "+++ Shipping in Italy and across Europe — cost calculated at checkout +++ Write to info@corpoceleste.eu for orders and timing +++"
-  de: "+++ Versand in Italien und Europa — Kosten an der Kasse +++ Für Bestellungen und Zeiten: info@corpoceleste.eu +++"
-announcementLink: ""
+  it: "+++ Edizioni in stampa — iscriviti / scrivi a info@corpoceleste.eu +++"
+  en: "+++ Editions in print — subscribe / write to info@corpoceleste.eu +++"
+  de: "+++ Editionen im Druck — Newsletter / schreib an info@corpoceleste.eu +++"
+announcementLink: contatti/
 ogImage: ""
 cloudflareAnalyticsToken: "94c7ecb4d9b44634aaefb9fee4f9f3b4"
 lowStockThreshold: 10

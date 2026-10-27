@@ -1,11 +1,16 @@
 ---
 import { localizedSetting, siteSettings } from "../data/settings";
-import { currentLocale } from "../i18n";
+import { currentLocale, pageUrl } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const enabled = Boolean(siteSettings.announcementEnabled);
 const text = localizedSetting("announcementText", locale).trim();
-const href = siteSettings.announcementLink.trim();
+const rawLink = siteSettings.announcementLink.trim();
+const href = !rawLink
+  ? ""
+  : /^(https?:|mailto:|#)/i.test(rawLink)
+    ? rawLink
+    : pageUrl(locale, rawLink.replace(/^\//, ""));
 const show = enabled && Boolean(text);
 ---
 

@@ -358,7 +358,8 @@ export default defineConfig({
             type: "string",
             name: "announcementLink",
             label: "Link barra (opzionale)",
-            description: "Es. /news/ o https://… — se vuoto il testo non è cliccabile.",
+            description:
+              "Path interno (es. contatti/) con lingua automatica, oppure https://… / mailto:… — se vuoto il testo non è cliccabile.",
           },
           {
             type: "string",
