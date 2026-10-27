@@ -151,6 +151,21 @@ p:last-child {
   z-index: 40;
 }
 
+/*
+  Announce content height (pads + line) when safe-area is 0.
+  Stage adds only the notch overflow: max(0, safe-area - --announce-pad-top).
+*/
+:root {
+  --announce: 0px;
+  --announce-pad-top: 0px;
+}
+
+body:has(.site-announce) {
+  /* 12 + 15*1.25 + 12 */
+  --announce: 2.625rem;
+  --announce-pad-top: 12px;
+}
+
 .site-announce {
   background: var(--danger);
   color: var(--white);
@@ -165,6 +180,12 @@ p:last-child {
 }
 
 @media (max-width: 699px) {
+  body:has(.site-announce) {
+    /* 8 + 11*1.3 + 8 — must match the shrunk bar or the stage leaves a white seam */
+    --announce: 1.9rem;
+    --announce-pad-top: 8px;
+  }
+
   .site-announce {
     padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) 8px
       max(8px, env(safe-area-inset-left, 0px));
@@ -1933,8 +1954,14 @@ body:has(.shop-home--closed) .footer {
 }
 
 body:has(.site-announce) .shop-home-stage {
-  min-height: calc(100svh - var(--header) - 2.5rem - env(safe-area-inset-top, 0px));
-  height: calc(100dvh - var(--header) - 2.5rem - env(safe-area-inset-top, 0px));
+  min-height: calc(
+    100svh - var(--header) - var(--announce) -
+      max(0px, env(safe-area-inset-top, 0px) - var(--announce-pad-top))
+  );
+  height: calc(
+    100dvh - var(--header) - var(--announce) -
+      max(0px, env(safe-area-inset-top, 0px) - var(--announce-pad-top))
+  );
 }
 
 .shop-home-stage__video,
