@@ -11,8 +11,8 @@ const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
 const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
-const posterSrc = asset("images/photos/la-parte-a-maggese.webp");
 const videoMp4 = asset("videos/home-stage.mp4");
+const posterSrc = asset("videos/og-stage.jpg");
 /* Frame from home-stage.mp4 — WhatsApp shows og:image, not the video. */
 const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
 ---
@@ -23,32 +23,55 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
   image={ogImage}
   video="videos/home-stage.mp4"
   preloadImage={posterSrc}
-  preloadImageType="image/webp"
+  preloadImageType="image/jpeg"
 >
   <div class="shop-home shop-home--closed">
     <h1 class="visually-hidden">{homeTitle}</h1>
     <p class="visually-hidden">{seoDescription}</p>
     <figure class="shop-home-stage">
+      {/* src on <video> (not only <source>) — iOS Safari autoplay is unreliable otherwise */}
       <video
         class="shop-home-stage__video"
+        src={videoMp4}
+        poster={posterSrc}
         autoplay
         muted
         loop
         playsinline
-        preload="metadata"
-        poster={posterSrc}
+        webkit-playsinline
+        preload="auto"
         aria-label={copy.home.stageAlt}
-      >
-        <source src={videoMp4} type="video/mp4" />
-      </video>
+      ></video>
       <img
         class="shop-home-stage__fallback"
         src={posterSrc}
         alt={copy.home.stageAlt}
-        width="2400"
-        height="1600"
+        width="1200"
+        height="1200"
         decoding="async"
       />
     </figure>
   </div>
+
+  <script>
+    const video = document.querySelector<HTMLVideoElement>(".shop-home-stage__video");
+    if (video) {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
+
+      const tryPlay = () => {
+        const p = video.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      };
+
+      tryPlay();
+      video.addEventListener("loadeddata", tryPlay, { once: true });
+      document.addEventListener("touchstart", tryPlay, { once: true, passive: true });
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) tryPlay();
+      });
+    }
+  </script>
 </Base>

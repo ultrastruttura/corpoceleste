@@ -1931,7 +1931,7 @@ body.cart-open {
   margin: 0;
 }
 
-/* Closed home: no white seam above the footer / system nav. */
+/* Closed home: paint the whole column dark so no white hairline can show. */
 html:has(.shop-home--closed),
 body:has(.shop-home--closed),
 body:has(.shop-home--closed) #main {
@@ -1940,33 +1940,31 @@ body:has(.shop-home--closed) #main {
 
 body:has(.shop-home--closed) .footer {
   border-top: none;
-  /* Kill subpixel white hairline where stage meets footer */
-  box-shadow: 0 -3px 0 #0b0d0f;
+  /* Dark strip above footer covers dvh/subpixel gaps without restyling the footer */
+  box-shadow: 0 -12px 0 #0b0d0f;
 }
 
 /* First viewport = only the stage (header + announce stay above). */
 .shop-home-stage {
+  --stage-chrome: calc(var(--header) + env(safe-area-inset-top, 0px));
   position: relative;
-  /* Overlap footer by a few px — mobile dvh rounding leaves a white hairline */
-  margin: 0 0 -4px;
+  margin: 0;
   width: 100%;
-  /* svh avoids mobile URL-bar gaps that leave a white strip */
-  min-height: calc(100svh - var(--header) - env(safe-area-inset-top, 0px) + 2px);
-  height: calc(100dvh - var(--header) - env(safe-area-inset-top, 0px) + 2px);
+  /* Fill the first screen; +1px closes mobile rounding gaps into the footer */
+  min-height: calc(100svh - var(--stage-chrome) + 1px);
+  height: calc(100dvh - var(--stage-chrome) + 1px);
   overflow: hidden;
   line-height: 0;
   /* Sampled from video letterbox: rgb(11,13,15) */
   background: #0b0d0f;
+  /* Extra dark paint under the stage (visible only if calc undershoots) */
+  box-shadow: 0 12px 0 #0b0d0f;
 }
 
 body:has(.site-announce) .shop-home-stage {
-  min-height: calc(
-    100svh - var(--header) - var(--announce) -
-      max(0px, env(safe-area-inset-top, 0px) - var(--announce-pad-top)) + 2px
-  );
-  height: calc(
-    100dvh - var(--header) - var(--announce) -
-      max(0px, env(safe-area-inset-top, 0px) - var(--announce-pad-top)) + 2px
+  --stage-chrome: calc(
+    var(--header) + var(--announce) +
+      max(0px, env(safe-area-inset-top, 0px) - var(--announce-pad-top))
   );
 }
 
@@ -1975,11 +1973,17 @@ body:has(.site-announce) .shop-home-stage {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
-  /* Crop compositor fringe on the video edge (a bit more on the bottom) */
-  clip-path: inset(1px 1px 2px 1px);
+  border: 0;
+  outline: none;
   background: #0b0d0f;
+  /* Scale past the box so iOS/Android compositor fringes stay clipped */
+  transform: scale(1.04);
+  transform-origin: center center;
+  /* Known iOS Safari fix for 1px video edge artifacts */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: -webkit-radial-gradient(white, black);
 }
 
 .shop-home-stage__fallback {
@@ -1993,6 +1997,7 @@ body:has(.site-announce) .shop-home-stage {
 
   .shop-home-stage__fallback {
     display: block;
+    transform: none;
   }
 }
 
