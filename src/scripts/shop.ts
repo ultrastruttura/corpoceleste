@@ -1,4 +1,5 @@
 import { isPurchasableStatus } from "../lib/product-status";
+import { bindAutoplayVideos } from "./autoplay-video";
 import { addItem } from "./cart";
 import { bindCart, openCart } from "./cart-ui";
 import { applyLiveStock, catalogProduct } from "./catalog";
@@ -36,6 +37,7 @@ async function refreshLiveStock() {
 function bind() {
   bindNav();
   bindCart();
+  bindAutoplayVideos();
   void refreshLiveStock().then(() => bindCart());
 
   document.querySelectorAll<HTMLInputElement>("[data-next-grazie]").forEach((node) => {

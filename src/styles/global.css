@@ -1700,6 +1700,7 @@ body.cart-open {
   right: 0;
   bottom: 0;
   width: min(420px, 100%);
+  max-height: 100vh;
   max-height: 100dvh;
   padding-top: env(safe-area-inset-top, 0px);
   background: var(--white);
@@ -1932,26 +1933,32 @@ body.cart-open {
   margin: 0;
 }
 
-/* Closed home: match video letterbox (~rgb 12,14,17) so seams don't flash. */
+/*
+  Stage ink = mean letterbox sampled from home-stage.mp4 rim (#0d0c0f).
+  CRT falloff is recreated on ::after (not on <video>) so iOS compositing stays safe.
+*/
 html:has(.shop-home--closed),
 body:has(.shop-home--closed),
 body:has(.shop-home--closed) #main {
-  background: var(--stage-ink, #0c0e11);
+  background: var(--stage-ink, #0d0c0f);
 }
 
 body:has(.shop-home--closed) .footer {
   border-top: none;
-  box-shadow: 0 -12px 0 var(--stage-ink, #0c0e11);
+  box-shadow: 0 -12px 0 var(--stage-ink, #0d0c0f);
 }
 
 /* First viewport = only the stage (header + announce stay above). */
 .shop-home-stage {
-  --stage-ink: #0c0e11;
+  --stage-ink: #0d0c0f;
   --stage-chrome: calc(var(--header) + env(safe-area-inset-top, 0px));
   position: relative;
   margin: 0;
   width: 100%;
+  /* vh fallbacks before svh/dvh (older WebViews / Samsung Internet). */
+  min-height: calc(100vh - var(--stage-chrome) + 1px);
   min-height: calc(100svh - var(--stage-chrome) + 1px);
+  height: calc(100vh - var(--stage-chrome) + 1px);
   height: calc(100dvh - var(--stage-chrome) + 1px);
   overflow: hidden;
   line-height: 0;
@@ -1966,19 +1973,57 @@ body:has(.site-announce) .shop-home-stage {
   );
 }
 
-/* Soft vignette: same fade the video has into its letterbox, over the stage edges */
+/*
+  CRT / tubo catodico (from video radial profile):
+  content still open ~0–45%, crush begins ~55–60%, letterbox by ~75%+.
+  Mid stop keeps a faint teal phosphor so flat CSS bars don't read as a hard step.
+*/
 .shop-home-stage::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse 68% 68% at 50% 50%,
-    transparent 42%,
-    color-mix(in srgb, var(--stage-ink) 55%, transparent) 72%,
-    var(--stage-ink) 100%
-  );
+  background:
+    radial-gradient(
+      ellipse 74% 74% at 50% 48%,
+      transparent 0%,
+      transparent 42%,
+      rgba(14, 22, 22, 0.22) 58%,
+      rgba(13, 12, 15, 0.72) 76%,
+      var(--stage-ink) 100%
+    ),
+    radial-gradient(
+      ellipse 100% 100% at 50% 50%,
+      transparent 58%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+/*
+  Layout-only wrapper. No mask/filter/transform here either — masking a
+  parent of <video> still freezes decoded frames on some iOS GPUs.
+*/
+.shop-home-stage__media {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+@media (max-width: 899px) {
+  /*
+    Mild zoom fills the phone; CSS CRT above restores the tube rim that
+    object-fit cropping would otherwise cut off (avoids the flat/video step).
+  */
+  .shop-home-stage__media {
+    inset: auto;
+    width: 110%;
+    height: 110%;
+    left: 50%;
+    top: 50%;
+    margin-left: -55%;
+    margin-top: -55%;
+  }
 }
 
 .shop-home-stage__video,
@@ -1991,27 +2036,6 @@ body:has(.site-announce) .shop-home-stage {
   border: 0;
   outline: none;
   background: var(--stage-ink);
-  /* Feather the video rectangle into the stage (no hard box edge) */
-  -webkit-mask-image: radial-gradient(
-    ellipse 78% 78% at 50% 50%,
-    #000 48%,
-    rgba(0, 0, 0, 0.85) 68%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    ellipse 78% 78% at 50% 50%,
-    #000 48%,
-    rgba(0, 0, 0, 0.85) 68%,
-    transparent 100%
-  );
-}
-
-@media (max-width: 899px) {
-  .shop-home-stage__video,
-  .shop-home-stage__fallback {
-    transform: scale(1.1);
-    transform-origin: center center;
-  }
 }
 
 .shop-home-stage__fallback {

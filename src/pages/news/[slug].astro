@@ -53,16 +53,18 @@ const gallery = item.images
         videoSrc ? (
           <video
             class="news-cover news-cover--video"
+            data-autoplay-video
+            src={videoSrc}
             autoplay
             muted
             loop
             playsinline
+            webkit-playsinline
+            disablePictureInPicture
             preload="metadata"
             poster={cover || undefined}
             aria-label={copy.news.imageAlt(title)}
-          >
-            <source src={videoSrc} type="video/mp4" />
-          </video>
+          ></video>
         ) : cover ? (
           <img
             class="news-cover"

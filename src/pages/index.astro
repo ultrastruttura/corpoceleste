@@ -29,49 +29,34 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
     <h1 class="visually-hidden">{homeTitle}</h1>
     <p class="visually-hidden">{seoDescription}</p>
     <figure class="shop-home-stage">
-      {/* src on <video> (not only <source>) — iOS Safari autoplay is unreliable otherwise */}
-      <video
-        class="shop-home-stage__video"
-        src={videoMp4}
-        poster={posterSrc}
-        autoplay
-        muted
-        loop
-        playsinline
-        webkit-playsinline
-        preload="auto"
-        aria-label={copy.home.stageAlt}
-      ></video>
-      <img
-        class="shop-home-stage__fallback"
-        src={posterSrc}
-        alt={copy.home.stageAlt}
-        width="1200"
-        height="1200"
-        decoding="async"
-      />
+      {/*
+        Wrapper is layout-only (zoom via box size). Never CSS mask/filter/transform on <video>
+        — Safari/iOS can freeze decoded frames. src on <video> (not only <source>) for iOS autoplay.
+      */}
+      <div class="shop-home-stage__media">
+        <video
+          class="shop-home-stage__video"
+          data-autoplay-video
+          src={videoMp4}
+          poster={posterSrc}
+          autoplay
+          muted
+          loop
+          playsinline
+          webkit-playsinline
+          disablePictureInPicture
+          preload="auto"
+          aria-label={copy.home.stageAlt}
+        ></video>
+        <img
+          class="shop-home-stage__fallback"
+          src={posterSrc}
+          alt={copy.home.stageAlt}
+          width="1200"
+          height="1200"
+          decoding="async"
+        />
+      </div>
     </figure>
   </div>
-
-  <script>
-    const video = document.querySelector<HTMLVideoElement>(".shop-home-stage__video");
-    if (video) {
-      video.muted = true;
-      video.defaultMuted = true;
-      video.setAttribute("playsinline", "");
-      video.setAttribute("webkit-playsinline", "");
-
-      const tryPlay = () => {
-        const p = video.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      };
-
-      tryPlay();
-      video.addEventListener("loadeddata", tryPlay, { once: true });
-      document.addEventListener("touchstart", tryPlay, { once: true, passive: true });
-      document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) tryPlay();
-      });
-    }
-  </script>
 </Base>
