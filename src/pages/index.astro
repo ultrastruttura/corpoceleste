@@ -13,14 +13,15 @@ const seoDescription = metaSnippet(
 );
 const posterSrc = asset("images/photos/la-parte-a-maggese.webp");
 const videoMp4 = asset("videos/home-stage.mp4");
-/* Maggese for share cards — not the stage serigrafia frame (WhatsApp ignores og:video). */
-const ogImage = siteSettings.ogImage || "images/photos/og-home.jpg";
+/* Frame from home-stage.mp4 — WhatsApp shows og:image, not the video. */
+const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
 ---
 
 <Base
   title="Corpoceleste"
   description={seoDescription}
   image={ogImage}
+  video="videos/home-stage.mp4"
   preloadImage={posterSrc}
   preloadImageType="image/webp"
 >
