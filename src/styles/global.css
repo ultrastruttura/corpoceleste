@@ -1962,10 +1962,21 @@ body.cart-open {
   margin: 0;
 }
 
+/* Closed home: no white seam above the footer / system nav. */
+body:has(.shop-home--closed) {
+  background: #0b0d0f;
+}
+
+body:has(.shop-home--closed) .footer {
+  border-top: none;
+}
+
 /* First viewport = only the painting (header + announce stay above). */
 .shop-home-stage {
-  margin: 0;
+  margin: 0 0 -2px;
   width: 100%;
+  /* svh avoids mobile URL-bar gaps that leave a white strip */
+  min-height: calc(100svh - var(--header) - env(safe-area-inset-top, 0px));
   height: calc(100dvh - var(--header) - env(safe-area-inset-top, 0px));
   overflow: hidden;
   line-height: 0;
@@ -1974,7 +1985,8 @@ body.cart-open {
 }
 
 body:has(.site-announce) .shop-home-stage {
-  height: calc(100dvh - var(--header) - 2.75rem - env(safe-area-inset-top, 0px));
+  min-height: calc(100svh - var(--header) - 2.5rem - env(safe-area-inset-top, 0px));
+  height: calc(100dvh - var(--header) - 2.5rem - env(safe-area-inset-top, 0px));
 }
 
 .shop-home-stage__video,
