@@ -20,6 +20,10 @@
     {
       "source": "/api/live-stock",
       "destination": "/api/shipping-quote?live_stock=1"
+    },
+    {
+      "source": "/api/account/newsletter",
+      "destination": "/api/account/users?newsletter=1"
     }
   ],
   "functions": {
@@ -30,11 +34,10 @@
     "api/withdrawal.ts": { "memory": 256, "maxDuration": 15 },
     "api/form.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/auth.ts": { "memory": 256, "maxDuration": 15 },
-    "api/account/users.ts": { "memory": 256, "maxDuration": 15 },
+    "api/account/users.ts": { "memory": 256, "maxDuration": 60 },
     "api/account/deals.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/sales.ts": { "memory": 256, "maxDuration": 15 },
     "api/account/settle.ts": { "memory": 256, "maxDuration": 15 },
-    "api/account/orders.ts": { "memory": 256, "maxDuration": 15 },
-    "api/account/newsletter.ts": { "memory": 256, "maxDuration": 60 }
+    "api/account/orders.ts": { "memory": 256, "maxDuration": 15 }
   }
 }
