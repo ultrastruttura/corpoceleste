@@ -13,13 +13,14 @@ const seoDescription = metaSnippet(
 );
 const posterSrc = asset("images/photos/la-parte-a-maggese.webp");
 const videoMp4 = asset("videos/home-stage.mp4");
-const ogImage = siteSettings.ogImage || "images/photos/la-parte-a-maggese.webp";
+const ogImage = siteSettings.ogImage || "videos/home-stage-og.jpg";
 ---
 
 <Base
   title="Corpoceleste"
   description={seoDescription}
   image={ogImage}
+  video="videos/home-stage.mp4"
   preloadImage={posterSrc}
   preloadImageType="image/webp"
 >
