@@ -12,11 +12,13 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  # Cancel older deploys so a stuck Pages job cannot block every later push.
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
       NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
@@ -59,6 +61,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
