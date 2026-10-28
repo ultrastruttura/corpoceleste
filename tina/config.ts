@@ -375,10 +375,10 @@ export default defineConfig({
           },
           {
             type: "string",
-            name: "cloudflareAnalyticsToken",
-            label: "Cloudflare Web Analytics — token",
+            name: "umamiWebsiteId",
+            label: "Umami Analytics — Website ID",
             description:
-              "OBBLIGATORIO per vedere le visite. dash.cloudflare.com → Analytics & logs → Web Analytics → Add a site → copia solo il token dallo snippet. Vuoto = analytics spente.",
+              "OBBLIGATORIO per vedere le visite. cloud.umami.is → Settings → Websites → Add website → copia il Website ID (o data-website-id dallo snippet). Vuoto = analytics spente.",
           },
           {
             type: "number",

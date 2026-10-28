@@ -9,6 +9,7 @@ const copy = t(locale);
 const p = copy.privacy;
 const formSubmitFallback = !commerce.formApi;
 const shopEmail = siteSettings.shopEmail;
+const umamiOn = Boolean(siteSettings.umamiWebsiteId);
 ---
 
 <Base title={`${p.title} — Corpoceleste`}>
@@ -92,6 +93,14 @@ const shopEmail = siteSettings.shopEmail;
           <strong>Cloudflare, Inc.</strong> — {p.cloudflare}{" "}
           <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">cloudflare.com</a>.
         </li>
+        {
+          umamiOn && (
+            <li>
+              <strong>Umami Software, Inc.</strong> — {p.umami}{" "}
+              <a href="https://umami.is/privacy" rel="noopener noreferrer">umami.is</a>.
+            </li>
+          )
+        }
         <li>{p.couriers}</li>
       </ul>
       <h2>{p.transfers}</h2>

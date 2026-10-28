@@ -10,7 +10,7 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 | **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO** |
 | **News** | Aggiungere / togliere / modificare articoli |
 | **Bio** | Nome, testo bio IT/EN/DE, sezioni stampa e stampa dal vivo |
-| **SEO e home** | Meta description, H1 home, immagine Open Graph, **email shop**, **token Cloudflare Web Analytics** |
+| **SEO e home** | Meta description, H1 home, immagine Open Graph, **email shop**, **Website ID Umami Analytics** |
 
 Le foto vanno caricate dal pannello (finiscono in `public/uploads/`).
 
@@ -58,14 +58,14 @@ Se è attivo il **webhook PayPal** (guida: [MAGAZZINO-VERCEL.md](./MAGAZZINO-VER
 
 Email shop: **SEO e home** → *Email shop*. Su Vercel: `SHOP_EMAIL`, `RESEND_API_KEY`, `MAIL_FROM`, `CRON_SECRET` (per il rilascio stock).
 
-### Cloudflare Web Analytics (gratis)
+### Umami Analytics (gratis, senza cookie)
 
-1. Account gratis su [dash.cloudflare.com](https://dash.cloudflare.com) (non serve spostare il DNS).
-2. **Analytics & logs** → **Web Analytics** → **Add a site** → hostname `corpoceleste.eu` (o `www.corpoceleste.eu`).
-3. Copia il **token** dallo snippet JS (`token: "…"`).
-4. In Tina → **SEO e home** → *Cloudflare Web Analytics — token*, incolla e salva → push / publish.
+1. Account gratis (piano Hobby) su [cloud.umami.is](https://cloud.umami.is).
+2. **Settings** → **Websites** → **Add website** → dominio `www.corpoceleste.eu`.
+3. Copia il **Website ID** (è anche il `data-website-id` nello snippet).
+4. In Tina → **SEO e home** → *Umami Analytics — Website ID*, incolla e salva → push / publish.
 
-**Senza token le visite non si vedono.** Dashboard: stessa sezione Web Analytics su Cloudflare.
+**Senza Website ID le visite non si vedono.** Dashboard: [cloud.umami.is](https://cloud.umami.is). Niente cookie → niente banner.
 
 ## Dati legali (da compilare)
 

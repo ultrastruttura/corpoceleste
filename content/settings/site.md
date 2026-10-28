@@ -20,7 +20,7 @@ announcementText:
   de: "+++ Editionen im Druck — Newsletter / schreib an info@corpoceleste.eu +++"
 announcementLink: contatti/
 ogImage: ""
-cloudflareAnalyticsToken: "94c7ecb4d9b44634aaefb9fee4f9f3b4"
+umamiWebsiteId: "546938a2-aa92-4654-bc29-85bba09323b4"
 lowStockThreshold: 10
 iban: "IT02C03268223000EM002734005"
 intestatario: "Andrea Baldelli Lorenzo"

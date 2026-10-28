@@ -54,11 +54,11 @@ const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline' https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://www.gstatic.com https://static.cloudflareinsights.com",
+  "script-src 'self' 'unsafe-inline' https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://www.gstatic.com https://cloud.umami.is",
   "style-src 'self' 'unsafe-inline' https://www.gstatic.com https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com https://www.gstatic.com",
-  `connect-src 'self' ${apiOrigin} https://api.zippopotam.us https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://google.com https://www.google.com https://payments.google.com https://www.gstatic.com https://static.cloudflareinsights.com https://cloudflareinsights.com`.replace(
+  `connect-src 'self' ${apiOrigin} https://api.zippopotam.us https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://google.com https://www.google.com https://payments.google.com https://www.gstatic.com https://cloud.umami.is https://gateway.umami.is`.replace(
     /\s+/g,
     " ",
   ),
@@ -89,8 +89,7 @@ const catalog = {
 const pageJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 const jsonLdBlocks = [organizationJsonLd(Astro.site), ...pageJsonLd];
 const llmsHref = llmsTxtUrl(locale === "en" ? "en" : "it");
-const cfToken = siteSettings.cloudflareAnalyticsToken;
-const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
+const umamiId = siteSettings.umamiWebsiteId;
 ---
 
 <!doctype html>
@@ -202,12 +201,12 @@ const cfBeacon = cfToken ? JSON.stringify({ token: cfToken, spa: false }) : "";
       import "../scripts/shop.ts";
     </script>
     {
-      cfBeacon && (
+      umamiId && (
         <script
           is:inline
           defer
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          data-cf-beacon={cfBeacon}
+          src="https://cloud.umami.is/script.js"
+          data-website-id={umamiId}
         />
       )
     }

@@ -39,8 +39,8 @@ export const siteSettings = {
   announcementText: asLocalized(data.announcementText),
   announcementLink: String(data.announcementLink ?? "").trim(),
   ogImage: data.ogImage ? String(data.ogImage) : "",
-  /** Cloudflare Web Analytics beacon token (public; empty = script off). */
-  cloudflareAnalyticsToken: String(data.cloudflareAnalyticsToken ?? "").trim(),
+  /** Umami Cloud website ID (public; empty = script off). */
+  umamiWebsiteId: String(data.umamiWebsiteId ?? "").trim(),
   /**
    * Badge “in esaurimento” quando i pezzi totali ≤ questa soglia.
    * 0 = disattivato. Default 10.
