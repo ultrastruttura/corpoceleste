@@ -254,7 +254,7 @@ const it = {
     contact: "Contatto:",
     cookies: "Cookie e storage",
     cookiesP1:
-      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Il carrello resta solo nel tuo browser. Se attiva, Umami Analytics conta le visite in forma aggregata, senza cookie sul dispositivo. Il proxy Cloudflare può impostare cookie tecnici di sicurezza (anti-bot), non di marketing.",
+      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Il carrello resta solo nel tuo browser. Se attiva, Umami Analytics conta le visite in forma aggregata, senza cookie sul dispositivo.",
     cookiesP3:
       "Il carrello e il riepilogo ordine stanno sul tuo dispositivo, non su un server nostro.",
     cookiesPaypal:
@@ -273,14 +273,13 @@ const it = {
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
-      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). DNS/CDN Cloudflare (USA). Se attive, statistiche di visita su Umami Cloud. Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
+      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Se attive, statistiche di visita su Umami Cloud. Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
     formsubmit:
       "fallback dei form se Vercel non è configurato. Società USA. Informativa:",
     paypalRecv: "se paghi con PayPal (sede europea, gruppo anche USA).",
     github: "hosting delle pagine pubbliche. Informativa su github.com.",
     vercel: "webhook PayPal, magazzino, form del sito, area artisti, mail di conferma. Dati d’ordine, non la carta.",
     resend: "invio delle mail (ordini, recesso, contatti, newsletter, corsi), mittente Corpoceleste.",
-    cloudflare: "DNS/CDN. Informativa:",
     umami: "statistiche di visita aggregate, senza cookie e senza profilazione. Informativa:",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
@@ -306,7 +305,7 @@ const it = {
       "Carrello e riepilogo dopo il checkout restano sul tuo dispositivo (localStorage / sessionStorage), non su un server nostro. Servono solo a far funzionare lo shop.",
     third: "Terze parti",
     thirdBody:
-      "Cloudflare: DNS/CDN; può impostare cookie tecnici di sicurezza. Umami Analytics, se attiva: statistiche di visita aggregate, senza cookie. Se paghi con PayPal, il checkout carica il suo script: valgono cookie e informativa di PayPal.",
+      "Umami Analytics, se attiva: statistiche di visita aggregate, senza cookie. Se paghi con PayPal, il checkout carica il suo script: valgono cookie e informativa di PayPal.",
     manage: "Come toglierli",
     manageBody: "Impostazioni del browser → dati del sito. Oppure svuota il carrello da qui. Per PayPal, gestisci i cookie dal tuo account o dalle impostazioni del browser.",
     privacyLink: "Informativa privacy completa",
@@ -642,7 +641,7 @@ const en: typeof it = {
     contact: "Contact:",
     cookies: "Cookies and storage",
     cookiesP1:
-      "No profiling or advertising cookies: that is why there is no banner. The cart stays only in your browser. If enabled, Umami Analytics counts visits in aggregate, without cookies on your device. The Cloudflare proxy may set technical security cookies (bot protection), not marketing ones.",
+      "No profiling or advertising cookies: that is why there is no banner. The cart stays only in your browser. If enabled, Umami Analytics counts visits in aggregate, without cookies on your device.",
     cookiesP3:
       "The cart and order summary stay on your device, not on a server of ours.",
     cookiesPaypal:
@@ -661,14 +660,13 @@ const en: typeof it = {
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
-      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Cloudflare DNS/CDN (USA). If enabled, visit statistics on Umami Cloud. Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
+      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). If enabled, visit statistics on Umami Cloud. Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
     formsubmit:
       "form fallback if Vercel is not configured. US company. Notice:",
     paypalRecv: "if you pay with PayPal (European seat, group also in the USA).",
     github: "hosts the public pages. Notice on github.com.",
     vercel: "PayPal webhook, stock, site forms, artist area, confirmation mail. Order data, not the card.",
     resend: "sends mail (orders, withdrawal, contact, newsletter, workshops), from Corpoceleste.",
-    cloudflare: "DNS/CDN. Notice:",
     umami: "aggregated visit statistics, no cookies and no profiling. Notice:",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
@@ -694,7 +692,7 @@ const en: typeof it = {
       "Cart and post-checkout summary stay on your device (localStorage / sessionStorage), not on a server of ours. They only make the shop work.",
     third: "Third parties",
     thirdBody:
-      "Cloudflare: DNS/CDN; may set technical security cookies. Umami Analytics, if enabled: aggregated visit statistics, no cookies. If you pay with PayPal, checkout loads its script: PayPal’s cookies and notice apply.",
+      "Umami Analytics, if enabled: aggregated visit statistics, no cookies. If you pay with PayPal, checkout loads its script: PayPal’s cookies and notice apply.",
     manage: "How to remove them",
     manageBody: "Browser settings → site data. Or empty the cart from here. For PayPal, manage cookies in your account or browser settings.",
     privacyLink: "Full privacy notice",
@@ -1030,7 +1028,7 @@ const de: typeof it = {
     contact: "Kontakt:",
     cookies: "Cookies und Speicher",
     cookiesP1:
-      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Der Warenkorb bleibt nur in deinem Browser. Ist Umami Analytics aktiv, zählt es Besuche aggregiert, ohne Cookies auf dem Gerät. Der Cloudflare-Proxy kann technische Sicherheits-Cookies setzen (Bot-Schutz), keine Marketing-Cookies.",
+      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Der Warenkorb bleibt nur in deinem Browser. Ist Umami Analytics aktiv, zählt es Besuche aggregiert, ohne Cookies auf dem Gerät.",
     cookiesP3:
       "Warenkorb und Bestellübersicht bleiben auf deinem Gerät, nicht auf einem Server von uns.",
     cookiesPaypal:
@@ -1049,14 +1047,13 @@ const de: typeof it = {
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
-      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Cloudflare DNS/CDN (USA). Falls aktiv, Besuchsstatistiken auf Umami Cloud. Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
+      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Falls aktiv, Besuchsstatistiken auf Umami Cloud. Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
     formsubmit:
       "Formular-Fallback, wenn Vercel nicht konfiguriert ist. US-Unternehmen. Hinweise:",
     paypalRecv: "wenn du mit PayPal zahlst (Sitz in Europa, Gruppe auch in den USA).",
     github: "hostet die öffentlichen Seiten. Hinweise auf github.com.",
     vercel: "PayPal-Webhook, Bestand, Formulare, Künstlerbereich, Bestätigungsmails. Bestelldaten, keine Karte.",
     resend: "versendet Mails (Bestellung, Widerruf, Kontakt, Newsletter, Kurse), Absender Corpoceleste.",
-    cloudflare: "DNS/CDN. Hinweise:",
     umami: "aggregierte Besuchsstatistiken, ohne Cookies und ohne Profiling. Hinweise:",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
@@ -1082,7 +1079,7 @@ const de: typeof it = {
       "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät (localStorage / sessionStorage), nicht auf einem Server von uns. Sie dienen nur dem Shop.",
     third: "Dritte",
     thirdBody:
-      "Cloudflare: DNS/CDN; kann technische Sicherheits-Cookies setzen. Umami Analytics, falls aktiv: aggregierte Besuchsstatistiken, ohne Cookies. Wenn du mit PayPal zahlst, lädt die Kasse sein Skript: es gelten Cookies und Hinweise von PayPal.",
+      "Umami Analytics, falls aktiv: aggregierte Besuchsstatistiken, ohne Cookies. Wenn du mit PayPal zahlst, lädt die Kasse sein Skript: es gelten Cookies und Hinweise von PayPal.",
     manage: "Wie du sie entfernst",
     manageBody: "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen verwalten.",
     privacyLink: "Vollständiger Datenschutzhinweis",
