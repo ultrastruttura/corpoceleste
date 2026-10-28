@@ -211,7 +211,13 @@ function updateBag() {
     (b as HTMLElement).dataset.count = String(n);
   });
   document.querySelectorAll<HTMLElement>("[data-cart-icon]").forEach((icon) => {
-    icon.hidden = n === 0;
+    if (n === 0) {
+      icon.setAttribute("aria-disabled", "true");
+      icon.tabIndex = -1;
+    } else {
+      icon.removeAttribute("aria-disabled");
+      icon.removeAttribute("tabindex");
+    }
   });
 }
 
