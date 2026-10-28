@@ -922,7 +922,7 @@ if (!root || !app) {
       el(
         "p",
         "account-lede",
-        "PayPal e bonifico compaiono qui in automatico. Per i bonifici: segna «Pagato» quando arriva l’accredito (altrimenti dopo 5 giorni lo stock si libera da solo). PDF per il pacco, CSV per il commercialista.",
+        "PayPal e bonifico compaiono qui in automatico. Per i bonifici: segna «Pagato» quando arriva l’accredito: solo allora il magazzino viene scalato (prima il pezzo non è riservato). PDF per il pacco, CSV per il commercialista.",
       ),
     );
 
@@ -1085,7 +1085,7 @@ if (!root || !app) {
           if (order.source === "bank" && !order.paid_at) {
             const paidBtn = el("button", "account-linkish", "Pagato") as HTMLButtonElement;
             paidBtn.type = "button";
-            paidBtn.title = "Segna bonifico ricevuto (blocca il rilascio stock a 5 giorni)";
+            paidBtn.title = "Segna bonifico ricevuto (scala il magazzino)";
             paidBtn.addEventListener("click", async () => {
               if (!confirm(`Confermi l’accredito per ${order.number || order.id}?`)) return;
               try {

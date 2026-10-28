@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
-import { customerBankOrderText } from "../server/customer-mail.js";
+import { bankOrderSubject, customerBankOrderText } from "../server/customer-mail.js";
 import { field, isEmail, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { sendMail } from "../server/mail.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
@@ -178,7 +178,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const customer = await sendMail({
     to: email,
-    subject: `Conferma d’ordine ${orderNumber} — Corpoceleste`,
+    subject: bankOrderSubject(locale, orderNumber),
     text: customerBody,
   });
   if (customer.ok === false) {

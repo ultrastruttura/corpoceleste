@@ -138,7 +138,7 @@ const it = {
     googlePay: "Google Pay",
     bank: "Bonifico",
     bankNote:
-      "L’importo da bonificare include merce e spedizione (stessa quote Sendcloud di PayPal). Invia il modulo: ti arriva subito una email con IBAN, importo e causale. L’ordine è confermato quando arriva il pagamento (riserva 5 giorni).",
+      "L’importo da bonificare include merce e spedizione (stessa quote Sendcloud di PayPal). Invia il modulo: ti arriva subito una email con IBAN, importo e causale. L’ordine si conclude quando arriva il pagamento: fino ad allora il pezzo non è riservato.",
     bankAmountDue: "Importo da bonificare",
     bankAmountOfWhichShip: "di cui spedizione",
     name: "Nome e cognome",
@@ -232,7 +232,7 @@ const it = {
     newsletter: "Ti ho mandato una email di conferma: clicca il link per attivare la newsletter.",
     reprint: "Se ristampo, ti avviso.",
     waitlist: "Quando il gruppo c’è, fisso la data.",
-    bank: "Controlla la email: trovi IBAN, importo e causale. L’ordine vale quando arriva il pagamento (riserva 5 giorni).",
+    bank: "Controlla la email: trovi IBAN, importo e causale. L’ordine si conclude quando arriva il pagamento.",
     paypal:
       "Se PayPal ha confermato il pagamento, ti scrivo per la spedizione. Questa pagina da sola non è una ricevuta.",
     withdrawal:
@@ -349,10 +349,10 @@ const it = {
       "I prezzi sono in euro e IVA inclusa, salvo diversa indicazione. La spedizione è a parte: in checkout, per Italia e Unione europea, Sendcloud calcola il corriere più economico da paese e codice postale; il costo entra nel totale da pagare (PayPal o bonifico).",
     order: "Come si conclude l’ordine",
     orderBody:
-      "Il contratto si conclude in checkout, quando premi il pulsante di pagamento e ricevi la conferma via email. Se un pezzo non c’è più dopo il pagamento, ti avviso e ti rimborso.",
+      "Con PayPal, carta, Apple Pay o Google Pay il contratto si conclude quando completi il pagamento in checkout, e ricevi la conferma via email. Con bonifico si conclude quando ricevo l’accredito (vedi Pagamenti). Se un pezzo non c’è più dopo il pagamento, ti avviso e ti rimborso.",
     payment: "Pagamenti",
     paymentBody:
-      "PayPal (anche con carta, tramite PayPal) oppure bonifico bancario. Non tratto né conservo i dati della tua carta: se paghi con PayPal, il pagamento avviene sui sistemi di PayPal. Con bonifico l’ordine è confermato quando ricevo l’accredito; tengo il pezzo in riserva 5 giorni.",
+      "PayPal (anche con carta, tramite PayPal) oppure bonifico bancario. Non tratto né conservo i dati della tua carta: se paghi con PayPal, il pagamento avviene sui sistemi di PayPal. Con bonifico, inviare il modulo è una richiesta d’ordine: il contratto si conclude quando ricevo l’accredito. Fino ad allora il pezzo non è riservato: se nel frattempo si esaurisce ti avviso e, se hai già pagato, ti rimborso per intero.",
     shipping: "Spedizione e consegna",
     shippingBody: (days: string) =>
       `Imballo e spedisco io dallo studio, di norma entro ${days} giorni lavorativi dalla conferma del pagamento. In ogni caso consegno entro 30 giorni dalla conclusione del contratto, salvo diverso accordo scritto. Il rischio di perdita o danno passa a te alla consegna del pacco. Se il pacco arriva visibilmente danneggiato, accetta con riserva e scrivimi.`,
@@ -750,10 +750,10 @@ const en: typeof it = {
       "Prices are in euro and include VAT unless stated otherwise. Shipping is charged separately: at checkout, from country and postcode, Sendcloud picks the cheapest carrier and the cost is added to the total you pay (PayPal or bank transfer).",
     order: "How the order is concluded",
     orderBody:
-      "The contract is concluded at checkout, when you press the payment button and receive the confirmation by email. If a piece is gone after payment, I tell you and refund you.",
+      "With PayPal, card, Apple Pay or Google Pay the contract is concluded when you complete payment at checkout, and you receive the confirmation by email. With bank transfer it is concluded when the money arrives (see Payment). If a piece is gone after payment, I tell you and refund you.",
     payment: "Payment",
     paymentBody:
-      "PayPal (card payments also go through PayPal) or bank transfer. I never receive or store your card details: with PayPal the payment happens on PayPal’s systems. With bank transfer the order is confirmed when the money arrives; I hold the piece for 5 days.",
+      "PayPal (card payments also go through PayPal) or bank transfer. I never receive or store your card details: with PayPal the payment happens on PayPal’s systems. With bank transfer, sending the form is an order request: the contract is concluded when the money arrives. Until then the piece is not reserved: if it sells out meanwhile I tell you and, if you have already paid, refund you in full.",
     shipping: "Shipping and delivery",
     shippingBody: (days: string) =>
       `I pack and ship from the studio myself, normally within ${days} working days of confirmed payment. In any case I deliver within 30 days of the contract, unless we agree otherwise in writing. Risk of loss or damage passes to you on delivery of the parcel. If a parcel arrives visibly damaged, accept it with reservation and write to me.`,
@@ -940,7 +940,7 @@ const de: typeof it = {
     googlePay: "Google Pay",
     bank: "Überweisung",
     bankNote:
-      "Der Überweisungsbetrag enthält Ware und Versand (gleiche Sendcloud-Quote wie PayPal). Schick das Formular: du bekommst sofort eine E-Mail mit IBAN, Betrag und Verwendungszweck. Die Bestellung gilt, wenn die Zahlung da ist (5 Tage Reserve).",
+      "Der Überweisungsbetrag enthält Ware und Versand (gleiche Sendcloud-Quote wie PayPal). Schick das Formular: du bekommst sofort eine E-Mail mit IBAN, Betrag und Verwendungszweck. Die Bestellung kommt mit Zahlungseingang zustande; bis dahin ist das Stück nicht reserviert.",
     bankAmountDue: "Zu überweisender Betrag",
     bankAmountOfWhichShip: "davon Versand",
     name: "Vor- und Nachname",
@@ -1034,7 +1034,7 @@ const de: typeof it = {
     newsletter: "Ich habe dir eine Bestätigungs-E-Mail geschickt: Link klicken, um den Newsletter zu aktivieren.",
     reprint: "Wenn ich nachdrucke, gebe ich Bescheid.",
     waitlist: "Wenn die Gruppe steht, lege ich den Termin fest.",
-    bank: "Prüfe deine E-Mail: IBAN, Betrag und Verwendungszweck stehen dort. Die Bestellung gilt, wenn die Zahlung da ist (5 Tage Reserve).",
+    bank: "Prüfe deine E-Mail: IBAN, Betrag und Verwendungszweck stehen dort. Die Bestellung kommt mit Zahlungseingang zustande.",
     paypal:
       "Wenn PayPal die Zahlung bestätigt hat, schreibe ich zum Versand. Diese Seite allein ist keine Quittung.",
     withdrawal:
@@ -1151,10 +1151,10 @@ const de: typeof it = {
       "Preise verstehen sich in Euro und inklusive MwSt., sofern nicht anders angegeben. Der Versand wird getrennt berechnet: an der Kasse ermittelt Sendcloud aus Land und PLZ den günstigsten Carrier und der Betrag fließt in die zu zahlende Summe (PayPal oder Überweisung).",
     order: "Zustandekommen der Bestellung",
     orderBody:
-      "Der Vertrag kommt an der Kasse zustande, wenn du den Zahlungsbutton drückst und die Bestätigung per E-Mail erhältst. Ist ein Stück nach der Zahlung weg, melde ich mich und erstatte.",
+      "Mit PayPal, Karte, Apple Pay oder Google Pay kommt der Vertrag zustande, wenn du die Zahlung an der Kasse abschließt, und du erhältst die Bestätigung per E-Mail. Bei Überweisung kommt er mit Zahlungseingang zustande (siehe Zahlung). Ist ein Stück nach der Zahlung weg, melde ich mich und erstatte.",
     payment: "Zahlung",
     paymentBody:
-      "PayPal (auch Kartenzahlung läuft über PayPal) oder Banküberweisung. Ich erhalte und speichere keine Kartendaten: bei PayPal läuft die Zahlung über die Systeme von PayPal. Bei Überweisung gilt die Bestellung als bestätigt, wenn das Geld eingeht; ich reserviere das Stück 5 Tage.",
+      "PayPal (auch Kartenzahlung läuft über PayPal) oder Banküberweisung. Ich erhalte und speichere keine Kartendaten: bei PayPal läuft die Zahlung über die Systeme von PayPal. Bei Überweisung ist das Absenden des Formulars eine Bestellanfrage: der Vertrag kommt mit Zahlungseingang zustande. Bis dahin ist das Stück nicht reserviert: ist es inzwischen ausverkauft, sage ich dir Bescheid und erstatte bereits Gezahltes vollständig.",
     shipping: "Versand und Lieferung",
     shippingBody: (days: string) =>
       `Ich packe und verschicke selbst aus dem Atelier, in der Regel innerhalb von ${days} Werktagen nach bestätigter Zahlung. In jedem Fall liefere ich innerhalb von 30 Tagen nach Vertragsschluss, sofern nichts anderes schriftlich vereinbart ist. Die Gefahr von Verlust oder Beschädigung geht bei Übergabe des Pakets auf dich über. Kommt ein Paket sichtbar beschädigt an, nimm es unter Vorbehalt an und schreib mir.`,

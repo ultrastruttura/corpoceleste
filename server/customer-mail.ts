@@ -93,13 +93,15 @@ export function customerOrderText(opts: {
   metodo: string;
   ordine: string;
   identity: ShopIdentity;
+  /** First line; defaults to the localized "order confirmation". */
+  heading?: string;
   when?: string;
 }) {
   const locale = opts.locale || "it";
   const when = opts.when || nowRome(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : "it-IT");
   if (locale === "en") {
     return [
-      "Order confirmation — Corpoceleste",
+      opts.heading || "Order confirmation — Corpoceleste",
       `Date and time: ${when}`,
       `Payment: ${opts.metodo}`,
       "",
@@ -114,7 +116,7 @@ export function customerOrderText(opts: {
   }
   if (locale === "de") {
     return [
-      "Bestellbestätigung — Corpoceleste",
+      opts.heading || "Bestellbestätigung — Corpoceleste",
       `Datum und Uhrzeit: ${when}`,
       `Zahlung: ${opts.metodo}`,
       "",
@@ -128,7 +130,7 @@ export function customerOrderText(opts: {
     ].join("\n");
   }
   return [
-    "Conferma d’ordine — Corpoceleste",
+    opts.heading || "Conferma d’ordine — Corpoceleste",
     `Data e ora: ${when}`,
     `Pagamento: ${opts.metodo}`,
     "",
@@ -142,7 +144,14 @@ export function customerOrderText(opts: {
   ].join("\n");
 }
 
-/** Bank-transfer confirmation with IBAN + payment reference (causale). */
+/** Not a "confirmation": for bank transfer the contract is concluded only when the money arrives. */
+export function bankOrderSubject(locale: string, orderRef: string) {
+  if (locale === "en") return `Order ${orderRef} received — bank transfer details — Corpoceleste`;
+  if (locale === "de") return `Bestellung ${orderRef} erhalten — Überweisungsdaten — Corpoceleste`;
+  return `Ordine ${orderRef} ricevuto — dati per il bonifico — Corpoceleste`;
+}
+
+/** Bank-transfer order request with IBAN + payment reference (causale). */
 export function customerBankOrderText(opts: {
   locale?: string;
   ordine: string;
@@ -177,7 +186,7 @@ export function customerBankOrderText(opts: {
           amountLine,
           `Payment reference (required): ${opts.orderRef}`,
           "",
-          "The order is confirmed when the payment arrives. I hold the piece for 5 days from this email.",
+          "The contract is concluded when the payment arrives. Until then the piece is not reserved: if it sells out first I tell you and, if you have already paid, refund you in full.",
         ]
       : locale === "de"
         ? [
@@ -187,7 +196,7 @@ export function customerBankOrderText(opts: {
             amountLine,
             `Verwendungszweck (pflicht): ${opts.orderRef}`,
             "",
-            "Die Bestellung gilt, wenn die Zahlung eingeht. Ich halte das Stück 5 Tage ab dieser E-Mail.",
+            "Der Vertrag kommt mit Zahlungseingang zustande. Bis dahin ist das Stück nicht reserviert: ist es vorher ausverkauft, sage ich dir Bescheid und erstatte bereits Gezahltes vollständig.",
           ]
         : [
             "Dati per il bonifico",
@@ -196,7 +205,7 @@ export function customerBankOrderText(opts: {
             amountLine,
             `Causale (obbligatoria): ${opts.orderRef}`,
             "",
-            "L’ordine è confermato quando arriva il pagamento. Tengo il pezzo in riserva 5 giorni da questa email.",
+            "Il contratto si conclude quando arriva il pagamento. Fino ad allora il pezzo non è riservato: se si esaurisce prima ti avviso e, se hai già pagato, ti rimborso per intero.",
           ];
 
   return customerOrderText({
@@ -204,6 +213,7 @@ export function customerBankOrderText(opts: {
     metodo: locale === "en" ? "Bank transfer" : locale === "de" ? "Überweisung" : "Bonifico",
     ordine: [opts.ordine, "", ...payBlock].join("\n"),
     identity: opts.identity,
+    heading: bankOrderSubject(locale, opts.orderRef),
     when,
   });
 }
