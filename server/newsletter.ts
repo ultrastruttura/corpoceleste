@@ -138,15 +138,79 @@ export async function sendNewsletterConfirmEmail(opts: {
   return sendMail({ to: opts.email, subject, text });
 }
 
+/** Short welcome after double opt-in — not resent if already an active subscriber. */
+export async function sendNewsletterWelcomeEmail(opts: {
+  email: string;
+  locale?: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const locale = opts.locale || "it";
+  let unsub = "";
+  try {
+    unsub = unsubscribeUrl(opts.email);
+  } catch (err) {
+    console.warn("newsletter: welcome without unsub link", err);
+  }
+  const site = (process.env.SITE_URL || "https://www.corpoceleste.eu").replace(/\/$/, "");
+  const text =
+    locale === "en"
+      ? [
+          "Welcome to the Corpoceleste newsletter.",
+          "",
+          "You’re in. I’ll write when there are new editions, reprints or studio news — no spam.",
+          site,
+          "",
+          unsub ? `Unsubscribe: ${unsub}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : locale === "de"
+        ? [
+            "Willkommen beim Newsletter von Corpoceleste.",
+            "",
+            "Du bist drin. Ich schreibe, wenn es neue Editionen, Nachdrucke oder Atelier-News gibt — kein Spam.",
+            site,
+            "",
+            unsub ? `Abmelden: ${unsub}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n")
+        : [
+            "Benvenuto nella newsletter Corpoceleste.",
+            "",
+            "Sei iscritto. Ti scrivo quando escono edizioni, ristampe o novità dallo studio — niente spam.",
+            site,
+            "",
+            unsub ? `Disiscriviti: ${unsub}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n");
+
+  const subject =
+    locale === "en"
+      ? "Welcome — Corpoceleste"
+      : locale === "de"
+        ? "Willkommen — Corpoceleste"
+        : "Benvenuto — Corpoceleste";
+
+  return sendMail({ to: opts.email, subject, text });
+}
+
 export async function confirmNewsletterSubscriber(email: string, locale: string) {
   const { portalConfigured, ensureSchema, getDb } = await import("./portal/db.js");
   if (!portalConfigured()) {
-    return { stored: false as const, resend: false as const };
+    return { stored: false as const, resend: false as const, welcomed: false as const };
   }
   await ensureSchema();
   const db = getDb();
   const normalized = email.toLowerCase();
   const loc = locale || "it";
+
+  const prior = await db.execute({
+    sql: `SELECT unsubscribed_at FROM newsletter_subscribers WHERE email = ?`,
+    args: [normalized],
+  });
+  const priorRow = prior.rows[0];
+  const alreadyActive = Boolean(priorRow && priorRow.unsubscribed_at == null);
 
   await db.execute({
     sql: `INSERT INTO newsletter_subscribers (email, confirmed_at, locale, unsubscribed_at)
@@ -176,7 +240,16 @@ export async function confirmNewsletterSubscriber(email: string, locale: string)
     }
   }
 
-  return { stored: true as const, resend: resendOk, resendError };
+  let welcomed = false;
+  if (!alreadyActive) {
+    const welcome = await sendNewsletterWelcomeEmail({ email: normalized, locale: loc });
+    welcomed = welcome.ok;
+    if (!welcome.ok) {
+      console.error("newsletter: welcome mail failed", welcome.error);
+    }
+  }
+
+  return { stored: true as const, resend: resendOk, resendError, welcomed };
 }
 
 export async function unsubscribeNewsletterSubscriber(email: string) {

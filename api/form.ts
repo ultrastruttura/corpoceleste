@@ -137,6 +137,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             `Locale: ${parsed.locale}`,
             `Lista Turso: ${result.stored ? "sì" : "no (portal off)"}`,
             `Resend Segment: ${result.resend ? "sì" : result.resendError || "no"}`,
+            `Benvenuto iscritto: ${result.welcomed ? "sì" : "no (già iscritto o mail fallita)"}`,
           ].join("\n"),
         });
       }
