@@ -2,7 +2,7 @@
 title: Maglia 5
 artist: content/artists/artista-5.md
 price: 1
-status: available
+status: soldout
 kind: shirt
 fitModel: content/fit-models/tee-default.md
 nuovo: false
@@ -22,9 +22,9 @@ stock:
   XL: 2
 images: []
 seoDescription:
-  it: Maglia 5 di Artista 5 — placeholder Corpoceleste.
-  en: Maglia 5 by Artist 5 — Corpoceleste placeholder.
-  de: Maglia 5 von Künstler 5 — Corpoceleste-Platzhalter.
+  it: Maglia 5 di Artista 5 â€” placeholder Corpoceleste.
+  en: Maglia 5 by Artist 5 â€” Corpoceleste placeholder.
+  de: Maglia 5 von KÃ¼nstler 5 â€” Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.

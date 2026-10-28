@@ -21,6 +21,11 @@ export async function rateLimit(opts: {
     });
     const row = res.rows[0];
     if (!row) {
+      // Keys hold IPs/emails: the privacy notice promises they are gone within 24h (longest window is 1h).
+      await db.execute({
+        sql: "DELETE FROM rate_limits WHERE CAST(window_start AS INTEGER) < ?",
+        args: [now - 24 * 60 * 60 * 1000],
+      });
       await db.execute({
         sql: "INSERT INTO rate_limits (key, count, window_start) VALUES (?, 1, ?)",
         args: [opts.key, String(now)],

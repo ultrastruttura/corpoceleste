@@ -113,6 +113,14 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   resend_contact_id TEXT
 );
 
+CREATE TABLE IF NOT EXISTS stock_holds (
+  id TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  open INTEGER NOT NULL DEFAULT 1,
+  at_ms INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_stock_holds_open ON stock_holds(open, at_ms);
 CREATE INDEX IF NOT EXISTS idx_shop_orders_status ON shop_orders(status);
 CREATE INDEX IF NOT EXISTS idx_shop_orders_created ON shop_orders(created_at);
 `;

@@ -2,7 +2,7 @@
 title: Maglia 3
 artist: content/artists/artista-3.md
 price: 1
-status: available
+status: soldout
 kind: shirt
 fitModel: content/fit-models/tee-default.md
 nuovo: true
@@ -22,9 +22,9 @@ stock:
   XL: 2
 images: []
 seoDescription:
-  it: Maglia 3 di Artista 3 — placeholder Corpoceleste.
-  en: Maglia 3 by Artist 3 — Corpoceleste placeholder.
-  de: Maglia 3 von Künstler 3 — Corpoceleste-Platzhalter.
+  it: Maglia 3 di Artista 3 â€” placeholder Corpoceleste.
+  en: Maglia 3 by Artist 3 â€” Corpoceleste placeholder.
+  de: Maglia 3 von KÃ¼nstler 3 â€” Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.

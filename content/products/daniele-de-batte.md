@@ -2,7 +2,7 @@
 title: Maglia 2
 artist: content/artists/artista-2.md
 price: 1
-status: available
+status: soldout
 kind: shirt
 fitModel: content/fit-models/tee-default.md
 nuovo: true

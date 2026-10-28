@@ -12,6 +12,7 @@ const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
 const videoMp4 = asset("videos/home-stage.mp4");
+const videoMp4Mobile = asset("videos/home-stage-mobile.mp4");
 const posterSrc = asset("videos/og-stage.jpg");
 /* Frame from home-stage.mp4 — WhatsApp shows og:image, not the video. */
 const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
@@ -38,6 +39,7 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
           class="shop-home-stage__video"
           data-autoplay-video
           src={videoMp4}
+          data-src-mobile={videoMp4Mobile}
           poster={posterSrc}
           autoplay
           muted
@@ -48,6 +50,13 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
           preload="auto"
           aria-label={copy.home.stageAlt}
         ></video>
+        {/* Runs during parsing, before the media fetch starts — phones get the 1.5 MB cut. */}
+        <script is:inline>
+          (function () {
+            var v = document.querySelector("[data-src-mobile]");
+            if (v && window.matchMedia("(max-width: 899px)").matches) v.src = v.getAttribute("data-src-mobile");
+          })();
+        </script>
         <span class="shop-home-stage__crt" aria-hidden="true"></span>
       </div>
     </figure>

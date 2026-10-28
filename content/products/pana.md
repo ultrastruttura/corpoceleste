@@ -1,8 +1,8 @@
-﻿---
+---
 title: Stampa 2
 artist: content/artists/artista-10.md
 price: 120
-status: available
+status: soldout
 kind: print
 nuovo: true
 createdAt: 2018-05-15T00:00:00.000Z

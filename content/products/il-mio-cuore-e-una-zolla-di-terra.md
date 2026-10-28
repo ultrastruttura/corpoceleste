@@ -22,9 +22,9 @@ stock:
   XL: 0
 images: []
 seoDescription:
-  it: Maglia 4 di Artista 4 — placeholder Corpoceleste.
-  en: Maglia 4 by Artist 4 — Corpoceleste placeholder.
-  de: Maglia 4 von Künstler 4 — Corpoceleste-Platzhalter.
+  it: Maglia 4 di Artista 4 â€” placeholder Corpoceleste.
+  en: Maglia 4 by Artist 4 â€” Corpoceleste placeholder.
+  de: Maglia 4 von KÃ¼nstler 4 â€” Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.

@@ -1,5 +1,12 @@
 import type { OrderLine } from "./paypal.js";
 import { patchStockQty, stockQtyLineRe } from "./stock-patch.js";
+import {
+  createHold,
+  getHold,
+  holdStoreActive,
+  listExpiredOpenHolds,
+  putHold,
+} from "./stock/hold-store.js";
 
 type GhFile = {
   content: string;
@@ -214,6 +221,7 @@ export async function assertGithubStockAccess(): Promise<void> {
 }
 
 export async function getLedger(captureId: string): Promise<LedgerRecord | null> {
+  if (holdStoreActive(captureId)) return getHold(captureId);
   const file = await getRepoFile(ledgerPath(captureId));
   if (!file) return null;
   try {
@@ -269,6 +277,21 @@ export async function claimOrResumeLedger(
   if (existing?.packlinkServiceId != null) ledger.packlinkServiceId = existing.packlinkServiceId;
   if (existing?.emailed) ledger.emailed = existing.emailed;
 
+  if (holdStoreActive(captureId)) {
+    if (existing) {
+      await putHold(ledger);
+      return { action: "process", ledger };
+    }
+    if (await createHold(ledger)) return { action: "process", ledger };
+    const again = await getHold(captureId);
+    if (again?.status === "done") return { action: "skip", ledger: again };
+    if (again?.status === "processing" && ledgerAgeMs(again) < PROCESSING_STALE_MS) {
+      throw new LedgerBusyError(captureId);
+    }
+    if (again) return { action: "process", ledger: again };
+    throw new Error(`Hold claim failed ${captureId}`);
+  }
+
   const body = JSON.stringify(ledger, null, 2) + "\n";
   try {
     const file = existing ? await getRepoFile(path) : null;
@@ -294,6 +317,7 @@ export async function claimOrResumeLedger(
 }
 
 export async function writeLedger(ledger: LedgerRecord): Promise<void> {
+  if (holdStoreActive(ledger.captureId)) return putHold(ledger);
   const path = ledgerPath(ledger.captureId);
   let lastErr: unknown;
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -659,10 +683,11 @@ const BANK_HOLD_TTL_MS = 2 * 24 * 60 * 60 * 1000;
 /** Restore stock for abandoned PayPal create-order holds (30 min). */
 export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<string[]> {
   const out: string[] = [];
-  const files = await listLedgerSummaries();
-  for (const file of files) {
-    if (!file.id.startsWith("hold_")) continue;
-    const ledger = await getLedger(file.id);
+  const candidates = holdStoreActive("hold_")
+    ? (await listExpiredOpenHolds(now - PAYPAL_HOLD_TTL_MS)).map((l) => l.captureId)
+    : (await listLedgerSummaries()).map((f) => f.id).filter((id) => id.startsWith("hold_"));
+  for (const id of candidates) {
+    const ledger = await getLedger(id);
     if (!ledger || ledger.kind !== "paypal_hold") continue;
     if (ledger.releasedAt || ledger.consumedBy) continue;
     if (ledgerAgeMs(ledger) < PAYPAL_HOLD_TTL_MS) continue;
@@ -680,7 +705,7 @@ export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<strin
       error: `released unpaid paypal hold; ${notes.join("; ")}`,
       at: new Date(now).toISOString(),
     });
-    out.push(file.id);
+    out.push(id);
   }
   return out;
 }

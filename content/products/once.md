@@ -1,8 +1,8 @@
-﻿---
+---
 title: Stampa 1
 artist: content/artists/artista-9.md
 price: 90
-status: available
+status: soldout
 kind: print
 nuovo: true
 createdAt: 2018-05-15T00:00:00.000Z

@@ -2,7 +2,7 @@
 title: Maglia 1
 artist: content/artists/artista-1.md
 price: 1
-status: preorder
+status: soldout
 kind: shirt
 fitModel: content/fit-models/tee-default.md
 nuovo: true
@@ -22,9 +22,9 @@ stock:
   XL: 5
 images: []
 seoDescription:
-  it: Maglia 1 di Artista 1 — placeholder Corpoceleste.
-  en: Maglia 1 by Artist 1 — Corpoceleste placeholder.
-  de: Maglia 1 von Künstler 1 — Corpoceleste-Platzhalter.
+  it: Maglia 1 di Artista 1 â€” placeholder Corpoceleste.
+  en: Maglia 1 by Artist 1 â€” Corpoceleste placeholder.
+  de: Maglia 1 von KÃ¼nstler 1 â€” Corpoceleste-Platzhalter.
 description:
   it: Placeholder maglia. Contenuto in aggiornamento.
   en: Placeholder. Content coming soon.
