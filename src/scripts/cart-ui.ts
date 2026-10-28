@@ -268,14 +268,22 @@ export function closeCart() {
   const drawer = document.querySelector<HTMLElement>("[data-cart-drawer]");
   const bg = document.querySelector("[data-cart-bg]");
   if (!drawer) return;
+  // Move focus out before aria-hidden/inert — browsers warn if a focused node stays inside.
+  const restore =
+    lastFocus && document.contains(lastFocus) && !drawer.contains(lastFocus) ? lastFocus : null;
+  lastFocus = null;
+  if (restore) {
+    restore.focus();
+  } else {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && drawer.contains(active)) active.blur();
+  }
   drawer.classList.remove("is-open");
   bg?.classList.remove("is-open");
   drawer.setAttribute("inert", "");
   drawer.setAttribute("aria-hidden", "true");
   drawer.removeAttribute("aria-modal");
   document.body.classList.remove("cart-open");
-  lastFocus?.focus();
-  lastFocus = null;
 }
 
 function onDrawerKey(e: KeyboardEvent) {
