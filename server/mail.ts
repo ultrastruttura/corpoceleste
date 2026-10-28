@@ -8,10 +8,51 @@ export function fromAddress() {
   return raw.includes("<") ? raw : `Corpoceleste <${raw}>`;
 }
 
+export function siteBase() {
+  return (process.env.SITE_URL || "https://www.corpoceleste.eu").replace(/\/$/, "");
+}
+
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/** Absolute logo URL for email clients (Gmail loads hosted images). */
+export function emailLogoUrl() {
+  return `${siteBase()}/brand/logo-scritta-sm.png`;
+}
+
+/** Wrap body HTML with Corpoceleste wordmark — visible when the message is opened in Gmail. */
+export function wrapEmailHtml(innerHtml: string) {
+  const logo = emailLogoUrl();
+  return `<!DOCTYPE html>
+<html lang="it">
+<body style="margin:0;padding:0;background:#ffffff;">
+  <div style="max-width:560px;margin:0 auto;padding:28px 20px;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.5;color:#141414;">
+    <p style="margin:0 0 28px;">
+      <img src="${logo}" alt="Corpoceleste" width="200" height="18" style="display:block;width:200px;max-width:60%;height:auto;border:0;" />
+    </p>
+    ${innerHtml}
+  </div>
+</body>
+</html>`;
+}
+
+/** Plain text → HTML with logo (keeps links as plain text; clients still show the image). */
+export function textToEmailHtml(text: string) {
+  const body = escapeHtml(text.trim()).replace(/\r\n/g, "\n").replace(/\n/g, "<br>\n");
+  return wrapEmailHtml(`<div>${body}</div>`);
+}
+
 export async function sendMail(opts: {
   to: string;
   subject: string;
   text: string;
+  /** Optional HTML; defaults to text + Corpoceleste logo header. */
+  html?: string;
 }): Promise<SendMailResult> {
   const key = (process.env.RESEND_API_KEY || "").trim();
   const from = fromAddress();
@@ -41,6 +82,7 @@ export async function sendMail(opts: {
         to: [to],
         subject: opts.subject,
         text: opts.text,
+        html: opts.html || textToEmailHtml(opts.text),
       }),
     });
     if (!res.ok) {
@@ -65,10 +107,6 @@ export async function sendMail(opts: {
 /** True if env looks ready (does not prove domain is verified). */
 export function mailConfigured() {
   return Boolean((process.env.RESEND_API_KEY || "").trim() && fromAddress());
-}
-
-export function siteBase() {
-  return (process.env.SITE_URL || "https://www.corpoceleste.eu").replace(/\/$/, "");
 }
 
 export function nowRome(locale = "it-IT") {

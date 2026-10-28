@@ -1,6 +1,6 @@
 /** Resend Contacts + Broadcasts (newsletter marketing). */
 
-import { fromAddress } from "./mail.js";
+import { fromAddress, wrapEmailHtml } from "./mail.js";
 
 function apiKey() {
   return (process.env.RESEND_API_KEY || "").trim();
@@ -129,10 +129,10 @@ export function newsletterBodyToHtml(text: string) {
   const paras = blocks
     .map((p) => `<p>${escapeHtml(p).replace(/\n/g, "<br>")}</p>`)
     .join("\n");
-  return `${paras}
+  return wrapEmailHtml(`${paras}
 <p style="margin-top:2em;font-size:12px;color:#666">
 <a href="{{{RESEND_UNSUBSCRIBE_URL}}}">Unsubscribe / Disiscriviti</a>
-</p>`;
+</p>`);
 }
 
 export async function sendNewsletterBroadcast(opts: {
