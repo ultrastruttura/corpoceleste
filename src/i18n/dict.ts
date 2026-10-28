@@ -230,6 +230,8 @@ const it = {
     order: "Ordine ricevuto",
     contact: "Ti rispondo per email.",
     newsletter: "Ti ho mandato una email di conferma: clicca il link per attivare la newsletter.",
+    newsletterDoneTitle: "Grazie",
+    newsletterDone: "Sei iscritto alla newsletter Corpoceleste. Ti scrivo quando ci sono novità dallo studio.",
     newsletterError:
       "Non sono riuscito a mandarti l’email di conferma. Riprova tra poco o scrivimi a info@corpoceleste.eu.",
     reprint: "Se ristampo, ti avviso.",
@@ -633,6 +635,8 @@ const en: typeof it = {
     order: "Order received",
     contact: "I’ll write back by email.",
     newsletter: "I sent you a confirmation email: click the link to activate the newsletter.",
+    newsletterDoneTitle: "Thank you",
+    newsletterDone: "You’re subscribed to the Corpoceleste newsletter. I’ll write when there’s news from the studio.",
     newsletterError:
       "I couldn’t send the confirmation email. Try again in a moment, or write to info@corpoceleste.eu.",
     reprint: "If I reprint, I’ll let you know.",
@@ -1036,6 +1040,8 @@ const de: typeof it = {
     order: "Bestellung angekommen",
     contact: "Ich antworte per E-Mail.",
     newsletter: "Ich habe dir eine Bestätigungs-E-Mail geschickt: Link klicken, um den Newsletter zu aktivieren.",
+    newsletterDoneTitle: "Danke",
+    newsletterDone: "Du bist für den Corpoceleste-Newsletter angemeldet. Ich schreibe, wenn es Neuigkeiten aus dem Atelier gibt.",
     newsletterError:
       "Die Bestätigungs-E-Mail konnte ich nicht senden. Versuch es gleich noch einmal oder schreib an info@corpoceleste.eu.",
     reprint: "Wenn ich nachdrucke, gebe ich Bescheid.",

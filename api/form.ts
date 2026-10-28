@@ -120,11 +120,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (nlToken) {
     if (req.method !== "GET") return res.status(405).send("Method not allowed");
     const parsed = verifyNewsletterConfirm(nlToken);
-    // Thank-you page lives on the static site, not on Vercel.
-    const thanks = `${siteBase()}/grazie/?from=newsletter`;
     if (!parsed) {
       return res.status(400).send("Link non valido o scaduto");
     }
+    // Thank-you page lives on the static site, not on Vercel.
+    const localePrefix =
+      parsed.locale === "en" ? "/en" : parsed.locale === "de" ? "/de" : "";
+    const thanks = `${siteBase()}${localePrefix}/grazie/?from=newsletter-confirmed`;
     try {
       const result = await confirmNewsletterSubscriber(parsed.email, parsed.locale);
       const shopTo = (process.env.SHOP_EMAIL || "").trim();

@@ -22,6 +22,7 @@ const formAction = publicFormAction(siteSettings.shopEmail);
       >
         <input type="hidden" name="_subject" value="Newsletter Corpoceleste" />
         <input type="hidden" name="_next" data-next-grazie="newsletter" />
+        <input type="hidden" name="locale" value={locale} />
         <FormHoney />
         <div class="newsletter-row">
           <label class="visually-hidden" for="nl-email">{copy.forms.email}</label>
