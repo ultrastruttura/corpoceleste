@@ -401,6 +401,10 @@ a.site-announce__text:hover {
   opacity: 0.6;
 }
 
+.icon-btn[hidden] {
+  display: none;
+}
+
 .bag-count {
   position: absolute;
   top: 2px;
@@ -2009,7 +2013,7 @@ body:has(.site-announce) .shop-home-stage {
     object-fit cropping would otherwise cut off (avoids the flat/video step).
   */
   .shop-home-stage__media {
-    inset: -5%;
+    inset: -10%;
   }
 }
 

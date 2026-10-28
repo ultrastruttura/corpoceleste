@@ -210,6 +210,9 @@ function updateBag() {
     b.textContent = n ? String(n) : "";
     (b as HTMLElement).dataset.count = String(n);
   });
+  document.querySelectorAll<HTMLElement>("[data-cart-icon]").forEach((icon) => {
+    icon.hidden = n === 0;
+  });
 }
 
 function onCartClick(e: Event) {
