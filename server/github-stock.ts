@@ -652,11 +652,11 @@ export async function consumePaypalHold(
   return next;
 }
 
-const PAYPAL_HOLD_TTL_MS = 3 * 60 * 60 * 1000;
+const PAYPAL_HOLD_TTL_MS = 30 * 60 * 1000;
 /** Legacy bank holds that decremented stock before soft-hold; unpaid release after 48h. */
 const BANK_HOLD_TTL_MS = 2 * 24 * 60 * 60 * 1000;
 
-/** Restore stock for abandoned PayPal create-order holds (default 3h). */
+/** Restore stock for abandoned PayPal create-order holds (30 min). */
 export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<string[]> {
   const out: string[] = [];
   const files = await listLedgerSummaries();

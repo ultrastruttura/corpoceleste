@@ -24,6 +24,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  /* Sticky announce + header (~112px on phones) must not cover focused fields / anchors. */
+  scroll-padding-top: calc(var(--header) + 3.5rem);
 }
 
 :focus:not(:focus-visible) {
@@ -397,8 +399,10 @@ a.site-announce__text:hover {
   color: var(--ink);
 }
 
-.icon-btn:hover {
-  opacity: 0.6;
+@media (hover: hover) {
+  .icon-btn:hover {
+    opacity: 0.6;
+  }
 }
 
 .icon-btn[aria-disabled="true"] {
@@ -757,10 +761,13 @@ body.cart-open {
   border-radius: 0;
 }
 
-.btn:hover {
-  background: var(--btn-hover);
-  border-color: var(--btn-hover);
-  text-decoration: none;
+/* Touch screens keep :hover after a tap — only style it where a real pointer hovers. */
+@media (hover: hover) {
+  .btn:hover {
+    background: var(--btn-hover);
+    border-color: var(--btn-hover);
+    text-decoration: none;
+  }
 }
 
 .btn--ghost {
@@ -768,9 +775,11 @@ body.cart-open {
   color: var(--ink);
 }
 
-.btn--ghost:hover {
-  background: var(--ink);
-  color: var(--white);
+@media (hover: hover) {
+  .btn--ghost:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
 }
 
 .btn--full {
@@ -1145,7 +1154,7 @@ body.cart-open {
   aspect-ratio: 1;
   background: var(--white);
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
 }
 
 .product-stage-frame img {
@@ -2332,6 +2341,10 @@ body:has(.site-announce) .shop-home-stage {
   flex: 1 1 140px;
   min-width: 120px;
   width: 100%;
+}
+
+.pay-buttons__slot[hidden] {
+  display: none !important;
 }
 
 .pay-buttons--stack .pay-buttons__slot {

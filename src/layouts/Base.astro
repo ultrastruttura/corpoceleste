@@ -55,9 +55,9 @@ const csp = [
   "base-uri 'self'",
   "object-src 'none'",
   "script-src 'self' 'unsafe-inline' https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://www.gstatic.com https://cloud.umami.is",
-  "style-src 'self' 'unsafe-inline' https://www.gstatic.com https://fonts.googleapis.com",
+  "style-src 'self' 'unsafe-inline' https://www.gstatic.com",
   "img-src 'self' data: blob: https:",
-  "font-src 'self' data: https://fonts.gstatic.com https://www.gstatic.com",
+  "font-src 'self' data: https://www.gstatic.com",
   `connect-src 'self' ${apiOrigin} https://api.zippopotam.us https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://google.com https://www.google.com https://payments.google.com https://www.gstatic.com https://cloud.umami.is https://gateway.umami.is`.replace(
     /\s+/g,
     " ",
@@ -70,7 +70,10 @@ const csp = [
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const rest = innerPath(Astro.url.pathname);
 const prefix = localePrefix(locale);
-const ogImage = absoluteUrl(image || siteSettings.ogImage || "brand/favicon.png", Astro.site);
+/* Favicon (192px) is below Facebook's 200px minimum — fall back to the 1200×1200 stage frame. */
+const ogSrc = image || siteSettings.ogImage || "videos/og-stage.jpg";
+const ogImage = absoluteUrl(ogSrc, Astro.site);
+const ogIsStage = ogSrc.replace(/^\//, "") === "videos/og-stage.jpg";
 const ogVideo = video ? absoluteUrl(video, Astro.site) : "";
 const ogType = ogVideo ? "video.other" : type === "product" ? "product" : "website";
 const catalog = {
@@ -113,9 +116,9 @@ const umamiId = siteSettings.umamiWebsiteId;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
     {ogImage && <meta property="og:image" content={ogImage} />}
-    {ogImage && <meta property="og:image:type" content="image/jpeg" />}
-    {ogImage && <meta property="og:image:width" content="1200" />}
-    {ogImage && <meta property="og:image:height" content="1200" />}
+    {ogIsStage && <meta property="og:image:type" content="image/jpeg" />}
+    {ogIsStage && <meta property="og:image:width" content="1200" />}
+    {ogIsStage && <meta property="og:image:height" content="1200" />}
     {
       ogVideo && (
         <>

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
 import { customerBankOrderText } from "../server/customer-mail.js";
-import { field, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
+import { field, isEmail, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { sendMail } from "../server/mail.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
@@ -19,12 +19,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const next = thanksUrl(body, "ordine");
   if (isHoney(body)) return res.redirect(303, next);
 
-  const nome = field(body, "nome");
+  const nome = field(body, "nome").slice(0, 120);
   const email = field(body, "email");
-  const phone = field(body, "telefono");
-  const address = field(body, "indirizzo");
-  const city = field(body, "citta");
-  if (!nome || !email || !email.includes("@") || !address || !city) {
+  const phone = field(body, "telefono").slice(0, 40);
+  const address = field(body, "indirizzo").slice(0, 200);
+  const city = field(body, "citta").slice(0, 100);
+  if (!nome || !isEmail(email) || !address || !city) {
     return res.status(400).send("Missing fields");
   }
 

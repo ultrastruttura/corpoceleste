@@ -254,18 +254,18 @@ const it = {
     contact: "Contatto:",
     cookies: "Cookie e storage",
     cookiesP1:
-      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Il carrello resta solo nel tuo browser. Se attiva, Umami Analytics conta le visite in forma aggregata, senza cookie sul dispositivo.",
+      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Il carrello resta solo nel tuo browser. Umami Analytics conta le visite in forma aggregata, senza cookie sul dispositivo.",
     cookiesP3:
       "Il carrello e il riepilogo ordine stanno sul tuo dispositivo, non su un server nostro.",
     cookiesPaypal:
-      "Se paghi con PayPal, il checkout carica lo script di PayPal su questa pagina: valgono cookie e informativa di PayPal",
+      "La pagina di checkout carica gli script di PayPal (anche per carta e Apple Pay) e di Google Pay, necessari al pagamento: valgono i loro cookie e le loro informative",
     cookiesMore: "Dettaglio nella",
     cookiesMoreLink: "cookie policy",
     data: "Quali dati, perché",
     dataIntro: "Trattiamo solo ciò che ci scrivi tu:",
     dataOrder:
       "nome, email, telefono, indirizzo, ordine — per spedire e per i conti.",
-    dataPaypal: "importo e indirizzo li gestisce PayPal, se paghi così.",
+    dataPaypal: "se paghi con PayPal, carta, Apple Pay o Google Pay, i dati di pagamento li gestisce PayPal; nome, email, telefono e indirizzo arrivano anche a me per l’ordine e la spedizione.",
     dataForms: "nome, email, messaggio — per risponderti, poi li tolgo.",
     dataNewsletter: (email: string) =>
       `solo l’email, se spunti la casella. Revoca quando vuoi scrivendo a ${email}.`,
@@ -273,7 +273,7 @@ const it = {
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
-      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Se attive, statistiche di visita su Umami Cloud. Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
+      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Database di ordini, newsletter e area artisti su Turso (società USA). Statistiche di visita su Umami Cloud (società USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
     formsubmit:
       "fallback dei form se Vercel non è configurato. Società USA. Informativa:",
     paypalRecv: "se paghi con PayPal (sede europea, gruppo anche USA).",
@@ -281,6 +281,9 @@ const it = {
     vercel: "webhook PayPal, magazzino, form del sito, area artisti, mail di conferma. Dati d’ordine, non la carta.",
     resend: "invio delle mail (ordini, recesso, contatti, newsletter, corsi), mittente Corpoceleste.",
     umami: "statistiche di visita aggregate, senza cookie e senza profilazione. Informativa:",
+    turso: "database di ordini, iscritti alla newsletter e area artisti.",
+    sendcloud: "calcolo della spedizione in checkout (paese e CAP) ed etichette di spedizione (nome, indirizzo, telefono).",
+    googlePay: "se paghi con Google Pay: il pagamento passa poi da PayPal.",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
     rights: "Diritti",
@@ -295,7 +298,7 @@ const it = {
   },
   cookiePolicy: {
     title: "Cookie policy",
-    lede: "Niente profilazione. Carrello nel browser. Analytics solo se attiva e senza cookie. PayPal, se paghi così.",
+    lede: "Niente profilazione. Carrello nel browser. Analytics senza cookie. PayPal e Google Pay in checkout.",
     updated: "Ultimo aggiornamento: 28 ottobre 2026.",
     noBanner: "Niente banner",
     noBannerBody:
@@ -305,7 +308,7 @@ const it = {
       "Carrello e riepilogo dopo il checkout restano sul tuo dispositivo (localStorage / sessionStorage), non su un server nostro. Servono solo a far funzionare lo shop.",
     third: "Terze parti",
     thirdBody:
-      "Umami Analytics, se attiva: statistiche di visita aggregate, senza cookie. Se paghi con PayPal, il checkout carica il suo script: valgono cookie e informativa di PayPal.",
+      "Umami Analytics: statistiche di visita aggregate, senza cookie. La pagina di checkout carica gli script di PayPal e Google Pay necessari al pagamento: valgono i loro cookie e le loro informative. Se scrivi il CAP in checkout, solo paese e CAP vanno a zippopotam.us per suggerirti la città.",
     manage: "Come toglierli",
     manageBody: "Impostazioni del browser → dati del sito. Oppure svuota il carrello da qui. Per PayPal, gestisci i cookie dal tuo account o dalle impostazioni del browser.",
     privacyLink: "Informativa privacy completa",
@@ -314,7 +317,7 @@ const it = {
   terms: {
     title: "Condizioni di vendita",
     lede: "Chi vende, cosa compri, come si paga, come si recede.",
-    updated: "Ultimo aggiornamento: 1 ottobre 2026.",
+    updated: "Ultimo aggiornamento: 28 ottobre 2026.",
     seller: "Venditore",
     vatLabel: "Partita IVA:",
     reaLabel: "REA:",
@@ -348,7 +351,7 @@ const it = {
     withdrawalHow: "Per recedere puoi usare la funzione online, oppure scrivermi via email una dichiarazione esplicita:",
     withdrawalLink: "recedere dal contratto qui",
     withdrawalEffects:
-      "Dopo la comunicazione hai 14 giorni per rispedire il pezzo. Rimborso tutto quello che hai pagato, spedizione standard di andata compresa, entro 14 giorni dal momento in cui ricevo il reso o la prova della spedizione, con lo stesso mezzo di pagamento che hai usato. Il costo della restituzione è a tuo carico. Rispondi della diminuzione di valore se hai usato il pezzo oltre quanto serve a verificarne natura e caratteristiche: provalo come faresti in negozio.",
+      "Dopo la comunicazione hai 14 giorni per rispedire il pezzo. Rimborso tutto quello che hai pagato, spedizione standard di andata compresa, entro 14 giorni dal giorno in cui ricevo la tua comunicazione di recesso, con lo stesso mezzo di pagamento che hai usato. Posso sospendere il rimborso finché non ricevo il pezzo o la prova che l’hai rispedito, se arriva prima. Il costo della restituzione è a tuo carico. Rispondi della diminuzione di valore se hai usato il pezzo oltre quanto serve a verificarne natura e caratteristiche: provalo come faresti in negozio.",
     withdrawalExceptions:
       "Il recesso non si applica ai pezzi realizzati su tua misura o chiaramente personalizzati su tua richiesta (art. 59 Codice del consumo). Su ogni pezzo personalizzato lo segnalo prima dell’acquisto.",
     warranty: "Garanzia legale di conformità",
@@ -372,7 +375,7 @@ const it = {
       "Con la presente comunico il recesso dal contratto di vendita dei beni sotto indicati, ai sensi dell’art. 52 del Codice del consumo.",
     name: "Nome e cognome",
     email: "Email per l’avviso di ricevimento",
-    orderRef: "Ordine da cui receda",
+    orderRef: "Ordine da cui recedi",
     orderRefHelp: "Numero d’ordine se ce l’hai, oppure data d’acquisto e pezzi ordinati.",
     received: "Data di consegna (se la ricordi)",
     note: "Note",
@@ -641,18 +644,18 @@ const en: typeof it = {
     contact: "Contact:",
     cookies: "Cookies and storage",
     cookiesP1:
-      "No profiling or advertising cookies: that is why there is no banner. The cart stays only in your browser. If enabled, Umami Analytics counts visits in aggregate, without cookies on your device.",
+      "No profiling or advertising cookies: that is why there is no banner. The cart stays only in your browser. Umami Analytics counts visits in aggregate, without cookies on your device.",
     cookiesP3:
       "The cart and order summary stay on your device, not on a server of ours.",
     cookiesPaypal:
-      "If you pay with PayPal, checkout loads PayPal’s script on this page; PayPal’s cookies and privacy notice then apply",
+      "The checkout page loads the PayPal scripts (also for card and Apple Pay) and Google Pay, needed for payment; their cookies and privacy notices apply",
     cookiesMore: "Detail in the",
     cookiesMoreLink: "cookie policy",
     data: "What data, and why",
     dataIntro: "We only process what you send us:",
     dataOrder:
       "name, email, phone, address, order — to ship and for the accounts.",
-    dataPaypal: "amount and address are handled by PayPal, if you pay that way.",
+    dataPaypal: "if you pay with PayPal, card, Apple Pay or Google Pay, payment data is handled by PayPal; name, email, phone and address also reach me for the order and shipping.",
     dataForms: "name, email, message — to reply, then we delete them.",
     dataNewsletter: (email: string) =>
       `email only, if you tick the box. Withdraw whenever you want by writing to ${email}.`,
@@ -660,7 +663,7 @@ const en: typeof it = {
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
-      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). If enabled, visit statistics on Umami Cloud. Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
+      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Orders, newsletter and artist-area database on Turso (US company). Visit statistics on Umami Cloud (US company). Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
     formsubmit:
       "form fallback if Vercel is not configured. US company. Notice:",
     paypalRecv: "if you pay with PayPal (European seat, group also in the USA).",
@@ -668,6 +671,9 @@ const en: typeof it = {
     vercel: "PayPal webhook, stock, site forms, artist area, confirmation mail. Order data, not the card.",
     resend: "sends mail (orders, withdrawal, contact, newsletter, workshops), from Corpoceleste.",
     umami: "aggregated visit statistics, no cookies and no profiling. Notice:",
+    turso: "database for orders, newsletter subscribers and the artist area.",
+    sendcloud: "shipping quote at checkout (country and postcode) and shipping labels (name, address, phone).",
+    googlePay: "if you pay with Google Pay; the payment then goes through PayPal.",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
     rights: "Rights",
@@ -682,7 +688,7 @@ const en: typeof it = {
   },
   cookiePolicy: {
     title: "Cookie policy",
-    lede: "No profiling. Cart in the browser. Analytics only if enabled and cookieless. PayPal, if you pay that way.",
+    lede: "No profiling. Cart in the browser. Cookieless analytics. PayPal and Google Pay at checkout.",
     updated: "Last updated: 28 October 2026.",
     noBanner: "No banner",
     noBannerBody:
@@ -692,7 +698,7 @@ const en: typeof it = {
       "Cart and post-checkout summary stay on your device (localStorage / sessionStorage), not on a server of ours. They only make the shop work.",
     third: "Third parties",
     thirdBody:
-      "Umami Analytics, if enabled: aggregated visit statistics, no cookies. If you pay with PayPal, checkout loads its script: PayPal’s cookies and notice apply.",
+      "Umami Analytics: aggregated visit statistics, no cookies. The checkout page loads the PayPal and Google Pay scripts needed for payment: their cookies and notices apply. Typing a postcode at checkout sends only country and postcode to zippopotam.us to suggest the city.",
     manage: "How to remove them",
     manageBody: "Browser settings → site data. Or empty the cart from here. For PayPal, manage cookies in your account or browser settings.",
     privacyLink: "Full privacy notice",
@@ -701,7 +707,7 @@ const en: typeof it = {
   terms: {
     title: "Terms of sale",
     lede: "Who sells, what you buy, how you pay, how you withdraw.",
-    updated: "Last updated: 1 October 2026.",
+    updated: "Last updated: 28 October 2026.",
     seller: "Seller",
     vatLabel: "VAT number:",
     reaLabel: "Business register:",
@@ -735,7 +741,7 @@ const en: typeof it = {
     withdrawalHow: "To withdraw you can use the online function, or send me an explicit statement by email:",
     withdrawalLink: "withdraw from the contract here",
     withdrawalEffects:
-      "After notifying me you have 14 days to send the piece back. I refund everything you paid, including standard outbound shipping, within 14 days of receiving the return or proof that you sent it, using the same payment method you used. Return shipping is at your cost. You are liable for any diminished value if you handled the piece beyond what is needed to establish its nature and characteristics: try it as you would in a shop.",
+      "After notifying me you have 14 days to send the piece back. I refund everything you paid, including standard outbound shipping, within 14 days of the day I receive your withdrawal notice, using the same payment method you used. I may withhold the refund until I have the piece back or proof that you sent it, whichever comes first. Return shipping is at your cost. You are liable for any diminished value if you handled the piece beyond what is needed to establish its nature and characteristics: try it as you would in a shop.",
     withdrawalExceptions:
       "Withdrawal does not apply to pieces made to your measurements or clearly personalised at your request (art. 59 Consumer Code). I flag any personalised piece before purchase.",
     warranty: "Legal guarantee of conformity",
@@ -1028,18 +1034,18 @@ const de: typeof it = {
     contact: "Kontakt:",
     cookies: "Cookies und Speicher",
     cookiesP1:
-      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Der Warenkorb bleibt nur in deinem Browser. Ist Umami Analytics aktiv, zählt es Besuche aggregiert, ohne Cookies auf dem Gerät.",
+      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Der Warenkorb bleibt nur in deinem Browser. Umami Analytics zählt Besuche aggregiert, ohne Cookies auf dem Gerät.",
     cookiesP3:
       "Warenkorb und Bestellübersicht bleiben auf deinem Gerät, nicht auf einem Server von uns.",
     cookiesPaypal:
-      "Wenn du mit PayPal zahlst, lädt die Kasse das PayPal-Skript auf dieser Seite; es gelten Cookies und Hinweise von PayPal",
+      "Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal (auch für Karte und Apple Pay) und Google Pay; es gelten deren Cookies und Datenschutzhinweise",
     cookiesMore: "Details in der",
     cookiesMoreLink: "Cookie-Richtlinie",
     data: "Welche Daten, wozu",
     dataIntro: "Wir verarbeiten nur, was du uns schreibst:",
     dataOrder:
       "Name, E-Mail, Telefon, Adresse, Bestellung — zum Versand und für die Buchhaltung.",
-    dataPaypal: "Betrag und Adresse verarbeitet PayPal, wenn du so zahlst.",
+    dataPaypal: "zahlst du mit PayPal, Karte, Apple Pay oder Google Pay, verarbeitet PayPal die Zahlungsdaten; Name, E-Mail, Telefon und Adresse erhalte auch ich für Bestellung und Versand.",
     dataForms: "Name, E-Mail, Nachricht — zum Antworten, dann löschen wir sie.",
     dataNewsletter: (email: string) =>
       `nur die E-Mail, wenn du das Kästchen ankreuzt. Widerruf jederzeit an ${email}.`,
@@ -1047,7 +1053,7 @@ const de: typeof it = {
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
-      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Falls aktiv, Besuchsstatistiken auf Umami Cloud. Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
+      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Datenbank für Bestellungen, Newsletter und Künstlerbereich auf Turso (US-Unternehmen). Besuchsstatistiken auf Umami Cloud (US-Unternehmen). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
     formsubmit:
       "Formular-Fallback, wenn Vercel nicht konfiguriert ist. US-Unternehmen. Hinweise:",
     paypalRecv: "wenn du mit PayPal zahlst (Sitz in Europa, Gruppe auch in den USA).",
@@ -1055,6 +1061,9 @@ const de: typeof it = {
     vercel: "PayPal-Webhook, Bestand, Formulare, Künstlerbereich, Bestätigungsmails. Bestelldaten, keine Karte.",
     resend: "versendet Mails (Bestellung, Widerruf, Kontakt, Newsletter, Kurse), Absender Corpoceleste.",
     umami: "aggregierte Besuchsstatistiken, ohne Cookies und ohne Profiling. Hinweise:",
+    turso: "Datenbank für Bestellungen, Newsletter-Abonnenten und Künstlerbereich.",
+    sendcloud: "Versandberechnung an der Kasse (Land und PLZ) und Versandetiketten (Name, Adresse, Telefon).",
+    googlePay: "wenn du mit Google Pay zahlst; die Zahlung läuft dann über PayPal.",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
     rights: "Rechte",
@@ -1069,7 +1078,7 @@ const de: typeof it = {
   },
   cookiePolicy: {
     title: "Cookie-Richtlinie",
-    lede: "Kein Profiling. Warenkorb im Browser. Analytics nur wenn aktiv und ohne Cookies. PayPal, wenn du so zahlst.",
+    lede: "Kein Profiling. Warenkorb im Browser. Analytics ohne Cookies. PayPal und Google Pay an der Kasse.",
     updated: "Stand: 28. Oktober 2026.",
     noBanner: "Kein Banner",
     noBannerBody:
@@ -1079,7 +1088,7 @@ const de: typeof it = {
       "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät (localStorage / sessionStorage), nicht auf einem Server von uns. Sie dienen nur dem Shop.",
     third: "Dritte",
     thirdBody:
-      "Umami Analytics, falls aktiv: aggregierte Besuchsstatistiken, ohne Cookies. Wenn du mit PayPal zahlst, lädt die Kasse sein Skript: es gelten Cookies und Hinweise von PayPal.",
+      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
     manage: "Wie du sie entfernst",
     manageBody: "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen verwalten.",
     privacyLink: "Vollständiger Datenschutzhinweis",
@@ -1088,7 +1097,7 @@ const de: typeof it = {
   terms: {
     title: "Verkaufsbedingungen",
     lede: "Wer verkauft, was du kaufst, wie bezahlt wird, wie du widerrufst.",
-    updated: "Stand: 1. Oktober 2026.",
+    updated: "Stand: 28. Oktober 2026.",
     seller: "Verkäufer",
     vatLabel: "USt-IdNr.:",
     reaLabel: "Handelsregister:",
@@ -1122,7 +1131,7 @@ const de: typeof it = {
     withdrawalHow: "Zum Widerruf kannst du die Online-Funktion nutzen oder mir eine eindeutige Erklärung per E-Mail schicken:",
     withdrawalLink: "hier vom Vertrag zurücktreten",
     withdrawalEffects:
-      "Nach der Mitteilung hast du 14 Tage, um das Stück zurückzuschicken. Ich erstatte alles, was du gezahlt hast, inklusive Standardversand hin, innerhalb von 14 Tagen nach Erhalt der Rücksendung oder des Sendungsnachweises, über dasselbe Zahlungsmittel. Die Rücksendekosten trägst du. Für einen Wertverlust haftest du, wenn du das Stück über das hinaus benutzt hast, was zur Prüfung von Beschaffenheit und Eigenschaften nötig ist: probier es wie im Laden.",
+      "Nach der Mitteilung hast du 14 Tage, um das Stück zurückzuschicken. Ich erstatte alles, was du gezahlt hast, inklusive Standardversand hin, innerhalb von 14 Tagen ab dem Tag, an dem mich dein Widerruf erreicht, über dasselbe Zahlungsmittel. Ich kann die Erstattung zurückhalten, bis ich das Stück zurückhabe oder du den Rückversand nachweist, je nachdem, was früher eintritt. Die Rücksendekosten trägst du. Für einen Wertverlust haftest du, wenn du das Stück über das hinaus benutzt hast, was zur Prüfung von Beschaffenheit und Eigenschaften nötig ist: probier es wie im Laden.",
     withdrawalExceptions:
       "Kein Widerrufsrecht besteht bei Stücken, die nach deinen Maßen gefertigt oder eindeutig auf deine Wünsche zugeschnitten sind (Art. 59 Verbrauchergesetzbuch). Personalisierte Stücke kennzeichne ich vor dem Kauf.",
     warranty: "Gesetzliche Gewährleistung",

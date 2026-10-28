@@ -3,6 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    # Stock ledger is API-internal (not rendered); content/products stock commits still deploy.
+    paths-ignore:
+      - "stock-ledger/**"
   workflow_dispatch:
 
 permissions:

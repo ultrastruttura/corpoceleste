@@ -24,7 +24,7 @@ const formAction = publicFormAction(siteSettings.shopEmail);
         <FormHoney />
         <div class="newsletter-row">
           <label class="visually-hidden" for="nl-email">{copy.forms.email}</label>
-          <input id="nl-email" type="email" name="email" required placeholder={copy.forms.email} />
+          <input id="nl-email" type="email" name="email" autocomplete="email" required placeholder={copy.forms.email} />
           <button type="submit">{copy.footer.subscribe}</button>
         </div>
         <PrivacyCheck id="nl-privacy" newsletter />

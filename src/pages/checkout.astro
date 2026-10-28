@@ -224,6 +224,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       <script define:vars={{ clientId: paypalClientId, sdkLocale: paypalSdkLocale[locale] }}>
         const s = document.createElement("script");
         s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=paylater,venmo`;
+        s.onerror = () => {
+          window.__paypalSdkFailed = true;
+        };
         document.head.append(s);
         const g = document.createElement("script");
         g.src = "https://pay.google.com/gp/p/js/pay.js";
@@ -251,7 +254,16 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
     const base = import.meta.env.BASE_URL;
     const prefix = document.documentElement.dataset.localePrefix || "";
+    const lang = (document.documentElement.lang || "it").slice(0, 2);
+    const say = (it: string, en: string, de: string) => (lang === "en" ? en : lang === "de" ? de : it);
+    const lockFallback = () =>
+      say(
+        "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.",
+        "Accept the terms and privacy notice, complete the address and wait for the shipping quote.",
+        "Akzeptiere AGB und Datenschutz, vervollständige die Adresse und warte auf die Versandberechnung.",
+      );
     let googlePayReady: (() => void) | null = null;
+    let createErrorShown = false;
     let buttonsMounted = false;
     const page = document.querySelector<HTMLElement>(".checkout-page");
     const paypalClientId = page?.dataset.paypalClientId || "";
@@ -586,15 +598,23 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           return;
         }
         if (!unlocked()) {
-          window.alert(
-            lockHint?.textContent?.trim() ||
-              "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.",
-          );
+          window.alert(lockHint?.textContent?.trim() || lockFallback());
           return;
         }
-        window.alert("Google Pay si sta caricando… riprova tra un secondo, oppure usa PayPal.");
+        window.alert(
+          say(
+            "Google Pay si sta caricando… riprova tra un secondo, oppure usa PayPal.",
+            "Google Pay is loading… try again in a second, or use PayPal.",
+            "Google Pay wird geladen… versuche es gleich noch einmal oder nutze PayPal.",
+          ),
+        );
       },
     );
+
+    // Apple Pay only exists in Safari on Apple devices — elsewhere the button would only show an alert.
+    if (!("ApplePaySession" in window)) {
+      document.querySelector<HTMLElement>("[data-applepay-slot]")?.setAttribute("hidden", "");
+    }
 
     syncProvinceField();
     syncPage();
@@ -674,16 +694,31 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           }
           if (apiDetail) console.error("paypal-create-order detail", apiDetail);
           if (apiError === "Out of stock" || res.status === 409) {
-            window.alert("Uno o più articoli non sono più disponibili. Aggiorna il carrello e riprova.");
-          } else if (apiError === "Stock backend misconfigured") {
             window.alert(
-              "Pagamento non disponibile: configurazione magazzino (GITHUB_TOKEN). Contatta lo shop.",
+              say(
+                "Uno o più articoli non sono più disponibili. Aggiorna il carrello e riprova.",
+                "One or more items are no longer available. Update your cart and try again.",
+                "Ein oder mehrere Artikel sind nicht mehr verfügbar. Aktualisiere den Warenkorb und versuche es erneut.",
+              ),
             );
           } else if (apiError === "Stock busy, retry" || apiError === "Stock unavailable, retry") {
-            window.alert("Magazzino momentaneamente occupato. Riprova tra qualche secondo.");
+            window.alert(
+              say(
+                "Magazzino momentaneamente occupato. Riprova tra qualche secondo.",
+                "Stock is busy right now. Try again in a few seconds.",
+                "Der Bestand ist gerade ausgelastet. Versuche es in ein paar Sekunden erneut.",
+              ),
+            );
           } else {
-            window.alert("Non è stato possibile avviare il pagamento. Riprova o usa un altro metodo.");
+            window.alert(
+              say(
+                "Non è stato possibile avviare il pagamento. Riprova o usa il bonifico.",
+                "The payment couldn't be started. Try again or use bank transfer.",
+                "Die Zahlung konnte nicht gestartet werden. Versuche es erneut oder nutze Überweisung.",
+              ),
+            );
           }
+          createErrorShown = true;
           throw new Error("Order create failed");
         }
         const data = (await res.json()) as { id?: string };
@@ -703,6 +738,20 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           await actions.order.capture();
           clearCart();
           location.href = `${base}${prefix}grazie/?from=paypal`;
+        },
+        onError: (err: unknown) => {
+          console.error("PayPal error", err);
+          if (createErrorShown) {
+            createErrorShown = false;
+            return;
+          }
+          window.alert(
+            say(
+              "Il pagamento non è andato a buon fine e non ti è stato addebitato nulla. Riprova o scegli il bonifico.",
+              "The payment didn't go through and you weren't charged. Try again or choose bank transfer.",
+              "Die Zahlung hat nicht geklappt, es wurde nichts abgebucht. Versuche es erneut oder wähle Überweisung.",
+            ),
+          );
         },
       };
 
@@ -743,13 +792,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       appleFallback?.addEventListener("click", () => {
         if (!unlocked() || appleRendered) return;
         // On Safari the SDK button replaces this; elsewhere explain availability.
-        const lang = (document.documentElement.lang || "it").slice(0, 2);
         window.alert(
-          lang === "en"
-            ? "Apple Pay is available in Safari on Apple devices."
-            : lang === "de"
-              ? "Apple Pay ist in Safari auf Apple-Geräten verfügbar."
-              : "Apple Pay è disponibile in Safari su dispositivi Apple.",
+          say(
+            "Apple Pay è disponibile in Safari su dispositivi Apple.",
+            "Apple Pay is available in Safari on Apple devices.",
+            "Apple Pay ist in Safari auf Apple-Geräten verfügbar.",
+          ),
         );
       });
 
@@ -789,9 +837,17 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       type GPayCtor = new (o: Record<string, unknown>) => GPayClient;
       type GPayNS = { payments: { api: { PaymentsClient: GPayCtor } } };
 
-      const lockMsg = () =>
-        lockHint?.textContent?.trim() ||
-        "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.";
+      const lockMsg = () => lockHint?.textContent?.trim() || lockFallback();
+      const gpayUnavailable = () =>
+        window.alert(
+          say(
+            "Google Pay non è disponibile. Usa PayPal o il bonifico.",
+            "Google Pay isn't available. Use PayPal or bank transfer.",
+            "Google Pay ist nicht verfügbar. Nutze PayPal oder Überweisung.",
+          ),
+        );
+      const hideGooglePay = () =>
+        document.querySelector<HTMLElement>("[data-googlepay-slot]")?.setAttribute("hidden", "");
 
       const waitDeps = () =>
         new Promise<{ googleNs: GPayNS; gp: NonNullable<typeof paypal.Googlepay> } | null>((resolve) => {
@@ -809,7 +865,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       const deps = await waitDeps();
       if (!deps) {
         console.warn("Google Pay: SDK not available");
-        googlePayReady = () => window.alert("Google Pay non disponibile. Usa PayPal.");
+        googlePayReady = gpayUnavailable;
         return;
       }
 
@@ -825,20 +881,36 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         gpConfig = await deps.gp().config();
       } catch (err) {
         console.warn("Google Pay config unavailable", err);
-        googlePayReady = () =>
-          window.alert("Google Pay non è attivo sull’account PayPal. Usa PayPal.");
+        googlePayReady = gpayUnavailable;
         return;
       }
 
       const allowedPaymentMethods = gpConfig.allowedPaymentMethods || [];
       if (!allowedPaymentMethods.length) {
-        googlePayReady = () =>
-          window.alert("Google Pay non è attivo sull’account PayPal. Usa PayPal.");
+        googlePayReady = gpayUnavailable;
         return;
       }
 
       const env =
         String(gpConfig.environment || "").toUpperCase() === "TEST" ? "TEST" : "PRODUCTION";
+
+      // In-app browsers (Instagram/Facebook) and unsupported devices: hide instead of a dead button.
+      try {
+        const probe = new deps.googleNs.payments.api.PaymentsClient({ environment: env });
+        const ready = await probe.isReadyToPay({
+          apiVersion: gpConfig.apiVersion ?? 2,
+          apiVersionMinor: gpConfig.apiVersionMinor ?? 0,
+          allowedPaymentMethods,
+        });
+        if (!ready.result) {
+          hideGooglePay();
+          return;
+        }
+      } catch (err) {
+        console.warn("Google Pay isReadyToPay failed", err);
+        hideGooglePay();
+        return;
+      }
 
       const startGooglePay = () => {
         if (!unlocked()) {
@@ -921,7 +993,13 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             const code = String((err as { statusCode?: string })?.statusCode || err);
             if (code.includes("CANCELED") || code.includes("AbortError")) return;
             console.error("Google Pay click", err);
-            window.alert("Google Pay non è riuscito ad aprire il pagamento. Riprova o usa PayPal.");
+            window.alert(
+              say(
+                "Google Pay non è riuscito ad aprire il pagamento. Riprova o usa PayPal.",
+                "Google Pay couldn't open the payment. Try again or use PayPal.",
+                "Google Pay konnte die Zahlung nicht öffnen. Versuche es erneut oder nutze PayPal.",
+              ),
+            );
           });
         }
       };
@@ -944,9 +1022,28 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       mountButtons();
     }
 
+    /** PayPal SDK blocked (ad blocker, flaky network): switch to bank transfer instead of an empty box. */
+    function paypalUnavailable() {
+      const slot = document.querySelector<HTMLElement>("[data-paypal-slot]");
+      if (slot) {
+        slot.textContent = say(
+          "PayPal non si è caricato (connessione o blocco contenuti). Puoi pagare con bonifico o ricaricare la pagina.",
+          "PayPal didn't load (connection or content blocker). You can pay by bank transfer or reload the page.",
+          "PayPal wurde nicht geladen (Verbindung oder Inhaltsblocker). Du kannst per Überweisung zahlen oder die Seite neu laden.",
+        );
+      }
+      const bank = [...methods].find((r) => r.value === "bonifico");
+      if (bank) {
+        bank.checked = true;
+        syncMethod();
+      }
+    }
+
     if (paypalClientId) {
       const wait = () => {
-        if ((window as unknown as { paypal?: unknown }).paypal) tryMountButtons();
+        const w = window as unknown as { paypal?: unknown; __paypalSdkFailed?: boolean };
+        if (w.paypal) tryMountButtons();
+        else if (w.__paypalSdkFailed) paypalUnavailable();
         else setTimeout(wait, 80);
       };
       wait();

@@ -20,13 +20,11 @@ function allowedOrigins() {
     .filter(Boolean);
   if (fromEnv.length) return fromEnv;
   const site = originOnly(process.env.SITE_URL || "https://www.corpoceleste.eu");
-  return [
-    site,
-    "https://www.corpoceleste.eu",
-    "https://corpoceleste.eu",
-    "http://localhost:4321",
-    "http://127.0.0.1:4321",
-  ].filter((v, i, a) => v && a.indexOf(v) === i);
+  const dev =
+    process.env.VERCEL_ENV === "production" ? [] : ["http://localhost:4321", "http://127.0.0.1:4321"];
+  return [site, "https://www.corpoceleste.eu", "https://corpoceleste.eu", ...dev].filter(
+    (v, i, a) => v && a.indexOf(v) === i,
+  );
 }
 
 /** Exact Origin match only (no startsWith). */
@@ -163,6 +161,15 @@ export async function requireUser(
   if (req.method === "OPTIONS") {
     res.status(204).end();
     return null;
+  }
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    // CSRF: SameSite=None cookie rides cross-site form posts; JSON forces a CORS preflight.
+    const contentType = String(req.headers["content-type"] || "").toLowerCase();
+    if (!contentType.startsWith("application/json")) {
+      json(res, 415, { error: "Expected application/json" });
+      return null;
+    }
+    if (!requireSiteOrigin(req, res)) return null;
   }
   if (!portalConfigured()) {
     json(res, 503, { error: "Portal DB not configured (TURSO_DATABASE_URL)" });

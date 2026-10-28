@@ -33,6 +33,11 @@ export function parseForm(req: VercelRequest): Record<string, unknown> {
   return out;
 }
 
+/** One plain address only — no lists/display names (Resend would accept several recipients). */
+export function isEmail(value: string) {
+  return value.length <= 254 && /^[^\s@,;<>"()]+@[^\s@,;<>"()]+\.[^\s@,;<>"()]+$/.test(value);
+}
+
 export function isHoney(body: Record<string, unknown>) {
   return Boolean(field(body, "_honey"));
 }

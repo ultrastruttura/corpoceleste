@@ -38,11 +38,11 @@ const withdrawAction = formEndpoint("withdrawal") || `https://formsubmit.co/${sh
 
           <div>
             <label for="wd-name">{w.name}</label>
-            <input id="wd-name" name="nome" required data-withdraw-field={w.name} />
+            <input id="wd-name" name="nome" autocomplete="name" required data-withdraw-field={w.name} />
           </div>
           <div>
             <label for="wd-email">{w.email}</label>
-            <input id="wd-email" type="email" name="email" required data-withdraw-field={w.email} />
+            <input id="wd-email" type="email" name="email" autocomplete="email" required data-withdraw-field={w.email} />
           </div>
           <div>
             <label for="wd-order">{w.orderRef}</label>

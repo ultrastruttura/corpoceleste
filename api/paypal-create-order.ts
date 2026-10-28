@@ -8,6 +8,7 @@ import {
 } from "../server/paypal.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import { abuseLimit } from "../server/abuse-limit.js";
+import { isEmail } from "../server/form-body.js";
 import {
   abandonPaypalCheckoutHold,
   bindPaypalCheckoutHold,
@@ -38,15 +39,15 @@ async function assertCapturableOrder(orderId: string): Promise<{ ok: true } | { 
 
 function parseShipTo(raw: Partial<CheckoutShipTo> | undefined, country: string, zip: string): CheckoutShipTo | null {
   if (!raw) return null;
-  const fullName = String(raw.fullName || "").trim();
+  const fullName = String(raw.fullName || "").trim().slice(0, 120);
   const email = String(raw.email || "").trim();
-  const phone = String(raw.phone || "").trim();
-  const street = String(raw.street || "").trim();
-  const city = String(raw.city || "").trim();
+  const phone = String(raw.phone || "").trim().slice(0, 40);
+  const street = String(raw.street || "").trim().slice(0, 200);
+  const city = String(raw.city || "").trim().slice(0, 100);
   let province = String(raw.province || "").trim();
   if (country === "IT") province = province.slice(0, 2).toUpperCase();
   // Phone and province optional — Sendcloud falls back via provinceForLabel / default phone.
-  if (!fullName || !email.includes("@") || !street || !city) return null;
+  if (!fullName || !isEmail(email) || !street || !city) return null;
   return {
     fullName,
     email,

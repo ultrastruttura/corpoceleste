@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
 import { customerWithdrawalText } from "../server/customer-mail.js";
-import { field, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
+import { field, isEmail, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { nowRome, sendMail } from "../server/mail.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
 
@@ -15,10 +15,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const next = thanksUrl(body, "recesso");
   if (isHoney(body)) return res.redirect(303, next);
 
-  const name = field(body, "nome");
+  // Caps: the acknowledgement must echo the withdrawal content, so limit size instead of dropping it.
+  const name = field(body, "nome").slice(0, 120);
   const email = field(body, "email");
-  const orderRef = field(body, "ordine");
-  if (!name || !email || !orderRef || !email.includes("@")) {
+  const orderRef = field(body, "ordine").slice(0, 80);
+  if (!name || !orderRef || !isEmail(email)) {
     return res.status(400).send("Missing fields");
   }
 
@@ -31,8 +32,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const locale = field(body, "locale") || "it";
   const when = nowRome(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : "it-IT");
-  const received = field(body, "consegna");
-  const note = field(body, "note");
+  const received = field(body, "consegna").slice(0, 40);
+  const note = field(body, "note").slice(0, 1000);
   const shopTo = (process.env.SHOP_EMAIL || "").trim();
   const ack = customerWithdrawalText({ locale, name, orderRef, received, note, when });
 

@@ -34,7 +34,11 @@ function read(): CartItem[] {
 }
 
 function write(items: CartItem[]) {
-  localStorage.setItem(KEY, JSON.stringify(items));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(items));
+  } catch {
+    /* storage blocked (private mode / in-app browser) */
+  }
   window.dispatchEvent(new Event("cart:change"));
 }
 
@@ -166,7 +170,11 @@ export function saveOrderSnapshot(shipping: number) {
   const items = sanitizeCart();
   const merce = items.reduce((n, i) => n + i.price * i.qty, 0);
   const snap: OrderSnapshot = { items, shipping, total: merce + shipping };
-  sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(snap));
+  try {
+    sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(snap));
+  } catch {
+    /* must never block a PayPal capture that runs right after */
+  }
 }
 
 export function readOrderSnapshot(): OrderSnapshot | null {

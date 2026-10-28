@@ -14,7 +14,7 @@ npm run dev
 1. Push su `https://github.com/ultrastruttura/corpoceleste`.
 2. Su GitHub: **Settings → Pages → Source: GitHub Actions**.
 3. Il workflow in `.github/workflows/deploy.yml` pubblica a ogni push su `main`.
-4. URL: `https://www.corpoceleste.eu/` (dominio custom su GitHub Pages; DNS su Cloudflare).
+4. URL: `https://www.corpoceleste.eu/` (dominio custom su GitHub Pages).
 
 ## Contenuti da cambiare
 

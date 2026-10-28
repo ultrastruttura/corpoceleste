@@ -12,7 +12,9 @@ import {
 } from "../../server/portal/orders.js";
 import { cors, json, readJson, requireUser } from "../../server/portal/http.js";
 
-function csvEscape(value: string) {
+function csvEscape(raw: string) {
+  // Customer text starting with = + - @ would run as a formula in Excel/Sheets.
+  const value = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
   if (/[",\n\r]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
   return value;
 }

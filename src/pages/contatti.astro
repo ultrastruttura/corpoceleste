@@ -71,11 +71,11 @@ const email = siteSettings.shopEmail || site.email;
         <FormHoney />
         <div>
           <label for="ct-name">{copy.forms.name}</label>
-          <input id="ct-name" name="nome" required />
+          <input id="ct-name" name="nome" autocomplete="name" required />
         </div>
         <div>
           <label for="ct-email">{copy.forms.email}</label>
-          <input id="ct-email" type="email" name="email" required />
+          <input id="ct-email" type="email" name="email" autocomplete="email" required />
         </div>
         <div>
           <label for="ct-msg">{copy.forms.message}</label>

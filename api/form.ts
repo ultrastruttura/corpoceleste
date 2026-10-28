@@ -3,6 +3,7 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import {
   bufferRequestBody,
   field,
+  isEmail,
   isHoney,
   parseForm,
   safeSubject,
@@ -43,7 +44,7 @@ function cronAuthorized(req: VercelRequest) {
   return auth === `Bearer ${secret}`;
 }
 
-/** Release unpaid PayPal holds (3h) and legacy bank holds (48h). Cron or CRON_SECRET. */
+/** Release unpaid PayPal holds (30 min) and legacy bank holds (48h). Cron or CRON_SECRET. */
 async function runStockReleaseJob(res: VercelResponse) {
   if (!(process.env.GITHUB_TOKEN || "").trim()) {
     return res.status(503).json({ error: "GITHUB_TOKEN missing" });
@@ -157,7 +158,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (isHoney(body)) return res.redirect(303, next);
 
   const email = field(body, "email");
-  if (!email || !email.includes("@")) {
+  if (!isEmail(email)) {
     return res.status(400).send("Missing email");
   }
 

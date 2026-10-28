@@ -1,7 +1,7 @@
 import { isPurchasableStatus } from "../lib/product-status";
 import { bindAutoplayVideos } from "./autoplay-video";
 import { addItem } from "./cart";
-import { bindCart, openCart } from "./cart-ui";
+import { bindCart, openCart, renderCart } from "./cart-ui";
 import { applyLiveStock, catalogProduct } from "./catalog";
 import { bindNav } from "./nav";
 
@@ -38,7 +38,7 @@ function bind() {
   bindNav();
   bindCart();
   bindAutoplayVideos();
-  void refreshLiveStock().then(() => bindCart());
+  void refreshLiveStock().then(() => renderCart());
 
   document.querySelectorAll<HTMLInputElement>("[data-next-grazie]").forEach((node) => {
     const from = node.getAttribute("data-next-grazie") || "form";

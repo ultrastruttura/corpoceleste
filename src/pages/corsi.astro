@@ -72,11 +72,11 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
           <FormHoney />
           <div>
             <label for="ws-name">{copy.forms.name}</label>
-            <input id="ws-name" name="nome" required />
+            <input id="ws-name" name="nome" autocomplete="name" required />
           </div>
           <div>
             <label for="ws-email">{copy.forms.email}</label>
-            <input id="ws-email" type="email" name="email" required />
+            <input id="ws-email" type="email" name="email" autocomplete="email" required />
           </div>
           <div>
             <label for="ws-note">{copy.forms.notes}</label>
@@ -95,11 +95,11 @@ const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
           <FormHoney />
           <div>
             <label for="sp-name">{copy.workshops.spaceName}</label>
-            <input id="sp-name" name="nome" required />
+            <input id="sp-name" name="nome" autocomplete="name" required />
           </div>
           <div>
             <label for="sp-email">{copy.forms.email}</label>
-            <input id="sp-email" type="email" name="email" required />
+            <input id="sp-email" type="email" name="email" autocomplete="email" required />
           </div>
           <div>
             <label for="sp-where">{copy.workshops.city}</label>
