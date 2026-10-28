@@ -145,14 +145,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const customerBody = customerBankOrderText({
     locale,
     orderRef: orderNumber,
-    iban: identity.iban,
-    intestatario: identity.intestatario,
+    identity,
     total: totalStr,
     shipping: shippingStr,
     merchandise: merchandiseStr,
     ordine: [
-      `Riferimento ordine: ${orderNumber}`,
-      `Nome: ${nome}`,
+      `${locale === "en" ? "Order reference" : locale === "de" ? "Bestellnummer" : "Riferimento ordine"}: ${orderNumber}`,
+      `${locale === "en" || locale === "de" ? "Name" : "Nome"}: ${nome}`,
       "",
       ordine,
     ].join("\n"),

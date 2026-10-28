@@ -9,7 +9,8 @@ import {
   type LedgerRecord,
 } from "../server/github-stock.js";
 import { notifyOrder } from "../server/notify-shop.js";
-import { customerOrderText } from "../server/customer-mail.js";
+import { customerOrderText, localeForCountry } from "../server/customer-mail.js";
+import { loadShopIdentity } from "../server/shop-identity.js";
 import { formatCustomerOrderLines, formatShopOrderEmail } from "../server/stock-patch.js";
 import { parseOrderLines } from "../src/lib/paypal-lines.js";
 import {
@@ -425,14 +426,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       packlinkLabels: packlink.packlinkLabels,
       packlinkError: packlink.packlinkError,
     });
+    const customerLocale = localeForCountry(addr?.country_code);
     const customerBody = customerOrderText({
+      locale: customerLocale,
       metodo: "PayPal",
       ordine: formatCustomerOrderLines({
         captureId,
         lines,
         itemLabels: bits.labels,
         total: bits.total || `${money(priced.order.total)} EUR`,
+        locale: customerLocale,
       }),
+      identity: await loadShopIdentity(),
     });
 
     let emailed = Boolean(working.emailed);

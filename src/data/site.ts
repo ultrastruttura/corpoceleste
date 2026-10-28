@@ -14,9 +14,9 @@ export const site = {
   /** Giorni lavorativi indicativi per la spedizione (info precontrattuale). */
   shippingDays: "5",
   /** Ragione sociale / ditta per le pagine legali. */
-  legalName: "Corpoceleste di Andrea Lorenzo Baldelli",
+  legalName: "Andrea Baldelli Lorenzo",
   /** Intestatario IBAN / titolare. */
-  intestatario: "Andrea Lorenzo Baldelli",
+  intestatario: "Andrea Baldelli Lorenzo",
   iban: "IT02C03268223000EM002734005",
   /** Codice destinatario SDI (fatturazione elettronica). */
   sdiCode: "BA6ET11",
@@ -39,7 +39,7 @@ export const site = {
   formApi: "https://corpoceleste.vercel.app",
   sede: "Nembro (BG), Italia",
   /** Indirizzo completo della sede: obbligatorio nelle info precontrattuali. */
-  indirizzo: "Via Moroni 51, 24027 Nembro (BG), Italia",
+  indirizzo: "Via Moroni 51, Lonno, 24027 Nembro (BG), Italia",
   /** Partita IVA. */
   vatId: "IT04952110163",
   /** Numero REA / iscrizione Registro imprese, se presente. */

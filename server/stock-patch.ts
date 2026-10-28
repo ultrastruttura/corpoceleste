@@ -92,16 +92,23 @@ export function formatCustomerOrderLines(opts: {
   lines: OrderLine[];
   itemLabels?: string[];
   total?: string;
+  locale?: string;
 }): string {
   const rows =
     opts.itemLabels?.length
       ? opts.itemLabels
       : opts.lines.map((l) => `${l.id} · ${l.size} · ×${l.qty}`);
+  const [totalLabel, refLabel] =
+    opts.locale === "en"
+      ? ["PayPal total", "Payment reference"]
+      : opts.locale === "de"
+        ? ["PayPal-Summe", "Zahlungsreferenz"]
+        : ["Totale PayPal", "Riferimento pagamento"];
   return [
     ...rows,
     "",
-    opts.total ? `Totale PayPal: ${opts.total}` : "",
-    `Riferimento pagamento: ${opts.captureId}`,
+    opts.total ? `${totalLabel}: ${opts.total}` : "",
+    `${refLabel}: ${opts.captureId}`,
   ]
     .filter((x) => x !== "")
     .join("\n");

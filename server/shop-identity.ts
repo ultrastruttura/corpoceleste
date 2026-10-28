@@ -4,14 +4,14 @@ import matter from "gray-matter";
 
 const FALLBACK = {
   iban: "IT02C03268223000EM002734005",
-  intestatario: "Andrea Lorenzo Baldelli",
-  legalName: "Corpoceleste di Andrea Lorenzo Baldelli",
+  intestatario: "Andrea Baldelli Lorenzo",
+  legalName: "Andrea Baldelli Lorenzo",
   vatId: "IT04952110163",
   pec: "andrealorenzobaldelli@pec.it",
   sdiCode: "BA6ET11",
   telefono: "",
   rea: "",
-  indirizzo: "Via Moroni 51, 24027 Nembro (BG), Italia",
+  indirizzo: "Via Moroni 51, Lonno, 24027 Nembro (BG), Italia",
 };
 
 export type ShopIdentity = typeof FALLBACK;

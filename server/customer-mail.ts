@@ -1,4 +1,13 @@
 import { nowRome, siteBase } from "./mail.js";
+import type { ShopIdentity } from "./shop-identity.js";
+
+/** Best guess for PayPal orders, which carry no site locale: ship-to country. */
+export function localeForCountry(country: string | undefined) {
+  const c = String(country || "").toUpperCase();
+  if (c === "IT" || c === "SM" || c === "VA") return "it";
+  if (c === "DE" || c === "AT" || c === "LI") return "de";
+  return "en";
+}
 
 function legalFooter(locale: string) {
   const site = siteBase();
@@ -23,10 +32,67 @@ function legalFooter(locale: string) {
   ].join("\n");
 }
 
+/** Seller identity + model withdrawal form (Codice del consumo, all. I parte B) — required in the durable-medium confirmation. */
+function sellerAndForm(locale: string, id: ShopIdentity) {
+  const email = (process.env.SHOP_EMAIL || "").trim() || "info@corpoceleste.eu";
+  const seller = [
+    id.legalName,
+    id.indirizzo,
+    id.vatId && (locale === "de" ? `USt-IdNr. ${id.vatId}` : locale === "en" ? `VAT ${id.vatId}` : `P. IVA ${id.vatId}`),
+    id.pec && `PEC ${id.pec}`,
+    email,
+  ].filter(Boolean);
+  const to = `${id.legalName}, ${id.indirizzo}, ${email}`;
+  if (locale === "en") {
+    return [
+      "Seller",
+      ...seller,
+      "",
+      "Model withdrawal form (fill in and return only if you wish to withdraw)",
+      `To: ${to}`,
+      "I hereby give notice that I withdraw from my contract of sale of the following goods: ______",
+      "Ordered on / received on: ______",
+      "Name of consumer: ______",
+      "Address of consumer: ______",
+      "Signature (only if this form is sent on paper): ______",
+      "Date: ______",
+    ];
+  }
+  if (locale === "de") {
+    return [
+      "Verkäufer",
+      ...seller,
+      "",
+      "Muster-Widerrufsformular (nur ausfüllen und zurücksenden, wenn du widerrufen willst)",
+      `An: ${to}`,
+      "Hiermit widerrufe ich den von mir abgeschlossenen Vertrag über den Kauf der folgenden Waren: ______",
+      "Bestellt am / erhalten am: ______",
+      "Name des Verbrauchers: ______",
+      "Anschrift des Verbrauchers: ______",
+      "Unterschrift (nur bei Mitteilung auf Papier): ______",
+      "Datum: ______",
+    ];
+  }
+  return [
+    "Venditore",
+    ...seller,
+    "",
+    "Modulo tipo di recesso (compilalo e rispediscilo solo se vuoi recedere)",
+    `Destinatario: ${to}`,
+    "Con la presente notifico il recesso dal mio contratto di vendita dei seguenti beni: ______",
+    "Ordinato il / ricevuto il: ______",
+    "Nome del consumatore: ______",
+    "Indirizzo del consumatore: ______",
+    "Firma (solo se il modulo è inviato su carta): ______",
+    "Data: ______",
+  ];
+}
+
 export function customerOrderText(opts: {
   locale?: string;
   metodo: string;
   ordine: string;
+  identity: ShopIdentity;
   when?: string;
 }) {
   const locale = opts.locale || "it";
@@ -41,6 +107,8 @@ export function customerOrderText(opts: {
       "",
       legalFooter("en"),
       "",
+      ...sellerAndForm("en", opts.identity),
+      "",
       "Keep this email: it is your confirmation on a durable medium.",
     ].join("\n");
   }
@@ -54,6 +122,8 @@ export function customerOrderText(opts: {
       "",
       legalFooter("de"),
       "",
+      ...sellerAndForm("de", opts.identity),
+      "",
       "Bewahre diese E-Mail auf: sie ist deine Bestätigung auf einem dauerhaften Datenträger.",
     ].join("\n");
   }
@@ -66,6 +136,8 @@ export function customerOrderText(opts: {
     "",
     legalFooter("it"),
     "",
+    ...sellerAndForm("it", opts.identity),
+    "",
     "Conserva questa email: è la conferma d’ordine su supporto durevole.",
   ].join("\n");
 }
@@ -75,8 +147,7 @@ export function customerBankOrderText(opts: {
   locale?: string;
   ordine: string;
   orderRef: string;
-  iban: string;
-  intestatario: string;
+  identity: ShopIdentity;
   total: string;
   /** Optional breakdown — same Sendcloud quote as PayPal checkout. */
   merchandise?: string;
@@ -101,8 +172,8 @@ export function customerBankOrderText(opts: {
     locale === "en"
       ? [
           "Bank transfer details",
-          `IBAN: ${opts.iban}`,
-          `Account holder: ${opts.intestatario}`,
+          `IBAN: ${opts.identity.iban}`,
+          `Account holder: ${opts.identity.intestatario}`,
           amountLine,
           `Payment reference (required): ${opts.orderRef}`,
           "",
@@ -111,8 +182,8 @@ export function customerBankOrderText(opts: {
       : locale === "de"
         ? [
             "Überweisungsdaten",
-            `IBAN: ${opts.iban}`,
-            `Kontoinhaber: ${opts.intestatario}`,
+            `IBAN: ${opts.identity.iban}`,
+            `Kontoinhaber: ${opts.identity.intestatario}`,
             amountLine,
             `Verwendungszweck (pflicht): ${opts.orderRef}`,
             "",
@@ -120,8 +191,8 @@ export function customerBankOrderText(opts: {
           ]
         : [
             "Dati per il bonifico",
-            `IBAN: ${opts.iban}`,
-            `Intestatario: ${opts.intestatario}`,
+            `IBAN: ${opts.identity.iban}`,
+            `Intestatario: ${opts.identity.intestatario}`,
             amountLine,
             `Causale (obbligatoria): ${opts.orderRef}`,
             "",
@@ -132,6 +203,7 @@ export function customerBankOrderText(opts: {
     locale,
     metodo: locale === "en" ? "Bank transfer" : locale === "de" ? "Überweisung" : "Bonifico",
     ordine: [opts.ordine, "", ...payBlock].join("\n"),
+    identity: opts.identity,
     when,
   });
 }
