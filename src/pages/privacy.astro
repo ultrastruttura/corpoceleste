@@ -67,6 +67,12 @@ const umamiOn = Boolean(siteSettings.umamiWebsiteId);
       </ul>
       <p>{p.noProfiling}</p>
 
+      <h2>{p.basis}</h2>
+      <ul>
+        {p.basisItems.map((item) => <li>{item}</li>)}
+      </ul>
+      <p>{p.basisTail}</p>
+
       <h2>{p.recipients}</h2>
       <ul>
         {

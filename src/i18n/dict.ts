@@ -270,6 +270,18 @@ const it = {
     dataNewsletter: (email: string) =>
       `solo l’email, se spunti la casella. Revoca quando vuoi scrivendo a ${email}.`,
     noProfiling: "Niente profilazione a fini pubblicitari.",
+    basis: "Perché trattiamo i dati e per quanto li teniamo",
+    basisItems: [
+      "Ordini, spedizioni, fatture — esecuzione del contratto e obblighi fiscali (art. 6.1 b e c GDPR). Conservati 10 anni, come richiesto per le scritture contabili.",
+      "Recesso e garanzia — obbligo di legge (art. 6.1 c). Conservati insieme all’ordine.",
+      "Contatti, corsi, consulenza, ristampe — risposta a una tua richiesta (art. 6.1 b). Cancellati entro 12 mesi dall’ultimo scambio.",
+      "Newsletter — consenso (art. 6.1 a), fino alla disiscrizione. Dopo resta solo l’indirizzo segnato come «disiscritto», per non scriverti più.",
+      "Area artisti — contratto con l’artista (art. 6.1 b), per la durata della collaborazione e poi 10 anni per i conti.",
+      "Protezione da abusi dei moduli — legittimo interesse (art. 6.1 f). Indirizzo IP cancellato entro 24 ore.",
+      "Statistiche Umami — legittimo interesse, dati aggregati e anonimi, nessun cookie.",
+    ],
+    basisTail:
+      "I dati d’ordine servono per spedire; tutto il resto è facoltativo. Nessuna decisione automatizzata.",
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
@@ -660,6 +672,18 @@ const en: typeof it = {
     dataNewsletter: (email: string) =>
       `email only, if you tick the box. Withdraw whenever you want by writing to ${email}.`,
     noProfiling: "No advertising profiling.",
+    basis: "Why we process data and how long we keep it",
+    basisItems: [
+      "Orders, shipping, invoices — performance of the contract and tax obligations (art. 6(1)(b) and (c) GDPR). Kept 10 years, as required for accounting records.",
+      "Withdrawal and guarantee — legal obligation (art. 6(1)(c)). Kept together with the order.",
+      "Contact, workshops, consulting, reprints — answering your request (art. 6(1)(b)). Deleted within 12 months of the last exchange.",
+      "Newsletter — consent (art. 6(1)(a)), until you unsubscribe. Afterwards only the address marked “unsubscribed” is kept, so we never write again.",
+      "Artist area — contract with the artist (art. 6(1)(b)), for the length of the collaboration and then 10 years for the accounts.",
+      "Form abuse protection — legitimate interest (art. 6(1)(f)). IP address deleted within 24 hours.",
+      "Umami statistics — legitimate interest, aggregated anonymous data, no cookies.",
+    ],
+    basisTail:
+      "Order data is needed to ship; everything else is optional. No automated decision-making.",
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
@@ -1050,6 +1074,18 @@ const de: typeof it = {
     dataNewsletter: (email: string) =>
       `nur die E-Mail, wenn du das Kästchen ankreuzt. Widerruf jederzeit an ${email}.`,
     noProfiling: "Kein Profiling für Werbung.",
+    basis: "Warum wir Daten verarbeiten und wie lange wir sie speichern",
+    basisItems: [
+      "Bestellungen, Versand, Rechnungen — Vertragserfüllung und steuerliche Pflichten (Art. 6 Abs. 1 lit. b und c DSGVO). 10 Jahre gespeichert, wie für Buchhaltungsunterlagen vorgeschrieben.",
+      "Widerruf und Gewährleistung — rechtliche Verpflichtung (Art. 6 Abs. 1 lit. c). Zusammen mit der Bestellung gespeichert.",
+      "Kontakt, Kurse, Beratung, Nachdrucke — Beantwortung deiner Anfrage (Art. 6 Abs. 1 lit. b). Gelöscht spätestens 12 Monate nach dem letzten Austausch.",
+      "Newsletter — Einwilligung (Art. 6 Abs. 1 lit. a), bis zur Abmeldung. Danach bleibt nur die als „abgemeldet“ markierte Adresse, damit wir dir nicht mehr schreiben.",
+      "Künstlerbereich — Vertrag mit dem Künstler (Art. 6 Abs. 1 lit. b), für die Dauer der Zusammenarbeit und danach 10 Jahre für die Abrechnung.",
+      "Schutz der Formulare vor Missbrauch — berechtigtes Interesse (Art. 6 Abs. 1 lit. f). IP-Adresse innerhalb von 24 Stunden gelöscht.",
+      "Umami-Statistiken — berechtigtes Interesse, aggregierte anonyme Daten, keine Cookies.",
+    ],
+    basisTail:
+      "Bestelldaten sind für den Versand nötig; alles andere ist freiwillig. Keine automatisierten Entscheidungen.",
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
