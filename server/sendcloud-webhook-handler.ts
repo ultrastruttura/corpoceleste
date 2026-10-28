@@ -66,7 +66,15 @@ export async function handleSendcloudWebhook(req: VercelRequest, res: VercelResp
   }
 
   try {
-    console.log("[sendcloud-webhook]", body.slice(0, 4000));
+    let event = "";
+    try {
+      const parsed = JSON.parse(body) as { action?: string; type?: string; parcel?: { id?: unknown } };
+      event = String(parsed.action || parsed.type || "");
+      const parcelId = parsed.parcel?.id;
+      console.log("[sendcloud-webhook]", event || "ok", parcelId != null ? `parcel ${parcelId}` : "");
+    } catch {
+      console.log("[sendcloud-webhook]", "ok", body.length);
+    }
   } catch (err) {
     console.error("[sendcloud-webhook] read", err);
   }

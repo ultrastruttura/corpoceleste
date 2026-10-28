@@ -26,6 +26,9 @@ export async function reservePaypalCheckoutHold(
   expectedTotal: number,
 ): Promise<ReservePaypalResult> {
   if (!(process.env.GITHUB_TOKEN || "").trim()) {
+    if (process.env.VERCEL_ENV === "production") {
+      return { ok: false, http: 503, error: "Stock backend misconfigured" };
+    }
     return { ok: true, tmpHoldId: "" };
   }
   const { paypalHoldId, reservePaypalHold, LedgerBusyError, assertGithubStockAccess } =

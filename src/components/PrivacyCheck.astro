@@ -14,7 +14,7 @@ const privacyHref = pageUrl(locale, "privacy/");
 <label class="check">
   {
     newsletter ? (
-      <input id={id} type="checkbox" name="consenso_newsletter" value="sì" required />
+      <input id={id} type="checkbox" name="consenso_newsletter" value="sì" required data-newsletter-consent />
     ) : (
       <input id={id} type="checkbox" name="privacy" value="presa visione" required />
     )

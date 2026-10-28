@@ -230,6 +230,8 @@ const it = {
     order: "Ordine ricevuto",
     contact: "Ti rispondo per email.",
     newsletter: "Ti ho mandato una email di conferma: clicca il link per attivare la newsletter.",
+    newsletterError:
+      "Non sono riuscito a mandarti l’email di conferma. Riprova tra poco o scrivimi a info@corpoceleste.eu.",
     reprint: "Se ristampo, ti avviso.",
     waitlist: "Quando il gruppo c’è, fisso la data.",
     bank: "Controlla la email: trovi IBAN, importo e causale. L’ordine si conclude quando arriva il pagamento.",
@@ -631,6 +633,8 @@ const en: typeof it = {
     order: "Order received",
     contact: "I’ll write back by email.",
     newsletter: "I sent you a confirmation email: click the link to activate the newsletter.",
+    newsletterError:
+      "I couldn’t send the confirmation email. Try again in a moment, or write to info@corpoceleste.eu.",
     reprint: "If I reprint, I’ll let you know.",
     waitlist: "When the group is together, I’ll set the date.",
     bank: "Check your email: IBAN, amount and payment reference are there. The order stands when payment arrives (5-day hold).",
@@ -1032,6 +1036,8 @@ const de: typeof it = {
     order: "Bestellung angekommen",
     contact: "Ich antworte per E-Mail.",
     newsletter: "Ich habe dir eine Bestätigungs-E-Mail geschickt: Link klicken, um den Newsletter zu aktivieren.",
+    newsletterError:
+      "Die Bestätigungs-E-Mail konnte ich nicht senden. Versuch es gleich noch einmal oder schreib an info@corpoceleste.eu.",
     reprint: "Wenn ich nachdrucke, gebe ich Bescheid.",
     waitlist: "Wenn die Gruppe steht, lege ich den Termin fest.",
     bank: "Prüfe deine E-Mail: IBAN, Betrag und Verwendungszweck stehen dort. Die Bestellung kommt mit Zahlungseingang zustande.",

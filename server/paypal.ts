@@ -161,6 +161,12 @@ function digitsPhone(phone: string) {
   return phone.replace(/\D+/g, "").slice(0, 15);
 }
 
+function checkoutInvoiceId(phone: string, email: string) {
+  const base = `o:${crypto.randomUUID().slice(0, 8)}|t:${phone}`;
+  const withEmail = `${base}|e:${email}`;
+  return withEmail.length <= 127 ? withEmail : base;
+}
+
 /** Create checkout order with catalog prices (server-side). */
 export async function createPayPalCheckoutOrder(
   order: PricedOrder,
@@ -183,8 +189,10 @@ export async function createPayPalCheckoutOrder(
         {
           description: "Corpoceleste",
           ...(customId.length <= 127 ? { custom_id: customId } : {}),
-          // Telefono checkout per il webhook Sendcloud (PayPal spesso non lo passa).
-          invoice_id: `t:${phone}|e:${shipTo.email}`.slice(0, 127),
+          // Telefono/email checkout per il webhook (PayPal spesso non li passa).
+          // PayPal blocks a second payment with the same invoice_id → unique prefix per order;
+          // drop the email rather than truncate it into a wrong address.
+          invoice_id: checkoutInvoiceId(phone, shipTo.email),
           amount: {
             currency_code: "EUR",
             value: money(order.total),

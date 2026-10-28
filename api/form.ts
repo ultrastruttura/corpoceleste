@@ -175,7 +175,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const sent = await sendNewsletterConfirmEmail({ email, locale });
     if (!sent.ok) {
       console.error("form: newsletter confirm mail failed", sent.error);
-      return res.status(502).send("Mail failed");
+      // Reuse client _next (locale path) so we never show a blank Vercel error page.
+      try {
+        const errNext = new URL(next);
+        errNext.searchParams.set("from", "newsletter-error");
+        return res.redirect(303, errNext.toString());
+      } catch {
+        return res.redirect(303, `${siteBase()}/grazie/?from=newsletter-error`);
+      }
     }
     return res.redirect(303, next);
   }

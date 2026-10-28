@@ -17,13 +17,14 @@ import {
 } from "../server/stock/reserve-paypal-checkout.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
-/** Only capture orders we created (stock hold) or APPROVED under our merchant. */
+/** Only capture orders we created and still hold. Fallback to APPROVED only if the hold store is down. */
 async function assertCapturableOrder(orderId: string): Promise<{ ok: true } | { ok: false; error: string }> {
   if ((process.env.GITHUB_TOKEN || "").trim()) {
     try {
       const { getLedger, paypalHoldId } = await import("../server/github-stock.js");
       const hold = await getLedger(paypalHoldId(orderId));
       if (hold?.kind === "paypal_hold" && !hold.releasedAt) return { ok: true };
+      return { ok: false, error: "Unknown order" };
     } catch (err) {
       console.warn("paypal-create: hold lookup for capture", err);
     }

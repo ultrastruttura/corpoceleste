@@ -40,6 +40,17 @@ function bind() {
   bindAutoplayVideos();
   void refreshLiveStock().then(() => renderCart());
 
+  document.querySelectorAll<HTMLFormElement>(".newsletter-form").forEach((form) => {
+    const consent = form.querySelector<HTMLInputElement>("[data-newsletter-consent]");
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (!consent || !submit) return;
+    const sync = () => {
+      submit.disabled = !consent.checked;
+    };
+    consent.addEventListener("change", sync);
+    sync();
+  });
+
   document.querySelectorAll<HTMLInputElement>("[data-next-grazie]").forEach((node) => {
     const from = node.getAttribute("data-next-grazie") || "form";
     const prefix = document.documentElement.dataset.localePrefix || "";

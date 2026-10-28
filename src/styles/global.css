@@ -1644,9 +1644,16 @@ body.cart-open {
   cursor: pointer;
 }
 
-.newsletter-row button:hover {
-  background: var(--btn-hover);
-  border-color: var(--btn-hover);
+@media (hover: hover) {
+  .newsletter-row button:hover:not(:disabled) {
+    background: var(--btn-hover);
+    border-color: var(--btn-hover);
+  }
+}
+
+.newsletter-row button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .footer-bar {

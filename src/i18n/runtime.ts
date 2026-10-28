@@ -14,6 +14,7 @@ export function thanksMessage(locale: Locale, from: string) {
   const map: Record<string, { title: string; body: string; order?: boolean }> = {
     contatto: { title: copy.received, body: copy.contact },
     newsletter: { title: copy.received, body: copy.newsletter },
+    "newsletter-error": { title: copy.received, body: copy.newsletterError },
     ristampa: { title: copy.received, body: copy.reprint },
     bio: { title: copy.received, body: copy.contact },
     corsi: { title: copy.received, body: copy.waitlist },
