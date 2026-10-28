@@ -1985,7 +1985,7 @@ body:has(.site-announce) .shop-home-stage {
 */
 .shop-home-stage__media {
   position: absolute;
-  inset: 0;
+  inset: -2.5%;
   display: block;
 }
 
