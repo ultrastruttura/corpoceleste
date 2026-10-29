@@ -1,18 +1,18 @@
 ---
 title: Stampa 1
-artist: content/artists/artista-9.md
+artist: null
 price: 90
 status: soldout
 kind: print
 nuovo: true
-createdAt: 2018-05-15T00:00:00.000Z
-color: "#141414"
+createdAt: '2018-05-15T00:00:00.000Z'
+color: '#141414'
 colorName: Nero
-composition: ""
+composition: ''
 sizes:
-  - "50x70"
+  - 50x70
 stock:
-  "50x70": 8
+  50x70: 8
 images: []
 seoDescription:
   it: Stampa 1 di Artista 9 — placeholder Corpoceleste.
@@ -23,3 +23,4 @@ description:
   en: Placeholder. Content coming soon.
   de: Platzhalter. Inhalt folgt.
 ---
+
