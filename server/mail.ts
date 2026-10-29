@@ -20,20 +20,27 @@ function escapeHtml(s: string) {
     .replace(/"/g, "&quot;");
 }
 
-/** Absolute logo URL for email clients (Gmail loads hosted images). */
+/** Wordmark for email header (hosted on the static site so Gmail can fetch it). */
 export function emailLogoUrl() {
   return `${siteBase()}/brand/logo-scritta-sm.png`;
 }
 
-/** Wrap body HTML with Corpoceleste wordmark — visible when the message is opened in Gmail. */
+/** Star mark — same asset family as the site favicon. */
+export function emailStarUrl() {
+  return `${siteBase()}/brand/logo-stella-256.png`;
+}
+
+/** Wrap body HTML with Corpoceleste star + wordmark. */
 export function wrapEmailHtml(innerHtml: string) {
-  const logo = emailLogoUrl();
+  const star = emailStarUrl();
+  const word = emailLogoUrl();
   return `<!DOCTYPE html>
 <html lang="it">
 <body style="margin:0;padding:0;background:#ffffff;">
   <div style="max-width:560px;margin:0 auto;padding:28px 20px;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.5;color:#141414;">
     <p style="margin:0 0 28px;">
-      <img src="${logo}" alt="Corpoceleste" width="200" height="18" style="display:block;width:200px;max-width:60%;height:auto;border:0;" />
+      <img src="${star}" alt="" width="48" height="48" style="display:block;width:48px;height:48px;border:0;" />
+      <img src="${word}" alt="Corpoceleste" width="200" height="18" style="display:block;width:200px;max-width:60%;height:auto;border:0;margin-top:12px;" />
     </p>
     ${innerHtml}
   </div>

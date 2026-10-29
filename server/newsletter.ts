@@ -8,12 +8,14 @@ import {
   upsertNewsletterContact,
 } from "./resend-marketing.js";
 
-/** Public Vercel API origin (newsletter confirm must not hit GitHub Pages). */
+/**
+ * Public Vercel API origin (confirm / unsub links in mail).
+ * Never use VERCEL_URL — that is a per-deploy preview host and breaks in Gmail.
+ */
 function apiPublicBase() {
   const raw = (
     process.env.SITE_API_URL ||
     process.env.FORM_API_BASE ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
     "https://corpoceleste.vercel.app"
   ).trim();
   return raw.replace(/\/$/, "");
