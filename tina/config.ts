@@ -72,8 +72,24 @@ export default defineConfig({
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/(^-|-$)/g, ""),
           },
+          // Prefill so object sections (stock / SEO / description) are reachable
+          // without filling every field first (Tina blocks navigation on invalid forms).
+          defaultItem: () => ({
+            price: 40,
+            status: "available",
+            kind: "shirt",
+            nuovo: false,
+            createdAt: new Date().toISOString(),
+            colorName: "Nero",
+            sizes: ["S", "M", "L", "XL", "XXL"],
+            stock: { S: 0, M: 0, L: 0, XL: 0, XXL: 0 },
+            description: { it: "", en: "", de: "" },
+            seoDescription: { it: "", en: "", de: "" },
+          }),
         },
         fields: [
+          // Only title stays required: Tina blocks Magazzino/SEO/Descrizione while any
+          // sibling required field on the parent form is empty.
           { type: "string", name: "title", label: "Titolo", isTitle: true, required: true },
           {
             type: "reference",
@@ -84,12 +100,12 @@ export default defineConfig({
             collections: ["artist"],
             required: false,
           },
-          { type: "number", name: "price", label: "Prezzo (€)", required: true },
+          { type: "number", name: "price", label: "Prezzo (€)", required: false },
           {
             type: "string",
             name: "status",
             label: "Stato",
-            required: true,
+            required: false,
             options: [
               { value: "available", label: "Disponibile" },
               { value: "preorder", label: "Pre-order" },
@@ -102,7 +118,7 @@ export default defineConfig({
             label: "Tipo",
             description:
               "Per le didascalie immagine: maglia, stampa su carta, o edizione/pezzo d’artista.",
-            required: true,
+            required: false,
             options: [
               { value: "shirt", label: "Maglia" },
               { value: "print", label: "Stampa (foglio)" },
@@ -118,12 +134,12 @@ export default defineConfig({
             collections: ["fitModel"],
           },
           { type: "boolean", name: "nuovo", label: "Nuovo (in cima allo shop)" },
-          { type: "datetime", name: "createdAt", label: "Data", required: true },
+          { type: "datetime", name: "createdAt", label: "Data", required: false },
           {
             type: "string",
             name: "colorName",
             label: "Colore",
-            required: true,
+            required: false,
             options: [
               { value: "Nero", label: "Nero" },
               { value: "Viola", label: "Viola" },
