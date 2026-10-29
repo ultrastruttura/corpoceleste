@@ -13,7 +13,8 @@ composition: ""
 sizes:
   - UNI
 stock:
-  UNI: 19images: []
+  UNI: 19
+images: []
 seoDescription:
   it: Articolo temporaneo per testare il checkout PayPal (ritiro, senza spedizione).
   en: Temporary item to test PayPal checkout (pickup, no shipping).

@@ -6,8 +6,9 @@ import type { OrderLine } from "./paypal.js";
  */
 export function stockQtyLineRe(size: string): RegExp {
   const sizeEsc = size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // Use [ \t] not \s — in JS \s includes \n and would eat the line break before the next FM key.
   return new RegExp(
-    `^([ \\t]+)((?:"${sizeEsc}"|'${sizeEsc}'|${sizeEsc}):\\s*)(\\d+)\\s*$`,
+    `^([ \\t]+)((?:"${sizeEsc}"|'${sizeEsc}'|${sizeEsc}):[ \\t]*)(\\d+)[ \\t]*$`,
     "m",
   );
 }
