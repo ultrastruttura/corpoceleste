@@ -363,8 +363,8 @@ const it = {
     withdrawal: "Diritto di recesso: 14 giorni",
     withdrawalBody:
       "Hai 14 giorni per recedere senza dover dare motivazioni. Il termine parte dal giorno in cui tu (o una persona da te indicata) ricevi fisicamente il pacco; se l’ordine contiene più pezzi consegnati separatamente, dall’ultimo.",
-    withdrawalHow: "Per recedere puoi usare la funzione online, oppure scrivermi via email una dichiarazione esplicita:",
-    withdrawalLink: "recedere dal contratto qui",
+    withdrawalHow: "Per recedere puoi usare il modulo online, oppure scrivermi via email:",
+    withdrawalLink: "apri il modulo",
     withdrawalEffects:
       "Dopo la comunicazione hai 14 giorni per rispedire il pezzo. Rimborso tutto quello che hai pagato, spedizione standard di andata compresa, entro 14 giorni dal giorno in cui ricevo la tua comunicazione di recesso, con lo stesso mezzo di pagamento che hai usato. Posso sospendere il rimborso finché non ricevo il pezzo o la prova che l’hai rispedito, se arriva prima. Il costo della restituzione è a tuo carico. Rispondi della diminuzione di valore se hai usato il pezzo oltre quanto serve a verificarne natura e caratteristiche: provalo come faresti in negozio.",
     withdrawalExceptions:
@@ -381,8 +381,8 @@ const it = {
   },
   withdrawal: {
     title: "Recesso",
-    entry: "Recedere dal contratto qui",
-    lede: "Modulo online per comunicare il recesso da un ordine fatto su questo sito. Hai 14 giorni dalla consegna.",
+    entry: "Modulo di recesso",
+    lede: "Comunica il recesso di un ordine fatto su questo sito. Hai 14 giorni dalla consegna.",
     intro:
       "Compila i dati, rileggi il riepilogo e conferma. Dopo la conferma ricevi via email l’avviso di ricevimento con il contenuto della dichiarazione, la data e l’ora di trasmissione.",
     legend: "Dichiarazione di recesso",
@@ -768,8 +768,8 @@ const en: typeof it = {
     withdrawal: "Right of withdrawal: 14 days",
     withdrawalBody:
       "You have 14 days to withdraw without giving any reason. The period starts the day you (or someone you nominate) physically receive the parcel; if the order contains several pieces delivered separately, from the last one.",
-    withdrawalHow: "To withdraw you can use the online function, or send me an explicit statement by email:",
-    withdrawalLink: "withdraw from the contract here",
+    withdrawalHow: "To withdraw you can use the online form, or email me:",
+    withdrawalLink: "open the form",
     withdrawalEffects:
       "After notifying me you have 14 days to send the piece back. I refund everything you paid, including standard outbound shipping, within 14 days of the day I receive your withdrawal notice, using the same payment method you used. I may withhold the refund until I have the piece back or proof that you sent it, whichever comes first. Return shipping is at your cost. You are liable for any diminished value if you handled the piece beyond what is needed to establish its nature and characteristics: try it as you would in a shop.",
     withdrawalExceptions:
@@ -786,8 +786,8 @@ const en: typeof it = {
   },
   withdrawal: {
     title: "Withdrawal",
-    entry: "Withdraw from the contract here",
-    lede: "Online form to declare withdrawal from an order placed on this site. You have 14 days from delivery.",
+    entry: "Withdrawal form",
+    lede: "Tell me you want to withdraw from an order on this site. You have 14 days from delivery.",
     intro:
       "Fill in the details, read the summary and confirm. After confirming you receive an acknowledgement by email with the content of the declaration and the date and time it was sent.",
     legend: "Declaration of withdrawal",
@@ -1173,8 +1173,8 @@ const de: typeof it = {
     withdrawal: "Widerrufsrecht: 14 Tage",
     withdrawalBody:
       "Du hast 14 Tage Zeit, ohne Angabe von Gründen zu widerrufen. Die Frist beginnt an dem Tag, an dem du (oder eine von dir benannte Person) das Paket in Besitz nimmst; bei mehreren getrennt gelieferten Stücken ab dem letzten.",
-    withdrawalHow: "Zum Widerruf kannst du die Online-Funktion nutzen oder mir eine eindeutige Erklärung per E-Mail schicken:",
-    withdrawalLink: "hier vom Vertrag zurücktreten",
+    withdrawalHow: "Zum Widerruf kannst du das Online-Formular nutzen oder mir eine E-Mail schreiben:",
+    withdrawalLink: "Formular öffnen",
     withdrawalEffects:
       "Nach der Mitteilung hast du 14 Tage, um das Stück zurückzuschicken. Ich erstatte alles, was du gezahlt hast, inklusive Standardversand hin, innerhalb von 14 Tagen ab dem Tag, an dem mich dein Widerruf erreicht, über dasselbe Zahlungsmittel. Ich kann die Erstattung zurückhalten, bis ich das Stück zurückhabe oder du den Rückversand nachweist, je nachdem, was früher eintritt. Die Rücksendekosten trägst du. Für einen Wertverlust haftest du, wenn du das Stück über das hinaus benutzt hast, was zur Prüfung von Beschaffenheit und Eigenschaften nötig ist: probier es wie im Laden.",
     withdrawalExceptions:
@@ -1191,8 +1191,8 @@ const de: typeof it = {
   },
   withdrawal: {
     title: "Widerruf",
-    entry: "Hier vom Vertrag zurücktreten",
-    lede: "Online-Formular, um den Widerruf einer auf dieser Website getätigten Bestellung zu erklären. Du hast 14 Tage ab Lieferung.",
+    entry: "Widerrufsformular",
+    lede: "Teile den Widerruf einer Bestellung auf dieser Website mit. Du hast 14 Tage ab Lieferung.",
     intro:
       "Daten ausfüllen, Zusammenfassung lesen, bestätigen. Nach der Bestätigung bekommst du per E-Mail eine Empfangsbestätigung mit dem Inhalt der Erklärung sowie Datum und Uhrzeit der Übermittlung.",
     legend: "Widerrufserklärung",
