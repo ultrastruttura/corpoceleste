@@ -5,6 +5,7 @@ import {
   listDeals,
   upsertDeal,
   dealSummary,
+  summarizeDeals,
 } from "../../server/portal/deals.js";
 import { json, readJson, requireUser } from "../../server/portal/http.js";
 
@@ -26,9 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       const deals =
         user.role === "admin" ? await listDeals() : await listDeals(user.id);
-      const summaries = [];
-      for (const d of deals) summaries.push(await dealSummary(d));
-      return json(res, 200, { deals: summaries });
+      return json(res, 200, { deals: await summarizeDeals(deals) });
     }
 
     if (user.role !== "admin") return json(res, 403, { error: "Admin only" });

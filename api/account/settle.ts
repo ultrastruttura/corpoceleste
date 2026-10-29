@@ -3,6 +3,7 @@ import {
   artistDashboard,
   deleteSettlement,
   listSettlements,
+  paidTotalsByUser,
   upsertSettlement,
 } from "../../server/portal/deals.js";
 import { json, readJson, requireUser } from "../../server/portal/http.js";
@@ -14,6 +15,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     if (req.method === "GET") {
+      if (req.query.paid_totals === "1") {
+        if (user.role !== "admin") return json(res, 403, { error: "Admin only" });
+        return json(res, 200, { totals: await paidTotalsByUser() });
+      }
       const userId =
         user.role === "admin" && req.query.user_id
           ? String(req.query.user_id)

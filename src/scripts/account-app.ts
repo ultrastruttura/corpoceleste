@@ -218,14 +218,22 @@ if (!root || !app) {
       const data = (await apiFetch(base, "auth", {
         method: "POST",
         body: JSON.stringify({ action: "me" }),
-      })) as { user: User | null };
+      })) as {
+        user: User | null;
+        mailConfigured?: boolean;
+        portalAdminEmail?: string | null;
+      };
       if (!data.user) {
         clearSession();
         renderLogin();
         return;
       }
-      if (data.user.role === "admin") await renderAdmin(data.user);
-      else await renderArtist(data.user);
+      if (data.user.role === "admin") {
+        await renderAdmin(data.user, {
+          mailConfigured: data.mailConfigured,
+          portalAdminEmail: data.portalAdminEmail,
+        });
+      } else await renderArtist(data.user);
     } catch {
       clearSession();
       renderLogin();
@@ -686,13 +694,67 @@ if (!root || !app) {
 
   let adminHashBound = false;
   let adminUserRef: User | null = null;
+  type AdminShellCache = {
+    users: User[];
+    deals: DealSummary[];
+    mailConfigured?: boolean;
+    portalAdminEmail?: string | null;
+    fetchedAt: number;
+  };
+  let adminShellCache: AdminShellCache | null = null;
+  const ADMIN_SHELL_TTL_MS = 45_000;
 
-  async function renderAdmin(user: User) {
+  function invalidateAdminShell() {
+    adminShellCache = null;
+  }
+
+  async function loadAdminShell(opts?: {
+    force?: boolean;
+    mailConfigured?: boolean;
+    portalAdminEmail?: string | null;
+  }): Promise<AdminShellCache> {
+    const force = Boolean(opts?.force);
+    const fresh =
+      adminShellCache && Date.now() - adminShellCache.fetchedAt < ADMIN_SHELL_TTL_MS;
+    if (!force && fresh && adminShellCache) {
+      if (opts?.mailConfigured !== undefined) {
+        adminShellCache.mailConfigured = opts.mailConfigured;
+      }
+      if (opts?.portalAdminEmail !== undefined) {
+        adminShellCache.portalAdminEmail = opts.portalAdminEmail;
+      }
+      return adminShellCache;
+    }
+    const [usersData, dealsData] = await Promise.all([
+      apiFetch(base, "users") as Promise<{ users: User[] }>,
+      apiFetch(base, "deals") as Promise<{ deals: DealSummary[] }>,
+    ]);
+    adminShellCache = {
+      users: usersData.users,
+      deals: dealsData.deals,
+      mailConfigured:
+        opts?.mailConfigured ?? adminShellCache?.mailConfigured,
+      portalAdminEmail:
+        opts?.portalAdminEmail ?? adminShellCache?.portalAdminEmail,
+      fetchedAt: Date.now(),
+    };
+    return adminShellCache;
+  }
+
+  async function renderAdmin(
+    user: User,
+    opts?: {
+      force?: boolean;
+      mailConfigured?: boolean;
+      portalAdminEmail?: string | null;
+    },
+  ) {
     adminUserRef = user;
     root!.classList.add("account-page--admin");
     if (!adminHashBound) {
       adminHashBound = true;
       window.addEventListener("hashchange", () => {
+        // Tab switches reuse cached users/deals — no full refetch.
         if (adminUserRef) void renderAdmin(adminUserRef);
       });
     }
@@ -701,20 +763,15 @@ if (!root || !app) {
     }
     const route = parseAdminRoute();
 
-    const usersData = (await apiFetch(base, "users")) as { users: User[] };
-    const dealsData = (await apiFetch(base, "deals")) as { deals: DealSummary[] };
-    const meData = (await apiFetch(base, "auth", {
-      method: "POST",
-      body: JSON.stringify({ action: "me" }),
-    })) as { mailConfigured?: boolean; portalAdminEmail?: string | null };
-    const artists = usersData.users.filter((u) => u.role === "artist");
+    const shellData = await loadAdminShell(opts);
+    const artists = shellData.users.filter((u) => u.role === "artist");
 
     app!.innerHTML = "";
     app!.append(toolbar(user));
     const title = document.querySelector(".account-page > h1");
     if (title) title.textContent = "Area personale";
 
-    if (meData.mailConfigured === false) {
+    if (shellData.mailConfigured === false) {
       app!.append(
         el(
           "p",
@@ -758,17 +815,18 @@ if (!root || !app) {
     const main = el("div", "account-shell__main");
     if (route.name === "orders") await renderAdminOrders(main);
     else if (route.name === "newsletter") await renderAdminNewsletter(main);
-    else if (route.name === "artists") await renderAdminArtists(main, user, artists, dealsData.deals);
+    else if (route.name === "artists")
+      await renderAdminArtists(main, user, artists, shellData.deals);
     else if (route.name === "artist") {
       const artist = artists.find((a) => a.id === route.id);
       if (!artist) {
         history.replaceState(null, "", "#artisti");
-        await renderAdminArtists(main, user, artists, dealsData.deals);
+        await renderAdminArtists(main, user, artists, shellData.deals);
       } else {
-        await renderAdminArtistDetail(main, user, artist, dealsData.deals);
+        await renderAdminArtistDetail(main, user, artist, shellData.deals);
       }
     } else {
-      await renderAdminSettings(main, user, artists, dealsData.deals);
+      await renderAdminSettings(main, user, artists, shellData.deals);
     }
 
     shell.append(main);
@@ -852,7 +910,7 @@ if (!root || !app) {
         <input name="subject" type="text" required maxlength="200" placeholder="Es. Nuove edizioni in stampa" />
       </label>
       <label class="account-stack-form__field"><span>Testo</span>
-        <textarea name="text" required rows="10" placeholder="Scrivi qui. Due a capo = nuovo paragrafo. In coda verrà aggiunto il link Disiscriviti di Resend."></textarea>
+        <textarea name="text" required rows="10" placeholder="Scrivi qui. Due a capo = nuovo paragrafo. In coda: link Disiscriviti Resend (sincronizza elenco + mail a te)."></textarea>
       </label>
       <button class="btn account-action-form__btn" type="submit">Invia a tutti gli iscritti Resend</button>
     `;
@@ -1168,12 +1226,18 @@ if (!root || !app) {
     }
     table.append(head);
 
+    const paidData = (await apiFetch(base, "settle?paid_totals=1")) as {
+      totals: Record<string, number>;
+    };
+    const paid = paidData.totals || {};
+
     for (const a of artists) {
-      const dash = (await apiFetch(
-        base,
-        `settle?dashboard=1&user_id=${encodeURIComponent(a.id)}`,
-      )) as Dashboard;
-      const dealCount = deals.filter((d) => d.deal.user_id === a.id).length;
+      const artistDeals = deals.filter((d) => d.deal.user_id === a.id);
+      const artistDueTotal = euroLocal(
+        artistDeals.reduce((s, d) => s + d.artistDue, 0),
+      );
+      const paidTotal = euroLocal(paid[a.id] || 0);
+      const outstanding = euroLocal(artistDueTotal - paidTotal);
       const row = el("button", "account-table__row") as HTMLButtonElement;
       row.type = "button";
       row.innerHTML = `
@@ -1181,9 +1245,9 @@ if (!root || !app) {
           <strong>${escapeHtml(a.name || a.email)}</strong>
           <small>${escapeHtml(a.email)}${a.artist_slug ? ` · ${escapeHtml(a.artist_slug)}` : ""}</small>
         </span>
-        <span class="account-table__num">${dealCount}</span>
-        <span class="account-table__num">${money(dash.artistDueTotal)}</span>
-        <span class="account-table__num account-table__emphasis">${money(dash.outstanding)}</span>
+        <span class="account-table__num">${artistDeals.length}</span>
+        <span class="account-table__num">${money(artistDueTotal)}</span>
+        <span class="account-table__num account-table__emphasis">${money(outstanding)}</span>
       `;
       row.addEventListener("click", () => {
         setAdminRoute({ name: "artist", id: a.id });
@@ -1287,7 +1351,8 @@ if (!root || !app) {
               external_id: `bank-${Date.now()}`,
             }),
           });
-          await renderAdmin(user);
+          invalidateAdminShell();
+          await renderAdmin(user, { force: true });
         });
         wrap.append(bank);
 
@@ -1303,7 +1368,8 @@ if (!root || !app) {
         delDeal.addEventListener("click", async () => {
           if (!confirm("Eliminare questo deal?")) return;
           await apiFetch(base, `deals?id=${encodeURIComponent(s.deal.id)}`, { method: "DELETE" });
-          await renderAdmin(user);
+          invalidateAdminShell();
+          await renderAdmin(user, { force: true });
         });
         actions.append(editBtn, delDeal);
         wrap.append(actions);
@@ -1353,7 +1419,8 @@ if (!root || !app) {
           }),
         });
         msg.textContent = "Deal salvato.";
-        await renderAdmin(user);
+        invalidateAdminShell();
+        await renderAdmin(user, { force: true });
       } catch (err) {
         msg.textContent = err instanceof Error ? err.message : "Errore";
       }
@@ -1396,7 +1463,8 @@ if (!root || !app) {
           note: "saldo mensile",
         }),
       });
-      await renderAdmin(user);
+      invalidateAdminShell();
+      await renderAdmin(user, { force: true });
     });
     conti.append(settle);
 
@@ -1405,7 +1473,8 @@ if (!root || !app) {
         settlementsByMonth(dashFull.settlements, {
           onUndo: async (id) => {
             await apiFetch(base, `settle?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-            await renderAdmin(user);
+            invalidateAdminShell();
+            await renderAdmin(user, { force: true });
           },
         }),
       );
@@ -1563,7 +1632,8 @@ if (!root || !app) {
         } else {
           setMsg(msg, data.message || "Invito inviato.");
         }
-        await renderAdmin(user);
+        invalidateAdminShell();
+        await renderAdmin(user, { force: true });
       } catch (err) {
         setMsg(msg, err instanceof Error ? err.message : "Errore");
       }
@@ -1595,7 +1665,8 @@ if (!root || !app) {
         del.addEventListener("click", async () => {
           if (!confirm(`Rimuovere ${a.email}?`)) return;
           await apiFetch(base, `users?id=${encodeURIComponent(a.id)}`, { method: "DELETE" });
-          await renderAdmin(user);
+          invalidateAdminShell();
+          await renderAdmin(user, { force: true });
         });
         row.append(open, del);
         table.append(row);

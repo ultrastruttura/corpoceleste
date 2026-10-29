@@ -1,8 +1,9 @@
-import { createClient, type Client } from "@libsql/client";
+import { createClient, type Client, type InStatement } from "@libsql/client";
 import { PORTAL_SCHEMA } from "./schema.js";
 
 let client: Client | null = null;
 let migrated = false;
+let migrating: Promise<void> | null = null;
 
 export function portalConfigured() {
   const url = (process.env.TURSO_DATABASE_URL || process.env.LIBSQL_URL || "").trim();
@@ -26,28 +27,37 @@ export function getDb(): Client {
 
 export async function ensureSchema() {
   if (migrated) return;
-  const db = getDb();
-  const statements = PORTAL_SCHEMA.split(";")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-  for (const sql of statements) {
-    await db.execute(sql);
-  }
-  // Additive migrations for existing Turso DBs
-  for (const sql of [
-    `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
-    `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
-    `ALTER TABLE shop_orders ADD COLUMN paid_at TEXT`,
-    `ALTER TABLE newsletter_subscribers ADD COLUMN unsubscribed_at TEXT`,
-    `ALTER TABLE newsletter_subscribers ADD COLUMN resend_contact_id TEXT`,
-  ]) {
-    try {
-      await db.execute(sql);
-    } catch {
-      /* column already exists */
+  if (migrating) return migrating;
+  migrating = (async () => {
+    const db = getDb();
+    const statements = PORTAL_SCHEMA.split(";")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0)
+      .map((sql): InStatement => ({ sql }));
+    // One round-trip instead of N sequential CREATE/INDEX calls to Turso.
+    if (statements.length) await db.batch(statements, "write");
+    for (const sql of [
+      `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
+      `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
+      `ALTER TABLE shop_orders ADD COLUMN paid_at TEXT`,
+      `ALTER TABLE newsletter_subscribers ADD COLUMN unsubscribed_at TEXT`,
+      `ALTER TABLE newsletter_subscribers ADD COLUMN resend_contact_id TEXT`,
+    ]) {
+      try {
+        await db.execute(sql);
+      } catch {
+        /* column already exists */
+      }
     }
+    migrated = true;
+    migrating = null;
+  })();
+  try {
+    await migrating;
+  } catch (err) {
+    migrating = null;
+    throw err;
   }
-  migrated = true;
 }
 
 export function newId(prefix = "") {

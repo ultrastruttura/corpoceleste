@@ -28,10 +28,15 @@ function magicMinutes() {
   return Number(process.env.PORTAL_MAGIC_MINUTES || 30);
 }
 
+/** Warm-instance cache — avoid UPDATE users on every API hit. */
+let cachedAdmin: PortalUser | null = null;
+let adminEnsuredFor = "";
+
 export async function ensureAdmin() {
   await ensureSchema();
   const email = portalAdminEmail();
   if (!email) return null;
+  if (adminEnsuredFor === email && cachedAdmin) return cachedAdmin;
   const db = getDb();
   const adminName = portalAdminName();
   const existing = await db.execute({
@@ -42,10 +47,14 @@ export async function ensureAdmin() {
   if (existing.rows[0]) {
     const row = existing.rows[0];
     const id = String(row.id);
-    await db.execute({
-      sql: "UPDATE users SET role = 'admin', name = ? WHERE id = ?",
-      args: [adminName, id],
-    });
+    const alreadyOk =
+      String(row.role) === "admin" && String(row.name || "") === adminName;
+    if (!alreadyOk) {
+      await db.execute({
+        sql: "UPDATE users SET role = 'admin', name = ? WHERE id = ?",
+        args: [adminName, id],
+      });
+    }
     admin = {
       id,
       email,
@@ -66,6 +75,8 @@ export async function ensureAdmin() {
     sql: "UPDATE users SET role = 'artist' WHERE role = 'admin' AND email != ?",
     args: [email],
   });
+  adminEnsuredFor = email;
+  cachedAdmin = admin;
   return admin;
 }
 

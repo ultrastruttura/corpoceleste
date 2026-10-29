@@ -31,18 +31,71 @@ function mapDeal(row: Record<string, unknown>, costs: Array<DealCost & { id: str
   };
 }
 
+function mapCost(r: Record<string, unknown>) {
+  return {
+    id: String(r.id),
+    label: String(r.label),
+    amount: Number(r.amount),
+    per_unit: Number(r.per_unit) === 1,
+  };
+}
+
 async function costsFor(dealId: string) {
   const db = getDb();
   const res = await db.execute({
     sql: "SELECT id, label, amount, per_unit FROM deal_costs WHERE deal_id = ? ORDER BY label",
     args: [dealId],
   });
-  return res.rows.map((r) => ({
+  return res.rows.map((r) => mapCost(r as Record<string, unknown>));
+}
+
+async function costsByDealIds(dealIds: string[]) {
+  const byDeal = new Map<string, Array<DealCost & { id: string }>>();
+  for (const id of dealIds) byDeal.set(id, []);
+  if (!dealIds.length) return byDeal;
+  const db = getDb();
+  const placeholders = dealIds.map(() => "?").join(",");
+  const res = await db.execute({
+    sql: `SELECT id, deal_id, label, amount, per_unit FROM deal_costs WHERE deal_id IN (${placeholders}) ORDER BY label`,
+    args: dealIds,
+  });
+  for (const row of res.rows) {
+    const did = String(row.deal_id);
+    const list = byDeal.get(did);
+    if (list) list.push(mapCost(row as Record<string, unknown>));
+  }
+  return byDeal;
+}
+
+function mapSale(r: Record<string, unknown>) {
+  return {
     id: String(r.id),
-    label: String(r.label),
-    amount: Number(r.amount),
-    per_unit: Number(r.per_unit) === 1,
-  }));
+    deal_id: String(r.deal_id),
+    qty: Number(r.qty),
+    unit_price: Number(r.unit_price),
+    size: String(r.size || ""),
+    source: String(r.source) as "paypal" | "bank" | "manual",
+    external_id: r.external_id ? String(r.external_id) : null,
+    sold_at: String(r.sold_at),
+  };
+}
+
+async function salesByDealIds(dealIds: string[]) {
+  const byDeal = new Map<string, ReturnType<typeof mapSale>[]>();
+  for (const id of dealIds) byDeal.set(id, []);
+  if (!dealIds.length) return byDeal;
+  const db = getDb();
+  const placeholders = dealIds.map(() => "?").join(",");
+  const res = await db.execute({
+    sql: `SELECT * FROM sales WHERE deal_id IN (${placeholders}) ORDER BY sold_at DESC`,
+    args: dealIds,
+  });
+  for (const row of res.rows) {
+    const sale = mapSale(row as Record<string, unknown>);
+    const list = byDeal.get(sale.deal_id);
+    if (list) list.push(sale);
+  }
+  return byDeal;
 }
 
 export async function listDeals(userId?: string) {
@@ -54,12 +107,12 @@ export async function listDeals(userId?: string) {
         args: [userId],
       })
     : await db.execute("SELECT * FROM deals ORDER BY created_at DESC");
-  const out: Deal[] = [];
-  for (const row of res.rows) {
+  const ids = res.rows.map((row) => String(row.id));
+  const costsMap = await costsByDealIds(ids);
+  return res.rows.map((row) => {
     const id = String(row.id);
-    out.push(mapDeal(row as Record<string, unknown>, await costsFor(id)));
-  }
-  return out;
+    return mapDeal(row as Record<string, unknown>, costsMap.get(id) || []);
+  });
 }
 
 export async function getDeal(id: string) {
@@ -153,21 +206,22 @@ export async function deleteDeal(id: string) {
 
 export async function listSales(dealId: string) {
   await ensureSchema();
+  const map = await salesByDealIds([dealId]);
+  return map.get(dealId) || [];
+}
+
+/** Paid settlement totals keyed by user_id (one query). */
+export async function paidTotalsByUser() {
+  await ensureSchema();
   const db = getDb();
-  const res = await db.execute({
-    sql: "SELECT * FROM sales WHERE deal_id = ? ORDER BY sold_at DESC",
-    args: [dealId],
-  });
-  return res.rows.map((r) => ({
-    id: String(r.id),
-    deal_id: String(r.deal_id),
-    qty: Number(r.qty),
-    unit_price: Number(r.unit_price),
-    size: String(r.size || ""),
-    source: String(r.source) as "paypal" | "bank" | "manual",
-    external_id: r.external_id ? String(r.external_id) : null,
-    sold_at: String(r.sold_at),
-  }));
+  const res = await db.execute(
+    "SELECT user_id, COALESCE(SUM(amount), 0) AS total FROM settlements GROUP BY user_id",
+  );
+  const map: Record<string, number> = {};
+  for (const r of res.rows) {
+    map[String(r.user_id)] = euro(Number(r.total));
+  }
+  return map;
 }
 
 export async function recordSale(input: {
@@ -297,8 +351,7 @@ export async function deleteSettlement(id: string) {
   await db.execute({ sql: "DELETE FROM settlements WHERE id = ?", args: [id] });
 }
 
-export async function dealSummary(deal: Deal) {
-  const sales = await listSales(deal.id);
+function summaryFromSales(deal: Deal, sales: ReturnType<typeof mapSale>[]) {
   const share = computeShare({
     sales: sales.map((s) => ({ qty: s.qty, unit_price: s.unit_price })),
     costs: deal.costs,
@@ -309,13 +362,23 @@ export async function dealSummary(deal: Deal) {
   return { deal, sales, ...share };
 }
 
+export async function dealSummary(deal: Deal) {
+  const sales = await listSales(deal.id);
+  return summaryFromSales(deal, sales);
+}
+
+/** Summaries for many deals with 1 sales query instead of N. */
+export async function summarizeDeals(deals: Deal[]) {
+  const salesMap = await salesByDealIds(deals.map((d) => d.id));
+  return deals.map((d) => summaryFromSales(d, salesMap.get(d.id) || []));
+}
+
 export async function artistDashboard(userId: string) {
   const deals = await listDeals(userId);
-  const summaries = [];
-  for (const deal of deals) {
-    summaries.push(await dealSummary(deal));
-  }
-  const settlements = await listSettlements(userId);
+  const [summaries, settlements] = await Promise.all([
+    summarizeDeals(deals),
+    listSettlements(userId),
+  ]);
   const artistDueTotal = euro(summaries.reduce((s, x) => s + x.artistDue, 0));
   const paidTotal = euro(settlements.reduce((s, x) => s + x.amount, 0));
   const outstanding = euro(artistDueTotal - paidTotal);
