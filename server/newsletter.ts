@@ -254,21 +254,72 @@ export async function confirmNewsletterSubscriber(email: string, locale: string)
   return { stored: true as const, resend: resendOk, resendError, welcomed };
 }
 
-export async function unsubscribeNewsletterSubscriber(email: string) {
+async function notifyShopUnsubscribe(email: string) {
+  const shop = (process.env.SHOP_EMAIL || "").trim();
+  if (!shop) {
+    console.warn("newsletter: SHOP_EMAIL unset — skip unsub notify");
+    return;
+  }
+  const result = await sendMail({
+    to: shop,
+    subject: `Newsletter: disiscrizione — ${email}`,
+    text: [
+      "Qualcuno si è disiscritto dalla newsletter Corpoceleste.",
+      "",
+      `Email: ${email}`,
+      "",
+      "L’indirizzo resta in elenco come disiscritto (non riceverà più invii).",
+    ].join("\n"),
+  });
+  if (!result.ok) {
+    console.error("newsletter: unsub notify failed", result.error);
+  }
+}
+
+export async function unsubscribeNewsletterSubscriber(
+  email: string,
+  opts?: { skipResend?: boolean },
+) {
   const { portalConfigured, ensureSchema, getDb } = await import("./portal/db.js");
-  const normalized = email.toLowerCase();
+  const normalized = email.toLowerCase().trim();
   let stored = false;
+  let wasActive = true;
   if (portalConfigured()) {
     await ensureSchema();
     const db = getDb();
+    const prior = await db.execute({
+      sql: `SELECT unsubscribed_at FROM newsletter_subscribers WHERE email = ?`,
+      args: [normalized],
+    });
+    const row = prior.rows[0];
+    // Unknown email → still mark/notify once (Resend may have the contact).
+    wasActive = !row || row.unsubscribed_at == null;
     await db.execute({
       sql: `UPDATE newsletter_subscribers SET unsubscribed_at = datetime('now') WHERE email = ?`,
       args: [normalized],
     });
+    // If never confirmed on Turso, insert a stub so admin list shows the unsub.
+    if (!row) {
+      await db.execute({
+        sql: `INSERT INTO newsletter_subscribers (email, confirmed_at, locale, unsubscribed_at)
+              VALUES (?, datetime('now'), 'it', datetime('now'))
+              ON CONFLICT(email) DO UPDATE SET unsubscribed_at = datetime('now')`,
+        args: [normalized],
+      });
+    }
     stored = true;
   }
-  const resend = await unsubscribeResendContact(normalized);
-  return { stored, resend: resend.ok, resendError: resend.ok ? "" : resend.error };
+  let resendOk = true;
+  let resendError = "";
+  if (!opts?.skipResend) {
+    const resend = await unsubscribeResendContact(normalized);
+    resendOk = resend.ok;
+    resendError = resend.ok ? "" : resend.error;
+  }
+  if (wasActive) {
+    await notifyShopUnsubscribe(normalized);
+  }
+  return { stored, resend: resendOk, resendError };
 }
 
 export type NewsletterSubscriberRow = {

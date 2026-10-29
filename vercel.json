@@ -18,6 +18,10 @@
       "destination": "/api/form?sendcloud_hook=1"
     },
     {
+      "source": "/api/resend-webhook",
+      "destination": "/api/form?resend_hook=1"
+    },
+    {
       "source": "/api/live-stock",
       "destination": "/api/shipping-quote?live_stock=1"
     },

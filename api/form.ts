@@ -22,8 +22,12 @@ import {
   handleSendcloudWebhook,
   isSendcloudWebhookRequest,
 } from "../server/sendcloud-webhook-handler.js";
+import {
+  handleResendWebhook,
+  isResendWebhookRequest,
+} from "../server/resend-webhook-handler.js";
 
-/** Raw body for Sendcloud HMAC; form POSTs buffered then urlencoded-parsed. */
+/** Raw body for Sendcloud/Resend HMAC; form POSTs buffered then urlencoded-parsed. */
 export const config = {
   api: {
     bodyParser: false,
@@ -72,12 +76,15 @@ async function runStockReleaseJob(res: VercelResponse) {
 /**
  * Generic site forms → Resend to shop. Contact, newsletter, workshops, consulting, reprint.
  * Also: newsletter confirm (?nl_confirm=), unsubscribe (?nl_unsub=), stock cron (?job=stock_release).
- * Sendcloud: rewrite /api/sendcloud-webhook → here (Hobby function budget).
+ * Sendcloud / Resend: rewrite webhooks → here (Hobby function budget).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Must run before bufferRequestBody — HMAC needs the untouched stream/body.
   if (isSendcloudWebhookRequest(req)) {
     return handleSendcloudWebhook(req, res);
+  }
+  if (isResendWebhookRequest(req)) {
+    return handleResendWebhook(req, res);
   }
 
   const job = queryFlag(req, "job");
