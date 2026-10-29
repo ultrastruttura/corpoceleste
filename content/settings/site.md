@@ -2,38 +2,23 @@
 title: SEO e home
 shopEmail: info@corpoceleste.eu
 metaDescription:
-  it: Serigrafia d’artista a un colore, stampata a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand. Spedizione in Italia e in Europa.
-  en: One-colour artist screen printing, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand. Shipping in Italy and across Europe.
-  de: Einfarbiger Künstlersiebdruck, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand. Versand in Italien und Europa.
+  it: 'Serigrafia d’artista a un colore, stampata a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand. Spedizione in Italia e in Europa.'
+  en: 'One-colour artist screen printing, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand. Shipping in Italy and across Europe.'
+  de: 'Einfarbiger Künstlersiebdruck, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand. Versand in Italien und Europa.'
 homeTitle:
   it: Serigrafie d’autore
   en: Author’s screen prints
   de: Siebdrucke von Autoren
 homeLede:
-  it: ""
-  en: ""
-  de: ""
-announcementEnabled: true
+  it: ''
+  en: ''
+  de: ''
+announcementEnabled: false
 announcementText:
-  it: "+++ Edizioni in stampa — iscriviti / scrivi a info@corpoceleste.eu +++"
-  en: "+++ Editions in print — subscribe / write to info@corpoceleste.eu +++"
-  de: "+++ Editionen im Druck — Newsletter / schreib an info@corpoceleste.eu +++"
+  it: +++ Edizioni in stampa — iscriviti / scrivi a info@corpoceleste.eu +++
+  en: +++ Editions in print — subscribe / write to info@corpoceleste.eu +++
+  de: +++ Editionen im Druck — Newsletter / schreib an info@corpoceleste.eu +++
 announcementLink: contatti/
-ogImage: ""
-umamiWebsiteId: "546938a2-aa92-4654-bc29-85bba09323b4"
-lowStockThreshold: 10
-iban: "IT02C03268223000EM002734005"
-intestatario: "Andrea Baldelli Lorenzo"
-legalName: "Andrea Baldelli Lorenzo"
-vatId: "IT04952110163"
-rea: ""
-telefono: ""
-indirizzo: "Via Moroni 51, Lonno, 24027 Nembro (BG), Italia"
-pec: "andrealorenzobaldelli@pec.it"
-sdiCode: "BA6ET11"
-paypalClientId: ""
-formApi: "https://corpoceleste.vercel.app"
-# Testo breve solo in Contatti (la bio lunga sta in content/bio)
 andreaName: Andrea Lorenzo Baldelli
 andreaBio:
   it: |-
@@ -54,4 +39,19 @@ andreaBio:
     Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events. Für Beratung (Anlagen, Farben, Abläufe, Schulung) schreib mir — Fall für Fall.
 
     Vor Corpoceleste: der Shop Corpoc (2012–2019). Ich male als Ultrastruttura.
+ogImage: ''
+umamiWebsiteId: 546938a2-aa92-4654-bc29-85bba09323b4
+lowStockThreshold: 10
+iban: IT02C03268223000EM002734005
+intestatario: Andrea Baldelli Lorenzo
+legalName: Andrea Baldelli Lorenzo
+vatId: IT04952110163
+rea: ''
+telefono: ''
+indirizzo: 'Via Moroni 51, Lonno, 24027 Nembro (BG), Italia'
+pec: andrealorenzobaldelli@pec.it
+sdiCode: BA6ET11
+paypalClientId: ''
+formApi: 'https://corpoceleste.vercel.app'
 ---
+
