@@ -23,7 +23,7 @@ body:
 
     Quando ho modo dipingo, e in questo campo cerco — guardacaso — di stare piuttosto lontano dalla serigrafia: riprodurre in stampa i miei lavori sarebbe decisamente complesso, sia per texture che per trasparenze. Immagino non sia un caso. Puoi dare un’occhiata [qui](https://ultrastruttura.com/).
   en: |-
-    I was born in 1984; I live and work (near) Bergamo.
+    I was born in 1984; I live and work (near) Bergamo, northern Italy.
 
     CORPOCELESTE is my current project tied to screen printing: I prepare and design graphics (alone or with artists I choose), hand-print them on fabric or paper, then pack and ship them to you.
 
@@ -43,7 +43,7 @@ body:
 
     When I can, I paint — and in that field I try, unsurprisingly, to stay rather far from screen printing: reproducing my work in print would be very complex, for texture and transparencies alike. I don’t think that’s a coincidence. You can have a look [here](https://ultrastruttura.com/).
   de: |-
-    Ich wurde 1984 geboren und lebe und arbeite (in der Nähe von) Bergamo.
+    Ich wurde 1984 geboren und lebe und arbeite (in der Nähe von) Bergamo, Norditalien.
 
     CORPOCELESTE ist mein aktuelles Projekt rund um den Siebdruck: ich bereite Grafiken vor und entwerfe sie (allein oder mit Künstler:innen, die ich auswähle), drucke sie von Hand auf Stoff oder Papier, verpacke sie und schicke sie dir.
 
@@ -63,3 +63,4 @@ body:
 
     Wenn ich kann, male ich — und dabei halte ich mich, wie der Zufall will, eher fern vom Siebdruck: meine Arbeiten in Druck zu reproduzieren wäre sehr komplex, wegen Textur und Transparenz. Das ist wohl kein Zufall. Du kannst [hier](https://ultrastruttura.com/) vorbeischauen.
 ---
+
