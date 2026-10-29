@@ -1435,7 +1435,7 @@ if (!root || !app) {
               <button class="account-action-form__btn" type="submit">Registra</button>
             </div>
           </div>
-          <p class="account-action-form__hint">Vendita pagata con bonifico (non PayPal). Taglia opzionale per lo storico (S–XL).</p>
+          <p class="account-action-form__hint">Bonifico già ricevuto: entra in Ordini (PDF / Elimina) e nei conti artista.</p>
         `;
         bank.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -1452,6 +1452,7 @@ if (!root || !app) {
           });
           invalidateAdminShell();
           await renderAdmin(user, { force: true });
+          setAdminRoute({ name: "orders" });
         });
         wrap.append(bank);
 

@@ -420,7 +420,17 @@ export async function isShopOrderPaidByExternalId(externalId: string): Promise<b
 
 export async function deleteShopOrder(id: string): Promise<boolean> {
   await ensureSchema();
+  const order = await getShopOrder(id);
+  if (!order) return false;
   const db = getDb();
+  const external = order.external_id;
+  if (external) {
+    // Drop deal sales linked to this shop order (exact id or captureId:product:size).
+    await db.execute({
+      sql: `DELETE FROM sales WHERE external_id = ? OR external_id LIKE ?`,
+      args: [external, `${external}:%`],
+    });
+  }
   const res = await db.execute({
     sql: `DELETE FROM shop_orders WHERE id = ?`,
     args: [id],
