@@ -287,32 +287,88 @@ export async function recordSalesFromOrder(opts: {
   return written;
 }
 
-export async function listSettlements(userId: string) {
-  await ensureSchema();
-  const db = getDb();
-  const res = await db.execute({
-    sql: "SELECT * FROM settlements WHERE user_id = ? ORDER BY period DESC, paid_at DESC",
-    args: [userId],
-  });
-  return res.rows.map((r) => ({
+export type Settlement = {
+  id: string;
+  user_id: string;
+  deal_id: string | null;
+  period: string;
+  amount: number;
+  note: string;
+  paid_at: string;
+};
+
+function mapSettlement(r: Record<string, unknown>): Settlement {
+  return {
     id: String(r.id),
     user_id: String(r.user_id),
+    deal_id: r.deal_id ? String(r.deal_id) : null,
     period: String(r.period),
     amount: Number(r.amount),
     note: String(r.note || ""),
     paid_at: String(r.paid_at),
-  }));
+  };
 }
 
-/** `period` = giorno saldo (YYYY-MM-DD). Righe legacy YYYY-MM restano valide. */
+export async function listSettlements(userId: string) {
+  await ensureSchema();
+  const db = getDb();
+  const res = await db.execute({
+    sql: "SELECT * FROM settlements WHERE user_id = ? ORDER BY paid_at DESC, period DESC",
+    args: [userId],
+  });
+  return res.rows.map((r) => mapSettlement(r as Record<string, unknown>));
+}
+
+/** Artist share if the whole deal sells (planned_qty × unit_price). */
+export function plannedArtistDue(deal: Deal) {
+  return computeShare({
+    sales: [{ qty: Math.max(1, Math.floor(deal.planned_qty)), unit_price: deal.unit_price }],
+    costs: deal.costs,
+    planned_qty: deal.planned_qty,
+    artist_share_pct: deal.artist_share_pct,
+    vat_rate_pct: deal.vat_rate_pct,
+  }).artistDue;
+}
+
+function lastDealPaidAt(settlements: Settlement[]) {
+  let max = "";
+  for (const s of settlements) {
+    const t = String(s.paid_at || s.period || "");
+    if (t > max) max = t;
+  }
+  return max || null;
+}
+
+/** `period` = giorno saldo (YYYY-MM-DD) for legacy monthly; deal pays use ISO timestamps. */
 export async function upsertSettlement(input: {
   user_id: string;
   period: string;
   amount: number;
   note?: string;
+  deal_id?: string;
 }) {
   await ensureSchema();
   const db = getDb();
+  const amount = euro(input.amount);
+  if (input.deal_id) {
+    const now = new Date().toISOString();
+    const id = newId("set");
+    await db.execute({
+      sql: `INSERT INTO settlements (id, user_id, deal_id, period, amount, note, paid_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        id,
+        input.user_id,
+        input.deal_id,
+        now,
+        amount,
+        input.note || "paga artista",
+        now,
+      ],
+    });
+    return id;
+  }
+
   let day = input.period.trim();
   if (/^\d{4}-\d{2}$/.test(day)) day = `${day}-01`;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error("period must be YYYY-MM-DD");
@@ -329,7 +385,7 @@ export async function upsertSettlement(input: {
     await db.execute({
       sql: "UPDATE settlements SET amount = ?, note = ?, paid_at = ? WHERE id = ?",
       args: [
-        euro(prevAmount + input.amount),
+        euro(prevAmount + amount),
         input.note || "",
         day,
         String(existing.rows[0].id),
@@ -339,10 +395,44 @@ export async function upsertSettlement(input: {
   }
   const id = newId("set");
   await db.execute({
-    sql: "INSERT INTO settlements (id, user_id, period, amount, note, paid_at) VALUES (?, ?, ?, ?, ?, ?)",
-    args: [id, input.user_id, day, euro(input.amount), input.note || "", day],
+    sql: `INSERT INTO settlements (id, user_id, deal_id, period, amount, note, paid_at)
+          VALUES (?, ?, NULL, ?, ?, ?, ?)`,
+    args: [id, input.user_id, day, amount, input.note || "", day],
   });
   return id;
+}
+
+/** Settle current unsettled artist share for a deal ("Paga artista"). */
+export async function payArtistForDeal(dealId: string) {
+  const deal = await getDeal(dealId);
+  if (!deal) return null;
+  const [sales, settlements] = await Promise.all([
+    listSales(deal.id),
+    listSettlements(deal.user_id),
+  ]);
+  const dealSettlements = settlements.filter((s) => s.deal_id === deal.id);
+  const cutoff = lastDealPaidAt(dealSettlements);
+  const unsettledSales = cutoff
+    ? sales.filter((s) => s.sold_at > cutoff)
+    : sales;
+  const unsettled = computeShare({
+    sales: unsettledSales.map((s) => ({ qty: s.qty, unit_price: s.unit_price })),
+    costs: deal.costs,
+    planned_qty: deal.planned_qty,
+    artist_share_pct: deal.artist_share_pct,
+    vat_rate_pct: deal.vat_rate_pct,
+  });
+  if (unsettled.artistDue <= 0) {
+    return { id: null as string | null, amount: 0, deal };
+  }
+  const id = await upsertSettlement({
+    user_id: deal.user_id,
+    deal_id: deal.id,
+    period: new Date().toISOString(),
+    amount: unsettled.artistDue,
+    note: `paga artista · ${deal.product_title || deal.product_id}`,
+  });
+  return { id, amount: unsettled.artistDue, deal };
 }
 
 export async function deleteSettlement(id: string) {
@@ -354,7 +444,7 @@ export async function deleteSettlement(id: string) {
 function summaryFromSales(
   deal: Deal,
   sales: ReturnType<typeof mapSale>[],
-  opts?: { includeSales?: boolean },
+  opts?: { includeSales?: boolean; settlements?: Settlement[] },
 ) {
   const share = computeShare({
     sales: sales.map((s) => ({ qty: s.qty, unit_price: s.unit_price })),
@@ -363,22 +453,47 @@ function summaryFromSales(
     artist_share_pct: deal.artist_share_pct,
     vat_rate_pct: deal.vat_rate_pct,
   });
+  const artistDuePlanned = plannedArtistDue(deal);
+  const dealSettlements = (opts?.settlements || [])
+    .filter((s) => s.deal_id === deal.id)
+    .slice()
+    .sort((a, b) => String(b.paid_at).localeCompare(String(a.paid_at)));
+  const cutoff = lastDealPaidAt(dealSettlements);
+  const unsettledSales = cutoff
+    ? sales.filter((s) => s.sold_at > cutoff)
+    : sales;
+  const unsettled = computeShare({
+    sales: unsettledSales.map((s) => ({ qty: s.qty, unit_price: s.unit_price })),
+    costs: deal.costs,
+    planned_qty: deal.planned_qty,
+    artist_share_pct: deal.artist_share_pct,
+    vat_rate_pct: deal.vat_rate_pct,
+  });
+  const dealPaidTotal = euro(dealSettlements.reduce((sum, s) => sum + s.amount, 0));
   return {
     deal,
     sales: opts?.includeSales === false ? [] : sales,
     ...share,
+    artistDuePlanned,
+    artistDueUnsettled: unsettled.artistDue,
+    dealSettlements,
+    dealPaidTotal,
+    remaining: euro(artistDuePlanned - dealPaidTotal),
   };
 }
 
 export async function dealSummary(deal: Deal) {
-  const sales = await listSales(deal.id);
-  return summaryFromSales(deal, sales);
+  const [sales, settlements] = await Promise.all([
+    listSales(deal.id),
+    listSettlements(deal.user_id),
+  ]);
+  return summaryFromSales(deal, sales, { settlements });
 }
 
 /** Summaries for many deals with 1 sales query instead of N. */
 export async function summarizeDeals(
   deals: Deal[],
-  opts?: { includeSales?: boolean },
+  opts?: { includeSales?: boolean; settlements?: Settlement[] },
 ) {
   const salesMap = await salesByDealIds(deals.map((d) => d.id));
   return deals.map((d) =>
@@ -388,11 +503,11 @@ export async function summarizeDeals(
 
 export async function artistDashboard(userId: string) {
   const deals = await listDeals(userId);
-  const [summaries, settlements] = await Promise.all([
-    summarizeDeals(deals),
-    listSettlements(userId),
-  ]);
-  const artistDueTotal = euro(summaries.reduce((s, x) => s + x.artistDue, 0));
+  const settlements = await listSettlements(userId);
+  const summaries = await summarizeDeals(deals, { settlements });
+  const artistDueTotal = euro(
+    summaries.reduce((s, x) => s + x.artistDuePlanned, 0),
+  );
   const paidTotal = euro(settlements.reduce((s, x) => s + x.amount, 0));
   const outstanding = euro(artistDueTotal - paidTotal);
   return {

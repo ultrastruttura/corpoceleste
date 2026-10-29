@@ -44,7 +44,7 @@ export async function ensureSchema() {
       args: ["schema_version"],
     });
     const current = String(ver.rows[0]?.value || "");
-    if (current !== "3") {
+    if (current !== "4") {
       for (const sql of [
         `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
         `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
@@ -52,6 +52,7 @@ export async function ensureSchema() {
         `ALTER TABLE shop_orders ADD COLUMN shipped_at TEXT`,
         `ALTER TABLE newsletter_subscribers ADD COLUMN unsubscribed_at TEXT`,
         `ALTER TABLE newsletter_subscribers ADD COLUMN resend_contact_id TEXT`,
+        `ALTER TABLE settlements ADD COLUMN deal_id TEXT`,
       ]) {
         try {
           await db.execute(sql);
@@ -62,7 +63,7 @@ export async function ensureSchema() {
       await db.execute({
         sql: `INSERT INTO portal_meta (key, value) VALUES (?, ?)
               ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
-        args: ["schema_version", "3"],
+        args: ["schema_version", "4"],
       });
     }
     migrated = true;

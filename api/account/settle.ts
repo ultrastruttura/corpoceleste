@@ -4,6 +4,7 @@ import {
   deleteSettlement,
   listSettlements,
   paidTotalsByUser,
+  payArtistForDeal,
   upsertSettlement,
 } from "../../server/portal/deals.js";
 import { json, readJson, requireUser } from "../../server/portal/http.js";
@@ -40,7 +41,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         period?: string;
         amount?: number;
         note?: string;
+        deal_id?: string;
+        /** Pay current unsettled share for this deal. */
+        pay_artist?: boolean;
       }>(req);
+
+      if (body.deal_id && (body.pay_artist || body.amount == null)) {
+        const result = await payArtistForDeal(body.deal_id);
+        if (!result) return json(res, 404, { error: "Deal not found" });
+        if (!result.id || result.amount <= 0) {
+          return json(res, 400, { error: "Niente da saldare su questo deal" });
+        }
+        return json(res, 200, { ok: true, id: result.id, amount: result.amount });
+      }
+
       if (!body.user_id || !body.period || body.amount == null) {
         return json(res, 400, { error: "user_id, period, amount required" });
       }
@@ -49,6 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         period: body.period,
         amount: Number(body.amount),
         note: body.note,
+        deal_id: body.deal_id,
       });
       return json(res, 200, { ok: true, id });
     }

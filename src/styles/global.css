@@ -2932,6 +2932,19 @@ body:has(.site-announce) .shop-home-stage {
   justify-self: end;
 }
 
+.account-metric__value-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  justify-self: end;
+  text-align: right;
+}
+
+.account-metric--with-action .account-metric__value-wrap .account-linkish {
+  font-size: 0.78rem;
+}
+
 .account-filters {
   display: grid;
   gap: 1rem;

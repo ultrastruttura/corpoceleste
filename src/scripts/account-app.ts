@@ -18,6 +18,15 @@ type User = {
   artist_slug: string | null;
 };
 
+type DealSettlement = {
+  id: string;
+  deal_id?: string | null;
+  period: string;
+  amount: number;
+  note: string;
+  paid_at: string;
+};
+
 type DealSummary = {
   deal: {
     id: string;
@@ -48,11 +57,18 @@ type DealSummary = {
   profit: number;
   artistDue: number;
   studioShare: number;
+  /** Artist share if 100% of planned qty sells. */
+  artistDuePlanned: number;
+  /** Artist share on sales since last "Paga artista". */
+  artistDueUnsettled: number;
+  dealSettlements: DealSettlement[];
+  dealPaidTotal: number;
+  remaining: number;
 };
 
 type Dashboard = {
   deals: DealSummary[];
-  settlements: Array<{ id: string; period: string; amount: number; note: string; paid_at: string }>;
+  settlements: DealSettlement[];
   artistDueTotal: number;
   paidTotal: number;
   outstanding: number;
@@ -67,11 +83,6 @@ function euroLocal(n: number) {
 function currentMonth() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function todayISO() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
 /** Month key YYYY-MM from settlement (supports legacy period=YYYY-MM). */
@@ -113,7 +124,10 @@ function inRange(isoDay: string, filter: PeriodFilter) {
   return true;
 }
 
-function shareFromSales(deal: DealSummary["deal"], sales: DealSummary["sales"]) {
+function shareFromSales(
+  deal: DealSummary["deal"],
+  sales: DealSummary["sales"],
+) {
   const planned = Math.max(1, Math.floor(deal.planned_qty));
   const soldQty = sales.reduce((s, x) => s + x.qty, 0);
   const gross = euroLocal(sales.reduce((s, x) => s + x.qty * x.unit_price, 0));
@@ -134,17 +148,76 @@ function shareFromSales(deal: DealSummary["deal"], sales: DealSummary["sales"]) 
   return { soldQty, gross, vat, costsTotal, profit, artistDue, studioShare };
 }
 
+function plannedDueLocal(deal: DealSummary["deal"]) {
+  return shareFromSales(deal, [
+    { id: "", qty: Math.max(1, Math.floor(deal.planned_qty)), unit_price: deal.unit_price, size: "", source: "", sold_at: "" },
+  ]).artistDue;
+}
+
+function enrichDealLocal(
+  deal: DealSummary["deal"],
+  sales: DealSummary["sales"],
+  settlements: DealSettlement[],
+): Pick<
+  DealSummary,
+  | "soldQty"
+  | "gross"
+  | "vat"
+  | "costsTotal"
+  | "profit"
+  | "artistDue"
+  | "studioShare"
+  | "artistDuePlanned"
+  | "artistDueUnsettled"
+  | "dealSettlements"
+  | "dealPaidTotal"
+  | "remaining"
+> {
+  const share = shareFromSales(deal, sales);
+  const artistDuePlanned = plannedDueLocal(deal);
+  const dealSettlements = settlements
+    .filter((s) => s.deal_id === deal.id)
+    .slice()
+    .sort((a, b) => String(b.paid_at).localeCompare(String(a.paid_at)));
+  let cutoff = "";
+  for (const s of dealSettlements) {
+    const t = String(s.paid_at || s.period || "");
+    if (t > cutoff) cutoff = t;
+  }
+  const unsettledSales = cutoff
+    ? sales.filter((s) => s.sold_at > cutoff)
+    : sales;
+  const unsettled = shareFromSales(deal, unsettledSales);
+  const dealPaidTotal = euroLocal(
+    dealSettlements.reduce((sum, s) => sum + s.amount, 0),
+  );
+  return {
+    ...share,
+    artistDuePlanned,
+    artistDueUnsettled: unsettled.artistDue,
+    dealSettlements,
+    dealPaidTotal,
+    remaining: euroLocal(artistDuePlanned - dealPaidTotal),
+  };
+}
+
 function filterDashboard(dash: Dashboard, filter: PeriodFilter): Dashboard {
   if (!filter.month && !filter.from && !filter.to) return dash;
-  const deals = dash.deals.map((d) => {
-    const sales = d.sales.filter((s) => inRange(s.sold_at, filter));
-    return { ...d, sales, ...shareFromSales(d.deal, sales) };
-  });
   const settlements = dash.settlements.filter((s) => {
     if (filter.month) return settlementMonth(s) === filter.month;
     return inRange(settlementDay(s), filter);
   });
-  const artistDueTotal = euroLocal(deals.reduce((s, x) => s + x.artistDue, 0));
+  const deals = dash.deals.map((d) => {
+    const sales = d.sales.filter((s) => inRange(s.sold_at, filter));
+    return {
+      ...d,
+      sales,
+      ...enrichDealLocal(d.deal, sales, d.dealSettlements || []),
+    };
+  });
+  const artistDueTotal = euroLocal(
+    deals.reduce((s, x) => s + (x.artistDuePlanned ?? plannedDueLocal(x.deal)), 0),
+  );
   const paidTotal = euroLocal(settlements.reduce((s, x) => s + x.amount, 0));
   return {
     deals,
@@ -551,7 +624,22 @@ if (!root || !app) {
     return source;
   }
 
-  function dealBlock(s: DealSummary, adminHints = false) {
+  function dealBlock(
+    s: DealSummary,
+    opts?: {
+      adminHints?: boolean;
+      onPayArtist?: () => void | Promise<void>;
+      onUndoSettlement?: (id: string) => void | Promise<void>;
+    },
+  ) {
+    const adminHints = Boolean(opts?.adminHints);
+    const planned = s.artistDuePlanned ?? plannedDueLocal(s.deal);
+    const unsettled = s.artistDueUnsettled ?? s.artistDue;
+    const paidEntries = s.dealSettlements || [];
+    const remaining =
+      s.remaining ??
+      euroLocal(planned - euroLocal(paidEntries.reduce((sum, x) => sum + x.amount, 0)));
+
     const box = el("article", "account-deal");
     const perUnit = s.deal.costs
       .filter((c) => c.per_unit)
@@ -611,18 +699,76 @@ if (!root || !app) {
     }
     box.append(orders);
 
-    // Conti di QUESTO deal — distinti dal riepilogo totale in alto.
     box.append(el("h4", "", "Conti di questo deal"));
-    box.append(
-      metrics([
-        ["Ricavi vendite", money(s.gross)],
-        [`− IVA (${s.deal.vat_rate_pct}%)`, money(s.vat)],
-        ["− Costi produzione", money(s.costsTotal)],
-        ["= Utile", money(s.profit)],
-        [`Quota artista (${s.deal.artist_share_pct}%)`, money(s.artistDue)],
-        ["Quota studio", money(s.studioShare)],
-      ]),
+    const conti = el("div", "account-metrics account-deal-conti");
+
+    const rowTotale = el("div", "account-metric");
+    rowTotale.append(
+      el("span", "account-metric__label", "Totale dovuto"),
+      el("span", "account-metric__value", money(planned)),
     );
+    conti.append(rowTotale);
+
+    const rowVenduto = el("div", "account-metric account-metric--with-action");
+    const vendutoLabel = el("span", "account-metric__label", "Venduto fino ad ora");
+    const vendutoRight = el("span", "account-metric__value-wrap");
+    vendutoRight.append(el("span", "account-metric__value", money(unsettled)));
+    if (opts?.onPayArtist) {
+      const payBtn = el("button", "account-linkish", "Paga artista") as HTMLButtonElement;
+      payBtn.type = "button";
+      payBtn.disabled = unsettled <= 0;
+      payBtn.title =
+        unsettled <= 0
+          ? "Niente da saldare: aspetta nuovi ordini"
+          : `Registra saldo di ${money(unsettled)} e azzera «Venduto fino ad ora»`;
+      payBtn.addEventListener("click", async () => {
+        if (unsettled <= 0) return;
+        if (
+          !confirm(
+            `Pagare l’artista ${money(unsettled)} per «${s.deal.product_title || s.deal.product_id}»?\nVerrà registrato in «Saldato in data» e il conteggio ripartirà dagli ordini successivi.`,
+          )
+        ) {
+          return;
+        }
+        await opts.onPayArtist!();
+      });
+      vendutoRight.append(payBtn);
+    }
+    rowVenduto.append(vendutoLabel, vendutoRight);
+    conti.append(rowVenduto);
+
+    if (paidEntries.length) {
+      for (const entry of paidEntries) {
+        const row = el("div", "account-metric");
+        const label = `Saldato in data ${formatDayLabel(settlementDay(entry))}`;
+        const valueWrap = el("span", "account-metric__value-wrap");
+        valueWrap.append(el("span", "account-metric__value", money(entry.amount)));
+        if (opts?.onUndoSettlement) {
+          const undo = el("button", "account-linkish", "Annulla") as HTMLButtonElement;
+          undo.type = "button";
+          undo.addEventListener("click", () => opts.onUndoSettlement!(entry.id));
+          valueWrap.append(undo);
+        }
+        row.append(el("span", "account-metric__label", label), valueWrap);
+        conti.append(row);
+      }
+    } else {
+      const row = el("div", "account-metric");
+      row.append(
+        el("span", "account-metric__label", "Saldato"),
+        el("span", "account-metric__value", money(0)),
+      );
+      conti.append(row);
+    }
+
+    const rowRemain = el("div", "account-metric");
+    rowRemain.append(
+      el("span", "account-metric__label", "Rimanente"),
+      el("span", "account-metric__value account-table__emphasis", money(remaining)),
+    );
+    conti.append(rowRemain);
+
+    box.append(conti);
     return box;
   }
 
@@ -646,20 +792,21 @@ if (!root || !app) {
           "Qui sotto è solo la somma delle quote artista. Il dettaglio per maglia è in ogni deal.",
         ),
         metrics([
-          ["Quota artista da fatturare", money(dash.artistDueTotal)],
-          ["Già saldato", money(dash.paidTotal)],
-          ["Ancora dovuto", money(dash.outstanding)],
+          ["Totale dovuto", money(dash.artistDueTotal)],
+          ["Saldato", money(dash.paidTotal)],
+          ["Rimanente", money(dash.outstanding)],
         ]),
       );
       dealsHost.replaceChildren(el("h2", "", "Deal"));
       if (!dash.deals.length) {
         dealsHost.append(el("p", "lede", "Nessun deal collegato ancora."));
       } else {
-        for (const d of dash.deals) dealsHost.append(dealBlock(d, false));
+        for (const d of dash.deals) dealsHost.append(dealBlock(d));
       }
-      if (dash.settlements.length) {
-        dealsHost.append(el("h2", "", "Saldi"));
-        dealsHost.append(settlementsByMonth(dash.settlements));
+      const orphans = dash.settlements.filter((s) => !s.deal_id);
+      if (orphans.length) {
+        dealsHost.append(el("h2", "", "Saldi storici"));
+        dealsHost.append(settlementsByMonth(orphans));
       }
     };
     app!.append(
@@ -1304,7 +1451,7 @@ if (!root || !app) {
 
     const table = el("div", "account-table account-table--artists");
     const head = el("div", "account-table__head");
-    for (const label of ["Artista", "Deal", "Dovuto", "Residuo", ""]) {
+    for (const label of ["Artista", "Deal", "Totale dovuto", "Rimanente", ""]) {
       head.append(el("span", "", label));
     }
     table.append(head);
@@ -1315,7 +1462,10 @@ if (!root || !app) {
     for (const a of artists) {
       const artistDeals = deals.filter((d) => d.deal.user_id === a.id);
       const artistDueTotal = euroLocal(
-        artistDeals.reduce((s, d) => s + d.artistDue, 0),
+        artistDeals.reduce(
+          (s, d) => s + (d.artistDuePlanned ?? plannedDueLocal(d.deal)),
+          0,
+        ),
       );
       const paidTotal = euroLocal(paid[a.id] || 0);
       const outstanding = euroLocal(artistDueTotal - paidTotal);
@@ -1399,9 +1549,9 @@ if (!root || !app) {
       const dash = filterDashboard(dashFull, filter);
       summaryBody.replaceChildren(
         metrics([
-          ["Quota artista da fatturare", money(dash.artistDueTotal)],
-          ["Già saldato", money(dash.paidTotal)],
-          ["Residuo", money(dash.outstanding)],
+          ["Totale dovuto", money(dash.artistDueTotal)],
+          ["Saldato", money(dash.paidTotal)],
+          ["Rimanente", money(dash.outstanding)],
         ]),
       );
     };
@@ -1416,7 +1566,27 @@ if (!root || !app) {
     } else {
       for (const s of deals) {
         const wrap = el("div", "account-deal-wrap");
-        wrap.append(dealBlock(s, true));
+        wrap.append(
+          dealBlock(s, {
+            adminHints: true,
+            onPayArtist: async () => {
+              await apiFetch(base, "settle", {
+                method: "POST",
+                body: JSON.stringify({ deal_id: s.deal.id, pay_artist: true }),
+              });
+              invalidateAdminShell();
+              await renderAdmin(user, { force: true });
+            },
+            onUndoSettlement: async (id) => {
+              if (!confirm("Annullare questo saldo?")) return;
+              await apiFetch(base, `settle?id=${encodeURIComponent(id)}`, {
+                method: "DELETE",
+              });
+              invalidateAdminShell();
+              await renderAdmin(user, { force: true });
+            },
+          }),
+        );
 
         const bank = el("form", "account-action-form");
         bank.innerHTML = `
@@ -1529,60 +1699,30 @@ if (!root || !app) {
     dealSection.append(dealForm);
     mount.append(dealSection);
 
-    const conti = el("section", "account-card");
-    conti.append(el("h3", "", "Saldi mensili"));
-    const settle = el("form", "account-action-form");
-    settle.innerHTML = `
-      <div class="account-action-form__row">
-        <label class="account-action-form__field account-action-form__field--month">
-          <span>Data saldo</span>
-          <input name="period" type="date" value="${todayISO()}" required />
-        </label>
-        <label class="account-action-form__field account-action-form__field--amount">
-          <span>Importo €</span>
-          <input name="amount" type="number" step="0.01" value="${Math.max(0, dashFull.outstanding).toFixed(2)}" required />
-        </label>
-        <div class="account-action-form__submit">
-          <span class="account-action-form__ghost" aria-hidden="true">Salva</span>
-          <button class="account-action-form__btn" type="submit">Salva</button>
-        </div>
-      </div>
-      <button type="button" class="account-action-form__today" data-today-month>Oggi</button>
-    `;
-    settle.querySelector("[data-today-month]")!.addEventListener("click", () => {
-      settle.querySelector<HTMLInputElement>('[name="period"]')!.value = todayISO();
-    });
-    settle.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fd = new FormData(settle);
-      await apiFetch(base, "settle", {
-        method: "POST",
-        body: JSON.stringify({
-          user_id: artist.id,
-          period: fd.get("period"),
-          amount: Number(fd.get("amount")),
-          note: "saldo mensile",
-        }),
-      });
-      invalidateAdminShell();
-      await renderAdmin(user, { force: true });
-    });
-    conti.append(settle);
-
-    if (dashFull.settlements.length) {
+    const orphanSettlements = dashFull.settlements.filter((s) => !s.deal_id);
+    if (orphanSettlements.length) {
+      const conti = el("section", "account-card");
       conti.append(
-        settlementsByMonth(dashFull.settlements, {
+        el("h3", "", "Saldi senza deal"),
+        el(
+          "p",
+          "account-lede",
+          "Saldi storici non legati a un deal. I nuovi saldi si registrano con «Paga artista» sul deal.",
+        ),
+      );
+      conti.append(
+        settlementsByMonth(orphanSettlements, {
           onUndo: async (id) => {
-            await apiFetch(base, `settle?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+            await apiFetch(base, `settle?id=${encodeURIComponent(id)}`, {
+              method: "DELETE",
+            });
             invalidateAdminShell();
             await renderAdmin(user, { force: true });
           },
         }),
       );
-    } else {
-      conti.append(el("p", "account-lede", "Nessun saldo registrato."));
+      mount.append(conti);
     }
-    mount.append(conti);
   }
 
   type DealProductOption = {
