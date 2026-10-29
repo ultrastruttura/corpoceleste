@@ -1384,7 +1384,7 @@ if (!root || !app) {
 
     let filter: PeriodFilter = {};
     const summary = el("section", "account-card");
-    summary.append(el("h3", "", "Riepilogo conti"));
+    summary.append(el("h3", "", "Totale (somma di tutti i deal)"));
     const summaryBody = el("div", "");
     summary.append(
       periodFilterBar(filter, (next) => {
