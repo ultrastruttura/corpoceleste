@@ -41,6 +41,8 @@ export type ShopOrder = {
   notes: string;
   /** ISO timestamp when payment confirmed; null = unpaid bank hold. */
   paid_at: string | null;
+  /** ISO when marked evaso (shipping mail sent). */
+  shipped_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -126,6 +128,7 @@ function mapRow(r: Record<string, unknown>): ShopOrder {
     packlink_ref: String(r.packlink_ref || ""),
     notes: String(r.notes || ""),
     paid_at: r.paid_at ? String(r.paid_at) : null,
+    shipped_at: r.shipped_at ? String(r.shipped_at) : null,
     created_at: created,
     updated_at: String(r.updated_at || ""),
   };
@@ -318,6 +321,18 @@ export async function updateShopOrderStatus(
   return getShopOrder(id);
 }
 
+/** Set once when the customer shipping email has been sent successfully. */
+export async function markShopOrderShippedMail(id: string): Promise<ShopOrder | null> {
+  await ensureSchema();
+  const db = getDb();
+  const now = new Date().toISOString();
+  await db.execute({
+    sql: `UPDATE shop_orders SET shipped_at = COALESCE(shipped_at, ?), updated_at = datetime('now') WHERE id = ?`,
+    args: [now, id],
+  });
+  return getShopOrder(id);
+}
+
 /** Mark bank order as paid (then decrement GitHub stock if still pending). */
 export async function markShopOrderPaid(id: string): Promise<ShopOrder | null> {
   await ensureSchema();
@@ -331,11 +346,10 @@ export async function markShopOrderPaid(id: string): Promise<ShopOrder | null> {
 }
 
 /**
- * Decrement GitHub stock for a bank order once (ledger id = external_id).
- * Idempotent via claimOrResumeLedger / stockComplete.
+ * Decrement GitHub/Tina stock once per order (ledger id = external_id).
+ * PayPal already did this in the webhook → no-op when ledger is complete.
  */
-export async function applyBankStockOnPaid(order: ShopOrder): Promise<{ ok: boolean; note: string }> {
-  if (order.source !== "bank") return { ok: true, note: "not bank" };
+export async function applyOrderStockOnce(order: ShopOrder): Promise<{ ok: boolean; note: string }> {
   if (!(process.env.GITHUB_TOKEN || "").trim()) {
     return { ok: false, note: "GITHUB_TOKEN missing" };
   }
@@ -366,7 +380,7 @@ export async function applyBankStockOnPaid(order: ShopOrder): Promise<{ ok: bool
     );
     await writeLedger({
       ...held,
-      kind: "bank",
+      kind: order.source === "bank" ? "bank" : "capture",
       status: "done",
       stockComplete: true,
       at: new Date().toISOString(),
@@ -381,9 +395,14 @@ export async function applyBankStockOnPaid(order: ShopOrder): Promise<{ ok: bool
       return { ok: false, note: "stock busy" };
     }
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("applyBankStockOnPaid", msg);
+    console.error("applyOrderStockOnce", msg);
     return { ok: false, note: msg.slice(0, 200) };
   }
+}
+
+export async function applyBankStockOnPaid(order: ShopOrder) {
+  if (order.source !== "bank") return { ok: true, note: "not bank" };
+  return applyOrderStockOnce(order);
 }
 
 export async function isShopOrderPaidByExternalId(externalId: string): Promise<boolean> {

@@ -217,11 +217,17 @@ if (!root || !app) {
     try {
       const data = (await apiFetch(base, "auth", {
         method: "POST",
-        body: JSON.stringify({ action: "me" }),
+        body: JSON.stringify({ action: "bootstrap" }),
       })) as {
         user: User | null;
         mailConfigured?: boolean;
         portalAdminEmail?: string | null;
+        shell?: {
+          users: User[];
+          deals: DealSummary[];
+          paidTotals: Record<string, number>;
+        };
+        dashboard?: Dashboard;
       };
       if (!data.user) {
         clearSession();
@@ -229,11 +235,21 @@ if (!root || !app) {
         return;
       }
       if (data.user.role === "admin") {
+        if (data.shell) {
+          adminShellCache = {
+            users: data.shell.users,
+            deals: data.shell.deals,
+            paidTotals: data.shell.paidTotals || {},
+            mailConfigured: data.mailConfigured,
+            portalAdminEmail: data.portalAdminEmail,
+            fetchedAt: Date.now(),
+          };
+        }
         await renderAdmin(data.user, {
           mailConfigured: data.mailConfigured,
           portalAdminEmail: data.portalAdminEmail,
         });
-      } else await renderArtist(data.user);
+      } else await renderArtist(data.user, data.dashboard);
     } catch {
       clearSession();
       renderLogin();
@@ -608,11 +624,13 @@ if (!root || !app) {
     return box;
   }
 
-  async function renderArtist(user: User) {
+  async function renderArtist(user: User, dashPrefetch?: Dashboard) {
     root!.classList.remove("account-page--admin");
     app!.innerHTML = "";
     app!.append(toolbar(user), el("h2", "", "Il tuo prospetto"));
-    const dashFull = (await apiFetch(base, "settle?dashboard=1")) as Dashboard;
+    const dashFull =
+      dashPrefetch ||
+      ((await apiFetch(base, "settle?dashboard=1")) as Dashboard);
     let filter: PeriodFilter = {};
     const summaryHost = el("div", "");
     const dealsHost = el("div", "");
@@ -726,21 +744,29 @@ if (!root || !app) {
       }
       return adminShellCache;
     }
-    const [usersData, dealsData, paidData] = await Promise.all([
-      apiFetch(base, "users") as Promise<{ users: User[] }>,
-      apiFetch(base, "deals?lite=1") as Promise<{ deals: DealSummary[] }>,
-      apiFetch(base, "settle?paid_totals=1") as Promise<{
-        totals: Record<string, number>;
-      }>,
-    ]);
+    const data = (await apiFetch(base, "auth", {
+      method: "POST",
+      body: JSON.stringify({ action: "bootstrap" }),
+    })) as {
+      mailConfigured?: boolean;
+      portalAdminEmail?: string | null;
+      shell?: {
+        users: User[];
+        deals: DealSummary[];
+        paidTotals: Record<string, number>;
+      };
+    };
+    if (!data.shell) throw new Error("Shell non disponibile");
     adminShellCache = {
-      users: usersData.users,
-      deals: dealsData.deals,
-      paidTotals: paidData.totals || {},
+      users: data.shell.users,
+      deals: data.shell.deals,
+      paidTotals: data.shell.paidTotals || {},
       mailConfigured:
-        opts?.mailConfigured ?? adminShellCache?.mailConfigured,
+        opts?.mailConfigured ?? data.mailConfigured ?? adminShellCache?.mailConfigured,
       portalAdminEmail:
-        opts?.portalAdminEmail ?? adminShellCache?.portalAdminEmail,
+        opts?.portalAdminEmail ??
+        data.portalAdminEmail ??
+        adminShellCache?.portalAdminEmail,
       fetchedAt: Date.now(),
     };
     return adminShellCache;
@@ -1145,14 +1171,27 @@ if (!root || !app) {
             order.status === "nuovo" ? "Segna evaso" : "Riapri",
           ) as HTMLButtonElement;
           statusBtn.type = "button";
+          statusBtn.title =
+            order.status === "nuovo"
+              ? "Scala lo stock su Tina (se non già fatto) e invia mail di spedizione al cliente"
+              : "Riporta l’ordine tra i nuovi (non ripristina lo stock)";
           statusBtn.addEventListener("click", async () => {
             const next = order.status === "nuovo" ? "evaso" : "nuovo";
+            if (
+              next === "evaso" &&
+              !confirm(
+                `Segnare ${order.number || order.id} come evaso?\n• Aggiorna magazzino Tina\n• Invia mail di spedizione a ${order.customer_email || "(nessuna email)"}`,
+              )
+            ) {
+              return;
+            }
             try {
-              await apiFetch(base, "orders", {
+              const res = (await apiFetch(base, "orders", {
                 method: "PATCH",
                 body: JSON.stringify({ id: order.id, status: next }),
-              });
+              })) as { warning?: string };
               await paint();
+              if (res.warning) setMsg(msg, res.warning);
             } catch (err) {
               setMsg(msg, err instanceof Error ? err.message : "Errore aggiornamento");
             }
@@ -1237,9 +1276,9 @@ if (!root || !app) {
       return;
     }
 
-    const table = el("div", "account-table");
+    const table = el("div", "account-table account-table--artists");
     const head = el("div", "account-table__head");
-    for (const label of ["Artista", "Deal", "Dovuto", "Residuo"]) {
+    for (const label of ["Artista", "Deal", "Dovuto", "Residuo", ""]) {
       head.append(el("span", "", label));
     }
     table.append(head);
@@ -1254,20 +1293,38 @@ if (!root || !app) {
       );
       const paidTotal = euroLocal(paid[a.id] || 0);
       const outstanding = euroLocal(artistDueTotal - paidTotal);
-      const row = el("button", "account-table__row") as HTMLButtonElement;
-      row.type = "button";
-      row.innerHTML = `
-        <span class="account-table__primary">
-          <strong>${escapeHtml(a.name || a.email)}</strong>
-          <small>${escapeHtml(a.email)}${a.artist_slug ? ` · ${escapeHtml(a.artist_slug)}` : ""}</small>
-        </span>
-        <span class="account-table__num">${artistDeals.length}</span>
-        <span class="account-table__num">${money(artistDueTotal)}</span>
-        <span class="account-table__num account-table__emphasis">${money(outstanding)}</span>
+      const row = el("div", "account-table__row account-table__row--artists");
+      const open = el("button", "account-table__open") as HTMLButtonElement;
+      open.type = "button";
+      open.innerHTML = `
+        <strong>${escapeHtml(a.name || a.email)}</strong>
+        <small>${escapeHtml(a.email)}${a.artist_slug ? ` · ${escapeHtml(a.artist_slug)}` : ""}</small>
       `;
-      row.addEventListener("click", () => {
+      open.classList.add("account-table__primary");
+      open.addEventListener("click", () => {
         setAdminRoute({ name: "artist", id: a.id });
       });
+      const del = el("button", "account-linkish", "Elimina") as HTMLButtonElement;
+      del.type = "button";
+      del.addEventListener("click", async () => {
+        if (
+          !confirm(
+            `Eliminare ${a.name || a.email} dall’elenco artisti?\nNon potrà più accedere all’area personale.`,
+          )
+        ) {
+          return;
+        }
+        await apiFetch(base, `users?id=${encodeURIComponent(a.id)}`, { method: "DELETE" });
+        invalidateAdminShell();
+        await renderAdmin(_user, { force: true });
+      });
+      row.append(
+        open,
+        el("span", "account-table__num", String(artistDeals.length)),
+        el("span", "account-table__num", money(artistDueTotal)),
+        el("span", "account-table__num account-table__emphasis", money(outstanding)),
+        del,
+      );
       table.append(row);
     }
     mount.append(table);

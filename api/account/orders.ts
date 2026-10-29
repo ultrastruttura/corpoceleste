@@ -5,12 +5,43 @@ import {
   getShopOrder,
   listShopOrders,
   applyBankStockOnPaid,
+  applyOrderStockOnce,
   markShopOrderPaid,
+  markShopOrderShippedMail,
   updateShopOrderStatus,
   type ShopOrder,
   type ShopOrderStatus,
 } from "../../server/portal/orders.js";
 import { cors, json, readJson, requireUser } from "../../server/portal/http.js";
+
+async function sendShippedCustomerMail(order: ShopOrder): Promise<{ ok: boolean; error?: string }> {
+  const to = String(order.customer_email || "").trim();
+  if (!to) return { ok: false, error: "Cliente senza email" };
+  const { sendMail } = await import("../../server/mail.js");
+  const { loadShopIdentity } = await import("../../server/shop-identity.js");
+  const {
+    customerShippedText,
+    localeForCountry,
+    shippedOrderSubject,
+  } = await import("../../server/customer-mail.js");
+  const locale = localeForCountry(order.ship_country);
+  const linesSummary = order.lines
+    .map((l) => `${l.title} · ${l.size} · ×${l.qty}`)
+    .join("\n");
+  const text = customerShippedText({
+    locale,
+    orderRef: order.number || order.external_id,
+    linesSummary,
+    tracking: order.packlink_ref || undefined,
+    identity: await loadShopIdentity(),
+  });
+  const sent = await sendMail({
+    to,
+    subject: shippedOrderSubject(locale, order.number || order.external_id),
+    text,
+  });
+  return sent.ok ? { ok: true } : { ok: false, error: sent.error };
+}
 
 function csvEscape(raw: string) {
   // Customer text starting with = + - @ would run as a formula in Excel/Sheets.
@@ -163,6 +194,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (body.status !== "nuovo" && body.status !== "evaso") {
         return json(res, 400, { error: "id and status (nuovo|evaso) or paid:true required" });
       }
+
+      if (body.status === "evaso") {
+        const current = await getShopOrder(body.id);
+        if (!current) return json(res, 404, { error: "Order not found" });
+        // Tina/GitHub stock (idempotent — PayPal may already have decremented on capture).
+        const stock = await applyOrderStockOnce(current);
+        if (!stock.ok) {
+          return json(res, 503, {
+            error: `Magazzino non aggiornato: ${stock.note}`,
+            order: current,
+          });
+        }
+        let mailed = Boolean(current.shipped_at);
+        let mailError = "";
+        if (!current.shipped_at) {
+          const mail = await sendShippedCustomerMail(current);
+          mailed = mail.ok;
+          mailError = mail.error || "";
+          if (!mail.ok) {
+            console.error("orders: shipped mail failed", current.id, mail.error);
+          } else {
+            await markShopOrderShippedMail(current.id);
+          }
+        }
+        const order = await updateShopOrderStatus(body.id, "evaso");
+        if (!order) return json(res, 404, { error: "Order not found" });
+        if (!mailed) {
+          return json(res, 200, {
+            order,
+            stock,
+            warning: mailError
+              ? `Evaso e magazzino ok, ma mail spedizione fallita: ${mailError}`
+              : "Evaso e magazzino ok, ma mail spedizione non inviata (email cliente mancante).",
+          });
+        }
+        return json(res, 200, { order, stock, mailed: true });
+      }
+
       const order = await updateShopOrderStatus(body.id, body.status);
       if (!order) return json(res, 404, { error: "Order not found" });
       return json(res, 200, { order });

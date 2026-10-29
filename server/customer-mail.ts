@@ -283,3 +283,75 @@ export function customerWithdrawalText(opts: {
     legalFooter("it"),
   ].join("\n");
 }
+
+export function shippedOrderSubject(locale: string, orderRef: string) {
+  if (locale === "en") return `Your order ${orderRef} has shipped — Corpoceleste`;
+  if (locale === "de") return `Deine Bestellung ${orderRef} ist unterwegs — Corpoceleste`;
+  return `Ordine ${orderRef} spedito — Corpoceleste`;
+}
+
+/** Customer notice when admin marks the order as “evaso”. */
+export function customerShippedText(opts: {
+  locale?: string;
+  orderRef: string;
+  linesSummary: string;
+  tracking?: string;
+  identity: ShopIdentity;
+  when?: string;
+}) {
+  const locale = opts.locale || "it";
+  const when = opts.when || nowRome(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : "it-IT");
+  const track = String(opts.tracking || "").trim();
+  if (locale === "en") {
+    return [
+      "Your order has shipped — Corpoceleste",
+      `Date: ${when}`,
+      `Order: ${opts.orderRef}`,
+      "",
+      opts.linesSummary,
+      track ? `\nTracking / label: ${track}` : "",
+      "",
+      "If the parcel arrives damaged, accept with reservation and write to me.",
+      "",
+      legalFooter("en"),
+      "",
+      ...sellerAndForm("en", opts.identity),
+    ]
+      .filter((x) => x !== "")
+      .join("\n");
+  }
+  if (locale === "de") {
+    return [
+      "Deine Bestellung ist unterwegs — Corpoceleste",
+      `Datum: ${when}`,
+      `Bestellung: ${opts.orderRef}`,
+      "",
+      opts.linesSummary,
+      track ? `\nSendungsnummer / Etikett: ${track}` : "",
+      "",
+      "Kommt das Paket beschädigt an, nimm es unter Vorbehalt an und schreib mir.",
+      "",
+      legalFooter("de"),
+      "",
+      ...sellerAndForm("de", opts.identity),
+    ]
+      .filter((x) => x !== "")
+      .join("\n");
+  }
+  return [
+    "Il tuo ordine è stato spedito — Corpoceleste",
+    `Data: ${when}`,
+    `Ordine: ${opts.orderRef}`,
+    "",
+    opts.linesSummary,
+    track ? `\nTracking / etichetta: ${track}` : "",
+    "",
+    "Se il pacco arriva danneggiato, accetta con riserva e scrivimi.",
+    "",
+    legalFooter("it"),
+    "",
+    ...sellerAndForm("it", opts.identity),
+  ]
+    .filter((x) => x !== "")
+    .join("\n");
+}

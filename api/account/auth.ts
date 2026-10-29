@@ -7,6 +7,7 @@ import {
   ensureAdmin,
   getUserByEmail,
   issueMagicLink,
+  listUsers,
   portalAdminEmail,
   sendMagicLinkEmail,
   consumeMagicLink,
@@ -14,6 +15,12 @@ import {
 } from "../../server/portal/auth.js";
 import { portalConfigured } from "../../server/portal/db.js";
 import { mailConfigured } from "../../server/mail.js";
+import {
+  artistDashboard,
+  listDeals,
+  paidTotalsByUser,
+  summarizeDeals,
+} from "../../server/portal/deals.js";
 import {
   cors,
   json,
@@ -251,6 +258,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         mailConfigured: user?.role === "admin" ? mailConfigured() : undefined,
         // So admin can verify Production env without guessing.
         portalAdminEmail: user?.role === "admin" ? portalAdminEmail() || null : undefined,
+      });
+    }
+
+    /** One round-trip: session + admin shell (or artist dashboard). */
+    if (action === "bootstrap") {
+      const user = await sessionUser(sessionToken(req));
+      if (!user) return json(res, 401, { user: null });
+      const meta = {
+        user,
+        mailConfigured: user.role === "admin" ? mailConfigured() : undefined,
+        portalAdminEmail: user.role === "admin" ? portalAdminEmail() || null : undefined,
+      };
+      if (user.role === "admin") {
+        const [users, deals, paidTotals] = await Promise.all([
+          listUsers(),
+          listDeals().then((d) => summarizeDeals(d, { includeSales: false })),
+          paidTotalsByUser(),
+        ]);
+        return json(res, 200, {
+          ...meta,
+          shell: { users, deals, paidTotals },
+        });
+      }
+      return json(res, 200, {
+        ...meta,
+        dashboard: await artistDashboard(user.id),
       });
     }
 

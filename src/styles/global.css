@@ -2657,12 +2657,23 @@ body:has(.site-announce) .shop-home-stage {
   text-align: right;
 }
 
-.account-table__row--roster {
+.account-table--artists .account-table__head,
+.account-table--artists .account-table__row {
+  grid-template-columns: minmax(0, 2.2fr) 4.5rem minmax(5.5rem, 1fr) minmax(5.5rem, 1fr) auto;
+}
+
+.account-table__row--roster,
+.account-table__row--artists {
   cursor: default;
 }
 
-.account-table__row--roster:hover {
+.account-table__row--roster:hover,
+.account-table__row--artists:hover {
   background: var(--paper);
+}
+
+.account-table--artists .account-table__open.account-table__primary {
+  width: auto;
 }
 
 .account-table__open {
