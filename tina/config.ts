@@ -157,7 +157,9 @@ export default defineConfig({
             name: "images",
             label: "Foto (fino a 4)",
             list: true,
-            required: true,
+            // Not required: placeholders have images: [] — Tina delete of a linked artist
+            // updates those products to clear the ref and fails validation if images is required.
+            required: false,
           },
           localizedText("description", "Descrizione (pagina prodotto)"),
           localizedText("seoDescription", "Meta SEO (max ~160 caratteri)"),
