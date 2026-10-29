@@ -12,12 +12,14 @@ import { notifyOrder } from "../server/notify-shop.js";
 import { customerOrderText, localeForCountry } from "../server/customer-mail.js";
 import { loadShopIdentity } from "../server/shop-identity.js";
 import { formatCustomerOrderLines, formatShopOrderEmail } from "../server/stock-patch.js";
+import { isPickupTestOnlyCart } from "../src/lib/pickup-test.js";
 import { parseOrderLines } from "../src/lib/paypal-lines.js";
 import {
   money,
   parseShipDest,
   paymentCoversExpected,
   priceOrderLines,
+  type ShipDest,
 } from "../server/order-pricing.js";
 import {
   createShipmentAndLabels,
@@ -265,10 +267,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const addr = order?.purchase_units?.[0]?.shipping?.address;
-    const dest = parseShipDest({
+    let dest: ShipDest | null = parseShipDest({
       country: addr?.country_code,
       zip: addr?.postal_code,
     });
+    // €0 pickup-test: PayPal/Google Pay often omit shipping address → still record the order.
+    if (!dest && isPickupTestOnlyCart(lines)) {
+      console.warn("pickup-test: missing PayPal shipping — using studio fallback", captureId);
+      dest = { country: "IT", zip: "24027" };
+    }
     if (!dest) {
       const msg = `Missing PayPal shipping CAP/country (${addr?.country_code || "?"}/${addr?.postal_code || "?"})`;
       console.error(msg, captureId);
