@@ -1,0 +1,15 @@
+# Site is on GitHub Pages — Vercel only serves api/. Skip heavy static/content
+# so each Function deploy stays smaller (Hobby Function Storage is 10 GB).
+content
+public
+dist
+.astro
+admin
+scripts
+src/pages
+src/components
+src/layouts
+src/styles
+src/scripts
+tina
+*.md

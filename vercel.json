@@ -2,6 +2,7 @@
   "framework": null,
   "buildCommand": "",
   "installCommand": "npm install --omit=dev",
+  "ignoreCommand": "git rev-parse HEAD^ >/dev/null 2>&1 && git diff --quiet HEAD^ HEAD -- api server package.json package-lock.json vercel.json || exit 1",
   "crons": [
     {
       "path": "/api/cron-stock-release",
