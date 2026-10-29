@@ -249,7 +249,7 @@ if (!root || !app) {
       el(
         "p",
         "lede",
-        "Qui entri tu, con la tua email. Non è un invito: se non sei già in elenco non arriva nessuna mail. Gli artisti nuovi si invitano da Impostazioni, dopo l’accesso admin.",
+        "Inserisci la mail con cui ti ho comunicato la registrazione. Non è un invito: se non sei già in elenco non arriva nessuna mail.",
       ),
     );
     const form = el("form", "account-form account-login");

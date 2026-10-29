@@ -1,5 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
+import ProductGrid from "../components/ProductGrid.astro";
+import { availableProducts } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
 import { metaSnippet } from "../lib/seo";
@@ -7,6 +9,8 @@ import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
+/** Temporary: show purchasable SKUs (e.g. prova-pagamento) while shop was closed. */
+const listed = availableProducts();
 const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
 const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
@@ -26,7 +30,7 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
   preloadImage={posterSrc}
   preloadImageType="image/jpeg"
 >
-  <div class="shop-home shop-home--closed">
+  <div class="shop-home">
     <h1 class="visually-hidden">{homeTitle}</h1>
     <p class="visually-hidden">{seoDescription}</p>
     <figure class="shop-home-stage">
@@ -60,5 +64,13 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
         <span class="shop-home-stage__crt" aria-hidden="true"></span>
       </div>
     </figure>
+
+    {
+      listed.length > 0 && (
+        <div class="wrap page-pad">
+          <ProductGrid products={listed} eager={1} />
+        </div>
+      )
+    }
   </div>
 </Base>

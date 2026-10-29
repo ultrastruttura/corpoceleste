@@ -156,6 +156,16 @@ export function productBySlug(slug: string) {
   return products.find((p) => p.slug === slug);
 }
 
+/** Acquistabili (available/preorder con stock). */
+export function availableProducts() {
+  return products.filter((p) => isInStock(p));
+}
+
+/** Esauriti / non in vendita. */
+export function soldOutProducts() {
+  return products.filter((p) => !isInStock(p));
+}
+
 export { artistName, artists };
 
 export function formatPrice(n: number) {
