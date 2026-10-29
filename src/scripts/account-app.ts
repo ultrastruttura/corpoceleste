@@ -1399,7 +1399,7 @@ if (!root || !app) {
       const dash = filterDashboard(dashFull, filter);
       summaryBody.replaceChildren(
         metrics([
-          ["Lordo da fatturare", money(dash.artistDueTotal)],
+          ["Quota artista da fatturare", money(dash.artistDueTotal)],
           ["Già saldato", money(dash.paidTotal)],
           ["Residuo", money(dash.outstanding)],
         ]),
