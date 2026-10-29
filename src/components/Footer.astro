@@ -1,6 +1,6 @@
 ---
 import { commerce } from "../data/commerce";
-import { publicFormAction } from "../data/site";
+import { publicFormAction, site } from "../data/site";
 import { siteSettings } from "../data/settings";
 import PrivacyCheck from "./PrivacyCheck.astro";
 import FormHoney from "./FormHoney.astro";
@@ -56,7 +56,7 @@ const formAction = publicFormAction(siteSettings.shopEmail);
         {" · "}<a href={pageUrl(locale, "privacy/")}>{copy.footer.privacy}</a>
         {" · "}<a href={pageUrl(locale, "cookie/")}>{copy.footer.cookies}</a>
       </p>
-      <p>{commerce.legalName} · P. IVA {commerce.vatId}</p>
+      <p>{site.name} · P. IVA {commerce.vatId}</p>
     </div>
   </div>
 </footer>
