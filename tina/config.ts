@@ -82,14 +82,18 @@ export default defineConfig({
             createdAt: new Date().toISOString(),
             colorName: "Nero",
             sizes: ["S", "M", "L", "XL", "XXL"],
-            stock: { S: 0, M: 0, L: 0, XL: 0, XXL: 0 },
+            stockS: 0,
+            stockM: 0,
+            stockL: 0,
+            stockXL: 0,
+            stockXXL: 0,
             description: { it: "", en: "", de: "" },
             seoDescription: { it: "", en: "", de: "" },
           }),
         },
         fields: [
-          // Only title stays required: Tina blocks Magazzino/SEO/Descrizione while any
-          // sibling required field on the parent form is empty.
+          // Only title stays required: Tina blocks object sections while sibling
+          // required fields on the parent form are empty.
           { type: "string", name: "title", label: "Titolo", isTitle: true, required: true },
           {
             type: "reference",
@@ -163,23 +167,41 @@ export default defineConfig({
           {
             type: "string",
             name: "sizes",
-            label: "Taglie",
+            label: "Taglie in vendita",
             list: true,
             options: ["S", "M", "L", "XL", "XXL"],
           },
+          // Flat on the main form — Tina object fields open a submenu and Save feels
+          // like it only saves the parent. Shop APIs still normalize to stock{S,…}.
           {
-            type: "object",
-            name: "stock",
-            label: "Magazzino (pezzi per taglia)",
-            description: "Vuoto = 0. Compila le taglie che vendi.",
+            type: "number",
+            name: "stockS",
+            label: "Magazzino S",
             required: false,
-            fields: [
-              { type: "number", name: "S", label: "S", required: false },
-              { type: "number", name: "M", label: "M", required: false },
-              { type: "number", name: "L", label: "L", required: false },
-              { type: "number", name: "XL", label: "XL", required: false },
-              { type: "number", name: "XXL", label: "XXL", required: false },
-            ],
+          },
+          {
+            type: "number",
+            name: "stockM",
+            label: "Magazzino M",
+            required: false,
+          },
+          {
+            type: "number",
+            name: "stockL",
+            label: "Magazzino L",
+            required: false,
+          },
+          {
+            type: "number",
+            name: "stockXL",
+            label: "Magazzino XL",
+            required: false,
+          },
+          {
+            type: "number",
+            name: "stockXXL",
+            label: "Magazzino XXL",
+            required: false,
           },
           {
             type: "image",

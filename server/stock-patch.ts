@@ -13,19 +13,11 @@ export function stockQtyLineRe(size: string): RegExp {
   );
 }
 
-/** Surgical stock patch: only rewrite size qty inside the `stock:` block. */
-export function patchStockQty(
-  markdown: string,
+function patchNestedStockQty(
+  front: string,
   size: string,
-  nextQty: number,
-): { content: string; before: number } | null {
-  const qty = Math.max(0, Math.floor(nextQty));
-  // Tina / Windows saves may include UTF-8 BOM and CRLF.
-  const source = markdown.replace(/^\uFEFF/, "");
-
-  const fm = source.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!fm) return null;
-  const front = fm[1];
+  qty: number,
+): { front: string; before: number } | null {
   // Last stock line may lack a trailing newline when it is the final frontmatter field.
   const stockMatch = front.match(
     /(^|\r?\n)(stock:\r?\n)((?:[ \t]+[^\r\n]*\r?\n)*(?:[ \t]+[^\r\n]*)?)/,
@@ -39,17 +31,58 @@ export function patchStockQty(
 
   const before = Math.floor(Number(lineMatch[3]));
   if (!Number.isFinite(before)) return null;
-  if (before === qty) {
-    return { content: markdown, before };
-  }
+  if (before === qty) return { front, before };
 
   const newStockBody = stockBody.replace(lineRe, `$1$2${qty}`);
   const newFront = front.replace(stockMatch[0], `${stockMatch[1]}${stockMatch[2]}${newStockBody}`);
-  const patchedFm = `---\n${newFront}\n---`;
+  return { front: newFront, before };
+}
+
+/** Flat Tina fields: `stockS: 10` (no nested `stock:` block). */
+function patchFlatStockQty(
+  front: string,
+  size: string,
+  qty: number,
+): { front: string; before: number } | null {
+  const sizeEsc = size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const lineRe = new RegExp(
+    `^(stock${sizeEsc}:[ \\t]*)(\\d+)[ \\t]*$`,
+    "m",
+  );
+  const lineMatch = front.match(lineRe);
+  if (!lineMatch) return null;
+
+  const before = Math.floor(Number(lineMatch[2]));
+  if (!Number.isFinite(before)) return null;
+  if (before === qty) return { front, before };
+
+  const newFront = front.replace(lineRe, `$1${qty}`);
+  return { front: newFront, before };
+}
+
+/** Surgical stock patch: nested `stock:` block or flat `stockS` / `stockM` / … keys. */
+export function patchStockQty(
+  markdown: string,
+  size: string,
+  nextQty: number,
+): { content: string; before: number } | null {
+  const qty = Math.max(0, Math.floor(nextQty));
+  // Tina / Windows saves may include UTF-8 BOM and CRLF.
+  const source = markdown.replace(/^\uFEFF/, "");
+
+  const fm = source.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fm) return null;
+  const front = fm[1];
+
+  const patched =
+    patchNestedStockQty(front, size, qty) || patchFlatStockQty(front, size, qty);
+  if (!patched) return null;
+
+  const patchedFm = `---\n${patched.front}\n---`;
   // Preserve original BOM if present; normalize only the replaced frontmatter fence newlines.
   const bom = markdown.startsWith("\uFEFF") ? "\uFEFF" : "";
   const content = bom + source.replace(fm[0], patchedFm);
-  return { content, before };
+  return { content, before: patched.before };
 }
 
 export function formatShopOrderEmail(opts: {

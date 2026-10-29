@@ -30,6 +30,28 @@ export function parseStockMap(raw: unknown, sizes: string[]): Record<string, num
   return stock;
 }
 
+/**
+ * Prefer flat Tina fields (stockS…); fall back to nested `stock: { S: n }` for
+ * older files and live GitHub stock patches.
+ */
+export function stockFromProductData(
+  data: Record<string, unknown>,
+  sizes: string[],
+): Record<string, number> {
+  const nested = parseStockMap(data.stock, sizes);
+  const out: Record<string, number> = { ...nested };
+  for (const size of sizes) {
+    const flat = data[`stock${size}`];
+    if (flat === undefined || flat === null || flat === "") continue;
+    const n = Number(flat);
+    if (Number.isFinite(n)) out[size] = Math.max(0, Math.floor(n));
+  }
+  for (const size of sizes) {
+    if (out[size] === undefined) out[size] = 0;
+  }
+  return out;
+}
+
 /** Core commerce fields from gray-matter `data` (or live_stock JSON). */
 export function parseProductFrontmatter(
   data: Record<string, unknown>,
@@ -41,6 +63,6 @@ export function parseProductFrontmatter(
     price: Number(data.price ?? 0),
     status: parseProductStatus(data.status),
     sizes,
-    stock: parseStockMap(data.stock, sizes),
+    stock: stockFromProductData(data, sizes),
   };
 }
