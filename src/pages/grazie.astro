@@ -1,6 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import { currentLocale, pageUrl, t } from "../i18n";
+import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
@@ -11,18 +11,7 @@ const copy = t(locale);
     <h1 data-thanks-title>{copy.thanks.received}</h1>
     <p data-thanks-body></p>
     <div class="recap" data-thanks-recap hidden></div>
-    {/* Hidden by default: newsletter (and similar) must never flash a Shop CTA. Shown only for non-newsletter thanks. */}
-    <a class="btn" href={pageUrl(locale)} data-thanks-shop hidden>{copy.nav.shop}</a>
   </div>
-
-  <script is:inline>
-    (function () {
-      var from = new URLSearchParams(location.search).get("from") || "form";
-      if (from.indexOf("newsletter") === 0) return;
-      var shop = document.querySelector("[data-thanks-shop]");
-      if (shop) shop.hidden = false;
-    })();
-  </script>
 
   <script>
     import { clearCart, getCart, readOrderSnapshot } from "../scripts/cart";
@@ -35,15 +24,12 @@ const copy = t(locale);
     const title = document.querySelector("[data-thanks-title]");
     const body = document.querySelector("[data-thanks-body]");
     const recap = document.querySelector("[data-thanks-recap]");
-    const shop = document.querySelector<HTMLElement>("[data-thanks-shop]");
 
     if (title) title.textContent = msg.title;
     if (body) {
       body.textContent = msg.body;
       body.hidden = !msg.body;
     }
-    // Keep Shop hidden for newsletter*; show for orders / other forms (inline script may already have).
-    if (shop) shop.hidden = from.startsWith("newsletter");
 
     if (msg.order && recap) {
       const snap = readOrderSnapshot();
