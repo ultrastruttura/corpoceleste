@@ -8,6 +8,7 @@ import {
   packagesForQty,
   quoteShipping,
   sendcloudConfigured,
+  type ShippingQuote,
 } from "./sendcloud.js";
 import type { OrderLine } from "./paypal.js";
 

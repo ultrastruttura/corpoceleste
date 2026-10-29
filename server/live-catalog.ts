@@ -5,6 +5,7 @@ import { parseProductFrontmatter } from "../src/lib/product-frontmatter.js";
 
 export type LiveCatalogProduct = {
   id: string;
+  title: string;
   stock: Record<string, number>;
   status: string;
   price: number;
@@ -42,6 +43,7 @@ export async function listLiveCatalogProducts(): Promise<LiveCatalogProduct[]> {
     const core = parseProductFrontmatter(data as Record<string, unknown>, id);
     products.push({
       id,
+      title: core.title || id,
       stock: core.stock,
       status: core.status,
       price: core.price,

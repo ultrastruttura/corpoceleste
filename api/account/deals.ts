@@ -8,6 +8,7 @@ import {
   summarizeDeals,
 } from "../../server/portal/deals.js";
 import { json, readJson, requireUser } from "../../server/portal/http.js";
+import { isPurchasableStatus } from "../../src/lib/product-status.js";
 
 /** Admin CRUD + artist read of deals. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -16,6 +17,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     if (req.method === "GET") {
+      // Tina catalog options for deal product_id dropdown (admin).
+      if (String(req.query.products || "") === "1") {
+        if (user.role !== "admin") return json(res, 403, { error: "Admin only" });
+        try {
+          const { listLiveCatalogProducts } = await import("../../server/live-catalog.js");
+          const products = await listLiveCatalogProducts();
+          const items = products
+            .map((p) => ({
+              id: p.id,
+              title: p.title || p.id,
+              price: p.price,
+              status: p.status,
+              sellable: isPurchasableStatus(p.status),
+            }))
+            .sort((a, b) => {
+              if (a.sellable !== b.sellable) return a.sellable ? -1 : 1;
+              return a.title.localeCompare(b.title, "it");
+            });
+          return json(res, 200, { products: items });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error("account deals products", msg);
+          return json(res, 503, { error: msg.slice(0, 200) || "Catalogo Tina non disponibile" });
+        }
+      }
+
       const id = String(req.query.id || "");
       if (id) {
         const deal = await getDeal(id);

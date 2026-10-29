@@ -1464,7 +1464,8 @@ if (!root || !app) {
     const dealSection = el("section", "account-card");
     dealSection.append(el("h3", "", "Deal"));
     dealSection.append(el("p", "account-lede", "Prezzo al cliente, costo per pezzo, percentuale artista."));
-    const dealForm = buildDealForm(artist.id);
+    const catalogProducts = await loadDealProductOptions();
+    const dealForm = buildDealForm(artist.id, catalogProducts);
     dealForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(dealForm);
@@ -1557,12 +1558,55 @@ if (!root || !app) {
     mount.append(conti);
   }
 
-  function buildDealForm(_artistId: string) {
+  type DealProductOption = {
+    id: string;
+    title: string;
+    price: number;
+    status: string;
+    sellable: boolean;
+  };
+
+  let dealProductsCache: { at: number; products: DealProductOption[] } | null = null;
+  const DEAL_PRODUCTS_TTL_MS = 120_000;
+
+  async function loadDealProductOptions(): Promise<DealProductOption[]> {
+    if (
+      dealProductsCache &&
+      Date.now() - dealProductsCache.at < DEAL_PRODUCTS_TTL_MS
+    ) {
+      return dealProductsCache.products;
+    }
+    try {
+      const data = (await apiFetch(base, "deals?products=1")) as {
+        products: DealProductOption[];
+      };
+      dealProductsCache = {
+        at: Date.now(),
+        products: data.products || [],
+      };
+      return dealProductsCache.products;
+    } catch {
+      return dealProductsCache?.products || [];
+    }
+  }
+
+  function buildDealForm(_artistId: string, products: DealProductOption[]) {
     const dealForm = el("form", "account-stack-form") as HTMLFormElement;
+    const optionsHtml = products.length
+      ? [
+          `<option value="">Scegli prodotto Tina…</option>`,
+          ...products.map((p) => {
+            const label = p.sellable
+              ? `${escapeHtml(p.title)} (${escapeHtml(p.id)})`
+              : `${escapeHtml(p.title)} (${escapeHtml(p.id)}) · ${escapeHtml(p.status)}`;
+            return `<option value="${escapeHtml(p.id)}" data-title="${escapeHtml(p.title)}" data-price="${escapeHtml(String(p.price))}">${label}</option>`;
+          }),
+        ].join("")
+      : `<option value="">Nessun prodotto Tina (controlla GITHUB_TOKEN)</option>`;
     dealForm.innerHTML = `
       <label class="account-stack-form__field">
-        <span>Product id (Tina)</span>
-        <input name="product_id" required placeholder="slug prodotto" />
+        <span>Prodotto Tina</span>
+        <select name="product_id" required>${optionsHtml}</select>
       </label>
       <label class="account-stack-form__field">
         <span>Titolo</span>
@@ -1600,12 +1644,33 @@ if (!root || !app) {
       <button class="account-action-form__btn" type="submit">Salva deal</button>
       <p class="account-msg" data-msg hidden></p>
     `;
+    const productSelect = dealForm.elements.namedItem("product_id") as HTMLSelectElement;
+    const titleInput = dealForm.elements.namedItem("product_title") as HTMLInputElement;
+    const priceInput = dealForm.elements.namedItem("unit_price") as HTMLInputElement;
+    const applyProduct = () => {
+      const opt = productSelect.selectedOptions[0];
+      if (!opt?.value) return;
+      const title = opt.getAttribute("data-title") || opt.value;
+      const price = opt.getAttribute("data-price") || "";
+      titleInput.value = title;
+      if (price && Number(price) > 0) priceInput.value = price;
+    };
+    productSelect.addEventListener("change", applyProduct);
     return dealForm;
   }
 
   function fillDealForm(dealForm: HTMLFormElement, s: DealSummary) {
     (dealForm.elements.namedItem("id") as HTMLInputElement).value = s.deal.id;
-    (dealForm.elements.namedItem("product_id") as HTMLInputElement).value = s.deal.product_id;
+    const productSelect = dealForm.elements.namedItem("product_id") as HTMLSelectElement;
+    if (![...productSelect.options].some((o) => o.value === s.deal.product_id)) {
+      const opt = document.createElement("option");
+      opt.value = s.deal.product_id;
+      opt.textContent = `${s.deal.product_title || s.deal.product_id} (${s.deal.product_id})`;
+      opt.setAttribute("data-title", s.deal.product_title || s.deal.product_id);
+      opt.setAttribute("data-price", String(s.deal.unit_price));
+      productSelect.append(opt);
+    }
+    productSelect.value = s.deal.product_id;
     (dealForm.elements.namedItem("product_title") as HTMLInputElement).value = s.deal.product_title;
     (dealForm.elements.namedItem("unit_price") as HTMLInputElement).value = String(s.deal.unit_price);
     (dealForm.elements.namedItem("planned_qty") as HTMLInputElement).value = String(
