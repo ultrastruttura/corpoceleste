@@ -61,7 +61,9 @@ function asLocalized(value: unknown): Localized {
 }
 
 function artistIdFromRef(ref: unknown): string {
-  const s = String(ref ?? "");
+  if (ref == null || ref === "") return "";
+  const s = String(ref).trim();
+  if (!s || s === "null" || s === "undefined") return "";
   const match = s.match(/artists\/([^/]+?)(?:\.md)?$/);
   return match?.[1] ?? s;
 }

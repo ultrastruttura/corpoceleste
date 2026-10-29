@@ -74,8 +74,11 @@ export default defineConfig({
             type: "reference",
             name: "artist",
             label: "Artista",
+            description:
+              "Obbligatorio in pratica sullo shop. Per eliminare un artista in Tina: prima riassegna (o elimina) le sue maglie, altrimenti Tina toglie il collegamento e la maglia resta senza artista.",
             collections: ["artist"],
-            required: true,
+            // Not required so Tina can clear refs when deleting an artist (required:true blocks delete).
+            required: false,
           },
           { type: "number", name: "price", label: "Prezzo (€)", required: true },
           {
