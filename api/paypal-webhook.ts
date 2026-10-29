@@ -69,21 +69,32 @@ async function readRawBody(req: VercelRequest): Promise<string> {
   return JSON.stringify(req.body ?? {});
 }
 
-function shippingAddressText(order: PayPalOrder | null): string {
+function shippingAddressText(
+  order: PayPalOrder | null,
+  fallback?: { country: string; zip: string; note?: string },
+): string {
   const ship = order?.purchase_units?.[0]?.shipping;
-  if (!ship?.address) return "";
-  const a = ship.address;
-  return [
-    ship.name?.full_name || "",
-    a.address_line_1 || "",
-    a.address_line_2 || "",
-    [a.postal_code, a.admin_area_2].filter(Boolean).join(" "),
-    a.admin_area_1 || "",
-    a.country_code || "",
-  ]
-    .map((x) => String(x || "").trim())
-    .filter(Boolean)
-    .join("\n");
+  if (ship?.address) {
+    const a = ship.address;
+    const text = [
+      ship.name?.full_name || "",
+      a.address_line_1 || "",
+      a.address_line_2 || "",
+      [a.postal_code, a.admin_area_2].filter(Boolean).join(" "),
+      a.admin_area_1 || "",
+      a.country_code || "",
+    ]
+      .map((x) => String(x || "").trim())
+      .filter(Boolean)
+      .join("\n");
+    if (text) return text;
+  }
+  if (fallback) {
+    return [fallback.note || "Indirizzo incompleto da PayPal", `${fallback.zip} ${fallback.country}`]
+      .filter(Boolean)
+      .join("\n");
+  }
+  return "";
 }
 
 async function ensureSendcloudShipment(opts: {
@@ -435,18 +446,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const bits = order ? orderEmailBits(order) : { labels: [] as string[], total: undefined };
+    const fromInvoice = shipContactFromInvoiceId(order?.purchase_units?.[0]?.invoice_id);
+    const customerEmail = (
+      fromInvoice.email ||
+      order?.payer?.email_address ||
+      ""
+    ).trim();
+    const customerPhone = fromInvoice.phone || "";
+    const addressText = shippingAddressText(order, {
+      country: dest.country,
+      zip: dest.zip,
+      note: isPickupTestOnlyCart(lines)
+        ? "Ritiro / test (indirizzo PayPal assente)"
+        : "Destinazione da checkout",
+    });
     const shopBody = formatShopOrderEmail({
       captureId,
       lines,
       stockNotes: notes,
       itemLabels: bits.labels,
+      merchandise: `${money(priced.order.merchandise)} EUR`,
+      shippingCost: `${money(priced.order.shipping)} EUR`,
       total: bits.total || `${money(priced.order.total)} EUR`,
-      shippingAddress: shippingAddressText(order),
+      customerEmail,
+      customerPhone,
+      shippingAddress: addressText,
       packlinkRef: packlink.packlinkRef,
       packlinkLabels: packlink.packlinkLabels,
       packlinkError: packlink.packlinkError,
     });
-    const customerLocale = localeForCountry(addr?.country_code);
+    const customerLocale = localeForCountry(addr?.country_code || dest.country);
     const customerBody = customerOrderText({
       locale: customerLocale,
       metodo: "PayPal",
@@ -465,7 +494,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       emailed = await notifyOrder({
         shopSubject: "Ordine shop Corpoceleste (PayPal)",
         shopBody,
-        customerTo: order?.payer?.email_address,
+        customerTo: customerEmail || order?.payer?.email_address,
         customerSubject: "Conferma d’ordine — Corpoceleste",
         customerBody,
       });
@@ -500,8 +529,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           external_id: captureId,
           source: "paypal",
           customer_name: ship?.name?.full_name || "",
-          customer_email: order?.payer?.email_address || "",
-          shipping_address: shippingAddressText(order),
+          customer_email: customerEmail || order?.payer?.email_address || "",
+          customer_phone: customerPhone,
+          shipping_address: addressText,
           ship_country: dest.country,
           ship_zip: dest.zip,
           merchandise: priced.order.merchandise,

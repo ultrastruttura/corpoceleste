@@ -57,6 +57,10 @@ export function formatShopOrderEmail(opts: {
   stockNotes: string[];
   itemLabels?: string[];
   total?: string;
+  merchandise?: string;
+  shippingCost?: string;
+  customerEmail?: string;
+  customerPhone?: string;
   packlinkRef?: string;
   packlinkLabels?: string[];
   packlinkError?: string;
@@ -72,12 +76,22 @@ export function formatShopOrderEmail(opts: {
     for (const url of opts.packlinkLabels) packlinkLines.push(`Etichetta: ${url}`);
   }
   if (opts.packlinkError) packlinkLines.push(`Sendcloud errore: ${opts.packlinkError}`);
+  const address = String(opts.shippingAddress || "").trim();
   return [
+    "Nuovo ordine PayPal",
+    "",
     ...rows,
     "",
+    opts.customerEmail ? `Email cliente: ${opts.customerEmail}` : "",
+    opts.customerPhone ? `Telefono: ${opts.customerPhone}` : "",
+    address ? `Indirizzo:\n${address}` : "Indirizzo: (non restituito da PayPal)",
+    "",
+    opts.merchandise ? `Merce: ${opts.merchandise}` : "",
+    opts.shippingCost != null && opts.shippingCost !== ""
+      ? `Spedizione: ${opts.shippingCost}`
+      : "",
+    opts.total ? `Totale: ${opts.total}` : "",
     `Capture: ${opts.captureId}`,
-    opts.total ? `Totale PayPal: ${opts.total}` : "",
-    opts.shippingAddress ? `Spedizione a:\n${opts.shippingAddress}` : "",
     ...packlinkLines,
     "",
     "Magazzino:",
