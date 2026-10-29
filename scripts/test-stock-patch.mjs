@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 function stockQtyLineRe(size) {
   const sizeEsc = size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(
-    `^([ \\t]+)((?:"${sizeEsc}"|'${sizeEsc}'|${sizeEsc}):\\s*)(\\d+)\\s*$`,
+    `^([ \\t]+)((?:"${sizeEsc}"|'${sizeEsc}'|${sizeEsc}):[ \\t]*)(\\d+)[ \\t]*$`,
     "m",
   );
 }
