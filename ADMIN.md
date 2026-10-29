@@ -7,7 +7,7 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 | Sezione | Azioni |
 |---------|--------|
 | **Maglie** | Aggiungere / togliere prodotti, prezzo, stato, taglie, **magazzino (pezzi per taglia)**, **2–3 foto**, descrizione IT/EN/DE, **meta SEO** |
-| **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO**. Per togliere un artista: prima elimina (o riassegna) le sue maglie, poi elimina l’artista. |
+| **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO**. Puoi eliminare un artista anche se ha maglie: Tina stacca il collegamento da solo. |
 | **News** | Aggiungere / togliere / modificare articoli |
 | **Bio** | Nome, testo bio IT/EN/DE, sezioni stampa e stampa dal vivo |
 | **SEO e home** | Meta description, H1 home, immagine Open Graph, **email shop**, **Website ID Umami Analytics** |

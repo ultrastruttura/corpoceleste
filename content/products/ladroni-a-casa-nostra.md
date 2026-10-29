@@ -14,11 +14,13 @@ sizes:
   - M
   - L
   - XL
+  - XXL
 stock:
   S: 10
   M: 15
   L: 15
   XL: 8
+  XXL: 0
 images:
   - /uploads/261022-Hamal-300.jpg
   - /uploads/261025-Betelgeuse-300.jpg

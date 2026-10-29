@@ -41,7 +41,7 @@ function thumbSrc(print: string) {
 }
 
 function sizesFor(id: string) {
-  return catalogProducts().find((p) => p.id === id)?.sizes ?? ["S", "M", "L", "XL"];
+  return catalogProducts().find((p) => p.id === id)?.sizes ?? ["S", "M", "L", "XL", "XXL"];
 }
 
 export function lineName(item: CartItem) {

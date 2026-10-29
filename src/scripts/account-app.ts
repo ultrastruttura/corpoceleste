@@ -721,7 +721,7 @@ if (!root || !app) {
     fetchedAt: number;
   };
   let adminShellCache: AdminShellCache | null = null;
-  const ADMIN_SHELL_TTL_MS = 60_000;
+  const ADMIN_SHELL_TTL_MS = 120_000;
 
   function invalidateAdminShell() {
     adminShellCache = null;
@@ -1089,16 +1089,34 @@ if (!root || !app) {
       msg,
     );
 
-    const paint = async () => {
+    type OrdersCache = { at: number; status: string; orders: ShopOrder[] };
+    let ordersCache: OrdersCache | null = null;
+    const ORDERS_TTL_MS = 45_000;
+
+    const paint = async (opts?: { force?: boolean }) => {
       listHost.replaceChildren(el("p", "lede", "Caricamento…"));
       msg.hidden = true;
       try {
-        const data = (await apiFetch(
-          base,
-          `orders?status=${encodeURIComponent(statusFilter)}`,
-        )) as { orders: ShopOrder[] };
+        const fresh =
+          !opts?.force &&
+          ordersCache &&
+          ordersCache.status === statusFilter &&
+          Date.now() - ordersCache.at < ORDERS_TTL_MS;
+        if (!fresh) {
+          const data = (await apiFetch(
+            base,
+            `orders?status=${encodeURIComponent(statusFilter)}`,
+          )) as { orders: ShopOrder[] };
+          ordersCache = {
+            at: Date.now(),
+            status: statusFilter,
+            orders: data.orders,
+          };
+        }
 
-        const orders = data.orders.filter((o) => inRange(o.created_at.slice(0, 10), period));
+        const orders = (ordersCache?.orders || []).filter((o) =>
+          inRange(o.created_at.slice(0, 10), period),
+        );
         const merceTotal = euroLocal(orders.reduce((s, o) => s + o.merchandise, 0));
 
         summaryHost.replaceChildren(
@@ -1190,7 +1208,7 @@ if (!root || !app) {
                 method: "PATCH",
                 body: JSON.stringify({ id: order.id, status: next }),
               })) as { warning?: string };
-              await paint();
+              await paint({ force: true });
               if (res.warning) setMsg(msg, res.warning);
             } catch (err) {
               setMsg(msg, err instanceof Error ? err.message : "Errore aggiornamento");
@@ -1208,7 +1226,7 @@ if (!root || !app) {
                   method: "PATCH",
                   body: JSON.stringify({ id: order.id, paid: true }),
                 });
-                await paint();
+                await paint({ force: true });
               } catch (err) {
                 setMsg(msg, err instanceof Error ? err.message : "Errore pagamento");
               }
@@ -1225,7 +1243,7 @@ if (!root || !app) {
                 method: "DELETE",
                 body: JSON.stringify({ id: order.id }),
               });
-              await paint();
+              await paint({ force: true });
             } catch (err) {
               setMsg(msg, err instanceof Error ? err.message : "Errore eliminazione");
             }
@@ -1402,7 +1420,7 @@ if (!root || !app) {
             </label>
             <label class="account-action-form__field account-action-form__field--size">
               <span>Taglia</span>
-              <input name="size" placeholder="S / M / L / XL" list="cc-sizes" />
+              <input name="size" placeholder="S / M / L / XL / XXL" list="cc-sizes" />
             </label>
             <div class="account-action-form__submit">
               <span class="account-action-form__ghost" aria-hidden="true">Salva</span>
@@ -1451,7 +1469,7 @@ if (!root || !app) {
       if (!document.getElementById("cc-sizes")) {
         const dl = document.createElement("datalist");
         dl.id = "cc-sizes";
-        for (const size of ["S", "M", "L", "XL"]) {
+        for (const size of ["S", "M", "L", "XL", "XXL"]) {
           const opt = document.createElement("option");
           opt.value = size;
           dl.append(opt);

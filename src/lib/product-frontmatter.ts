@@ -2,7 +2,7 @@
 
 import { parseProductStatus, type ProductStatus } from "./product-status.js";
 
-const DEFAULT_SIZES = ["S", "M", "L", "XL"];
+const DEFAULT_SIZES = ["S", "M", "L", "XL", "XXL"];
 
 export type ProductFrontmatterCore = {
   title: string;

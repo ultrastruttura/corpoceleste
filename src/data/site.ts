@@ -46,7 +46,7 @@ export const site = {
   rea: "",
   /** Telefono di contatto, se lo pubblichi. */
   telefono: "",
-  sizes: ["S", "M", "L", "XL"] as const,
+  sizes: ["S", "M", "L", "XL", "XXL"] as const,
   /**
    * Fallback tabella taglie se il prodotto non ha `fitModel`.
    * Preferisci content/fit-models/*.md (Tina → Modelli capo).
@@ -57,6 +57,7 @@ export const site = {
     { size: "M", chest: 52, length: 72, sleeve: 21 },
     { size: "L", chest: 55, length: 74, sleeve: 22 },
     { size: "XL", chest: 58, length: 76, sleeve: 23 },
+    { size: "XXL", chest: 61, length: 78, sleeve: 24 },
   ] as const,
 };
 

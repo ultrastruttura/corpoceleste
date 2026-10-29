@@ -18,4 +18,8 @@ rows:
     chest: 58
     length: 76
     sleeve: 23
+  - size: XXL
+    chest: 61
+    length: 78
+    sleeve: 24
 ---
