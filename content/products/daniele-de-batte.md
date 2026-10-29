@@ -1,13 +1,13 @@
 ---
 title: Maglia 2
-artist: content/artists/artista-2.md
+artist: null
 price: 1
 status: soldout
 kind: shirt
 fitModel: content/fit-models/tee-default.md
 nuovo: true
-createdAt: 2017-05-14T00:00:00.000Z
-color: "#141414"
+createdAt: '2017-05-14T00:00:00.000Z'
+color: '#141414'
 colorName: Nero
 composition: 100% cotone
 sizes:
@@ -30,3 +30,4 @@ description:
   en: Placeholder. Content coming soon.
   de: Platzhalter. Inhalt folgt.
 ---
+
