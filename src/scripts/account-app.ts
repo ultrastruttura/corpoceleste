@@ -117,8 +117,7 @@ function shareFromSales(deal: DealSummary["deal"], sales: DealSummary["sales"]) 
   const planned = Math.max(1, Math.floor(deal.planned_qty));
   const soldQty = sales.reduce((s, x) => s + x.qty, 0);
   const gross = euroLocal(sales.reduce((s, x) => s + x.qty * x.unit_price, 0));
-  const vatFactor = deal.vat_rate_pct / (100 + deal.vat_rate_pct);
-  const vat = euroLocal(gross * vatFactor);
+  const vat = euroLocal((gross * deal.vat_rate_pct) / 100);
   let variable = 0;
   let fixedTotal = 0;
   for (const c of deal.costs) {

@@ -26,8 +26,8 @@ export function computeShare(opts: {
   const planned = Math.max(1, Math.floor(opts.planned_qty));
   const soldQty = opts.sales.reduce((s, x) => s + x.qty, 0);
   const gross = euro(opts.sales.reduce((s, x) => s + x.qty * x.unit_price, 0));
-  const vatFactor = opts.vat_rate_pct / (100 + opts.vat_rate_pct);
-  const vat = euro(gross * vatFactor);
+  // IVA as % of gross (e.g. 22% of 160 = 35.20), not scorporata 22/122.
+  const vat = euro((gross * opts.vat_rate_pct) / 100);
 
   let variable = 0;
   let fixedTotal = 0;
