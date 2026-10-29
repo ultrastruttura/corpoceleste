@@ -112,11 +112,10 @@ export default defineConfig({
           },
           { type: "boolean", name: "nuovo", label: "Nuovo (in cima allo shop)" },
           { type: "datetime", name: "createdAt", label: "Data", required: true },
-          { type: "string", name: "color", label: "Colore (hex)", required: true },
           {
             type: "string",
             name: "colorName",
-            label: "Nome colore",
+            label: "Colore",
             required: true,
             options: [
               { value: "Nero", label: "Nero" },

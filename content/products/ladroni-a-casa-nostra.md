@@ -7,7 +7,6 @@ kind: shirt
 fitModel: content/fit-models/tee-default.md
 nuovo: true
 createdAt: 2026-10-28T14:11:44.131Z
-color: '000000'
 colorName: Nero
 composition: 100% cotone
 sizes:
