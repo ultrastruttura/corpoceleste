@@ -1,0 +1,14 @@
+{
+  "captureId": "9LN78033JG710611S",
+  "lines": [
+    {
+      "id": "prova-pagamento",
+      "size": "UNI",
+      "qty": 1
+    }
+  ],
+  "status": "failed",
+  "at": "2026-10-29T13:05:47.778Z",
+  "error": "Invalid size prova-pagamento UNI",
+  "paidTotal": "0.01"
+}
