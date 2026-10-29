@@ -1,5 +1,8 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
+import { discoverySitemapBlockFragments } from "./src/lib/discovery.ts";
+
+const blockedDiscovery = discoverySitemapBlockFragments();
 
 // Produzione: https://www.corpoceleste.eu/
 // Locale: http://localhost:4321/
@@ -17,13 +20,20 @@ export default defineConfig({
           de: "de-DE",
         },
       },
-      filter: (page) =>
-        !page.includes("/404") &&
-        !page.includes("/grazie") &&
-        !page.includes("/carrello") &&
-        !page.includes("/checkout") &&
-        !page.includes("/admin") &&
-        !page.includes("/account"),
+      filter: (page) => {
+        if (
+          page.includes("/404") ||
+          page.includes("/grazie") ||
+          page.includes("/carrello") ||
+          page.includes("/checkout") ||
+          page.includes("/admin") ||
+          page.includes("/account")
+        ) {
+          return false;
+        }
+        // CMS placeholders (Maglia 1… / Artista 1…) stay out of the public sitemap until filled.
+        return !blockedDiscovery.some((frag) => page.includes(frag));
+      },
     }),
   ],
   i18n: {

@@ -3,8 +3,8 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import SiteAnnounce from "../components/SiteAnnounce.astro";
 import { asset } from "../lib/paths";
-import { absoluteUrl, organizationJsonLd } from "../lib/seo";
-import { llmsTxtUrl } from "../lib/llms";
+import { absoluteUrl, organizationJsonLd, websiteJsonLd } from "../lib/seo";
+import { llmsFullTxtUrl, llmsTxtUrl } from "../lib/llms";
 import { products, artistName, productImageAlt } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { commerce } from "../data/commerce";
@@ -90,8 +90,14 @@ const catalog = {
   })),
 };
 const pageJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
-const jsonLdBlocks = [organizationJsonLd(Astro.site), ...pageJsonLd];
-const llmsHref = llmsTxtUrl(locale === "en" ? "en" : "it");
+const jsonLdBlocks = [
+  organizationJsonLd(Astro.site),
+  websiteJsonLd(Astro.site),
+  ...pageJsonLd,
+];
+const llmsLocale = locale === "en" || locale === "de" ? locale : "it";
+const llmsHref = llmsTxtUrl(llmsLocale);
+const llmsFullHref = llmsFullTxtUrl(llmsLocale);
 const umamiId = siteSettings.umamiWebsiteId;
 ---
 
@@ -152,6 +158,11 @@ const umamiId = siteSettings.umamiWebsiteId;
     <link rel="icon" href={asset("brand/favicon.png")} type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href={asset("brand/apple-touch-icon.png")} sizes="180x180" />
     <link rel="describedby" href={llmsHref} type="text/plain" title="llms.txt" />
+    <link rel="alternate" href={llmsHref} type="text/plain" title="llms.txt" />
+    <link rel="alternate" href={llmsFullHref} type="text/plain" title="llms-full.txt" />
+    <link rel="alternate" href={llmsTxtUrl("it")} type="text/plain" title="llms.txt (it)" hreflang="it" />
+    <link rel="alternate" href={llmsTxtUrl("en")} type="text/plain" title="llms.txt (en)" hreflang="en" />
+    <link rel="alternate" href={llmsTxtUrl("de")} type="text/plain" title="llms.txt (de)" hreflang="de" />
     {
       jsonLdBlocks.map((block) => (
         <script type="application/ld+json" set:html={JSON.stringify(block)} />
