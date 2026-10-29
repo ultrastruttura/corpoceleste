@@ -12,14 +12,12 @@ import { notifyOrder } from "../server/notify-shop.js";
 import { customerOrderText, localeForCountry } from "../server/customer-mail.js";
 import { loadShopIdentity } from "../server/shop-identity.js";
 import { formatCustomerOrderLines, formatShopOrderEmail } from "../server/stock-patch.js";
-import { isPickupTestOnlyCart } from "../src/lib/pickup-test.js";
 import { parseOrderLines } from "../src/lib/paypal-lines.js";
 import {
   money,
   parseShipDest,
   paymentCoversExpected,
   priceOrderLines,
-  type ShipDest,
 } from "../server/order-pricing.js";
 import {
   createShipmentAndLabels,
@@ -109,19 +107,6 @@ async function ensureSendcloudShipment(opts: {
       packlinkLabels: opts.ledger.packlinkLabels || [],
       packlinkServiceId: opts.ledger.packlinkServiceId || opts.priced.packlink.serviceId,
       packlinkError: opts.ledger.packlinkError,
-    };
-  }
-
-  // Temporary pickup-test SKU: never create a real Sendcloud shipment.
-  const { isPickupTestOnlyCart, isPickupTestServiceId, PICKUP_TEST_SERVICE_ID } =
-    await import("../src/lib/pickup-test.js");
-  if (
-    isPickupTestOnlyCart(opts.priced.lines) ||
-    isPickupTestServiceId(opts.priced.packlink.serviceId)
-  ) {
-    return {
-      packlinkRef: PICKUP_TEST_SERVICE_ID,
-      packlinkServiceId: PICKUP_TEST_SERVICE_ID,
     };
   }
 
@@ -278,15 +263,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const addr = order?.purchase_units?.[0]?.shipping?.address;
-    let dest: ShipDest | null = parseShipDest({
+    const dest = parseShipDest({
       country: addr?.country_code,
       zip: addr?.postal_code,
     });
-    // €0 pickup-test: PayPal/Google Pay often omit shipping address → still record the order.
-    if (!dest && isPickupTestOnlyCart(lines)) {
-      console.warn("pickup-test: missing PayPal shipping — using studio fallback", captureId);
-      dest = { country: "IT", zip: "24027" };
-    }
     if (!dest) {
       const msg = `Missing PayPal shipping CAP/country (${addr?.country_code || "?"}/${addr?.postal_code || "?"})`;
       console.error(msg, captureId);
@@ -456,9 +436,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const addressText = shippingAddressText(order, {
       country: dest.country,
       zip: dest.zip,
-      note: isPickupTestOnlyCart(lines)
-        ? "Ritiro / test (indirizzo PayPal assente)"
-        : "Destinazione da checkout",
+      note: "Destinazione da checkout",
     });
     const shopBody = formatShopOrderEmail({
       captureId,

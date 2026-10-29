@@ -1,10 +1,6 @@
 /** Server-side pricing from catalog — never trust client unit amounts. */
 
 import { isPurchasableStatus, loadCatalogProduct } from "./catalog.js";
-import {
-  isPickupTestOnlyCart,
-  PICKUP_TEST_SERVICE_ID,
-} from "../src/lib/pickup-test.js";
 import { isSupportedShipCountry } from "../src/lib/ship-countries.js";
 import { mergeOrderLines } from "../src/lib/paypal-lines.js";
 import { normalizeCountry, normalizeZip } from "../src/lib/ship-normalize.js";
@@ -12,7 +8,6 @@ import {
   packagesForQty,
   quoteShipping,
   sendcloudConfigured,
-  type ShippingQuote,
 } from "./sendcloud.js";
 import type { OrderLine } from "./paypal.js";
 
@@ -150,31 +145,6 @@ export async function priceOrderLines(
   }
 
   merchandise = Math.round(merchandise * 100) / 100;
-
-  // Temporary: cart with only `prova-pagamento` → €0 shipping, no Sendcloud.
-  if (isPickupTestOnlyCart(priced)) {
-    const packlink: ShippingQuote = {
-      serviceId: PICKUP_TEST_SERVICE_ID,
-      price: 0,
-      currency: "EUR",
-      carrier: "Ritiro test",
-      serviceName: "Nessuna spedizione (test pagamento)",
-      firstMile: "pickup",
-    };
-    return {
-      ok: true,
-      order: {
-        lines: priced,
-        merchandise,
-        shipping: 0,
-        total: merchandise,
-        shipZone: shipZoneFromCountry(shipCountry),
-        shipCountry,
-        shipZip,
-        packlink,
-      },
-    };
-  }
 
   if (!sendcloudConfigured()) {
     return { ok: false, error: "Shipping not configured (Sendcloud keys)" };
