@@ -553,17 +553,28 @@ if (!root || !app) {
 
   function dealBlock(s: DealSummary, adminHints = false) {
     const box = el("article", "account-deal");
+    const perUnit = s.deal.costs
+      .filter((c) => c.per_unit)
+      .reduce((sum, c) => sum + c.amount, 0);
     box.append(
       el("h3", "", s.deal.product_title || s.deal.product_id),
       el(
         "p",
         "account-meta",
-        `${s.soldQty}/${s.deal.planned_qty} pezzi · ${s.deal.artist_share_pct}% artista · IVA ${s.deal.vat_rate_pct}% · ${money(s.deal.unit_price)}`,
+        [
+          `${s.soldQty}/${s.deal.planned_qty} pezzi`,
+          `${money(s.deal.unit_price)} / pezzo`,
+          perUnit > 0 ? `costo ${money(perUnit)} / pezzo` : "",
+          `IVA ${s.deal.vat_rate_pct}%`,
+          `${s.deal.artist_share_pct}% artista`,
+        ]
+          .filter(Boolean)
+          .join(" · "),
       ),
     );
 
     const orders = el("div", "account-sales");
-    orders.append(el("h4", "", "Ordini"));
+    orders.append(el("h4", "", "Ordini di questo deal"));
     if (!s.sales.length) {
       orders.append(
         el(
@@ -600,26 +611,18 @@ if (!root || !app) {
     }
     box.append(orders);
 
-    if (s.sales.length) {
-      const rows: Array<[string, string]> = [
-        ["Ricavi lordi", money(s.gross)],
-        ["IVA", money(s.vat)],
-        ["Costi", money(s.costsTotal)],
-        ["Utile", money(s.profit)],
-        ["Quota artista", money(s.artistDue)],
+    // Conti di QUESTO deal — distinti dal riepilogo totale in alto.
+    box.append(el("h4", "", "Conti di questo deal"));
+    box.append(
+      metrics([
+        ["Ricavi vendite", money(s.gross)],
+        [`− IVA (${s.deal.vat_rate_pct}%)`, money(s.vat)],
+        ["− Costi produzione", money(s.costsTotal)],
+        ["= Utile", money(s.profit)],
+        [`Quota artista (${s.deal.artist_share_pct}%)`, money(s.artistDue)],
         ["Quota studio", money(s.studioShare)],
-      ];
-      box.append(metrics(rows));
-    }
-
-    if (s.deal.costs.length) {
-      const perUnit = s.deal.costs
-        .filter((c) => c.per_unit)
-        .reduce((sum, c) => sum + c.amount, 0);
-      if (perUnit > 0) {
-        box.append(el("p", "account-meta", `Costo per pezzo: ${money(perUnit)}`));
-      }
-    }
+      ]),
+    );
     return box;
   }
 
@@ -631,18 +634,24 @@ if (!root || !app) {
       dashPrefetch ||
       ((await apiFetch(base, "settle?dashboard=1")) as Dashboard);
     let filter: PeriodFilter = {};
-    const summaryHost = el("div", "");
+    const summaryHost = el("section", "account-card");
     const dealsHost = el("div", "");
     const paint = () => {
       const dash = filterDashboard(dashFull, filter);
       summaryHost.replaceChildren(
+        el("h3", "", "Totale (somma di tutti i deal)"),
+        el(
+          "p",
+          "account-lede",
+          "Qui sotto è solo la somma delle quote artista. Il dettaglio per maglia è in ogni deal.",
+        ),
         metrics([
-          ["Lordo da fatturare", money(dash.artistDueTotal)],
+          ["Quota artista da fatturare", money(dash.artistDueTotal)],
           ["Già saldato", money(dash.paidTotal)],
           ["Ancora dovuto", money(dash.outstanding)],
         ]),
       );
-      dealsHost.replaceChildren();
+      dealsHost.replaceChildren(el("h2", "", "Deal"));
       if (!dash.deals.length) {
         dealsHost.append(el("p", "lede", "Nessun deal collegato ancora."));
       } else {
@@ -1401,7 +1410,7 @@ if (!root || !app) {
     // Full sales come from dashboard (shell uses lite deals without sale rows).
     const deals = dashFull.deals;
     const orders = el("section", "account-card");
-    orders.append(el("h3", "", "Ordini e deal"));
+    orders.append(el("h3", "", "Deal (conti per maglia)"));
     if (!deals.length) {
       orders.append(el("p", "account-lede", "Nessun deal ancora. Creane uno sotto in Deal."));
     } else {
