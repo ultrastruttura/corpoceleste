@@ -11,8 +11,18 @@ const copy = t(locale);
     <h1 data-thanks-title>{copy.thanks.received}</h1>
     <p data-thanks-body></p>
     <div class="recap" data-thanks-recap hidden></div>
-    <a class="btn" href={pageUrl(locale)} data-thanks-shop>{copy.nav.shop}</a>
+    {/* Hidden by default: newsletter (and similar) must never flash a Shop CTA. Shown only for non-newsletter thanks. */}
+    <a class="btn" href={pageUrl(locale)} data-thanks-shop hidden>{copy.nav.shop}</a>
   </div>
+
+  <script is:inline>
+    (function () {
+      var from = new URLSearchParams(location.search).get("from") || "form";
+      if (from.indexOf("newsletter") === 0) return;
+      var shop = document.querySelector("[data-thanks-shop]");
+      if (shop) shop.hidden = false;
+    })();
+  </script>
 
   <script>
     import { clearCart, getCart, readOrderSnapshot } from "../scripts/cart";
@@ -32,8 +42,8 @@ const copy = t(locale);
       body.textContent = msg.body;
       body.hidden = !msg.body;
     }
-    // Newsletter flow: no Shop CTA — just the message.
-    if (shop && from.startsWith("newsletter")) shop.hidden = true;
+    // Keep Shop hidden for newsletter*; show for orders / other forms (inline script may already have).
+    if (shop) shop.hidden = from.startsWith("newsletter");
 
     if (msg.order && recap) {
       const snap = readOrderSnapshot();
