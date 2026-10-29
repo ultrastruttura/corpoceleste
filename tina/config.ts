@@ -129,6 +129,14 @@ export default defineConfig({
               { value: "Viola", label: "Viola" },
             ],
           },
+          // Kept optional so older admin/form state that still sends `color` can save.
+          // Shop ignores this and uses colorName.
+          {
+            type: "string",
+            name: "color",
+            label: "Colore hex (non usare)",
+            required: false,
+          },
           {
             type: "string",
             name: "composition",
