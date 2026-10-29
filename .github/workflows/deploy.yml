@@ -37,8 +37,8 @@ jobs:
       - name: Build TinaCMS admin
         run: |
           if [ -n "$TINA_CLIENT_ID" ] && [ -n "$TINA_TOKEN" ]; then
-            echo "Building Tina admin for TinaCloud (skip gate — Cloud indexes async after push)"
-            npx tinacms build --skip-cloud-checks
+            echo "Building Tina admin for TinaCloud"
+            npx tinacms build
           else
             echo "WARNING: TINA_CLIENT_ID / TINA_TOKEN secrets missing — building local admin (login online will fail)"
             npx tinacms build --local --skip-cloud-checks

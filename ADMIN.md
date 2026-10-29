@@ -7,7 +7,7 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 | Sezione | Azioni |
 |---------|--------|
 | **Maglie** | Aggiungere / togliere prodotti, prezzo, stato, taglie, **magazzino (pezzi per taglia)**, **2–3 foto**, descrizione IT/EN/DE, **meta SEO** |
-| **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO**. Per eliminare: **prima** apri le Maglie di quell’artista e cambia Artista (o elimina la maglia), **poi** cancella l’artista. Se Tina dà ancora errore, aspetta il deploy Pages, ricarica `/admin/` a fondo (Ctrl+F5) e riprova. |
+| **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO**. Per togliere un artista: prima elimina (o riassegna) le sue maglie, poi elimina l’artista. |
 | **News** | Aggiungere / togliere / modificare articoli |
 | **Bio** | Nome, testo bio IT/EN/DE, sezioni stampa e stampa dal vivo |
 | **SEO e home** | Meta description, H1 home, immagine Open Graph, **email shop**, **Website ID Umami Analytics** |

@@ -19,9 +19,9 @@
     "@vercel/node": "^16.0.2",
     "astro": "^7.3.5",
     "gray-matter": "^4.0.3",
-    "tinacms": "^3.14.1"
+    "tinacms": "^3.15.0"
   },
   "devDependencies": {
-    "@tinacms/cli": "^3.0.0"
+    "@tinacms/cli": "^4.0.4"
   }
 }
