@@ -140,13 +140,25 @@ async function nextSeqForYear(year: number): Promise<number> {
   return Number((res.rows[0] as { m?: number } | undefined)?.m || 0) + 1;
 }
 
+/** Warm-instance: skip after first successful pass (or when nothing to fix). */
+let orderNumbersBackfilled = false;
+
 /** Assign 1/YY, 2/YY… to rows missing order_seq (by created_at ASC within year). */
 async function backfillOrderNumbers() {
+  if (orderNumbersBackfilled) return;
   const db = getDb();
+  const need = await db.execute(
+    `SELECT 1 AS x FROM shop_orders WHERE order_seq IS NULL OR order_seq = 0 LIMIT 1`,
+  );
+  if (!need.rows.length) {
+    orderNumbersBackfilled = true;
+    return;
+  }
   const res = await db.execute(
     `SELECT id, created_at, order_year, order_seq FROM shop_orders ORDER BY created_at ASC, id ASC`,
   );
   const counters = new Map<number, number>();
+  const updates: Array<{ sql: string; args: Array<string | number> }> = [];
   for (const raw of res.rows) {
     const r = raw as Record<string, unknown>;
     const id = String(r.id);
@@ -158,11 +170,13 @@ async function backfillOrderNumbers() {
     }
     seq = (counters.get(year) || 0) + 1;
     counters.set(year, seq);
-    await db.execute({
+    updates.push({
       sql: `UPDATE shop_orders SET order_year = ?, order_seq = ?, updated_at = datetime('now') WHERE id = ?`,
       args: [year, seq, id],
     });
   }
+  if (updates.length) await db.batch(updates, "write");
+  orderNumbersBackfilled = true;
 }
 
 /** Insert or no-op if external_id already exists (idempotent). */

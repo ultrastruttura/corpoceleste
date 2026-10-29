@@ -27,7 +27,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       const deals =
         user.role === "admin" ? await listDeals() : await listDeals(user.id);
-      return json(res, 200, { deals: await summarizeDeals(deals) });
+      // lite=1: aggregates only (admin shell / artist list) — skips shipping sale rows in JSON.
+      const lite = String(req.query.lite || "") === "1";
+      return json(res, 200, {
+        deals: await summarizeDeals(deals, { includeSales: !lite }),
+      });
     }
 
     if (user.role !== "admin") return json(res, 403, { error: "Admin only" });

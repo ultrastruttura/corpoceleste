@@ -697,12 +697,13 @@ if (!root || !app) {
   type AdminShellCache = {
     users: User[];
     deals: DealSummary[];
+    paidTotals: Record<string, number>;
     mailConfigured?: boolean;
     portalAdminEmail?: string | null;
     fetchedAt: number;
   };
   let adminShellCache: AdminShellCache | null = null;
-  const ADMIN_SHELL_TTL_MS = 45_000;
+  const ADMIN_SHELL_TTL_MS = 60_000;
 
   function invalidateAdminShell() {
     adminShellCache = null;
@@ -725,13 +726,17 @@ if (!root || !app) {
       }
       return adminShellCache;
     }
-    const [usersData, dealsData] = await Promise.all([
+    const [usersData, dealsData, paidData] = await Promise.all([
       apiFetch(base, "users") as Promise<{ users: User[] }>,
-      apiFetch(base, "deals") as Promise<{ deals: DealSummary[] }>,
+      apiFetch(base, "deals?lite=1") as Promise<{ deals: DealSummary[] }>,
+      apiFetch(base, "settle?paid_totals=1") as Promise<{
+        totals: Record<string, number>;
+      }>,
     ]);
     adminShellCache = {
       users: usersData.users,
       deals: dealsData.deals,
+      paidTotals: paidData.totals || {},
       mailConfigured:
         opts?.mailConfigured ?? adminShellCache?.mailConfigured,
       portalAdminEmail:
@@ -739,6 +744,32 @@ if (!root || !app) {
       fetchedAt: Date.now(),
     };
     return adminShellCache;
+  }
+
+  function syncAdminNav(nav: HTMLElement, route: ReturnType<typeof parseAdminRoute>) {
+    const tabs = nav.querySelectorAll<HTMLButtonElement>(".account-subnav__tab");
+    const labels = ["Ordini", "Artisti", "Newsletter", "Impostazioni"];
+    const activeIdx =
+      route.name === "orders"
+        ? 0
+        : route.name === "artists" || route.name === "artist"
+          ? 1
+          : route.name === "newsletter"
+            ? 2
+            : 3;
+    tabs.forEach((btn, i) => {
+      btn.classList.toggle("is-active", i === activeIdx);
+      if (!btn.dataset.bound) {
+        btn.dataset.bound = "1";
+        btn.type = "button";
+        btn.addEventListener("click", () => {
+          if (labels[i] === "Ordini") setAdminRoute({ name: "orders" });
+          else if (labels[i] === "Artisti") setAdminRoute({ name: "artists" });
+          else if (labels[i] === "Newsletter") setAdminRoute({ name: "newsletter" });
+          else setAdminRoute({ name: "settings" });
+        });
+      }
+    });
   }
 
   async function renderAdmin(
@@ -766,71 +797,58 @@ if (!root || !app) {
     const shellData = await loadAdminShell(opts);
     const artists = shellData.users.filter((u) => u.role === "artist");
 
-    app!.innerHTML = "";
-    app!.append(toolbar(user));
     const title = document.querySelector(".account-page > h1");
     if (title) title.textContent = "Area personale";
 
-    if (shellData.mailConfigured === false) {
-      app!.append(
-        el(
-          "p",
-          "account-banner account-banner--warn",
-          "Mail non configurata su Vercel: manca RESEND_API_KEY oppure MAIL_FROM/SHOP_EMAIL. Finché non li imposti (Production) e fai Redeploy, login e inviti non partono da Resend.",
-        ),
-      );
+    let shell = app!.querySelector<HTMLElement>(".account-shell");
+    let main = app!.querySelector<HTMLElement>(".account-shell__main");
+    let nav = app!.querySelector<HTMLElement>(".account-subnav");
+    const canReuse = Boolean(shell && main && nav && !opts?.force);
+
+    if (!canReuse) {
+      app!.innerHTML = "";
+      app!.append(toolbar(user));
+
+      if (shellData.mailConfigured === false) {
+        app!.append(
+          el(
+            "p",
+            "account-banner account-banner--warn",
+            "Mail non configurata su Vercel: manca RESEND_API_KEY oppure MAIL_FROM/SHOP_EMAIL. Finché non li imposti (Production) e fai Redeploy, login e inviti non partono da Resend.",
+          ),
+        );
+      }
+
+      shell = el("div", "account-shell");
+      nav = el("nav", "account-subnav");
+      nav.setAttribute("aria-label", "Sezioni admin");
+      for (const label of ["Ordini", "Artisti", "Newsletter", "Impostazioni"]) {
+        nav.append(el("button", "account-subnav__tab", label));
+      }
+      shell.append(nav);
+      main = el("div", "account-shell__main");
+      shell.append(main);
+      app!.append(shell);
     }
 
-    const shell = el("div", "account-shell");
-    const nav = el("nav", "account-subnav");
-    nav.setAttribute("aria-label", "Sezioni admin");
+    syncAdminNav(nav!, route);
+    main!.replaceChildren();
 
-    const mkTab = (label: string, active: boolean, onClick: () => void) => {
-      const btn = el(
-        "button",
-        `account-subnav__tab${active ? " is-active" : ""}`,
-        label,
-      ) as HTMLButtonElement;
-      btn.type = "button";
-      btn.addEventListener("click", onClick);
-      return btn;
-    };
-
-    nav.append(
-      mkTab("Ordini", route.name === "orders", () => {
-        setAdminRoute({ name: "orders" });
-      }),
-      mkTab("Artisti", route.name === "artists" || route.name === "artist", () => {
-        setAdminRoute({ name: "artists" });
-      }),
-      mkTab("Newsletter", route.name === "newsletter", () => {
-        setAdminRoute({ name: "newsletter" });
-      }),
-      mkTab("Impostazioni", route.name === "settings", () => {
-        setAdminRoute({ name: "settings" });
-      }),
-    );
-    shell.append(nav);
-
-    const main = el("div", "account-shell__main");
-    if (route.name === "orders") await renderAdminOrders(main);
-    else if (route.name === "newsletter") await renderAdminNewsletter(main);
+    if (route.name === "orders") await renderAdminOrders(main!);
+    else if (route.name === "newsletter") await renderAdminNewsletter(main!);
     else if (route.name === "artists")
-      await renderAdminArtists(main, user, artists, shellData.deals);
+      await renderAdminArtists(main!, user, artists, shellData);
     else if (route.name === "artist") {
       const artist = artists.find((a) => a.id === route.id);
       if (!artist) {
         history.replaceState(null, "", "#artisti");
-        await renderAdminArtists(main, user, artists, shellData.deals);
+        await renderAdminArtists(main!, user, artists, shellData);
       } else {
-        await renderAdminArtistDetail(main, user, artist, shellData.deals);
+        await renderAdminArtistDetail(main!, user, artist);
       }
     } else {
-      await renderAdminSettings(main, user, artists, shellData.deals);
+      await renderAdminSettings(main!, user, artists, shellData.deals);
     }
-
-    shell.append(main);
-    app!.append(shell);
   }
 
   async function renderAdminNewsletter(mount: HTMLElement) {
@@ -1205,9 +1223,9 @@ if (!root || !app) {
 
   async function renderAdminArtists(
     mount: HTMLElement,
-    user: User,
+    _user: User,
     artists: User[],
-    deals: DealSummary[],
+    shell: AdminShellCache,
   ) {
     mount.append(
       el("h2", "account-section-title", "Artisti attivi"),
@@ -1226,10 +1244,8 @@ if (!root || !app) {
     }
     table.append(head);
 
-    const paidData = (await apiFetch(base, "settle?paid_totals=1")) as {
-      totals: Record<string, number>;
-    };
-    const paid = paidData.totals || {};
+    const paid = shell.paidTotals || {};
+    const deals = shell.deals;
 
     for (const a of artists) {
       const artistDeals = deals.filter((d) => d.deal.user_id === a.id);
@@ -1261,7 +1277,6 @@ if (!root || !app) {
     mount: HTMLElement,
     user: User,
     artist: User,
-    allDeals: DealSummary[],
   ) {
     const back = el("button", "account-back", "← Artisti") as HTMLButtonElement;
     back.type = "button";
@@ -1309,7 +1324,8 @@ if (!root || !app) {
     };
     paintSummary();
 
-    const deals = allDeals.filter((d) => d.deal.user_id === artist.id);
+    // Full sales come from dashboard (shell uses lite deals without sale rows).
+    const deals = dashFull.deals;
     const orders = el("section", "account-card");
     orders.append(el("h3", "", "Ordini e deal"));
     if (!deals.length) {

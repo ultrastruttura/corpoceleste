@@ -351,7 +351,11 @@ export async function deleteSettlement(id: string) {
   await db.execute({ sql: "DELETE FROM settlements WHERE id = ?", args: [id] });
 }
 
-function summaryFromSales(deal: Deal, sales: ReturnType<typeof mapSale>[]) {
+function summaryFromSales(
+  deal: Deal,
+  sales: ReturnType<typeof mapSale>[],
+  opts?: { includeSales?: boolean },
+) {
   const share = computeShare({
     sales: sales.map((s) => ({ qty: s.qty, unit_price: s.unit_price })),
     costs: deal.costs,
@@ -359,7 +363,11 @@ function summaryFromSales(deal: Deal, sales: ReturnType<typeof mapSale>[]) {
     artist_share_pct: deal.artist_share_pct,
     vat_rate_pct: deal.vat_rate_pct,
   });
-  return { deal, sales, ...share };
+  return {
+    deal,
+    sales: opts?.includeSales === false ? [] : sales,
+    ...share,
+  };
 }
 
 export async function dealSummary(deal: Deal) {
@@ -368,9 +376,14 @@ export async function dealSummary(deal: Deal) {
 }
 
 /** Summaries for many deals with 1 sales query instead of N. */
-export async function summarizeDeals(deals: Deal[]) {
+export async function summarizeDeals(
+  deals: Deal[],
+  opts?: { includeSales?: boolean },
+) {
   const salesMap = await salesByDealIds(deals.map((d) => d.id));
-  return deals.map((d) => summaryFromSales(d, salesMap.get(d.id) || []));
+  return deals.map((d) =>
+    summaryFromSales(d, salesMap.get(d.id) || [], opts),
+  );
 }
 
 export async function artistDashboard(userId: string) {

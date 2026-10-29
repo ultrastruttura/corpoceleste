@@ -36,18 +36,33 @@ export async function ensureSchema() {
       .map((sql): InStatement => ({ sql }));
     // One round-trip instead of N sequential CREATE/INDEX calls to Turso.
     if (statements.length) await db.batch(statements, "write");
-    for (const sql of [
-      `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
-      `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
-      `ALTER TABLE shop_orders ADD COLUMN paid_at TEXT`,
-      `ALTER TABLE newsletter_subscribers ADD COLUMN unsubscribed_at TEXT`,
-      `ALTER TABLE newsletter_subscribers ADD COLUMN resend_contact_id TEXT`,
-    ]) {
-      try {
-        await db.execute(sql);
-      } catch {
-        /* column already exists */
+    await db.execute(
+      `CREATE TABLE IF NOT EXISTS portal_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)`,
+    );
+    const ver = await db.execute({
+      sql: `SELECT value FROM portal_meta WHERE key = ?`,
+      args: ["schema_version"],
+    });
+    const current = String(ver.rows[0]?.value || "");
+    if (current !== "2") {
+      for (const sql of [
+        `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
+        `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
+        `ALTER TABLE shop_orders ADD COLUMN paid_at TEXT`,
+        `ALTER TABLE newsletter_subscribers ADD COLUMN unsubscribed_at TEXT`,
+        `ALTER TABLE newsletter_subscribers ADD COLUMN resend_contact_id TEXT`,
+      ]) {
+        try {
+          await db.execute(sql);
+        } catch {
+          /* column already exists */
+        }
       }
+      await db.execute({
+        sql: `INSERT INTO portal_meta (key, value) VALUES (?, ?)
+              ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+        args: ["schema_version", "2"],
+      });
     }
     migrated = true;
     migrating = null;

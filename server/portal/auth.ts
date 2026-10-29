@@ -269,7 +269,7 @@ export async function createSession(userId: string) {
 export async function sessionUser(token: string | null | undefined) {
   if (!token) return null;
   await ensureSchema();
-  await ensureAdmin();
+  // Admin bootstrap lives on auth login / listUsers / createArtist — not every API hit.
   const db = getDb();
   const res = await db.execute({
     sql: `SELECT u.id, u.email, u.name, u.role, u.artist_slug

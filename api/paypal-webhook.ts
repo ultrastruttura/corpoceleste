@@ -99,6 +99,19 @@ async function ensureSendcloudShipment(opts: {
     };
   }
 
+  // Temporary pickup-test SKU: never create a real Sendcloud shipment.
+  const { isPickupTestOnlyCart, isPickupTestServiceId, PICKUP_TEST_SERVICE_ID } =
+    await import("../src/lib/pickup-test.js");
+  if (
+    isPickupTestOnlyCart(opts.priced.lines) ||
+    isPickupTestServiceId(opts.priced.packlink.serviceId)
+  ) {
+    return {
+      packlinkRef: PICKUP_TEST_SERVICE_ID,
+      packlinkServiceId: PICKUP_TEST_SERVICE_ID,
+    };
+  }
+
   if (!sendcloudConfigured()) {
     return { packlinkError: "SENDCLOUD_PUBLIC_KEY / SENDCLOUD_SECRET_KEY missing" };
   }
