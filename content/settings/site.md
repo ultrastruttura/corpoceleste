@@ -13,7 +13,7 @@ homeLede:
   it: ''
   en: ''
   de: ''
-announcementEnabled: false
+announcementEnabled: true
 announcementText:
   it: +++ Edizioni in stampa — iscriviti / scrivi a info@corpoceleste.eu +++
   en: +++ Editions in print — subscribe / write to info@corpoceleste.eu +++
@@ -39,7 +39,6 @@ andreaBio:
     Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events. Für Beratung (Anlagen, Farben, Abläufe, Schulung) schreib mir — Fall für Fall.
 
     Vor Corpoceleste: der Shop Corpoc (2012–2019). Ich male als Ultrastruttura.
-ogImage: ''
 umamiWebsiteId: 546938a2-aa92-4654-bc29-85bba09323b4
 lowStockThreshold: 10
 iban: IT02C03268223000EM002734005
