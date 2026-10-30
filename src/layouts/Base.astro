@@ -54,15 +54,15 @@ const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline' https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://www.gstatic.com https://cloud.umami.is",
-  "style-src 'self' 'unsafe-inline' https://www.gstatic.com",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://www.gstatic.com https://cloud.umami.is",
+  "style-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.gstatic.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://www.gstatic.com",
-  `connect-src 'self' ${apiOrigin} https://api.zippopotam.us https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://google.com https://www.google.com https://payments.google.com https://www.gstatic.com https://cloud.umami.is https://gateway.umami.is`.replace(
+  `connect-src 'self' ${apiOrigin} https://challenges.cloudflare.com https://api.zippopotam.us https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://google.com https://www.google.com https://payments.google.com https://www.gstatic.com https://cloud.umami.is https://gateway.umami.is`.replace(
     /\s+/g,
     " ",
   ),
-  "frame-src https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://*.google.com https://www.gstatic.com",
+  "frame-src https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://*.google.com https://www.gstatic.com",
   `form-action 'self' ${apiOrigin}`.trim(),
 ]
   .filter(Boolean)
@@ -99,6 +99,7 @@ const llmsLocale = locale === "en" || locale === "de" ? locale : "it";
 const llmsHref = llmsTxtUrl(llmsLocale);
 const llmsFullHref = llmsFullTxtUrl(llmsLocale);
 const umamiId = siteSettings.umamiWebsiteId;
+const turnstileKey = String(site.turnstileSiteKey || "").trim();
 ---
 
 <!doctype html>
@@ -214,6 +215,16 @@ const umamiId = siteSettings.umamiWebsiteId;
     <script>
       import "../scripts/shop.ts";
     </script>
+    {
+      turnstileKey && (
+        <script
+          is:inline
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          async
+          defer
+        />
+      )
+    }
     {
       umamiId && (
         <script

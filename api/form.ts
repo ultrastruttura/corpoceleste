@@ -9,6 +9,7 @@ import {
   safeSubject,
   thanksUrl,
 } from "../server/form-body.js";
+import { assertTurnstile } from "../server/turnstile.js";
 import { sendMail, siteBase } from "../server/mail.js";
 import {
   confirmNewsletterSubscriber,
@@ -34,7 +35,14 @@ export const config = {
   },
 };
 
-const SKIP = new Set(["_honey", "_next", "_gotcha", "privacy", "privacy_newsletter"]);
+const SKIP = new Set([
+  "_honey",
+  "_next",
+  "_gotcha",
+  "privacy",
+  "privacy_newsletter",
+  "cf-turnstile-response",
+]);
 
 function queryFlag(req: VercelRequest, key: string) {
   const v = req.query[key];
@@ -166,6 +174,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const fromKey = guessFrom(subject, field(body, "_next"));
   const next = thanksUrl(body, fromKey);
   if (isHoney(body)) return res.redirect(303, next);
+  if (!(await assertTurnstile(req, body))) {
+    return res.status(403).send("Bot check failed");
+  }
 
   const email = field(body, "email");
   if (!isEmail(email)) {

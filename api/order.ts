@@ -6,6 +6,7 @@ import { sendMail } from "../server/mail.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
 import { loadShopIdentity } from "../server/shop-identity.js";
+import { assertTurnstile } from "../server/turnstile.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 import type { PricedOrder } from "../server/order-pricing.js";
 
@@ -18,6 +19,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const body = parseForm(req);
   const next = thanksUrl(body, "ordine");
   if (isHoney(body)) return res.redirect(303, next);
+  if (!(await assertTurnstile(req, body))) {
+    return res.status(403).send("Bot check failed");
+  }
 
   const nome = field(body, "nome").slice(0, 120);
   const email = field(body, "email");

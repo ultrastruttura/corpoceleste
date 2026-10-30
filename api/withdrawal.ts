@@ -4,6 +4,7 @@ import { customerWithdrawalText } from "../server/customer-mail.js";
 import { field, isEmail, isHoney, parseForm, thanksUrl } from "../server/form-body.js";
 import { nowRome, sendMail } from "../server/mail.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
+import { assertTurnstile } from "../server/turnstile.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   cors(req, res);
@@ -14,6 +15,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const body = parseForm(req);
   const next = thanksUrl(body, "recesso");
   if (isHoney(body)) return res.redirect(303, next);
+  if (!(await assertTurnstile(req, body))) {
+    return res.status(403).send("Bot check failed");
+  }
 
   // Caps: the acknowledgement must echo the withdrawal content, so limit size instead of dropping it.
   const name = field(body, "nome").slice(0, 120);

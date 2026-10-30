@@ -1,7 +1,32 @@
 ---
-/** Honeypot — leave empty; bots that fill it are dropped (FormSubmit + API Vercel). */
+/**
+ * Honeypot + Cloudflare Turnstile (site key in site.ts; secret on Vercel).
+ * Drop this into every public POST form.
+ */
+import { site } from "../data/site";
+
+const turnstileKey = String(site.turnstileSiteKey || "").trim();
 ---
-<input type="text" name="_honey" value="" tabindex="-1" autocomplete="off" class="honey" aria-hidden="true" />
+
+<input
+  type="text"
+  name="_honey"
+  value=""
+  tabindex="-1"
+  autocomplete="off"
+  class="honey"
+  aria-hidden="true"
+/>
+{
+  turnstileKey && (
+    <div
+      class="cf-turnstile form-turnstile"
+      data-sitekey={turnstileKey}
+      data-theme="light"
+      data-size="flexible"
+    />
+  )
+}
 
 <style>
   .honey {
@@ -10,5 +35,8 @@
     width: 1px;
     height: 1px;
     overflow: hidden;
+  }
+  .form-turnstile {
+    margin: 0.65rem 0 0.25rem;
   }
 </style>
