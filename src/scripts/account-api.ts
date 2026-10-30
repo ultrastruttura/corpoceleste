@@ -1,4 +1,10 @@
-const KEY = "cc-portal-session";
+/**
+ * Portal session: HttpOnly cookie on the API host is the source of truth.
+ * We do NOT store the session token in sessionStorage (XSS-exfiltratable).
+ * A boolean flag only syncs “logged in” UX across tabs.
+ */
+const FLAG = "cc-portal-on";
+const LEGACY_KEY = "cc-portal-session";
 
 function store() {
   try {
@@ -11,39 +17,51 @@ function store() {
 const bc =
   typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("cc-portal-session") : null;
 
-function writeSession(token: string | null, broadcast: boolean) {
+function writeFlag(on: boolean, broadcast: boolean) {
   const s = store();
-  if (!s) return;
-  if (token) s.setItem(KEY, token);
-  else s.removeItem(KEY);
-  if (broadcast) bc?.postMessage({ type: token ? "set" : "clear", token: token || "" });
+  if (s) {
+    if (on) s.setItem(FLAG, "1");
+    else s.removeItem(FLAG);
+    try {
+      s.removeItem(LEGACY_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+  if (broadcast) bc?.postMessage({ type: on ? "set" : "clear" });
 }
 
-export function getSession(): string {
+/** True if this tab believes the user logged in (cookie still required for API). */
+export function hasSession(): boolean {
   try {
-    return store()?.getItem(KEY) || "";
+    return store()?.getItem(FLAG) === "1";
   } catch {
-    return "";
+    return false;
   }
 }
 
-export function setSession(token: string) {
-  writeSession(token, true);
+/** @deprecated Token is cookie-only; always returns "". */
+export function getSession(): string {
+  return "";
+}
+
+export function setSession(_token?: string) {
+  writeFlag(true, true);
 }
 
 export function clearSession() {
-  writeSession(null, true);
+  writeFlag(false, true);
 }
 
-/** Other tabs (e.g. admin still open) adopt the session from a magic-link login. */
-export function onSessionBroadcast(handler: (token: string | null) => void) {
+/** Other tabs re-boot when login/logout happens. */
+export function onSessionBroadcast(handler: (_authed: boolean) => void) {
   if (!bc) return () => {};
   const listener = (ev: MessageEvent) => {
-    const data = ev.data as { type?: string; token?: string } | null;
+    const data = ev.data as { type?: string } | null;
     if (!data || (data.type !== "set" && data.type !== "clear")) return;
-    const token = data.type === "set" ? String(data.token || "") : "";
-    writeSession(token || null, false);
-    handler(token || null);
+    const on = data.type === "set";
+    writeFlag(on, false);
+    handler(on);
   };
   bc.addEventListener("message", listener);
   return () => bc.removeEventListener("message", listener);
@@ -59,9 +77,7 @@ export async function apiFetch(base: string, path: string, init: RequestInit = {
   if (method !== "GET" && method !== "HEAD" && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
-  // Bearer kept as fallback when third-party cookies are blocked; HttpOnly cookie is primary.
-  const session = getSession();
-  if (session) headers.set("Authorization", `Bearer ${session}`);
+  // Cookie (HttpOnly) via credentials — no Bearer token in JS.
   const res = await fetch(`${base}/api/account/${path.replace(/^\//, "")}`, {
     ...init,
     headers,

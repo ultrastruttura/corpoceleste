@@ -1,6 +1,11 @@
 import type { VercelRequest } from "@vercel/node";
 import { field } from "./form-body.js";
 
+function vercelDeployed() {
+  const env = process.env.VERCEL_ENV || "";
+  return env === "production" || env === "preview";
+}
+
 /** Client IP for Turnstile siteverify (optional but useful). */
 export function clientIp(req: VercelRequest) {
   const xf = String(req.headers["x-forwarded-for"] || "")
@@ -13,8 +18,8 @@ export function clientIp(req: VercelRequest) {
 
 /**
  * Verify Cloudflare Turnstile token.
- * - No secret configured → allow (local / unset); log once-style warn.
- * - Secret set → token required and must pass siteverify.
+ * On Vercel production/preview: secret required (fail closed).
+ * Local/dev without secret: skip (DX).
  */
 export async function verifyTurnstileToken(
   token: string,
@@ -22,7 +27,11 @@ export async function verifyTurnstileToken(
 ): Promise<{ ok: boolean; skipped?: boolean }> {
   const secret = (process.env.TURNSTILE_SECRET_KEY || "").trim();
   if (!secret) {
-    console.warn("turnstile: TURNSTILE_SECRET_KEY missing — skip verify");
+    if (vercelDeployed()) {
+      console.error("turnstile: TURNSTILE_SECRET_KEY missing on Vercel — reject");
+      return { ok: false };
+    }
+    console.warn("turnstile: TURNSTILE_SECRET_KEY missing — skip verify (local)");
     return { ok: true, skipped: true };
   }
   if (!token) return { ok: false };
@@ -49,7 +58,10 @@ export async function assertTurnstile(
   req: VercelRequest,
   body: Record<string, unknown>,
 ): Promise<boolean> {
-  const token = field(body, "cf-turnstile-response");
+  const token =
+    field(body, "cf-turnstile-response") ||
+    field(body, "turnstileToken") ||
+    field(body, "turnstile_token");
   const result = await verifyTurnstileToken(token, clientIp(req));
   return result.ok;
 }

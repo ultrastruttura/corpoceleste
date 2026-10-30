@@ -3,6 +3,7 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import { listLiveCatalogProducts } from "../server/live-catalog.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
+import { assertTurnstile } from "../server/turnstile.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
@@ -39,7 +40,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
   if (!requireSiteOrigin(req, res)) return;
 
-  const limited = await abuseLimit(req, "shipping-quote", 30, 15 * 60);
+  const limited = await abuseLimit(req, "shipping-quote", 20, 15 * 60);
   if (!limited.ok) {
     if (limited.unavailable) {
       return json(res, 503, { error: "Service unavailable", retryAfterSec: limited.retryAfterSec });
@@ -54,7 +55,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       zip?: string;
       city?: string;
       province?: string;
+      turnstileToken?: string;
+      "cf-turnstile-response"?: string;
     }>(req);
+
+    if (!(await assertTurnstile(req, body as Record<string, unknown>))) {
+      return json(res, 403, { error: "Bot check failed" });
+    }
     const dest = parseShipDest({
       country: body.country,
       zip: body.zip,

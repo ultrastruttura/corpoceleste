@@ -17,6 +17,7 @@ export const site = {
   legalName: "Andrea Baldelli Lorenzo",
   /** Intestatario IBAN / titolare. */
   intestatario: "Andrea Baldelli Lorenzo",
+  /** Public business identifiers (legal/checkout) — not secrets. */
   iban: "IT02C03268223000EM002734005",
   /** Codice destinatario SDI (fatturazione elettronica). */
   sdiCode: "BA6ET11",
@@ -27,8 +28,7 @@ export const site = {
    */
   paypalEmail: "baldellimtt@gmail.com",
   /**
-   * Client ID da developer.paypal.com (gratis).
-   * Obbligatorio per mostrare PayPal in checkout e per magazzino/mail via webhook Vercel.
+   * PayPal Client ID (public by design). Secret: PAYPAL_CLIENT_SECRET on Vercel only.
    */
   paypalClientId:
     "BAAM0t3KcdroiWYnkmi328SdvzTkYVhsGK9W2sRAOgmXuAF0cP8B7bPs-Pu7EJGvMRRxhLyteIrIUMyd-I",
@@ -38,8 +38,7 @@ export const site = {
    */
   formApi: "https://corpoceleste.vercel.app",
   /**
-   * Cloudflare Turnstile site key (public). Secret: TURNSTILE_SECRET_KEY su Vercel.
-   * Empty = widget off (server skips verify if secret also missing).
+   * Cloudflare Turnstile site key (public). Secret: TURNSTILE_SECRET_KEY on Vercel only.
    */
   turnstileSiteKey: "0x4AAAAAAFsWwAXlgOz46Ez9",
   sede: "Nembro (BG), Italia",

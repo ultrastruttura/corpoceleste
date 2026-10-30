@@ -1,4 +1,4 @@
-import { apiFetch, apiRoot, clearSession, getSession, setSession } from "./account-api";
+import { apiFetch, apiRoot, clearSession, setSession } from "./account-api";
 
 function readMagicToken() {
   const hash = location.hash.replace(/^#/, "");
@@ -45,20 +45,17 @@ if (root) {
       return;
     }
     try {
-      // Drop any prior portal session (e.g. admin tab on same browser) before
-      // verify. Pass the old token so the server can invalidate it too.
-      const previous = getSession();
+      // Server invalidates any prior session from the HttpOnly cookie.
       clearSession();
       const data = (await apiFetch(base, "auth", {
         method: "POST",
         body: JSON.stringify({
           action: "verify",
           token,
-          ...(previous ? { replace_session: previous } : {}),
         }),
       })) as { session?: string };
       if (!data.session) throw new Error("Sessione non creata");
-      setSession(data.session);
+      setSession();
       if (status) status.textContent = "Accesso riuscito. Reindirizzo…";
       location.replace(homeHref);
     } catch (err) {

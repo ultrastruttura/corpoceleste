@@ -34,7 +34,21 @@ async function refreshLiveStock() {
   }
 }
 
+function hydrateCatalog() {
+  const node = document.getElementById("cc-catalog");
+  if (!node?.textContent) return;
+  try {
+    const data = JSON.parse(node.textContent) as { products?: unknown };
+    if (data && typeof data === "object") {
+      window.__catalog = data as typeof window.__catalog;
+    }
+  } catch {
+    /* keep empty catalog */
+  }
+}
+
 function bind() {
+  hydrateCatalog();
   bindNav();
   bindCart();
   bindAutoplayVideos();

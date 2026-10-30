@@ -50,13 +50,8 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
           preload="auto"
           aria-label={copy.home.stageAlt}
         ></video>
-        {/* Runs during parsing, before the media fetch starts — phones get the 1.5 MB cut. */}
-        <script is:inline>
-          (function () {
-            var v = document.querySelector("[data-src-mobile]");
-            if (v && window.matchMedia("(max-width: 899px)").matches) v.src = v.getAttribute("data-src-mobile");
-          })();
-        </script>
+        {/* Early src swap for mobile — external file so CSP can omit unsafe-inline. */}
+        <script is:inline src={asset("early-video.js")}></script>
         <span class="shop-home-stage__crt" aria-hidden="true"></span>
       </div>
     </figure>

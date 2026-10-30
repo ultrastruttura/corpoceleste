@@ -90,6 +90,7 @@ export async function requestShippingQuote(opts: {
   city?: string;
   province?: string;
   lines: Array<{ id: string; size: string; qty: number }>;
+  turnstileToken?: string;
 }): Promise<CheckoutQuote | null> {
   const country = opts.country.toUpperCase();
   const zip = normalizeZip(opts.zip, country);
@@ -102,6 +103,7 @@ export async function requestShippingQuote(opts: {
       city: opts.city || undefined,
       province: opts.province || undefined,
       lines: opts.lines,
+      turnstileToken: opts.turnstileToken || undefined,
     }),
   });
   if (!res.ok) return null;

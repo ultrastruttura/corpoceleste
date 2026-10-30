@@ -3,7 +3,6 @@ import {
   apiRoot,
   clearSession,
   el,
-  getSession,
   money,
   onSessionBroadcast,
   setMsg,
@@ -282,10 +281,6 @@ if (!root || !app) {
       app!.append(el("p", "lede", "API non configurata."));
       return;
     }
-    if (!getSession()) {
-      renderLogin();
-      return;
-    }
     try {
       const data = (await apiFetch(base, "auth", {
         method: "POST",
@@ -306,6 +301,7 @@ if (!root || !app) {
         renderLogin();
         return;
       }
+      setSession();
       if (data.user.role === "admin") {
         if (data.shell) {
           adminShellCache = {
@@ -848,12 +844,9 @@ if (!root || !app) {
   }
 
   async function downloadOrderPdf(orderId: string) {
-    const headers = new Headers();
-    const session = getSession();
-    if (session) headers.set("Authorization", `Bearer ${session}`);
     const res = await fetch(
       `${base}/api/account/orders?id=${encodeURIComponent(orderId)}&pdf=1`,
-      { headers, credentials: "include" },
+      { credentials: "include" },
     );
     if (!res.ok) throw new Error("PDF non disponibile");
     const blob = await res.blob();
@@ -1195,13 +1188,9 @@ if (!root || !app) {
     csvBtn.type = "button";
     csvBtn.addEventListener("click", async () => {
       try {
-        const session = getSession();
         const res = await fetch(
           `${base}/api/account/orders?status=${encodeURIComponent(statusFilter)}&csv=1`,
-          {
-            headers: session ? { Authorization: `Bearer ${session}` } : {},
-            credentials: "include",
-          },
+          { credentials: "include" },
         );
         if (!res.ok) throw new Error("Export fallito");
         const blob = await res.blob();
