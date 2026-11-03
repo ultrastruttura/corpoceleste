@@ -1143,7 +1143,7 @@ const de: typeof it = {
       "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät (localStorage / sessionStorage), nicht auf einem Server von uns. Sie dienen nur dem Shop.",
     third: "Dritte",
     thirdBody:
-      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
+      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Formulare nutzen Cloudflare Turnstile (Bot-Schutz): cloudflare.com/turnstile-privacy-policy. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
     manage: "Wie du sie entfernst",
     manageBody: "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen verwalten.",
     privacyLink: "Vollständiger Datenschutzhinweis",
