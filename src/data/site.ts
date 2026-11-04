@@ -37,10 +37,6 @@ export const site = {
    * Se vuoto, bonifico e recesso restano su FormSubmit. Con URL: mail transazionali da Vercel.
    */
   formApi: "https://corpoceleste.vercel.app",
-  /**
-   * Cloudflare Turnstile site key (public). Secret: TURNSTILE_SECRET_KEY on Vercel only.
-   */
-  turnstileSiteKey: "0x4AAAAAAFsWwAXlgOz46Ez9",
   sede: "Nembro (BG), Italia",
   /** Indirizzo completo della sede: obbligatorio nelle info precontrattuali. */
   indirizzo: "Via Moroni 51, Lonno, 24027 Nembro (BG), Italia",

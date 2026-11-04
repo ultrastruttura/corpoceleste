@@ -4,7 +4,6 @@ import { addItem } from "./cart";
 import { bindCart, openCart, renderCart } from "./cart-ui";
 import { applyLiveStock, catalogProduct } from "./catalog";
 import { bindNav } from "./nav";
-import { bindInvisibleTurnstileForms } from "./turnstile-token";
 
 const base = import.meta.env.BASE_URL;
 
@@ -53,7 +52,6 @@ function bind() {
   bindNav();
   bindCart();
   bindAutoplayVideos();
-  bindInvisibleTurnstileForms();
   void refreshLiveStock().then(() => renderCart());
 
   document.querySelectorAll<HTMLFormElement>(".newsletter-form").forEach((form) => {

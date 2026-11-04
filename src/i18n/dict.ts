@@ -262,8 +262,6 @@ const it = {
       "Il carrello e il riepilogo ordine stanno sul tuo dispositivo, non su un server nostro.",
     cookiesPaypal:
       "La pagina di checkout carica gli script di PayPal (anche per carta e Apple Pay) e di Google Pay, necessari al pagamento: valgono i loro cookie e le loro informative",
-    cookiesTurnstile:
-      "Sui moduli pubblici (newsletter, contatti, checkout, ecc.) usiamo Cloudflare Turnstile per limitare i bot: verifica silenziosa, senza puzzle. Vale l’addendum privacy di Cloudflare",
     cookiesMore: "Dettaglio nella",
     cookiesMoreLink: "cookie policy",
     data: "Quali dati, perché",
@@ -282,7 +280,7 @@ const it = {
       "Contatti, corsi, consulenza, ristampe — risposta a una tua richiesta (art. 6.1 b). Cancellati entro 12 mesi dall’ultimo scambio.",
       "Newsletter — consenso (art. 6.1 a), fino alla disiscrizione. Dopo resta solo l’indirizzo segnato come «disiscritto», per non scriverti più.",
       "Area artisti — contratto con l’artista (art. 6.1 b), per la durata della collaborazione e poi 10 anni per i conti.",
-      "Protezione da abusi dei moduli (anche via Cloudflare Turnstile) — legittimo interesse (art. 6.1 f). Indirizzo IP e segnali tecnici usati solo per la verifica anti-bot; i token non sostituiscono i dati del form.",
+      "Protezione da abusi dei moduli — legittimo interesse (art. 6.1 f). Indirizzo IP cancellato entro 24 ore.",
       "Statistiche Umami — legittimo interesse, dati aggregati e anonimi, nessun cookie.",
     ],
     basisTail:
@@ -290,7 +288,7 @@ const it = {
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
-      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Database di ordini, newsletter e area artisti su Turso (società USA). Statistiche di visita su Umami Cloud (società USA). Protezione moduli con Cloudflare Turnstile (società USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
+      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Database di ordini, newsletter e area artisti su Turso (società USA). Statistiche di visita su Umami Cloud (società USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
     formsubmit:
       "fallback dei form se Vercel non è configurato. Società USA. Informativa:",
     paypalRecv: "se paghi con PayPal (sede europea, gruppo anche USA).",
@@ -301,8 +299,6 @@ const it = {
     turso: "database di ordini, iscritti alla newsletter e area artisti.",
     sendcloud: "calcolo della spedizione in checkout (paese e CAP) ed etichette di spedizione (nome, indirizzo, telefono).",
     googlePay: "se paghi con Google Pay: il pagamento passa poi da PayPal.",
-    cloudflareTurnstile:
-      "protezione anti-bot sui moduli (Turnstile). Addendum privacy:",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
     rights: "Diritti",
@@ -327,7 +323,7 @@ const it = {
       "Carrello e riepilogo dopo il checkout restano sul tuo dispositivo (localStorage / sessionStorage), non su un server nostro. Servono solo a far funzionare lo shop.",
     third: "Terze parti",
     thirdBody:
-      "Umami Analytics: statistiche di visita aggregate, senza cookie. La pagina di checkout carica gli script di PayPal e Google Pay necessari al pagamento: valgono i loro cookie e le loro informative. Sui form usiamo Cloudflare Turnstile (anti-bot): cloudflare.com/turnstile-privacy-policy. Se scrivi il CAP in checkout, solo paese e CAP vanno a zippopotam.us per suggerirti la città.",
+      "Umami Analytics: statistiche di visita aggregate, senza cookie. La pagina di checkout carica gli script di PayPal e Google Pay necessari al pagamento: valgono i loro cookie e le loro informative. Se scrivi il CAP in checkout, solo paese e CAP vanno a zippopotam.us per suggerirti la città.",
     manage: "Come toglierli",
     manageBody: "Impostazioni del browser → dati del sito. Oppure svuota il carrello da qui. Per PayPal, gestisci i cookie dal tuo account o dalle impostazioni del browser.",
     privacyLink: "Informativa privacy completa",
@@ -671,8 +667,6 @@ const en: typeof it = {
       "The cart and order summary stay on your device, not on a server of ours.",
     cookiesPaypal:
       "The checkout page loads the PayPal scripts (also for card and Apple Pay) and Google Pay, needed for payment; their cookies and privacy notices apply",
-    cookiesTurnstile:
-      "On public forms (newsletter, contact, checkout, etc.) we use Cloudflare Turnstile to limit bots: a silent check, no puzzles. Cloudflare’s Turnstile Privacy Addendum applies",
     cookiesMore: "Detail in the",
     cookiesMoreLink: "cookie policy",
     data: "What data, and why",
@@ -691,7 +685,7 @@ const en: typeof it = {
       "Contact, workshops, consulting, reprints — answering your request (art. 6(1)(b)). Deleted within 12 months of the last exchange.",
       "Newsletter — consent (art. 6(1)(a)), until you unsubscribe. Afterwards only the address marked “unsubscribed” is kept, so we never write again.",
       "Artist area — contract with the artist (art. 6(1)(b)), for the length of the collaboration and then 10 years for the accounts.",
-      "Form abuse protection (including Cloudflare Turnstile) — legitimate interest (art. 6(1)(f)). IP address and technical signals used only for the bot check; tokens do not replace form data.",
+      "Form abuse protection — legitimate interest (art. 6(1)(f)). IP address deleted within 24 hours.",
       "Umami statistics — legitimate interest, aggregated anonymous data, no cookies.",
     ],
     basisTail:
@@ -699,7 +693,7 @@ const en: typeof it = {
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
-      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Orders, newsletter and artist-area database on Turso (US company). Visit statistics on Umami Cloud (US company). Form protection via Cloudflare Turnstile (US company). Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
+      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Orders, newsletter and artist-area database on Turso (US company). Visit statistics on Umami Cloud (US company). Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
     formsubmit:
       "form fallback if Vercel is not configured. US company. Notice:",
     paypalRecv: "if you pay with PayPal (European seat, group also in the USA).",
@@ -710,7 +704,6 @@ const en: typeof it = {
     turso: "database for orders, newsletter subscribers and the artist area.",
     sendcloud: "shipping quote at checkout (country and postcode) and shipping labels (name, address, phone).",
     googlePay: "if you pay with Google Pay; the payment then goes through PayPal.",
-    cloudflareTurnstile: "anti-bot protection on forms (Turnstile). Privacy addendum:",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
     rights: "Rights",
@@ -735,7 +728,7 @@ const en: typeof it = {
       "Cart and post-checkout summary stay on your device (localStorage / sessionStorage), not on a server of ours. They only make the shop work.",
     third: "Third parties",
     thirdBody:
-      "Umami Analytics: aggregated visit statistics, no cookies. The checkout page loads the PayPal and Google Pay scripts needed for payment: their cookies and notices apply. Forms use Cloudflare Turnstile (anti-bot): cloudflare.com/turnstile-privacy-policy. Typing a postcode at checkout sends only country and postcode to zippopotam.us to suggest the city.",
+      "Umami Analytics: aggregated visit statistics, no cookies. The checkout page loads the PayPal and Google Pay scripts needed for payment: their cookies and notices apply. Typing a postcode at checkout sends only country and postcode to zippopotam.us to suggest the city.",
     manage: "How to remove them",
     manageBody: "Browser settings → site data. Or empty the cart from here. For PayPal, manage cookies in your account or browser settings.",
     privacyLink: "Full privacy notice",
@@ -1079,8 +1072,6 @@ const de: typeof it = {
       "Warenkorb und Bestellübersicht bleiben auf deinem Gerät, nicht auf einem Server von uns.",
     cookiesPaypal:
       "Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal (auch für Karte und Apple Pay) und Google Pay; es gelten deren Cookies und Datenschutzhinweise",
-    cookiesTurnstile:
-      "Bei öffentlichen Formularen (Newsletter, Kontakt, Kasse usw.) nutzen wir Cloudflare Turnstile gegen Bots: stille Prüfung, ohne Rätsel. Es gilt das Cloudflare Turnstile Privacy Addendum",
     cookiesMore: "Details in der",
     cookiesMoreLink: "Cookie-Richtlinie",
     data: "Welche Daten, wozu",
@@ -1099,7 +1090,7 @@ const de: typeof it = {
       "Kontakt, Kurse, Beratung, Nachdrucke — Beantwortung deiner Anfrage (Art. 6 Abs. 1 lit. b). Gelöscht spätestens 12 Monate nach dem letzten Austausch.",
       "Newsletter — Einwilligung (Art. 6 Abs. 1 lit. a), bis zur Abmeldung. Danach bleibt nur die als „abgemeldet“ markierte Adresse, damit wir dir nicht mehr schreiben.",
       "Künstlerbereich — Vertrag mit dem Künstler (Art. 6 Abs. 1 lit. b), für die Dauer der Zusammenarbeit und danach 10 Jahre für die Abrechnung.",
-      "Schutz der Formulare vor Missbrauch (auch über Cloudflare Turnstile) — berechtigtes Interesse (Art. 6 Abs. 1 lit. f). IP-Adresse und technische Signale nur für die Bot-Prüfung; Tokens ersetzen keine Formulardaten.",
+      "Schutz der Formulare vor Missbrauch — berechtigtes Interesse (Art. 6 Abs. 1 lit. f). IP-Adresse innerhalb von 24 Stunden gelöscht.",
       "Umami-Statistiken — berechtigtes Interesse, aggregierte anonyme Daten, keine Cookies.",
     ],
     basisTail:
@@ -1107,7 +1098,7 @@ const de: typeof it = {
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
-      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Datenbank für Bestellungen, Newsletter und Künstlerbereich auf Turso (US-Unternehmen). Besuchsstatistiken auf Umami Cloud (US-Unternehmen). Formularschutz über Cloudflare Turnstile (US-Unternehmen). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
+      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Datenbank für Bestellungen, Newsletter und Künstlerbereich auf Turso (US-Unternehmen). Besuchsstatistiken auf Umami Cloud (US-Unternehmen). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
     formsubmit:
       "Formular-Fallback, wenn Vercel nicht konfiguriert ist. US-Unternehmen. Hinweise:",
     paypalRecv: "wenn du mit PayPal zahlst (Sitz in Europa, Gruppe auch in den USA).",
@@ -1118,7 +1109,6 @@ const de: typeof it = {
     turso: "Datenbank für Bestellungen, Newsletter-Abonnenten und Künstlerbereich.",
     sendcloud: "Versandberechnung an der Kasse (Land und PLZ) und Versandetiketten (Name, Adresse, Telefon).",
     googlePay: "wenn du mit Google Pay zahlst; die Zahlung läuft dann über PayPal.",
-    cloudflareTurnstile: "Bot-Schutz für Formulare (Turnstile). Privacy-Addendum:",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
     rights: "Rechte",
@@ -1143,7 +1133,7 @@ const de: typeof it = {
       "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät (localStorage / sessionStorage), nicht auf einem Server von uns. Sie dienen nur dem Shop.",
     third: "Dritte",
     thirdBody:
-      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Formulare nutzen Cloudflare Turnstile (Bot-Schutz): cloudflare.com/turnstile-privacy-policy. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
+      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
     manage: "Wie du sie entfernst",
     manageBody: "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen verwalten.",
     privacyLink: "Vollständiger Datenschutzhinweis",

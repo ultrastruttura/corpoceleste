@@ -9,7 +9,6 @@ import {
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import { abuseLimit } from "../server/abuse-limit.js";
 import { isEmail } from "../server/form-body.js";
-import { assertTurnstile } from "../server/turnstile.js";
 import {
   abandonPaypalCheckoutHold,
   bindPaypalCheckoutHold,
@@ -89,13 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       country?: string;
       zip?: string;
       shipTo?: Partial<CheckoutShipTo>;
-      turnstileToken?: string;
-      "cf-turnstile-response"?: string;
     }>(req);
-
-    if (!(await assertTurnstile(req, body as Record<string, unknown>))) {
-      return json(res, 403, { error: "Bot check failed" });
-    }
 
     // Google Pay (and similar) confirm then capture server-side.
     if (body.action === "capture") {

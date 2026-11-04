@@ -3,7 +3,6 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import { listLiveCatalogProducts } from "../server/live-catalog.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
-import { assertTurnstile } from "../server/turnstile.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
@@ -55,13 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       zip?: string;
       city?: string;
       province?: string;
-      turnstileToken?: string;
-      "cf-turnstile-response"?: string;
     }>(req);
-
-    if (!(await assertTurnstile(req, body as Record<string, unknown>))) {
-      return json(res, 403, { error: "Bot check failed" });
-    }
     const dest = parseShipDest({
       country: body.country,
       zip: body.zip,

@@ -1,11 +1,5 @@
 ---
-/**
- * Honeypot + slot for invisible Cloudflare Turnstile (bound in shop.ts).
- * Site key: site.ts / data-turnstile. Secret: TURNSTILE_SECRET_KEY on Vercel.
- */
-import { site } from "../data/site";
-
-const turnstileKey = String(site.turnstileSiteKey || "").trim();
+/** Honeypot — leave empty; bots that fill it are dropped. */
 ---
 
 <input
@@ -17,7 +11,6 @@ const turnstileKey = String(site.turnstileSiteKey || "").trim();
   class="honey"
   aria-hidden="true"
 />
-{turnstileKey && <div data-turnstile-slot aria-hidden="true"></div>}
 
 <style>
   .honey {
@@ -26,12 +19,5 @@ const turnstileKey = String(site.turnstileSiteKey || "").trim();
     width: 1px;
     height: 1px;
     overflow: hidden;
-  }
-  [data-turnstile-slot] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
   }
 </style>

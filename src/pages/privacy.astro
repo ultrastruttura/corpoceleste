@@ -44,15 +44,6 @@ const umamiOn = Boolean(siteSettings.umamiWebsiteId);
         (<a href="https://www.paypal.com/it/legalhub/paypal/privacy-full" rel="noopener noreferrer">paypal.com</a>).
       </p>
       <p>
-        {p.cookiesTurnstile}
-        {" "}
-        (<a
-          href="https://www.cloudflare.com/turnstile-privacy-policy/"
-          rel="noopener noreferrer"
-          >cloudflare.com/turnstile-privacy-policy</a
-        >).
-      </p>
-      <p>
         {p.cookiesMore}
         {" "}
         <a href={pageUrl(locale, "cookie/")}>{p.cookiesMoreLink}</a>.
@@ -112,14 +103,6 @@ const umamiOn = Boolean(siteSettings.umamiWebsiteId);
         </li>
         <li>
           <strong>Google Pay (Google Ireland Ltd.)</strong> — {p.googlePay}
-        </li>
-        <li>
-          <strong>Cloudflare, Inc. (Turnstile)</strong> — {p.cloudflareTurnstile}{" "}
-          <a
-            href="https://www.cloudflare.com/turnstile-privacy-policy/"
-            rel="noopener noreferrer"
-            >cloudflare.com/turnstile-privacy-policy</a
-          >.
         </li>
         {
           umamiOn && (
