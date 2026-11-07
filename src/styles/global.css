@@ -2754,6 +2754,36 @@ body:has(.site-announce) .shop-home-stage {
   margin: 0;
 }
 
+.account-cost-editor {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.account-cost-rows {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.account-cost-row {
+  align-items: end;
+}
+
+.account-cost-row__remove {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-bottom: 0.35rem;
+}
+
+.account-deal-costs {
+  margin: 0.85rem 0 0;
+}
+
+.account-deal-costs h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 .account-table__emphasis {
   font-weight: 500;
 }

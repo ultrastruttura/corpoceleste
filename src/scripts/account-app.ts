@@ -123,6 +123,22 @@ function inRange(isoDay: string, filter: PeriodFilter) {
   return true;
 }
 
+const DEFAULT_COST_LABELS = ["Maglie", "Telai", "Inchiostri", "Postazione"];
+
+/** Batch cost lines for display/edit: per-unit rows shown as total over planned_qty. */
+function batchCostView(deal: DealSummary["deal"]) {
+  const planned = Math.max(1, Math.floor(deal.planned_qty));
+  const lines = deal.costs
+    .map((c) => ({
+      label: c.label.trim() || "Costo",
+      amount: euroLocal(c.per_unit ? c.amount * planned : c.amount),
+    }))
+    .filter((c) => c.amount > 0);
+  const total = euroLocal(lines.reduce((s, c) => s + c.amount, 0));
+  const perShirt = euroLocal(total / planned);
+  return { lines, total, perShirt, planned };
+}
+
 function shareFromSales(
   deal: DealSummary["deal"],
   sales: DealSummary["sales"],
@@ -637,9 +653,7 @@ if (!root || !app) {
       euroLocal(planned - euroLocal(paidEntries.reduce((sum, x) => sum + x.amount, 0)));
 
     const box = el("article", "account-deal");
-    const perUnit = s.deal.costs
-      .filter((c) => c.per_unit)
-      .reduce((sum, c) => sum + c.amount, 0);
+    const costs = batchCostView(s.deal);
     box.append(
       el("h3", "", s.deal.product_title || s.deal.product_id),
       el(
@@ -648,7 +662,7 @@ if (!root || !app) {
         [
           `${s.soldQty}/${s.deal.planned_qty} pezzi`,
           `${money(s.deal.unit_price)} / pezzo`,
-          perUnit > 0 ? `costo ${money(perUnit)} / pezzo` : "",
+          costs.perShirt > 0 ? `costo ${money(costs.perShirt)} / pezzo` : "",
           `IVA ${s.deal.vat_rate_pct}%`,
           `${s.deal.artist_share_pct}% artista`,
         ]
@@ -656,6 +670,34 @@ if (!root || !app) {
           .join(" · "),
       ),
     );
+
+    if (costs.lines.length) {
+      const costi = el("div", "account-deal-costs");
+      costi.append(el("h4", "", "Costi produzione"));
+      const list = el("div", "account-metrics");
+      for (const line of costs.lines) {
+        const row = el("div", "account-metric");
+        row.append(
+          el("span", "account-metric__label", line.label),
+          el("span", "account-metric__value", money(line.amount)),
+        );
+        list.append(row);
+      }
+      const tot = el("div", "account-metric");
+      tot.append(
+        el("span", "account-metric__label", "Costo totale"),
+        el("span", "account-metric__value account-table__emphasis", money(costs.total)),
+      );
+      list.append(tot);
+      const per = el("div", "account-metric");
+      per.append(
+        el("span", "account-metric__label", `Costo a maglietta (${costs.planned} pezzi)`),
+        el("span", "account-metric__value", money(costs.perShirt)),
+      );
+      list.append(per);
+      costi.append(list);
+      box.append(costi);
+    }
 
     const orders = el("div", "account-sales");
     orders.append(el("h4", "", "Ordini di questo deal"));
@@ -785,7 +827,7 @@ if (!root || !app) {
         el(
           "p",
           "account-lede",
-          "Qui sotto è solo la somma delle quote artista. Il dettaglio per maglia è in ogni deal.",
+          "Qui sotto è solo la somma delle quote artista. Costi e conti sono in ogni deal.",
         ),
         metrics([
           ["Totale dovuto", money(dash.artistDueTotal)],
@@ -1649,7 +1691,13 @@ if (!root || !app) {
 
     const dealSection = el("section", "account-card");
     dealSection.append(el("h3", "", "Deal"));
-    dealSection.append(el("p", "account-lede", "Prezzo al cliente, costo per pezzo, percentuale artista."));
+    dealSection.append(
+      el(
+        "p",
+        "account-lede",
+        "Prezzo al cliente, costi di produzione (voci modificabili in ogni momento), percentuale artista.",
+      ),
+    );
     const catalogProducts = await loadDealProductOptions();
     const dealForm = buildDealForm(artist.id, catalogProducts);
     dealForm.addEventListener("submit", async (e) => {
@@ -1657,11 +1705,7 @@ if (!root || !app) {
       const fd = new FormData(dealForm);
       const msg = dealForm.querySelector<HTMLElement>("[data-msg]")!;
       msg.hidden = false;
-      const costPerUnit = Number(fd.get("cost_per_unit") || 0);
-      const costs =
-        Number.isFinite(costPerUnit) && costPerUnit > 0
-          ? [{ label: "Costo per pezzo", amount: costPerUnit, per_unit: true }]
-          : [];
+      const costs = readDealCostRows(dealForm);
       try {
         await apiFetch(base, "deals", {
           method: "POST",
@@ -1746,6 +1790,72 @@ if (!root || !app) {
     }
   }
 
+  function addDealCostRow(
+    host: HTMLElement,
+    label = "",
+    amount: string | number = "",
+  ) {
+    const row = el("div", "account-stack-form__row account-cost-row");
+    row.setAttribute("data-cost-row", "");
+    const labelField = el("label", "account-stack-form__field");
+    labelField.append(el("span", "", "Voce"));
+    const labelInput = document.createElement("input");
+    labelInput.name = "cost_label";
+    labelInput.type = "text";
+    labelInput.placeholder = "es. Maglie";
+    labelInput.value = label;
+    labelInput.autocomplete = "off";
+    labelField.append(labelInput);
+    const amountField = el("label", "account-stack-form__field");
+    amountField.append(el("span", "", "Importo €"));
+    const amountInput = document.createElement("input");
+    amountInput.name = "cost_amount";
+    amountInput.type = "number";
+    amountInput.step = "0.01";
+    amountInput.min = "0";
+    amountInput.value = amount === "" ? "" : String(amount);
+    amountField.append(amountInput);
+    const remove = el("button", "account-linkish account-cost-row__remove", "Rimuovi") as HTMLButtonElement;
+    remove.type = "button";
+    remove.addEventListener("click", () => {
+      row.remove();
+      if (!host.querySelector("[data-cost-row]")) addDealCostRow(host);
+    });
+    row.append(labelField, amountField, remove);
+    host.append(row);
+  }
+
+  function setDealCostRows(
+    form: HTMLFormElement,
+    lines: Array<{ label: string; amount: number }>,
+  ) {
+    const host = form.querySelector<HTMLElement>("[data-cost-rows]");
+    if (!host) return;
+    host.replaceChildren();
+    if (lines.length) {
+      for (const line of lines) addDealCostRow(host, line.label, line.amount);
+    } else {
+      for (const label of DEFAULT_COST_LABELS) addDealCostRow(host, label, "");
+    }
+  }
+
+  function readDealCostRows(form: HTMLFormElement) {
+    const costs: Array<{ label: string; amount: number; per_unit: boolean }> = [];
+    for (const row of form.querySelectorAll("[data-cost-row]")) {
+      const label = (
+        row.querySelector('input[name="cost_label"]') as HTMLInputElement | null
+      )?.value.trim();
+      const amount = Number(
+        (row.querySelector('input[name="cost_amount"]') as HTMLInputElement | null)
+          ?.value || 0,
+      );
+      if (label && Number.isFinite(amount) && amount > 0) {
+        costs.push({ label, amount, per_unit: false });
+      }
+    }
+    return costs;
+  }
+
   function buildDealForm(_artistId: string, products: DealProductOption[]) {
     const dealForm = el("form", "account-stack-form") as HTMLFormElement;
     const optionsHtml = products.length
@@ -1792,14 +1902,20 @@ if (!root || !app) {
         <span>Note</span>
         <input name="notes" />
       </label>
-      <label class="account-stack-form__field">
-        <span>Costo per pezzo €</span>
-        <input name="cost_per_unit" type="number" step="0.01" min="0" value="0" />
-      </label>
+      <div class="account-cost-editor">
+        <p class="account-lede">Costi di produzione (totali del lotto). Il costo a maglietta = somma ÷ pezzi previsti.</p>
+        <div data-cost-rows class="account-cost-rows"></div>
+        <button type="button" class="account-linkish" data-add-cost>Aggiungi voce</button>
+      </div>
       <input type="hidden" name="id" value="" />
       <button class="account-action-form__btn" type="submit">Salva deal</button>
       <p class="account-msg" data-msg hidden></p>
     `;
+    const costHost = dealForm.querySelector<HTMLElement>("[data-cost-rows]")!;
+    setDealCostRows(dealForm, []);
+    dealForm.querySelector("[data-add-cost]")!.addEventListener("click", () => {
+      addDealCostRow(costHost);
+    });
     const productSelect = dealForm.elements.namedItem("product_id") as HTMLSelectElement;
     const titleInput = dealForm.elements.namedItem("product_title") as HTMLInputElement;
     const priceInput = dealForm.elements.namedItem("unit_price") as HTMLInputElement;
@@ -1839,10 +1955,7 @@ if (!root || !app) {
       s.deal.vat_rate_pct,
     );
     (dealForm.elements.namedItem("notes") as HTMLInputElement).value = s.deal.notes || "";
-    const perUnit = s.deal.costs
-      .filter((c) => c.per_unit)
-      .reduce((sum, c) => sum + c.amount, 0);
-    (dealForm.elements.namedItem("cost_per_unit") as HTMLInputElement).value = String(perUnit || 0);
+    setDealCostRows(dealForm, batchCostView(s.deal).lines);
   }
 
   async function renderAdminSettings(
