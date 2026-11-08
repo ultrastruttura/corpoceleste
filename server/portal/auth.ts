@@ -1,5 +1,5 @@
 import { ensureSchema, getDb, newId } from "./db.js";
-import { sendMail, siteBase } from "../mail.js";
+import { sendMail, siteBase, wrapEmailHtml } from "../mail.js";
 
 export type PortalUser = {
   id: string;
@@ -163,26 +163,52 @@ export async function deleteUser(id: string) {
   await db.execute({ sql: "DELETE FROM users WHERE id = ? AND role = 'artist'", args: [id] });
 }
 
-export async function issueMagicLink(userId: string) {
+/** Invite links stay valid longer — artists often open mail hours/days later. */
+export function inviteMagicMinutes() {
+  return Number(process.env.PORTAL_INVITE_MAGIC_MINUTES || 7 * 24 * 60);
+}
+
+export async function issueMagicLink(userId: string, opts?: { minutes?: number }) {
   await ensureSchema();
   const token = newId("mag");
-  const expires = new Date(Date.now() + magicMinutes() * 60_000).toISOString();
+  const minutes = Math.max(1, Math.floor(opts?.minutes ?? magicMinutes()));
+  const expires = new Date(Date.now() + minutes * 60_000).toISOString();
   const db = getDb();
   await db.execute({
     sql: "INSERT INTO magic_links (token, user_id, expires_at) VALUES (?, ?, ?)",
     args: [token, userId, expires],
   });
-  return token;
+  return { token, minutes };
+}
+
+function escapeMail(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function expiryLabel(minutes: number) {
+  if (minutes >= 24 * 60) {
+    const days = Math.round(minutes / (24 * 60));
+    return days === 1 ? "circa 1 giorno" : `circa ${days} giorni`;
+  }
+  if (minutes >= 60) {
+    const hours = Math.round(minutes / 60);
+    return hours === 1 ? "circa 1 ora" : `circa ${hours} ore`;
+  }
+  return minutes === 1 ? "circa 1 minuto" : `circa ${minutes} minuti`;
 }
 
 export async function sendMagicLinkEmail(
   user: PortalUser,
   token: string,
-  opts?: { kind?: "login" | "invite" },
+  opts?: { kind?: "login" | "invite"; minutes?: number },
 ) {
-  // Hash fragment: not sent in Referer / server logs of the landing request.
-  const link = `${siteBase()}/account/auth/#t=${encodeURIComponent(token)}`;
-  const mins = magicMinutes();
+  // Query param (not #hash): Outlook/Gmail Safe Links often strip fragments → empty login.
+  const link = `${siteBase()}/account/auth/?t=${encodeURIComponent(token)}`;
+  const mins = Math.max(1, Math.floor(opts?.minutes ?? magicMinutes()));
   const isInvite = opts?.kind === "invite";
   const isArtist = user.role === "artist" || isInvite;
   const subject = isInvite
@@ -195,18 +221,31 @@ export async function sendMagicLinkEmail(
     : isArtist
       ? "Usa questo link per entrare nell’area personale artista Corpoceleste."
       : "Usa questo link per entrare nell’area personale Corpoceleste.";
+  const hello = `Ciao${user.name ? ` ${user.name}` : ""},`;
+  const expiry = expiryLabel(mins);
+  const text = [
+    hello,
+    "",
+    areaLine,
+    `È monouso e scade dopo ${expiry}:`,
+    link,
+    "",
+    "Se non l’hai chiesto tu, ignora questa mail.",
+  ].join("\n");
+  const html = wrapEmailHtml(
+    [
+      `<p style="margin:0 0 1em;">${escapeMail(hello)}</p>`,
+      `<p style="margin:0 0 1em;">${escapeMail(areaLine)}</p>`,
+      `<p style="margin:0 0 1em;"><a href="${escapeMail(link)}" style="color:#141414;font-weight:700;">Apri l’area personale</a></p>`,
+      `<p style="margin:0 0 1em;font-size:14px;color:#444;">Link monouso, scade dopo ${escapeMail(expiry)}. Se il bottone non apre, copia questo indirizzo:<br>${escapeMail(link)}</p>`,
+      `<p style="margin:0;font-size:14px;color:#666;">Se non l’hai chiesto tu, ignora questa mail.</p>`,
+    ].join("\n"),
+  );
   const result = await sendMail({
     to: user.email,
     subject,
-    text: [
-      `Ciao${user.name ? ` ${user.name}` : ""},`,
-      "",
-      areaLine,
-      `È monouso e scade dopo circa ${mins} minuti:`,
-      link,
-      "",
-      "Se non l’hai chiesto tu, ignora questa mail.",
-    ].join("\n"),
+    text,
+    html,
   });
   return { ok: result.ok, link, error: result.ok === false ? result.error : undefined };
 }

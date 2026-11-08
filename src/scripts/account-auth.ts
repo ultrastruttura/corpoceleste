@@ -1,11 +1,17 @@
-import { apiFetch, apiRoot, clearSession, setSession } from "./account-api";
+import {
+  apiFetch,
+  apiRoot,
+  clearSession,
+  getSession,
+  setSession,
+} from "./account-api";
 
 function readMagicToken() {
+  // Prefer query (?t=) — email Safe Links often strip #hash fragments.
+  const fromQuery = new URLSearchParams(location.search).get("t");
+  if (fromQuery) return fromQuery;
   const hash = location.hash.replace(/^#/, "");
-  const fromHash = new URLSearchParams(hash).get("t");
-  if (fromHash) return fromHash;
-  // Legacy query links (?t=) still work once, then we strip them.
-  return new URLSearchParams(location.search).get("t") || "";
+  return new URLSearchParams(hash).get("t") || "";
 }
 
 function scrubUrl() {
@@ -41,12 +47,10 @@ if (root) {
       return;
     }
     if (!token) {
-      showStatus(status, "Link mancante.", homeHref);
+      showStatus(status, "Link mancante o incompleto. Torna all’", homeHref);
       return;
     }
     try {
-      // Server invalidates any prior session from the HttpOnly cookie.
-      clearSession();
       const data = (await apiFetch(base, "auth", {
         method: "POST",
         body: JSON.stringify({
@@ -60,6 +64,23 @@ if (root) {
       if (status) status.textContent = "Accesso riuscito. Reindirizzo…";
       location.replace(homeHref);
     } catch (err) {
+      // Twin tab / double-fetch: first verify may already have stored a valid session.
+      const existing = getSession();
+      if (existing) {
+        try {
+          const me = (await apiFetch(base, "auth", {
+            method: "POST",
+            body: JSON.stringify({ action: "me" }),
+          })) as { user?: unknown };
+          if (me.user) {
+            if (status) status.textContent = "Accesso riuscito. Reindirizzo…";
+            location.replace(homeHref);
+            return;
+          }
+        } catch {
+          /* fall through */
+        }
+      }
       clearSession();
       const text =
         err instanceof Error ? err.message : "Link non valido. Richiedi un nuovo accesso.";

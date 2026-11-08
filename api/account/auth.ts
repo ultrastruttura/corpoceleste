@@ -6,6 +6,7 @@ import {
   destroySession,
   ensureAdmin,
   getUserByEmail,
+  inviteMagicMinutes,
   issueMagicLink,
   listUsers,
   portalAdminEmail,
@@ -152,8 +153,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           message: "Accesso locale (dev): sessione aperta.",
         });
       }
-      const token = await issueMagicLink(user.id);
-      const sent = await sendMagicLinkEmail(user, token);
+      const magic = await issueMagicLink(user.id);
+      const sent = await sendMagicLinkEmail(user, magic.token, { minutes: magic.minutes });
       if (!sent.ok) {
         // Same client body as success — do not leak that the email exists via Resend errors.
         console.warn("[portal] magic link email failed for", user.email, sent.error);
@@ -187,8 +188,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           error: `L’utente ${user.email} non è artista (ruolo: ${user.role}). Controlla PORTAL_ADMIN_EMAIL su Vercel.`,
         });
       }
-      const token = await issueMagicLink(user.id);
-      const sent = await sendMagicLinkEmail(user, token, { kind: "invite" });
+      const magic = await issueMagicLink(user.id, { minutes: inviteMagicMinutes() });
+      const sent = await sendMagicLinkEmail(user, magic.token, {
+        kind: "invite",
+        minutes: magic.minutes,
+      });
       console.info("[portal] invite →", user.email, user.name, user.role, sent.ok ? "mailed" : "mail-failed");
       const payload: Record<string, unknown> = {
         ok: true,
