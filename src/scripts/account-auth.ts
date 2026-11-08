@@ -55,7 +55,8 @@ if (root) {
         }),
       })) as { session?: string };
       if (!data.session) throw new Error("Sessione non creata");
-      setSession();
+      // Must persist Bearer: Pages → Vercel cookies are third-party and often blocked.
+      setSession(data.session);
       if (status) status.textContent = "Accesso riuscito. Reindirizzo…";
       location.replace(homeHref);
     } catch (err) {

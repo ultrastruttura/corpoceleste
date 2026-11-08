@@ -42,7 +42,11 @@ export function setSessionCookie(res: VercelResponse, token: string, expiresAtIs
     // Cross-origin API (GitHub Pages → Vercel): None required for credentialed fetch.
     secure ? "SameSite=None" : "SameSite=Lax",
   ];
-  if (secure) parts.push("Secure");
+  if (secure) {
+    parts.push("Secure");
+    // CHIPS: allow the cookie in the Pages→Vercel partition when 3P cookies are restricted.
+    parts.push("Partitioned");
+  }
   res.setHeader("Set-Cookie", parts.join("; "));
 }
 
@@ -55,6 +59,9 @@ export function clearSessionCookie(res: VercelResponse) {
     "Max-Age=0",
     secure ? "SameSite=None" : "SameSite=Lax",
   ];
-  if (secure) parts.push("Secure");
+  if (secure) {
+    parts.push("Secure");
+    parts.push("Partitioned");
+  }
   res.setHeader("Set-Cookie", parts.join("; "));
 }

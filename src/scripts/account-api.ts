@@ -1,10 +1,10 @@
 /**
- * Portal session: HttpOnly cookie on the API host is the source of truth.
- * We do NOT store the session token in sessionStorage (XSS-exfiltratable).
- * A boolean flag only syncs “logged in” UX across tabs.
+ * Portal session across GitHub Pages → Vercel API.
+ * Prefer Authorization Bearer from sessionStorage (third-party cookies are often blocked).
+ * HttpOnly cookie on the API host is still set as a secondary channel when the browser allows it.
  */
 const FLAG = "cc-portal-on";
-const LEGACY_KEY = "cc-portal-session";
+const SESSION_KEY = "cc-portal-session";
 
 function store() {
   try {
@@ -21,31 +21,34 @@ function writeFlag(on: boolean, broadcast: boolean) {
   const s = store();
   if (s) {
     if (on) s.setItem(FLAG, "1");
-    else s.removeItem(FLAG);
-    try {
-      s.removeItem(LEGACY_KEY);
-    } catch {
-      /* ignore */
+    else {
+      s.removeItem(FLAG);
+      s.removeItem(SESSION_KEY);
     }
   }
   if (broadcast) bc?.postMessage({ type: on ? "set" : "clear" });
 }
 
-/** True if this tab believes the user logged in (cookie still required for API). */
+/** True if this tab believes the user logged in. */
 export function hasSession(): boolean {
   try {
-    return store()?.getItem(FLAG) === "1";
+    return store()?.getItem(FLAG) === "1" || Boolean(getSession());
   } catch {
     return false;
   }
 }
 
-/** @deprecated Token is cookie-only; always returns "". */
 export function getSession(): string {
-  return "";
+  try {
+    return store()?.getItem(SESSION_KEY) || "";
+  } catch {
+    return "";
+  }
 }
 
-export function setSession(_token?: string) {
+export function setSession(token?: string) {
+  const s = store();
+  if (s && token) s.setItem(SESSION_KEY, token);
   writeFlag(true, true);
 }
 
@@ -60,7 +63,13 @@ export function onSessionBroadcast(handler: (_authed: boolean) => void) {
     const data = ev.data as { type?: string } | null;
     if (!data || (data.type !== "set" && data.type !== "clear")) return;
     const on = data.type === "set";
-    writeFlag(on, false);
+    if (!on) {
+      const s = store();
+      s?.removeItem(FLAG);
+      s?.removeItem(SESSION_KEY);
+    } else {
+      writeFlag(true, false);
+    }
     handler(on);
   };
   bc.addEventListener("message", listener);
@@ -77,7 +86,10 @@ export async function apiFetch(base: string, path: string, init: RequestInit = {
   if (method !== "GET" && method !== "HEAD" && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
-  // Cookie (HttpOnly) via credentials — no Bearer token in JS.
+  const token = getSession();
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
   const res = await fetch(`${base}/api/account/${path.replace(/^\//, "")}`, {
     ...init,
     headers,
