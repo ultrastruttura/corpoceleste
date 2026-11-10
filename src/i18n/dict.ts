@@ -64,7 +64,7 @@ const it = {
     careGuideAlt: "Guida al lavaggio della maglia serigrafata Corpoceleste",
     galleryPrev: "Foto precedente",
     galleryNext: "Foto successiva",
-    shipLine: "Spedizione in Italia e in Europa — costo calcolato in checkout (Sendcloud).",
+    shipLine: "Spedizione in Italia e in Europa — costo calcolato in checkout.",
     /** Alt SEO commerciale: tipo + opera + artista + keyword vendita. */
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
@@ -471,7 +471,7 @@ const en: typeof it = {
     careGuideAlt: "Care guide for Corpoceleste screen-printed shirts",
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
-    shipLine: "Shipping in Italy and across Europe — cost calculated at checkout (Sendcloud).",
+    shipLine: "Shipping in Italy and across Europe — cost calculated at checkout.",
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
@@ -876,7 +876,7 @@ const de: typeof it = {
     careGuideAlt: "Pflegehinweise für siebgedruckte Corpoceleste-Shirts",
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
-    shipLine: "Versand in Italien und Europa — Kosten an der Kasse (Sendcloud).",
+    shipLine: "Versand in Italien und Europa — Kosten an der Kasse.",
     imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
