@@ -2,6 +2,8 @@
  * Portal session across GitHub Pages → Vercel API.
  * Prefer Authorization Bearer from sessionStorage (third-party cookies are often blocked).
  * HttpOnly cookie on the API host is still set as a secondary channel when the browser allows it.
+ * Tradeoff: any XSS on the site origin can read the Bearer token until the tab closes / TTL ends.
+ * Mitigations: CSP without unsafe-inline scripts, short session TTL, no analytics on auth.
  */
 const FLAG = "cc-portal-on";
 const SESSION_KEY = "cc-portal-session";

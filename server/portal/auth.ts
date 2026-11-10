@@ -21,7 +21,8 @@ function portalAdminName() {
 }
 
 function sessionDays() {
-  return Number(process.env.PORTAL_SESSION_DAYS || 14);
+  // Shorter default limits blast radius if sessionStorage is stolen via XSS.
+  return Number(process.env.PORTAL_SESSION_DAYS || 7);
 }
 
 function magicMinutes() {

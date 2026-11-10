@@ -352,15 +352,22 @@ if (!root || !app) {
         "Inserisci la mail con cui ti ho comunicato la registrazione. Non è un invito: se non sei già in elenco non arriva nessuna mail.",
       ),
     );
-    const form = el("form", "account-form account-login");
-    form.innerHTML = `
-      <label class="account-login-field">
-        <span>La tua email</span>
-        <input type="email" name="email" required autocomplete="email" placeholder="la tua email, non quella di un’altra persona" />
-      </label>
-      <button class="btn" type="submit">Invia link di accesso</button>
-      <p class="account-msg" data-msg hidden></p>
-    `;
+    const form = el("form", "account-form account-login") as HTMLFormElement;
+    const emailLabel = el("label", "account-login-field");
+    emailLabel.append(el("span", "", "La tua email"));
+    const emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.name = "email";
+    emailInput.required = true;
+    emailInput.autocomplete = "email";
+    emailInput.placeholder = "la tua email, non quella di un’altra persona";
+    emailLabel.append(emailInput);
+    const submitBtn = el("button", "btn", "Invia link di accesso") as HTMLButtonElement;
+    submitBtn.type = "submit";
+    const msgEl = el("p", "account-msg") as HTMLParagraphElement;
+    msgEl.hidden = true;
+    msgEl.setAttribute("data-msg", "");
+    form.append(emailLabel, submitBtn, msgEl);
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const msg = form.querySelector<HTMLElement>("[data-msg]")!;

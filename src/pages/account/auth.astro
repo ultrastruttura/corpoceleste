@@ -1,11 +1,13 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { commerceApiBase as apiBase } from "../../data/commerce";
+import { asset } from "../../lib/paths";
 
 const api = apiBase();
 ---
 
-<Base title="Accesso — Corpoceleste" noIndex>
+<Base title="Accesso — Corpoceleste" noIndex noAnalytics referrer="no-referrer">
+  <script slot="head" src={asset("account-auth-boot.js")} />
   <div
     class="wrap page-main page-main--narrow account-page"
     data-account-auth

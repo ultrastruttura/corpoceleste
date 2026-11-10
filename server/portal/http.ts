@@ -149,7 +149,11 @@ export async function readJson<T = Record<string, unknown>>(req: VercelRequest):
 }
 
 export function json(res: VercelResponse, status: number, body: unknown) {
-  res.status(status).setHeader("Content-Type", "application/json").send(JSON.stringify(body));
+  res
+    .status(status)
+    .setHeader("Content-Type", "application/json")
+    .setHeader("Cache-Control", "no-store")
+    .send(JSON.stringify(body));
 }
 
 export async function requireUser(

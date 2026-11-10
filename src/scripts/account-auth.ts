@@ -6,8 +6,19 @@ import {
   setSession,
 } from "./account-api";
 
+const PENDING_KEY = "cc-magic-pending";
+
 function readMagicToken() {
-  // Prefer query (?t=) — email Safe Links often strip #hash fragments.
+  try {
+    const pending = sessionStorage.getItem(PENDING_KEY);
+    if (pending) {
+      sessionStorage.removeItem(PENDING_KEY);
+      return pending;
+    }
+  } catch {
+    /* ignore */
+  }
+  // Fallback if boot script did not run (old cached HTML).
   const fromQuery = new URLSearchParams(location.search).get("t");
   if (fromQuery) return fromQuery;
   const hash = location.hash.replace(/^#/, "");

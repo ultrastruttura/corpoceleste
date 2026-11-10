@@ -24,6 +24,10 @@ type Props = {
   preloadImageType?: string;
   /** Hide from search engines (account, etc.). */
   noIndex?: boolean;
+  /** Skip Umami and other third-party analytics (magic-link / auth pages). */
+  noAnalytics?: boolean;
+  /** Override Referrer-Policy (auth uses no-referrer so ?t= never leaks). */
+  referrer?: string;
 };
 
 const locale = currentLocale(Astro.currentLocale);
@@ -40,6 +44,8 @@ const {
   preloadImage,
   preloadImageType = "image/webp",
   noIndex = false,
+  noAnalytics = false,
+  referrer = "strict-origin-when-cross-origin",
 } = Astro.props;
 const apiOrigin = (() => {
   try {
@@ -50,18 +56,23 @@ const apiOrigin = (() => {
 })();
 /** GitHub Pages cannot set HTTP headers — meta CSP is the practical layer. */
 /** frame-ancestors is ignored in <meta>; omit it (GH Pages can't set CSP headers). */
+const umamiHost = noAnalytics ? "" : "https://cloud.umami.is";
+const umamiConnect = noAnalytics ? "" : "https://cloud.umami.is https://gateway.umami.is";
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "script-src 'self' https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://www.gstatic.com https://cloud.umami.is",
+  `script-src 'self' https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://www.gstatic.com ${umamiHost}`.replace(
+    /\s+/g,
+    " ",
+  ).trim(),
   "style-src 'self' 'unsafe-inline' https://www.gstatic.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://www.gstatic.com",
-  `connect-src 'self' ${apiOrigin} https://api.zippopotam.us https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://google.com https://www.google.com https://payments.google.com https://www.gstatic.com https://cloud.umami.is https://gateway.umami.is`.replace(
+  `connect-src 'self' ${apiOrigin} https://api.zippopotam.us https://www.paypal.com https://www.sandbox.paypal.com https://api.paypal.com https://api.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://google.com https://www.google.com https://payments.google.com https://www.gstatic.com ${umamiConnect}`.replace(
     /\s+/g,
     " ",
-  ),
+  ).trim(),
   "frame-src https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com https://pay.google.com https://*.google.com https://www.gstatic.com",
   `form-action 'self' ${apiOrigin}`.trim(),
 ]
@@ -98,7 +109,7 @@ const jsonLdBlocks = [
 const llmsLocale = locale === "en" || locale === "de" ? locale : "it";
 const llmsHref = llmsTxtUrl(llmsLocale);
 const llmsFullHref = llmsFullTxtUrl(llmsLocale);
-const umamiId = siteSettings.umamiWebsiteId;
+const umamiId = noAnalytics ? "" : siteSettings.umamiWebsiteId;
 ---
 
 <!doctype html>
@@ -111,7 +122,8 @@ const umamiId = siteSettings.umamiWebsiteId;
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <meta http-equiv="Content-Security-Policy" content={csp} />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="referrer" content={referrer} />
+    <slot name="head" />
     <link rel="canonical" href={canonical.href} />
     {locales.map((code) => <link rel="alternate" hreflang={code} href={pageAbs(code, rest)} />)}
     <link rel="alternate" hreflang="x-default" href={pageAbs("it", rest)} />
