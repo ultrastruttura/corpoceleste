@@ -360,7 +360,7 @@ if (!root || !app) {
     emailInput.name = "email";
     emailInput.required = true;
     emailInput.autocomplete = "email";
-    emailInput.placeholder = "la tua email, non quella di un’altra persona";
+    emailInput.placeholder = "Your e-mail here";
     emailLabel.append(emailInput);
     const submitBtn = el("button", "btn", "Invia link di accesso") as HTMLButtonElement;
     submitBtn.type = "submit";

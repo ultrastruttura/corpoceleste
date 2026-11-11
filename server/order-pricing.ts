@@ -1,6 +1,10 @@
 /** Server-side pricing from catalog — never trust client unit amounts. */
 
 import { isPurchasableStatus, loadCatalogProduct } from "./catalog.js";
+import {
+  PICKUP_BERGAMO,
+  PICKUP_BERGAMO_SERVICE_ID,
+} from "../src/lib/pickup.js";
 import { isSupportedShipCountry } from "../src/lib/ship-countries.js";
 import { mergeOrderLines } from "../src/lib/paypal-lines.js";
 import { normalizeCountry, normalizeZip } from "../src/lib/ship-normalize.js";
@@ -85,15 +89,18 @@ export function parseShipDest(input: {
 export async function priceOrderLines(
   rawLines: OrderLine[],
   dest: ShipDest,
-  opts?: { ignoreStock?: boolean },
+  opts?: { ignoreStock?: boolean; delivery?: "ship" | "pickup" },
 ): Promise<{ ok: true; order: PricedOrder } | { ok: false; error: string }> {
   if (!rawLines.length) return { ok: false, error: "Empty cart" };
   if (rawLines.length > MAX_ORDER_LINES * 3) {
     return { ok: false, error: "Too many lines" };
   }
 
-  const shipCountry = normalizeCountry(dest.country);
-  const shipZip = normalizeZip(dest.zip, shipCountry);
+  const pickup = opts?.delivery === "pickup";
+  const shipCountry = pickup ? PICKUP_BERGAMO.country : normalizeCountry(dest.country);
+  const shipZip = pickup
+    ? PICKUP_BERGAMO.zip
+    : normalizeZip(dest.zip, shipCountry);
   if (!shipCountry || !shipZip || !isSupportedShipCountry(shipCountry)) {
     return { ok: false, error: "Invalid shipping destination" };
   }
@@ -146,6 +153,30 @@ export async function priceOrderLines(
   }
 
   merchandise = Math.round(merchandise * 100) / 100;
+
+  if (pickup) {
+    const packlink: ShippingQuote = {
+      serviceId: PICKUP_BERGAMO_SERVICE_ID,
+      price: 0,
+      currency: "EUR",
+      carrier: PICKUP_BERGAMO.carrier,
+      serviceName: PICKUP_BERGAMO.serviceName,
+      firstMile: "pickup",
+    };
+    return {
+      ok: true,
+      order: {
+        lines: priced,
+        merchandise,
+        shipping: 0,
+        total: merchandise,
+        shipZone: "it",
+        shipCountry: PICKUP_BERGAMO.country,
+        shipZip: PICKUP_BERGAMO.zip,
+        packlink,
+      },
+    };
+  }
 
   if (!sendcloudConfigured()) {
     return { ok: false, error: "Shipping not configured (Sendcloud keys)" };

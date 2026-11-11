@@ -87,6 +87,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       lines?: OrderLine[];
       country?: string;
       zip?: string;
+      delivery?: string;
       shipTo?: Partial<CheckoutShipTo>;
     }>(req);
 
@@ -101,6 +102,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const lines = Array.isArray(body.lines) ? body.lines : [];
+    const delivery = String(body.delivery || "").trim() === "pickup" ? "pickup" : "ship";
     const dest = parseShipDest({
       country: body.country,
       zip: body.zip,
@@ -114,7 +116,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     await releaseExpiredPaypalHoldsBestEffort();
 
-    const priced = await priceOrderLines(lines, dest);
+    const priced = await priceOrderLines(lines, dest, { delivery });
     if (priced.ok === false) return json(res, 400, { error: priced.error });
 
     const stockLines = priced.order.lines.map((l) => ({

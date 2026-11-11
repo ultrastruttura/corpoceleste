@@ -1,13 +1,16 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { commerceApiBase as apiBase } from "../../data/commerce";
+import { currentLocale, t } from "../../i18n";
 
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 const api = apiBase();
 ---
 
-<Base title="Area personale — Corpoceleste" noIndex noAnalytics>
+<Base title={`${copy.account.title} — Corpoceleste`} noIndex noAnalytics>
   <div class="wrap page-main account-page" data-account-root data-api={api}>
-    <h1>Area personale</h1>
+    <h1>{copy.account.title}</h1>
     {
       !api ? (
         <p class="lede">
@@ -15,7 +18,7 @@ const api = apiBase();
         </p>
       ) : (
         <div data-account-app>
-          <p class="lede">Caricamento…</p>
+          <p class="lede">{copy.account.loading}</p>
         </div>
       )
     }

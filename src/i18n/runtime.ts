@@ -9,8 +9,9 @@ export function t(locale: string | undefined): Ui {
   return ui[currentLocale(locale)];
 }
 
-export function thanksMessage(locale: Locale, from: string) {
+export function thanksMessage(locale: Locale, from: string, orderRef = "") {
   const copy = ui[locale].thanks;
+  const ref = orderRef.trim().slice(0, 64);
   const map: Record<string, { title: string; body: string; order?: boolean }> = {
     contatto: { title: copy.received, body: copy.contact },
     newsletter: { title: copy.received, body: copy.newsletter },
@@ -21,7 +22,11 @@ export function thanksMessage(locale: Locale, from: string) {
     corsi: { title: copy.received, body: copy.waitlist },
     workshop: { title: copy.received, body: copy.contact },
     recesso: { title: copy.received, body: copy.withdrawal },
-    ordine: { title: copy.order, body: copy.bank, order: true },
+    ordine: {
+      title: copy.order,
+      body: ref ? copy.bankWithRef(ref) : copy.bank,
+      order: true,
+    },
     paypal: { title: copy.order, body: copy.paypal, order: true },
     form: { title: copy.received, body: "" },
   };

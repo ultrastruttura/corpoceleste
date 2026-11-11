@@ -19,8 +19,10 @@ const copy = t(locale);
     import { currentLocale, thanksMessage } from "../i18n/runtime";
 
     const locale = currentLocale(document.documentElement.lang);
-    const from = new URLSearchParams(location.search).get("from") || "form";
-    const msg = thanksMessage(locale, from);
+    const params = new URLSearchParams(location.search);
+    const from = params.get("from") || "form";
+    const orderRef = params.get("ref") || "";
+    const msg = thanksMessage(locale, from, orderRef);
     const title = document.querySelector("[data-thanks-title]");
     const body = document.querySelector("[data-thanks-body]");
     const recap = document.querySelector("[data-thanks-recap]");

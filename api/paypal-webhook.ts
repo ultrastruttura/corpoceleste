@@ -110,6 +110,15 @@ async function ensureSendcloudShipment(opts: {
     };
   }
 
+  const { isHandPickup } = await import("../src/lib/pickup.js");
+  if (isHandPickup(opts.priced.packlink.serviceId)) {
+    return {
+      packlinkRef: "pickup-bergamo",
+      packlinkLabels: [],
+      packlinkServiceId: opts.priced.packlink.serviceId,
+    };
+  }
+
   if (!sendcloudConfigured()) {
     return { packlinkError: "SENDCLOUD_PUBLIC_KEY / SENDCLOUD_SECRET_KEY missing" };
   }
@@ -291,7 +300,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Any live hold (complete or partial): catalog already reflects reserved units.
     const ignoreStock = Boolean(earlyHold && !earlyHold.releasedAt);
 
-    const priced = await priceOrderLines(lines, dest, { ignoreStock });
+    const shipLine1 = String(
+      order?.purchase_units?.[0]?.shipping?.address?.address_line_1 || "",
+    );
+    const delivery = /ritiro a mano/i.test(shipLine1) ? "pickup" : "ship";
+    const priced = await priceOrderLines(lines, dest, { ignoreStock, delivery });
     const paidRaw =
       event.resource?.amount?.value ||
       order?.purchase_units?.[0]?.amount?.value ||

@@ -35,6 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(429).send("Too many requests");
   }
 
+  const delivery = field(body, "delivery") === "pickup" ? "pickup" : "ship";
   const dest = parseShipDest({
     country: field(body, "shipCountry"),
     zip: field(body, "shipZip"),
@@ -50,17 +51,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let pricedOrder: PricedOrder | null = null;
   try {
     const parsed = JSON.parse(linesRaw) as OrderLine[];
-    const priced = await priceOrderLines(Array.isArray(parsed) ? parsed : [], dest);
+    const priced = await priceOrderLines(Array.isArray(parsed) ? parsed : [], dest, {
+      delivery,
+    });
     if (priced.ok === false) return res.status(400).send(priced.error);
     pricedOrder = priced.order;
     const carrier = priced.order.packlink.carrier
       ? ` · ${priced.order.packlink.carrier}`
       : "";
+    const shipLabel =
+      delivery === "pickup"
+        ? `Ritiro a mano ${money(priced.order.shipping)}€${carrier}`
+        : `Spedizione ${money(priced.order.shipping)}€ (${priced.order.shipCountry} ${priced.order.shipZip}${carrier})`;
     ordine = [
       ...priced.order.lines.map(
         (l) => `${l.title} · ${l.size} · ×${l.qty} · ${money(l.lineTotal)}€`,
       ),
-      `Spedizione ${money(priced.order.shipping)}€ (${priced.order.shipCountry} ${priced.order.shipZip}${carrier})`,
+      shipLabel,
       `Totale ${money(priced.order.total)}€`,
     ].join("\n");
   } catch {
@@ -73,10 +80,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `Nome: ${nome}`,
     `Email: ${email}`,
     `Telefono: ${phone}`,
-    `Indirizzo: ${address}`,
-    `CAP: ${dest.zip}`,
-    `Città: ${city}`,
-    `Paese: ${dest.country}`,
+    delivery === "pickup"
+      ? "Consegna: ritiro a mano zona Bergamo (tempi da concordare)"
+      : `Indirizzo: ${address}`,
+    delivery === "pickup" ? "" : `CAP: ${dest.zip}`,
+    delivery === "pickup" ? `Città contatto: ${city}` : `Città: ${city}`,
+    delivery === "pickup" ? "" : `Paese: ${dest.country}`,
     note ? `Note: ${note}` : "",
     "",
     ordine,
@@ -90,58 +99,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { newId, portalConfigured } = await import("../server/portal/db.js");
+  if (!portalConfigured()) {
+    console.error("order: Turso portal not configured — cannot assign order number");
+    return res.status(503).send("Orders unavailable");
+  }
+  if (!pricedOrder) return res.status(400).send("Invalid lines");
+
   const bankId = newId("bank");
 
   // Soft-hold: stock is checked in priceOrderLines but only decremented when admin
   // marks the bonifico paid (avoids unpaid orders locking inventory for days).
-  let stockNote =
-    pricedOrder && (process.env.GITHUB_TOKEN || "").trim()
-      ? "Magazzino: verrà scalato alla conferma bonifico (area personale)."
-      : pricedOrder
-        ? "Magazzino: GITHUB_TOKEN assente — aggiorna a mano su Tina alla conferma."
-        : "";
+  const stockNote = (process.env.GITHUB_TOKEN || "").trim()
+    ? "Magazzino: verrà scalato alla conferma bonifico (area personale)."
+    : "Magazzino: GITHUB_TOKEN assente — aggiorna a mano su Tina alla conferma.";
 
-  let orderNumber = bankId;
-  if (pricedOrder && portalConfigured()) {
-    try {
-      const { upsertShopOrder } = await import("../server/portal/orders.js");
-      const shippingAddress = [address, `${dest.zip} ${city}`.trim(), dest.country]
-        .filter(Boolean)
-        .join("\n");
-      const saved = await upsertShopOrder({
-        external_id: bankId,
-        source: "bank",
-        customer_name: nome,
-        customer_email: email,
-        customer_phone: phone,
-        shipping_address: shippingAddress,
-        ship_country: dest.country,
-        ship_zip: dest.zip,
-        merchandise: pricedOrder.merchandise,
-        shipping: pricedOrder.shipping,
-        total: pricedOrder.total,
-        lines: pricedOrder.lines.map((l) => ({
-          id: l.id,
-          title: l.title,
-          size: l.size,
-          qty: l.qty,
-          unitPrice: l.unitPrice,
-          lineTotal: l.lineTotal,
-        })),
-        notes: note,
-        paid_at: null,
-      });
-      if (saved?.number && saved.number !== "—") orderNumber = saved.number;
-    } catch (err) {
-      console.error("order: shop order save failed", err);
-    }
+  // Same yearly sequence as PayPal (1/26, 2/26…) — required before customer mail / causale.
+  let orderNumber = "";
+  try {
+    const { upsertShopOrder } = await import("../server/portal/orders.js");
+    const shippingAddress = [address, `${dest.zip} ${city}`.trim(), dest.country]
+      .filter(Boolean)
+      .join("\n");
+    const saved = await upsertShopOrder({
+      external_id: bankId,
+      source: "bank",
+      customer_name: nome,
+      customer_email: email,
+      customer_phone: phone,
+      shipping_address: shippingAddress,
+      ship_country: dest.country,
+      ship_zip: dest.zip,
+      merchandise: pricedOrder.merchandise,
+      shipping: pricedOrder.shipping,
+      total: pricedOrder.total,
+      lines: pricedOrder.lines.map((l) => ({
+        id: l.id,
+        title: l.title,
+        size: l.size,
+        qty: l.qty,
+        unitPrice: l.unitPrice,
+        lineTotal: l.lineTotal,
+      })),
+      notes: note,
+      paid_at: null,
+    });
+    if (saved?.number && saved.number !== "—") orderNumber = saved.number;
+  } catch (err) {
+    console.error("order: shop order save failed", err);
+  }
+  if (!orderNumber) {
+    console.error("order: missing shop order number after upsert");
+    return res.status(503).send("Could not assign order number");
   }
 
   const identity = await loadShopIdentity();
   const locale = field(body, "locale") || "it";
-  const totalStr = pricedOrder ? money(pricedOrder.total) : "";
-  const shippingStr = pricedOrder ? money(pricedOrder.shipping) : "";
-  const merchandiseStr = pricedOrder ? money(pricedOrder.merchandise) : "";
+  const totalStr = money(pricedOrder.total);
+  const shippingStr = money(pricedOrder.shipping);
+  const merchandiseStr = money(pricedOrder.merchandise);
   const customerBody = customerBankOrderText({
     locale,
     orderRef: orderNumber,
@@ -190,5 +205,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  return res.redirect(303, next);
+  try {
+    const thanks = new URL(next);
+    thanks.searchParams.set("ref", orderNumber);
+    return res.redirect(303, thanks.toString());
+  } catch {
+    return res.redirect(303, next);
+  }
 }

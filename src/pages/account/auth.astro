@@ -2,19 +2,22 @@
 import Base from "../../layouts/Base.astro";
 import { commerceApiBase as apiBase } from "../../data/commerce";
 import { asset } from "../../lib/paths";
+import { currentLocale, t } from "../../i18n";
 
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
 const api = apiBase();
 ---
 
-<Base title="Accesso — Corpoceleste" noIndex noAnalytics referrer="no-referrer">
+<Base title={`${copy.account.authTitle} — Corpoceleste`} noIndex noAnalytics referrer="no-referrer">
   <script slot="head" src={asset("account-auth-boot.js")} />
   <div
     class="wrap page-main page-main--narrow account-page"
     data-account-auth
     data-api={api}
   >
-    <h1>Accesso</h1>
-    <p class="lede" data-auth-status>Verifica del link in corso…</p>
+    <h1>{copy.account.authTitle}</h1>
+    <p class="lede" data-auth-status>{copy.account.authStatus}</p>
   </div>
 
   <script>

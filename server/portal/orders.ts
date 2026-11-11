@@ -277,7 +277,39 @@ export async function upsertShopOrder(input: ShopOrderInput): Promise<ShopOrder 
     });
   }
 
-  return getShopOrder(id);
+  const saved = await getShopOrder(id);
+  const number = formatOrderNumber(seq, year);
+  // Prefer DB row; always keep the seq we just assigned (read-after-write lag).
+  if (saved) {
+    return saved.number !== "—" ? saved : { ...saved, order_year: year, order_seq: seq, number };
+  }
+  return {
+    id,
+    external_id: external,
+    source: input.source === "bank" ? "bank" : "paypal",
+    status: "nuovo",
+    order_year: year,
+    order_seq: seq,
+    number,
+    pieces: piecesFromLines(input.lines || []),
+    customer_name: String(input.customer_name || "").trim(),
+    customer_email: String(input.customer_email || "").trim(),
+    customer_phone: String(input.customer_phone || "").trim(),
+    shipping_address: String(input.shipping_address || "").trim(),
+    ship_country: String(input.ship_country || "").trim().toUpperCase(),
+    ship_zip: String(input.ship_zip || "").trim().toUpperCase(),
+    merchandise: euro(input.merchandise),
+    shipping: euro(input.shipping),
+    total: euro(input.total),
+    currency: String(input.currency || "EUR"),
+    lines: input.lines || [],
+    packlink_ref: String(input.packlink_ref || "").trim(),
+    notes: String(input.notes || "").trim(),
+    paid_at: paidAt,
+    shipped_at: null,
+    created_at: created || new Date().toISOString(),
+    updated_at: created || new Date().toISOString(),
+  };
 }
 
 export async function listShopOrders(opts?: {

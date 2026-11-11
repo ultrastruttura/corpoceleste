@@ -123,6 +123,10 @@ const it = {
     readPrivacy: (privacy: string) => `Ho letto l’${privacy}.`,
     privacyLink: "informativa privacy",
     shipTo: "Spedizione",
+    deliveryCourier: "Spedizione a domicilio",
+    deliveryPickup: "Ritiro a mano zona Bergamo — 0 €",
+    deliveryPickupNote:
+      "Ci mettiamo d’accordo su luogo, giorni e orari compatibili con gli impegni di entrambi. Dopo l’ordine ti scrivo.",
     shipCountry: "Paese",
     shipZip: "Codice postale",
     italy: "Italia",
@@ -130,6 +134,7 @@ const it = {
     shippingQuoteLoading: "Calcolo spedizione…",
     shippingQuoteError: "Spedizione non disponibile per questo paese o codice postale. Controlla o scrivimi.",
     shippingQuoteNeedZip: "Scegli il paese e il codice postale (Italia o UE) per calcolare la spedizione.",
+    shippingPickupReady: "Ritiro a mano · 0,00 €",
     paypal: "PayPal",
     paypalBack: "Torna a Corpoceleste",
     payTitle: "Scegli il pagamento",
@@ -138,7 +143,7 @@ const it = {
     googlePay: "Google Pay",
     bank: "Bonifico",
     bankNote:
-      "L’importo da bonificare include merce e spedizione (stessa quote Sendcloud di PayPal). Invia il modulo: ti arriva subito una email con IBAN, importo e causale. L’ordine si conclude quando arriva il pagamento: fino ad allora il pezzo non è riservato.",
+      "L’importo da bonificare include merce e spedizione (stessa quote Sendcloud di PayPal). Invia il modulo: ti arriva subito una email con IBAN, importo e il numero d’ordine da scrivere in causale. L’ordine si conclude quando arriva il pagamento: fino ad allora il pezzo non è riservato.",
     bankAmountDue: "Importo da bonificare",
     bankAmountOfWhichShip: "di cui spedizione",
     name: "Nome e cognome",
@@ -149,7 +154,13 @@ const it = {
     province: "Provincia / regione (facoltativo)",
     notes: "Note",
     sendOrder: "Ordine con obbligo di pagamento",
-    unlockPay: "Accetta condizioni e privacy, completa l’indirizzo e attendi il calcolo spedizione.",
+    unlockPay: "Accetta condizioni e privacy, completa i dati e (se spedisci) attendi il calcolo spedizione.",
+  },
+  account: {
+    title: "Area personale",
+    authTitle: "Accesso",
+    loading: "Caricamento…",
+    authStatus: "Verifica del link in corso…",
   },
   forms: {
     name: "Nome",
@@ -236,7 +247,9 @@ const it = {
       "Non sono riuscito a mandarti l’email di conferma. Riprova tra poco o scrivimi a info@corpoceleste.eu.",
     reprint: "Se ristampo, ti avviso.",
     waitlist: "Quando il gruppo c’è, fisso la data.",
-    bank: "Controlla la email: trovi IBAN, importo e causale. L’ordine si conclude quando arriva il pagamento.",
+    bank: "Controlla la email: trovi IBAN, importo e il numero d’ordine da scrivere in causale. L’ordine si conclude quando arriva il pagamento.",
+    bankWithRef: (ref: string) =>
+      `Il tuo ordine è il numero ${ref}. Controlla la email: IBAN, importo e causale. Scrivi ${ref} nella causale quando fai il bonifico. L’ordine si conclude quando arriva il pagamento.`,
     paypal:
       "Se PayPal ha confermato il pagamento, ti scrivo per la spedizione. Questa pagina da sola non è una ricevuta.",
     withdrawal:
@@ -528,6 +541,10 @@ const en: typeof it = {
     readPrivacy: (privacy: string) => `I have read the ${privacy}.`,
     privacyLink: "privacy notice",
     shipTo: "Shipping",
+    deliveryCourier: "Home delivery",
+    deliveryPickup: "Hand pickup in the Bergamo area — €0",
+    deliveryPickupNote:
+      "We’ll agree on a place, day and time that works for both of us. I’ll write after you order.",
     shipCountry: "Country",
     shipZip: "Postcode",
     italy: "Italy",
@@ -535,6 +552,7 @@ const en: typeof it = {
     shippingQuoteLoading: "Calculating shipping…",
     shippingQuoteError: "Shipping is not available for this country or postcode. Check it or write to me.",
     shippingQuoteNeedZip: "Choose country and postcode (Italy or EU) to calculate shipping.",
+    shippingPickupReady: "Hand pickup · €0.00",
     paypal: "PayPal",
     paypalBack: "Back to Corpoceleste",
     payTitle: "Choose how to pay",
@@ -543,7 +561,7 @@ const en: typeof it = {
     googlePay: "Google Pay",
     bank: "Bank transfer",
     bankNote:
-      "The amount to transfer includes goods and shipping (same Sendcloud quote as PayPal). Send the form: you get an email right away with IBAN, amount and payment reference. The order is confirmed when payment arrives (5-day hold).",
+      "The amount to transfer includes goods and shipping (same Sendcloud quote as PayPal). Send the form: you get an email right away with IBAN, amount and the order number to put in the payment reference. The order is confirmed when payment arrives (5-day hold).",
     bankAmountDue: "Amount to transfer",
     bankAmountOfWhichShip: "of which shipping",
     name: "Full name",
@@ -554,7 +572,13 @@ const en: typeof it = {
     province: "Province / region (optional)",
     notes: "Notes",
     sendOrder: "Order with obligation to pay",
-    unlockPay: "Accept terms and privacy, complete the address, and wait for the shipping quote.",
+    unlockPay: "Accept terms and privacy, complete your details, and (if shipping) wait for the quote.",
+  },
+  account: {
+    title: "Account",
+    authTitle: "Sign in",
+    loading: "Loading…",
+    authStatus: "Checking your link…",
   },
   forms: {
     name: "Name",
@@ -641,7 +665,9 @@ const en: typeof it = {
       "I couldn’t send the confirmation email. Try again in a moment, or write to info@corpoceleste.eu.",
     reprint: "If I reprint, I’ll let you know.",
     waitlist: "When the group is together, I’ll set the date.",
-    bank: "Check your email: IBAN, amount and payment reference are there. The order stands when payment arrives (5-day hold).",
+    bank: "Check your email: IBAN, amount and the order number for the payment reference are there. The order stands when payment arrives (5-day hold).",
+    bankWithRef: (ref: string) =>
+      `Your order number is ${ref}. Check your email: IBAN, amount and payment reference. Write ${ref} in the payment reference when you transfer. The order stands when payment arrives.`,
     paypal:
       "If PayPal confirmed the payment, I’ll write about shipping. This page alone is not a receipt.",
     withdrawal:
@@ -933,6 +959,10 @@ const de: typeof it = {
     readPrivacy: (privacy: string) => `Ich habe die ${privacy} gelesen.`,
     privacyLink: "Datenschutzhinweise",
     shipTo: "Versand",
+    deliveryCourier: "Lieferung nach Hause",
+    deliveryPickup: "Abholung in der Region Bergamo — 0 €",
+    deliveryPickupNote:
+      "Ort, Tag und Uhrzeit stimmen wir so ab, dass es für beide passt. Nach der Bestellung schreibe ich dir.",
     shipCountry: "Land",
     shipZip: "Postleitzahl",
     italy: "Italien",
@@ -940,6 +970,7 @@ const de: typeof it = {
     shippingQuoteLoading: "Versand wird berechnet…",
     shippingQuoteError: "Versand für dieses Land oder diese PLZ nicht verfügbar. Prüfe sie oder schreib mir.",
     shippingQuoteNeedZip: "Land und Postleitzahl wählen (Italien oder EU), um den Versand zu berechnen.",
+    shippingPickupReady: "Abholung · 0,00 €",
     paypal: "PayPal",
     paypalBack: "Zurück zu Corpoceleste",
     payTitle: "Zahlung wählen",
@@ -948,7 +979,7 @@ const de: typeof it = {
     googlePay: "Google Pay",
     bank: "Überweisung",
     bankNote:
-      "Der Überweisungsbetrag enthält Ware und Versand (gleiche Sendcloud-Quote wie PayPal). Schick das Formular: du bekommst sofort eine E-Mail mit IBAN, Betrag und Verwendungszweck. Die Bestellung kommt mit Zahlungseingang zustande; bis dahin ist das Stück nicht reserviert.",
+      "Der Überweisungsbetrag enthält Ware und Versand (gleiche Sendcloud-Quote wie PayPal). Schick das Formular: du bekommst sofort eine E-Mail mit IBAN, Betrag und der Bestellnummer für den Verwendungszweck. Die Bestellung kommt mit Zahlungseingang zustande; bis dahin ist das Stück nicht reserviert.",
     bankAmountDue: "Zu überweisender Betrag",
     bankAmountOfWhichShip: "davon Versand",
     name: "Vor- und Nachname",
@@ -959,7 +990,13 @@ const de: typeof it = {
     province: "Provinz / Region (optional)",
     notes: "Anmerkungen",
     sendOrder: "Zahlungspflichtig bestellen",
-    unlockPay: "AGB und Datenschutz akzeptieren, Adresse ausfüllen und Versandberechnung abwarten.",
+    unlockPay: "AGB und Datenschutz akzeptieren, Daten ausfüllen und (bei Versand) die Berechnung abwarten.",
+  },
+  account: {
+    title: "Persönlicher Bereich",
+    authTitle: "Anmeldung",
+    loading: "Wird geladen…",
+    authStatus: "Link wird geprüft…",
   },
   forms: {
     name: "Name",
@@ -1046,7 +1083,9 @@ const de: typeof it = {
       "Die Bestätigungs-E-Mail konnte ich nicht senden. Versuch es gleich noch einmal oder schreib an info@corpoceleste.eu.",
     reprint: "Wenn ich nachdrucke, gebe ich Bescheid.",
     waitlist: "Wenn die Gruppe steht, lege ich den Termin fest.",
-    bank: "Prüfe deine E-Mail: IBAN, Betrag und Verwendungszweck stehen dort. Die Bestellung kommt mit Zahlungseingang zustande.",
+    bank: "Prüfe deine E-Mail: IBAN, Betrag und die Bestellnummer für den Verwendungszweck stehen dort. Die Bestellung kommt mit Zahlungseingang zustande.",
+    bankWithRef: (ref: string) =>
+      `Deine Bestellnummer ist ${ref}. Prüfe die E-Mail: IBAN, Betrag und Verwendungszweck. Schreib ${ref} in den Verwendungszweck der Überweisung. Die Bestellung kommt mit Zahlungseingang zustande.`,
     paypal:
       "Wenn PayPal die Zahlung bestätigt hat, schreibe ich zum Versand. Diese Seite allein ist keine Quittung.",
     withdrawal:

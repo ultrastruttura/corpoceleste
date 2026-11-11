@@ -27,6 +27,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     data-ship-need-zip={copy.checkout.shippingQuoteNeedZip}
     data-ship-loading={copy.checkout.shippingQuoteLoading}
     data-ship-error={copy.checkout.shippingQuoteError}
+    data-ship-pickup-ready={copy.checkout.shippingPickupReady}
     data-bank-amount-due={copy.checkout.bankAmountDue}
     data-bank-amount-ship={copy.checkout.bankAmountOfWhichShip}
     data-paypal-client-id={paypalClientId || undefined}
@@ -40,30 +41,43 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     <div class="checkout-flow" data-checkout-flow hidden>
       <section class="checkout-step checkout-step--order">
         <h2 class="checkout-bank-title">{copy.checkout.shipTo}</h2>
-        <div class="field checkout-ship">
-          <label class="field-label" for="ship-country">{copy.checkout.shipCountry}</label>
-          <select id="ship-country" data-ship-country autocomplete="country">
-            {
-              shipCountries.map(({ code, label }) => (
-                <option value={code} selected={code === "IT"}>
-                  {label}
-                </option>
-              ))
-            }
-          </select>
+        <div class="pay-methods checkout-delivery" data-delivery-group>
+          <label class="check">
+            <input type="radio" name="consegna" value="ship" checked data-delivery />
+            <span>{copy.checkout.deliveryCourier}</span>
+          </label>
+          <label class="check">
+            <input type="radio" name="consegna" value="pickup" data-delivery />
+            <span>{copy.checkout.deliveryPickup}</span>
+          </label>
         </div>
-        <div class="field checkout-ship">
-          <label class="field-label" for="ship-zip">{copy.checkout.shipZip}</label>
-          <input
-            id="ship-zip"
-            data-ship-zip
-            type="text"
-            autocomplete="postal-code"
-            inputmode="text"
-            spellcheck="false"
-          />
+        <p class="checkout-vat" data-pickup-note hidden>{copy.checkout.deliveryPickupNote}</p>
+        <div data-ship-address-fields>
+          <div class="field checkout-ship">
+            <label class="field-label" for="ship-country">{copy.checkout.shipCountry}</label>
+            <select id="ship-country" data-ship-country autocomplete="country">
+              {
+                shipCountries.map(({ code, label }) => (
+                  <option value={code} selected={code === "IT"}>
+                    {label}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+          <div class="field checkout-ship">
+            <label class="field-label" for="ship-zip">{copy.checkout.shipZip}</label>
+            <input
+              id="ship-zip"
+              data-ship-zip
+              type="text"
+              autocomplete="postal-code"
+              inputmode="text"
+              spellcheck="false"
+            />
+          </div>
+          <p class="checkout-vat" data-ship-status>{copy.checkout.shippingQuoteNeedZip}</p>
         </div>
-        <p class="checkout-vat" data-ship-status>{copy.checkout.shippingQuoteNeedZip}</p>
         <div class="field checkout-ship">
           <label class="field-label" for="ship-name">{copy.checkout.name}</label>
           <input id="ship-name" data-ship-name autocomplete="name" required />
@@ -76,24 +90,26 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           <label class="field-label" for="ship-phone">{copy.checkout.phone}</label>
           <input id="ship-phone" data-ship-phone type="tel" autocomplete="tel" />
         </div>
-        <div class="field checkout-ship">
-          <label class="field-label" for="ship-street">{copy.checkout.address}</label>
-          <input id="ship-street" data-ship-street autocomplete="street-address" required />
-        </div>
-        <div class="field checkout-ship">
-          <label class="field-label" for="ship-city">{copy.checkout.city}</label>
-          <input id="ship-city" data-ship-city autocomplete="address-level2" required />
-        </div>
-        <div class="field checkout-ship">
-          <label class="field-label" for="ship-province">{copy.checkout.province}</label>
-          <input
-            id="ship-province"
-            data-ship-province
-            autocomplete="address-level1"
-            maxlength="40"
-            spellcheck="false"
-            placeholder="RM"
-          />
+        <div data-ship-street-fields>
+          <div class="field checkout-ship">
+            <label class="field-label" for="ship-street">{copy.checkout.address}</label>
+            <input id="ship-street" data-ship-street autocomplete="street-address" required />
+          </div>
+          <div class="field checkout-ship">
+            <label class="field-label" for="ship-city">{copy.checkout.city}</label>
+            <input id="ship-city" data-ship-city autocomplete="address-level2" required />
+          </div>
+          <div class="field checkout-ship">
+            <label class="field-label" for="ship-province">{copy.checkout.province}</label>
+            <input
+              id="ship-province"
+              data-ship-province
+              autocomplete="address-level1"
+              maxlength="40"
+              spellcheck="false"
+              placeholder="RM"
+            />
+          </div>
         </div>
         <div class="recap" data-recap></div>
       </section>
@@ -200,6 +216,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             <input type="hidden" name="lines" data-lines-field />
             <input type="hidden" name="shipCountry" data-ship-country-field value="IT" />
             <input type="hidden" name="shipZip" data-ship-zip-field value="" />
+            <input type="hidden" name="delivery" data-delivery-field value="ship" />
             <FormHoney />
             <input type="hidden" name="nome" data-bank-name />
             <input type="hidden" name="email" data-bank-email />
@@ -241,6 +258,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       requestShippingQuote,
       type CheckoutQuote,
     } from "../scripts/checkout-ship";
+    import { PICKUP_BERGAMO, PICKUP_BERGAMO_SERVICE_ID } from "../lib/pickup";
 
     (function bootPayPalSdk() {
       const boot = document.querySelector<HTMLElement>("[data-paypal-boot]");
@@ -283,6 +301,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       needZip: page?.dataset.shipNeedZip || "",
       loading: page?.dataset.shipLoading || "",
       error: page?.dataset.shipError || "",
+      pickupReady: page?.dataset.shipPickupReady || "",
       bankDue: page?.dataset.bankAmountDue || "",
       bankShip: page?.dataset.bankAmountShip || "",
     };
@@ -298,6 +317,11 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     const cityInput = document.querySelector<HTMLInputElement>("[data-ship-city]");
     const provinceInput = document.querySelector<HTMLInputElement>("[data-ship-province]");
     const shipStatus = document.querySelector<HTMLElement>("[data-ship-status]");
+    const pickupNote = document.querySelector<HTMLElement>("[data-pickup-note]");
+    const shipAddressFields = document.querySelector<HTMLElement>("[data-ship-address-fields]");
+    const shipStreetFields = document.querySelector<HTMLElement>("[data-ship-street-fields]");
+    const deliveryRadios = document.querySelectorAll<HTMLInputElement>("[data-delivery]");
+    const deliveryField = document.querySelector<HTMLInputElement>("[data-delivery-field]");
     const disclaimer = document.querySelector<HTMLInputElement>("[data-disclaimer]");
     const privacy = document.querySelector<HTMLInputElement>("[data-privacy]");
     const payBox = document.querySelector("[data-pay-box]");
@@ -324,11 +348,17 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     let quoteSeq = 0;
     let quoteTimer: ReturnType<typeof setTimeout> | undefined;
 
+    function isPickup() {
+      return [...deliveryRadios].find((r) => r.checked)?.value === "pickup";
+    }
+
     function destCountry() {
+      if (isPickup()) return PICKUP_BERGAMO.country;
       return String(countrySel?.value || "IT").toUpperCase();
     }
 
     function destZip() {
+      if (isPickup()) return PICKUP_BERGAMO.zip;
       return normalizeZip(zipInput?.value || "", destCountry());
     }
 
@@ -342,6 +372,17 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     }
 
     function shipTo() {
+      if (isPickup()) {
+        return buildShipTo({
+          fullName: nameInput?.value || "",
+          email: emailInput?.value || "",
+          phone: phoneInput?.value || "",
+          street: PICKUP_BERGAMO.street,
+          city: PICKUP_BERGAMO.city,
+          province: PICKUP_BERGAMO.province,
+          country: PICKUP_BERGAMO.country,
+        });
+      }
       return buildShipTo({
         fullName: nameInput?.value || "",
         email: emailInput?.value || "",
@@ -354,7 +395,42 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     }
 
     function hasCompleteAddress() {
+      if (isPickup()) {
+        const a = shipTo();
+        return Boolean(a.fullName && a.email.includes("@"));
+      }
       return addressComplete(shipTo());
+    }
+
+    function applyPickupQuote() {
+      quote = {
+        shipping: 0,
+        country: PICKUP_BERGAMO.country,
+        zip: PICKUP_BERGAMO.zip,
+        serviceId: PICKUP_BERGAMO_SERVICE_ID,
+        carrier: PICKUP_BERGAMO.carrier,
+      };
+      quoteError = false;
+      quoteLoading = false;
+      setStatus(labels.pickupReady);
+    }
+
+    function syncDeliveryUi() {
+      const pickup = isPickup();
+      if (pickupNote) pickupNote.hidden = !pickup;
+      if (shipAddressFields) shipAddressFields.hidden = pickup;
+      if (shipStreetFields) shipStreetFields.hidden = pickup;
+      if (streetInput) streetInput.required = !pickup;
+      if (cityInput) cityInput.required = !pickup;
+      if (deliveryField) deliveryField.value = pickup ? "pickup" : "ship";
+      if (pickup) {
+        quoteSeq += 1;
+        applyPickupQuote();
+      } else {
+        quote = null;
+        scheduleQuote();
+      }
+      syncPage();
     }
 
     let zipLookupTimer: ReturnType<typeof setTimeout> | null = null;
@@ -392,20 +468,25 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       const lines = items.map((i) => `${lineName(i)} · ${i.size} · ×${i.qty} · ${i.price * i.qty}€`);
       if (hasValidQuote()) {
         const carrier = quote?.carrier ? ` (${quote.carrier})` : "";
-        lines.push(`Spedizione ${ship}€${carrier}`, `Totale ${total() + ship}€`);
+        lines.push(
+          isPickup() ? `Ritiro a mano ${ship}€${carrier}` : `Spedizione ${ship}€${carrier}`,
+          `Totale ${total() + ship}€`,
+        );
       } else {
         lines.push("Spedizione: da calcolare", `Totale merce ${total()}€`);
       }
       if (hasCompleteAddress()) {
-        lines.push(
-          "",
-          `Destinatario: ${a.fullName}`,
-          a.street,
-          `${[a.province, destZip(), a.city].filter(Boolean).join(" ")}`,
-          destCountry(),
-          ...(a.phone ? [a.phone] : []),
-          a.email,
-        );
+        lines.push("", `Destinatario: ${a.fullName}`);
+        if (isPickup()) {
+          lines.push("Ritiro a mano zona Bergamo — tempi da concordare");
+        } else {
+          lines.push(
+            a.street,
+            `${[a.province, destZip(), a.city].filter(Boolean).join(" ")}`,
+            destCountry(),
+          );
+        }
+        lines.push(...(a.phone ? [a.phone] : []), a.email);
       }
       return lines.join("\n");
     }
@@ -486,6 +567,11 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         syncPage();
         return;
       }
+      if (isPickup()) {
+        applyPickupQuote();
+        syncPage();
+        return;
+      }
       if (!zip || zip.length < 3) {
         quoteLoading = false;
         setStatus(labels.needZip);
@@ -562,6 +648,13 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
     methods.forEach((radio) => radio.addEventListener("change", syncMethod));
     syncMethod();
+
+    deliveryRadios.forEach((radio) =>
+      radio.addEventListener("change", () => {
+        syncDeliveryUi();
+      }),
+    );
+    syncDeliveryUi();
 
     countrySel?.addEventListener("change", () => {
       syncProvinceField();
@@ -682,6 +775,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             lines: items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
             country: quote.country,
             zip: quote.zip,
+            delivery: isPickup() ? "pickup" : "ship",
             shipTo: {
               fullName: a.fullName,
               email: a.email,

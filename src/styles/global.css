@@ -860,6 +860,10 @@ body.cart-open {
   margin-bottom: 8px;
 }
 
+.checkout-delivery {
+  margin-bottom: 16px;
+}
+
 .checkout-bank-title {
   margin: 0 0 16px;
   font-size: 18px;
