@@ -63,10 +63,12 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 ## What the unit suite covers
 
 - Money / shipping floor / destination parsing / payment coverage — `server/order-pricing.ts`
+- Full `priceOrderLines` with mocked catalog + Sendcloud (pickup €0, OOS, ignoreStock)
 - Sendcloud quote selection (pure) — `server/sendcloud/quote-select.ts`
 - PayPal line / SKU encoding — `src/lib/paypal-lines.ts`
 - CAP / country allowlist — `src/lib/ship-normalize.ts`, `src/lib/ship-countries.ts`
-- Stock markdown patch — `server/stock-patch.ts`
+- Stock markdown patch + ledger idempotency (`remainingStockLines`) — `server/stock-patch.ts`, `server/github-stock.ts`
+- PayPal webhook: bad signature, underpay, duplicate done, happy path (all mocked) — `api/paypal-webhook.ts`
 - Artist deal share math — `server/portal/math.ts`
 - Sendcloud webhook HMAC — `server/sendcloud-webhook-handler.ts`
 - Browser Origin / Sec-Fetch gate — `server/portal/http.ts`
@@ -78,6 +80,7 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 - Product → add to cart → checkout with CAP `24067`
 - Shipping quote via **mocked** `/api/shipping-quote` (no Sendcloud)
 - Pay box stays locked without address/terms
+- Bonifico: locked without quote/data; amount due after quote; unlock only when complete
 - Mobile viewport smoke on home
 
 **Not automated:** real PayPal capture, Apple/Google Pay on device, Resend delivery, Sendcloud label creation, Turso writes, GitHub stock commits.
