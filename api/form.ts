@@ -48,7 +48,7 @@ function cronAuthorized(req: VercelRequest) {
   return auth === `Bearer ${secret}`;
 }
 
-/** Release unpaid PayPal holds (30 min) and legacy bank holds (48h). Cron or CRON_SECRET. */
+/** Release unpaid PayPal holds (30 min) and unpaid bank soft-holds (48h). Cron or CRON_SECRET. */
 async function runStockReleaseJob(res: VercelResponse) {
   if (!(process.env.GITHUB_TOKEN || "").trim()) {
     return res.status(503).json({ error: "GITHUB_TOKEN missing" });

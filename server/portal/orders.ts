@@ -365,7 +365,7 @@ export async function markShopOrderShippedMail(id: string): Promise<ShopOrder | 
   return getShopOrder(id);
 }
 
-/** Mark bank order as paid (then decrement GitHub stock if still pending). */
+/** Mark bank order as paid (stock already soft-held at checkout; applyOrderStockOnce is idempotent). */
 export async function markShopOrderPaid(id: string): Promise<ShopOrder | null> {
   await ensureSchema();
   const db = getDb();

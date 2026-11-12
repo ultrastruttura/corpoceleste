@@ -711,8 +711,62 @@ export async function releaseExpiredPaypalHolds(now = Date.now()): Promise<strin
 }
 
 /**
+ * Soft-hold stock for a bonifico order (ledger id = bank_* external_id).
+ * Released by cron after BANK_HOLD_TTL if still unpaid; kept if admin marks paid.
+ */
+export async function reserveBankHold(
+  bankExternalId: string,
+  lines: OrderLine[],
+  meta?: { expectedTotal?: string },
+): Promise<LedgerRecord> {
+  const holdId = String(bankExternalId || "").trim();
+  if (!holdId.startsWith("bank_")) {
+    throw new Error(`Invalid bank hold id ${holdId}`);
+  }
+  const claim = await claimOrResumeLedger(holdId, lines, meta);
+  if (claim.action === "skip" && claim.ledger.stockComplete && !claim.ledger.releasedAt) {
+    return { ...claim.ledger, kind: "bank" };
+  }
+  if (claim.action === "skip") {
+    throw new Error(`Bank hold ${holdId} not reusable (${claim.ledger.status})`);
+  }
+  let held = claim.ledger;
+  if (!held.stockComplete) {
+    held = await applyStockDecrementCheckpointed(held, lines, writeLedger);
+  }
+  const done: LedgerRecord = {
+    ...held,
+    kind: "bank",
+    status: "done",
+    stockComplete: true,
+    at: new Date().toISOString(),
+  };
+  await writeLedger(done);
+  return done;
+}
+
+/** Restore units if the shop order could not be saved after the hold. */
+export async function abandonBankHold(bankExternalId: string): Promise<void> {
+  const hold = await getLedger(bankExternalId);
+  if (!hold || hold.kind !== "bank") return;
+  if (hold.releasedAt || hold.consumedBy) return;
+  const applied = (hold.lines || []).filter((l) =>
+    (hold.stockAppliedKeys || []).includes(stockLineKey(l)),
+  );
+  const lines = applied.length ? applied : hold.stockComplete ? hold.lines || [] : [];
+  if (lines.length) await applyStockIncrement(lines);
+  await writeLedger({
+    ...hold,
+    releasedAt: new Date().toISOString(),
+    status: "done",
+    error: "abandoned before shop order saved",
+    at: new Date().toISOString(),
+  });
+}
+
+/**
  * Restore stock for unpaid bank holds older than BANK_HOLD_TTL (48h).
- * New bank orders soft-hold (stock only on mark paid); this cleans legacy decrements.
+ * Soft-holds created at bonifico checkout and any legacy bank decrements.
  * `isPaid(externalId)` should return true when Andrea confirmed the transfer.
  */
 export async function releaseExpiredBankHolds(

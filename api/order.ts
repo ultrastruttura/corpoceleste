@@ -106,11 +106,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!pricedOrder) return res.status(400).send("Invalid lines");
 
   const bankId = newId("bank");
+  const stockLines = pricedOrder.lines.map((l) => ({
+    id: l.id,
+    size: l.size,
+    qty: l.qty,
+  }));
 
-  // Soft-hold: stock is checked in priceOrderLines but only decremented when admin
-  // marks the bonifico paid (avoids unpaid orders locking inventory for days).
-  const stockNote = (process.env.GITHUB_TOKEN || "").trim()
-    ? "Magazzino: verrà scalato alla conferma bonifico (area personale)."
+  // Soft-hold: decrement now; cron restores after 48h if still unpaid.
+  let stockHeld = false;
+  const hasGithub = Boolean((process.env.GITHUB_TOKEN || "").trim());
+  if (hasGithub) {
+    try {
+      const { reserveBankHold, assertGithubStockAccess } = await import("../server/github-stock.js");
+      await assertGithubStockAccess();
+      await reserveBankHold(bankId, stockLines, {
+        expectedTotal: money(pricedOrder.total),
+      });
+      stockHeld = true;
+    } catch (err: unknown) {
+      const { LedgerBusyError } = await import("../server/github-stock.js");
+      if (err instanceof LedgerBusyError) {
+        return res.status(503).send("Stock busy, retry");
+      }
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("order: bank stock hold failed", msg);
+      if (
+        msg.includes("INSUFFICIENT_STOCK") ||
+        msg.startsWith("no stock line") ||
+        msg.startsWith("missing product")
+      ) {
+        return res.status(409).send("Out of stock");
+      }
+      return res.status(503).send("Stock unavailable");
+    }
+  }
+
+  const stockNote = stockHeld
+    ? "Magazzino: soft-hold 48h (rilascio automatico se bonifico non confermato)."
     : "Magazzino: GITHUB_TOKEN assente — aggiorna a mano su Tina alla conferma.";
 
   // Same yearly sequence as PayPal (1/26, 2/26…) — required before customer mail / causale.
@@ -149,6 +181,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   if (!orderNumber) {
     console.error("order: missing shop order number after upsert");
+    if (stockHeld) {
+      try {
+        const { abandonBankHold } = await import("../server/github-stock.js");
+        await abandonBankHold(bankId);
+      } catch (err) {
+        console.error("order: abandon bank hold failed", err);
+      }
+    }
     return res.status(503).send("Could not assign order number");
   }
 
