@@ -86,7 +86,7 @@ La funzione magazzino sarà:
 
 `https://corpoceleste-xxxx.vercel.app/api/paypal-webhook`
 
-Copia anche l’URL base (`https://corpoceleste-xxxx.vercel.app`) in `src/data/site.ts` → `formApi`: da lì partono conferma d’ordine (bonifico) e avviso di recesso.
+Copia anche l’URL base (`https://corpoceleste-xxxx.vercel.app`) in Tina → `formApi` (`content/settings/site.md`; fallback `src/data/site.ts`): da lì partono conferma d’ordine (bonifico) e avviso di recesso.
 
 Apri quell’URL nel browser (GET): deve rispondere qualcosa tipo:
 
@@ -154,17 +154,9 @@ Senza Webhook ID corretto, Vercel rifiuta le chiamate (firma non verificata).
 
 ## Passo 6 — Client ID sul sito (GitHub Pages)
 
-1. Apri `src/data/site.ts` nel repo.
-2. Metti:
-
-```ts
-paypalClientId: "IL_TUO_CLIENT_ID_LIVE_O_SANDBOX",
-```
-
-(stesso Client ID del passo 1)
-
-3. Commit + push su `main`.
-4. Aspetta che GitHub Actions finisca (Pages aggiornato).
+1. In Tina (*PayPal client ID*) o in `content/settings/site.md` / fallback `src/data/site.ts`, metti lo stesso Client ID del passo 1.
+2. Commit + push su `main`.
+3. Aspetta che GitHub Actions finisca (Pages aggiornato).
 
 In checkout deve comparire il **bottone PayPal**.  
 Se `paypalClientId` è vuoto, vedi solo il bonifico.
@@ -211,7 +203,7 @@ Stesso flusso con `PAYPAL_MODE=live`, Client ID Live, e un ordine reale piccolo.
 | Bottone ok ma stock non scende | Webhook URL sbagliato; `PAYPAL_WEBHOOK_ID` mancante; Redeploy non fatto; evento non è *Payment capture completed* |
 | GET `/api/paypal-webhook` non risponde | Deploy Vercel fallito; Framework non su Other; log in Deployments |
 | Stock non si scrive su GitHub | Token senza **Contents: Read and write**; `GITHUB_REPO` / branch sbagliati; token scaduto |
-| Nessuna email | `SHOP_EMAIL` vuoto; conferma FormSubmit sulla prima mail a quell’indirizzo |
+| Nessuna email | `SHOP_EMAIL` / `RESEND_API_KEY` / `MAIL_FROM` su Vercel; dominio Resend non verificato |
 | Sandbox vs Live misti | Client ID Sandbox con `PAYPAL_MODE=live` (o il contrario) → fallisce |
 
 ---

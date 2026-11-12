@@ -18,18 +18,19 @@ npm run dev
 
 ## Contenuti da cambiare
 
-- Email, Instagram, IBAN: `src/data/site.ts`
+- Email, Instagram, IBAN, PayPal Client ID, `formApi`: Tina → `content/settings/site.md` (fallback in `src/data/site.ts`)
 - Maglie: Tina / `content/products/` (inclusi pezzi magazzino per taglia)
 - Artisti: `content/artists/`
 - News: `content/news/`
 - Corsi: `src/data/workshops.ts`
+- Test e CI: [`docs/TESTING_AND_CI.md`](./docs/TESTING_AND_CI.md)
 
 ## Checkout (PayPal, senza abbonamento)
 
 PayPal non ha canone mensile: solo commissione sull’ordine (in Italia circa 3% + 0,35 €).
 
 1. Account **PayPal Business** (gratis).
-2. [developer.paypal.com](https://developer.paypal.com/) → crea un’app → copia il **Client ID** in `src/data/site.ts` → `paypalClientId`.
+2. [developer.paypal.com](https://developer.paypal.com/) → crea un’app → copia il **Client ID** in Tina (*PayPal client ID* / `content/settings/site.md`) o, in fallback, `src/data/site.ts` → `paypalClientId`.
 3. Senza Client ID il checkout mostra **solo bonifico** (niente form PayPal classico).
 
 ### Magazzino + mail ordine (Vercel webhook)
@@ -84,9 +85,8 @@ Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora 
 
 #### 4. Sito
 
-Metti lo stesso **Client ID** Live in `src/data/site.ts` → `paypalClientId`, push, aspetta Pages.
+Metti lo stesso **Client ID** Live in Tina / `content/settings/site.md` (o fallback `src/data/site.ts`), push, aspetta Pages.
 
 Dopo un ordine di prova (sandbox o 1€), in repo dovresti vedere:
-- un file in `stock-ledger/`
-- stock aggiornato nel markdown del prodotto
-- email a `SHOP_EMAIL` (FormSubmit)
+- stock aggiornato nel markdown del prodotto (i JSON in `stock-ledger/` restano locali / gitignored)
+- email a `SHOP_EMAIL` via **Resend** dal webhook Vercel (non FormSubmit)

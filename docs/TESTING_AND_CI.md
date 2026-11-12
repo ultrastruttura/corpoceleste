@@ -15,14 +15,14 @@ Corpoceleste is a split stack:
 
 Testing is three levels:
 
-1. **Isolated (every PR / push)** — Vitest unit tests + `astro check` + Astro build + Playwright Chromium against a local preview. All external services mocked. No real payments, emails, or shipments.
+1. **Isolated (every PR / push)** — Vitest unit tests + `tsc -p tsconfig.ci.json` (`npm run check`) + Astro build + Playwright Chromium against a local preview. All external services mocked. No real payments, emails, or shipments.
 2. **Scheduled / manual** — broader npm audit + Playwright Firefox/WebKit (`nightly.yml`).
 3. **Post-deploy smoke** — non-destructive HTTP checks on `www.corpoceleste.eu` after a successful Pages deploy.
 
 ```mermaid
 flowchart TD
   pr[PR or push] --> ci[ci.yml]
-  ci --> unit[astro check + vitest]
+  ci --> unit[tsc check + vitest]
   ci --> build[astro build]
   ci --> e2e[Playwright Chromium]
   main[push main] --> deploy[deploy.yml]

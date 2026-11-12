@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22 <26"
+  },
   "scripts": {
     "dev": "node --disable-warning=DEP0190 ./node_modules/@tinacms/cli/bin/tinacms dev -c \"astro dev\"",
     "build": "tinacms build --local --skip-cloud-checks && astro build",
@@ -15,7 +18,6 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "ci": "npm run check && npm run test:unit && npm run build:site",
-    "optimize:prints": "node scripts/optimize-prints.mjs",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -32,6 +34,7 @@
     "@astrojs/check": "^0.9.12",
     "@playwright/test": "^1.65.0",
     "@tinacms/cli": "^4.0.4",
+    "sharp": "^0.33.5",
     "typescript": "^6.0.3",
     "vitest": "^3.2.7"
   }
