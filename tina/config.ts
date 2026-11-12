@@ -249,7 +249,7 @@ export default defineConfig({
             label: "Misure (cm, capo disteso)",
             list: true,
             description:
-              "chest = ½ petto (ascella–ascella). length = spalla–orlo. sleeve = spalla–polsino.",
+              "A = larghezza / ½ petto (ascella–ascella). B = lunghezza spalla–orlo. Manica solo se il modello la pubblica. IT/FR come in guida taglie.",
             ui: {
               itemProps: (item: { size?: string }) => ({
                 label: item?.size ? `Taglia ${item.size}` : "Taglia",
@@ -259,13 +259,15 @@ export default defineConfig({
               {
                 type: "string",
                 name: "size",
-                label: "Taglia",
+                label: "Taglia (USA)",
                 required: true,
                 options: ["S", "M", "L", "XL", "XXL"],
               },
-              { type: "number", name: "chest", label: "½ petto (cm)", required: true },
-              { type: "number", name: "length", label: "Lunghezza (cm)", required: true },
-              { type: "number", name: "sleeve", label: "Manica (cm)", required: true },
+              { type: "string", name: "it", label: "Italia (es. 3 – 46)", required: false },
+              { type: "string", name: "fr", label: "Francia (es. 42)", required: false },
+              { type: "number", name: "chest", label: "A. Larghezza (cm)", required: true },
+              { type: "number", name: "length", label: "B. Lunghezza (cm)", required: true },
+              { type: "number", name: "sleeve", label: "C. Manica (cm, opz.)", required: false },
             ],
           },
         ],

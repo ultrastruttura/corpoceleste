@@ -56,12 +56,12 @@ const it = {
     compositionLabel: "Come da etichetta cucita sul capo.",
     sizeChart: "Tabella taglie",
     sizeGuideLink: "Guida alle taglie",
-    sizeChest: "½ petto",
-    sizeLength: "Lunghezza",
-    sizeSleeve: "Manica",
+    sizeChest: "A. Larghezza",
+    sizeLength: "B. Lunghezza",
+    sizeSleeve: "C. Manica",
     sizeUnit: "cm",
     sizeChartNote:
-      "Misure del capo disteso, in centimetri. ½ petto = da cucitura a cucitura, non la circonferenza. Tolleranza di stampa circa ±1 cm. Confronta con una maglia che ti sta. Se l’etichetta cucita indica una composizione diversa da quella in pagina, vale l’etichetta.",
+      "Misure del capo disteso, in centimetri. A = larghezza da cucitura a cucitura sotto le ascelle (non la circonferenza). Confronta con una maglia che ti sta. Se l’etichetta cucita indica una composizione diversa da quella in pagina, vale l’etichetta.",
     careGuideAlt: "Guida al lavaggio della maglia serigrafata Corpoceleste",
     galleryPrev: "Foto precedente",
     galleryNext: "Foto successiva",
@@ -238,35 +238,35 @@ const it = {
     closed: "Elenco in aggiornamento — intanto Bio, Corsi o Contatti.",
   },
   sizeGuide: {
-    title: "Guida alle taglie",
+    title: "Guida alle taglie — modelli T-shirt",
     lede:
-      "Guida alle taglie delle maglie Corpoceleste: come misurare larghezza, lunghezza e manica a capo disteso, tabella in centimetri, fit regular. Serigrafia a mano a Bergamo.",
-    howTitle: "Come misurare",
+      "Misure del modello T-shirt / maglia in cotone: tabella Italia / USA / Francia, A larghezza e B lunghezza a capo disteso. Serigrafia a mano a Bergamo.",
+    howTitle: "Come misurarsi correttamente",
     howBody:
-      "Per non sbagliare, prendi una maglia che ti sta bene, stendila su un piano e misura in centimetri con un metro da sarta (vedi figura):",
+      "Prendi una maglia che ti sta bene, stendila su un piano e misura in centimetri con un metro da sarta (vedi figura):",
     howChest:
-      "A — larghezza: da cucitura a cucitura sotto le ascelle (½ petto, non la circonferenza del torace).",
+      "A — larghezza: da cucitura a cucitura sotto le ascelle (non la circonferenza del torace).",
     howLength:
       "B — lunghezza: dal punto più alto della spalla (accanto al collo) fino all’orlo.",
-    howSleeve: "C — manica: dall’attaccatura manica al polsino (se presente).",
-    figureAlt: "Maglia stesa con misure A larghezza, B lunghezza e C manica.",
-    tipTitle: "Consigli sulla vestibilità",
-    tipBody:
-      "I modelli sono regular, taglio comodo. Se dopo le misure sei a cavallo tra due taglie, di solito conviene la superiore. Preferisci più aderente? Scegli quella sotto. Tolleranza circa ±1 cm.",
-    tableTitle: "Misure del modello",
-    tableIntro:
-      "Capo disteso, in centimetri. Confronta A / B / C con la tua maglia di riferimento, poi scegli la taglia in tabella.",
-    colSize: "Taglia",
-    colChest: "A. Larghezza (cm)",
-    colLength: "B. Lunghezza (cm)",
-    colSleeve: "C. Manica (cm)",
-    modelFallback: "Maglia",
+    figureAlt: "Maglia stesa con misure A larghezza e B lunghezza.",
+    tipLabel: "Consigli sulla vestibilità:",
+    tipRegular:
+      "modello regular dal taglio casual. Se dopo aver preso le misure ed aver consultato la tabella scopri che sei a cavallo tra due taglie, ti consigliamo la taglia superiore.",
+    tipStretch:
+      "modello con vestibilità aderente al corpo. Se dopo aver preso le misure ed aver consultato la tabella scopri che sei a cavallo tra due taglie, dovrai decidere in funzione dei tuoi gusti e delle tue abitudini personali tra la taglia inferiore (più attillata) o quella superiore (più ampia).",
+    colItaly: "Italia",
+    colUsa: "usa",
+    colFrance: "francia",
+    colChest: "A. larghezza (cm)",
+    colLength: "B. lunghezza (cm)",
+    colSleeve: "C. manica (cm)",
+    modelFallback: "Maglia in cotone",
     faqMeasureQ: "Come misuro la maglia per scegliere la taglia?",
     faqMeasureA:
-      "Stendi una maglia che ti sta bene e misura in centimetri: A sotto le ascelle (½ petto), B dalla spalla all’orlo, C dalla cucitura manica al polsino. Confronta con la tabella Corpoceleste.",
+      "Stendi una maglia che ti sta bene e misura in centimetri: A sotto le ascelle (larghezza), B dalla spalla all’orlo. Confronta con la tabella.",
     faqBetweenQ: "Sono a cavallo tra due taglie: quale prendo?",
     faqBetweenA:
-      "Di solito la superiore per un fit più comodo; se preferisci più aderente, la inferiore. Tolleranza circa ±1 cm.",
+      "Sul modello regular ti consigliamo la taglia superiore. Sul modello aderente scegli in base ai tuoi gusti tra inferiore (più attillata) e superiore (più ampia).",
     faqUnitQ: "Le misure sono in centimetri sul capo disteso?",
     faqUnitA:
       "Sì: tabella sul capo disteso in centimetri, non la circonferenza del corpo. Vale l’etichetta cucita se indica una composizione diversa.",
@@ -511,12 +511,12 @@ const en: typeof it = {
     compositionLabel: "As on the sewn-in label.",
     sizeChart: "Size chart",
     sizeGuideLink: "Size guide",
-    sizeChest: "½ chest",
-    sizeLength: "Length",
-    sizeSleeve: "Sleeve",
+    sizeChest: "A. Width",
+    sizeLength: "B. Length",
+    sizeSleeve: "C. Sleeve",
     sizeUnit: "cm",
     sizeChartNote:
-      "Garment laid flat, in centimetres. ½ chest is seam to seam, not circumference. Print tolerance about ±1 cm. Compare with a shirt that fits you. If the sewn-in label states a different fibre composition, the label prevails.",
+      "Garment laid flat, in centimetres. A = width seam to seam under the arms (not circumference). Compare with a shirt that fits you. If the sewn-in label states a different fibre composition, the label prevails.",
     careGuideAlt: "Care guide for Corpoceleste screen-printed shirts",
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
@@ -691,35 +691,35 @@ const en: typeof it = {
     closed: "List coming soon — for now see Bio, Workshops or Contact.",
   },
   sizeGuide: {
-    title: "Size guide",
+    title: "Size guide — T-shirt models",
     lede:
-      "Corpoceleste size guide: how to measure shirt width, length and sleeve laid flat, centimetre chart, regular fit. Hand screen printing in Bergamo.",
-    howTitle: "How to measure",
+      "Cotton T-shirt / shirt model measurements: Italy / USA / France chart, A width and B length laid flat. Hand screen printing in Bergamo.",
+    howTitle: "How to measure correctly",
     howBody:
-      "To get it right, take a shirt that fits you well, lay it flat, and measure in centimetres with a tape measure (see figure):",
+      "Take a shirt that fits you well, lay it flat, and measure in centimetres with a tape measure (see figure):",
     howChest:
-      "A — width: seam to seam under the arms (½ chest, not the body circumference).",
+      "A — width: seam to seam under the arms (not the body circumference).",
     howLength:
       "B — length: from the top of the shoulder (next to the neck) down to the hem.",
-    howSleeve: "C — sleeve: from the armhole seam to the cuff (if any).",
-    figureAlt: "Shirt laid flat with A width, B length and C sleeve measurements.",
-    tipTitle: "Fit tips",
-    tipBody:
-      "These are regular, casual fits. If you land between two sizes after measuring, take the larger one for comfort. Prefer closer? Take the smaller. Tolerance about ±1 cm.",
-    tableTitle: "Model measurements",
-    tableIntro:
-      "Garment laid flat, in centimetres. Compare A / B / C with your reference shirt, then pick the size in the table.",
-    colSize: "Size",
-    colChest: "A. Width (cm)",
-    colLength: "B. Length (cm)",
-    colSleeve: "C. Sleeve (cm)",
-    modelFallback: "Shirt",
+    figureAlt: "Shirt laid flat with A width and B length measurements.",
+    tipLabel: "Fit tips:",
+    tipRegular:
+      "the garment is styled in a classic and regular fit. If after having taken the measurements and having consulted the table, we see that we are between two sizes, we recommend the larger size.",
+    tipStretch:
+      "the garment is styled with a tight fit. If after having taken the measurements and having consulted the table, we see that we are between two sizes, we should decide according to our tastes and habits between the lower (more tight) or the higher (wider) size.",
+    colItaly: "Italy",
+    colUsa: "usa",
+    colFrance: "france",
+    colChest: "A. width (cm)",
+    colLength: "B. length (cm)",
+    colSleeve: "C. sleeve (cm)",
+    modelFallback: "Cotton shirt",
     faqMeasureQ: "How do I measure a shirt to pick a size?",
     faqMeasureA:
-      "Lay flat a shirt that fits you and measure in centimetres: A under the arms (½ chest), B from shoulder to hem, C from sleeve seam to cuff. Compare with the Corpoceleste chart.",
+      "Lay flat a shirt that fits you and measure in centimetres: A under the arms (width), B from shoulder to hem. Compare with the chart.",
     faqBetweenQ: "I’m between two sizes — which should I take?",
     faqBetweenA:
-      "Usually the larger for a more relaxed fit; prefer closer? Take the smaller. Tolerance about ±1 cm.",
+      "On the regular model we recommend the larger size. On the slim model choose by taste between the smaller (tighter) and the larger (wider).",
     faqUnitQ: "Are measurements in centimetres on the garment laid flat?",
     faqUnitA:
       "Yes: chart on the garment laid flat in centimetres, not body circumference. If the sewn-in label lists a different composition, the label wins.",
@@ -964,12 +964,12 @@ const de: typeof it = {
     compositionLabel: "Wie auf dem eingenähten Etikett.",
     sizeChart: "Größentabelle",
     sizeGuideLink: "Größenratgeber",
-    sizeChest: "½ Brust",
-    sizeLength: "Länge",
-    sizeSleeve: "Ärmel",
+    sizeChest: "A. Breite",
+    sizeLength: "B. Länge",
+    sizeSleeve: "C. Ärmel",
     sizeUnit: "cm",
     sizeChartNote:
-      "Maß des flach liegenden Kleidungsstücks, in Zentimetern. ½ Brust ist Naht zu Naht, nicht der Umfang. Drucktoleranz etwa ±1 cm. Vergleich mit einem Shirt, das dir passt. Steht auf dem eingenähten Etikett eine andere Faserzusammensetzung, gilt das Etikett.",
+      "Maß des flach liegenden Kleidungsstücks, in Zentimetern. A = Breite Naht zu Naht unter den Achseln (nicht der Umfang). Vergleich mit einem Shirt, das dir passt. Steht auf dem eingenähten Etikett eine andere Faserzusammensetzung, gilt das Etikett.",
     careGuideAlt: "Pflegehinweise für siebgedruckte Corpoceleste-Shirts",
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
@@ -1144,35 +1144,35 @@ const de: typeof it = {
     closed: "Liste in Vorbereitung — vorerst Bio, Kurse oder Kontakt.",
   },
   sizeGuide: {
-    title: "Größenratgeber",
+    title: "Größenratgeber — T-Shirt-Modelle",
     lede:
-      "Größenratgeber Corpoceleste: Shirt-Breite, Länge und Ärmel flach liegend messen, Tabelle in Zentimetern, Regular Fit. Handsiebdruck in Bergamo.",
-    howTitle: "So misst du",
+      "Maße des Baumwoll-T-Shirt / Shirt-Modells: Italien / USA / Frankreich, A Breite und B Länge flach liegend. Handsiebdruck in Bergamo.",
+    howTitle: "Richtig messen",
     howBody:
-      "Damit es stimmt: nimm ein Shirt, das dir gut passt, lege es flach hin und miss in Zentimetern mit dem Maßband (siehe Abbildung):",
+      "Nimm ein Shirt, das dir gut passt, lege es flach hin und miss in Zentimetern mit dem Maßband (siehe Abbildung):",
     howChest:
-      "A — Breite: Naht zu Naht unter den Achseln (½ Brust, nicht der Körperumfang).",
+      "A — Breite: Naht zu Naht unter den Achseln (nicht der Körperumfang).",
     howLength:
       "B — Länge: vom höchsten Punkt der Schulter (neben dem Hals) bis zum Saum.",
-    howSleeve: "C — Ärmel: von der Ärmelnaht bis zum Bündchen (falls vorhanden).",
-    figureAlt: "Flach liegendes Shirt mit Maßen A Breite, B Länge und C Ärmel.",
-    tipTitle: "Passform-Tipps",
-    tipBody:
-      "Regular Fit, lässiger Schnitt. Landest du nach dem Messen zwischen zwei Größen, nimm meist die größere. Lieber enger? Die kleinere. Toleranz etwa ±1 cm.",
-    tableTitle: "Maße des Modells",
-    tableIntro:
-      "Kleidungsstück flach liegend, in Zentimetern. Vergleiche A / B / C mit deinem Referenz-Shirt und wähle dann die Größe in der Tabelle.",
-    colSize: "Größe",
+    figureAlt: "Flach liegendes Shirt mit Maßen A Breite und B Länge.",
+    tipLabel: "Passform-Tipps:",
+    tipRegular:
+      "Regular Fit mit lässigem Schnitt. Liegt man nach dem Messen und der Tabelle zwischen zwei Größen, empfehlen wir die größere.",
+    tipStretch:
+      "engerer Schnitt am Körper. Liegt man nach dem Messen und der Tabelle zwischen zwei Größen, wählt man nach Geschmack die kleinere (enger) oder die größere (weiter).",
+    colItaly: "Italien",
+    colUsa: "usa",
+    colFrance: "frankreich",
     colChest: "A. Breite (cm)",
     colLength: "B. Länge (cm)",
     colSleeve: "C. Ärmel (cm)",
-    modelFallback: "Shirt",
+    modelFallback: "Baumwoll-Shirt",
     faqMeasureQ: "Wie messe ich ein Shirt für die richtige Größe?",
     faqMeasureA:
-      "Lege ein Shirt, das dir passt, flach hin und miss in Zentimetern: A unter den Achseln (½ Brust), B von der Schulter zum Saum, C von der Ärmelnaht zum Bündchen. Vergleiche mit der Corpoceleste-Tabelle.",
+      "Lege ein Shirt, das dir passt, flach hin und miss in Zentimetern: A unter den Achseln (Breite), B von der Schulter zum Saum. Vergleiche mit der Tabelle.",
     faqBetweenQ: "Ich liege zwischen zwei Größen — welche nehmen?",
     faqBetweenA:
-      "Meist die größere für einen lockeren Fit; lieber eng? Die kleinere. Toleranz etwa ±1 cm.",
+      "Beim Regular-Modell empfehlen wir die größere. Beim engen Modell nach Geschmack die kleinere (enger) oder die größere (weiter).",
     faqUnitQ: "Sind die Maße in Zentimetern am flach liegenden Kleidungsstück?",
     faqUnitA:
       "Ja: Tabelle am flach liegenden Kleidungsstück in Zentimetern, nicht Körperumfang. Weicht das eingenähte Etikett in der Zusammensetzung ab, gilt das Etikett.",

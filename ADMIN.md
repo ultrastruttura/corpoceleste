@@ -91,7 +91,7 @@ Finché `formApi` è vuoto, bonifico e recesso restano su FormSubmit — solo pe
 
 ## Tabella taglie
 
-Le misure (cm, capo disteso) sono in `src/data/site.ts` → `sizeChart`. **Misura i blank veri** e correggi i numeri prima di vendere. La composizione in Tina deve coincidere con l’etichetta cucita.
+Le misure (cm, capo disteso: A larghezza, B lunghezza) sono in `content/fit-models/` (Tina → Modelli capo); fallback in `src/data/site.ts` → `sizeChart`. Allineate alla guida T-shirt FareTessile. La composizione in Tina deve coincidere con l’etichetta cucita.
 
 ## Flusso tipico: nuova maglia
 

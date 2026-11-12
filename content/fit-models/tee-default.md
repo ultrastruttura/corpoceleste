@@ -1,25 +1,31 @@
 ---
-name: ""
+name: Maglia in cotone
 kind: shirt
+tipKey: regular
 rows:
   - size: S
+    it: 3 – 46
+    fr: "42"
     chest: 49
-    length: 69
-    sleeve: 20
+    length: 70
   - size: M
-    chest: 52
-    length: 72
-    sleeve: 21
+    it: 4 – 48
+    fr: "44"
+    chest: 51
+    length: 71
   - size: L
-    chest: 55
-    length: 74
-    sleeve: 22
+    it: 5 – 50
+    fr: "46"
+    chest: 54
+    length: 73
   - size: XL
-    chest: 58
-    length: 76
-    sleeve: 23
+    it: 6 – 52
+    fr: "48"
+    chest: 57
+    length: 75
   - size: XXL
-    chest: 61
-    length: 78
-    sleeve: 24
+    it: 7 – 54
+    fr: "50"
+    chest: 59
+    length: 77
 ---

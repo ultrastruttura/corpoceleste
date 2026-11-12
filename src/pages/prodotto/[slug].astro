@@ -16,7 +16,7 @@ import {
   stockOf,
 } from "../../data/products";
 import { site, publicFormAction } from "../../data/site";
-import { sizeChartForProduct } from "../../data/fit-models";
+import { modelHasSleeve, sizeChartForProduct } from "../../data/fit-models";
 import { siteSettings } from "../../data/settings";
 import { SHIP_COUNTRIES } from "../../lib/ship-countries";
 import { asset, cardImageUrls, largeImageUrls } from "../../lib/paths";
@@ -41,6 +41,7 @@ const alt = productImageAlt(product, artist, locale);
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
 const sizeChart = sizeChartForProduct(product.fitModelId);
+const sizeChartHasSleeve = modelHasSleeve(sizeChart.rows);
 const formAction = publicFormAction(siteSettings.shopEmail);
 const defaultSize = inStockSizes.includes("M")
   ? "M"
@@ -414,7 +415,9 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
                   <th>{copy.product.size}</th>
                   <th>{copy.product.sizeChest}</th>
                   <th>{copy.product.sizeLength}</th>
-                  <th>{copy.product.sizeSleeve}</th>
+                  {sizeChartHasSleeve && (
+                    <th>{copy.product.sizeSleeve}</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -423,7 +426,7 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
                     <th scope="row">{row.size}</th>
                     <td>{row.chest}</td>
                     <td>{row.length}</td>
-                    <td>{row.sleeve}</td>
+                    {sizeChartHasSleeve && <td>{row.sleeve}</td>}
                   </tr>
                 ))}
               </tbody>

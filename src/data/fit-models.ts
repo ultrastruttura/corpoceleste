@@ -5,8 +5,13 @@ export type FitModelKind = "shirt" | "hoodie";
 
 export type FitModelRow = {
   size: string;
+  /** IT size label, e.g. "3 – 46" */
+  it: string;
+  /** FR size label, e.g. "42" */
+  fr: string;
   chest: number;
   length: number;
+  /** Optional; only for long-sleeve models that publish manica. */
   sleeve: number;
 };
 
@@ -15,11 +20,32 @@ export type FitModel = {
   slug: string;
   name: string;
   kind: FitModelKind;
+  tipKey: "regular" | "stretch";
   rows: FitModelRow[];
+};
+
+const DEFAULT_IT: Record<string, string> = {
+  S: "3 – 46",
+  M: "4 – 48",
+  L: "5 – 50",
+  XL: "6 – 52",
+  XXL: "7 – 54",
+};
+
+const DEFAULT_FR: Record<string, string> = {
+  S: "42",
+  M: "44",
+  L: "46",
+  XL: "48",
+  XXL: "50",
 };
 
 function parseKind(raw: unknown): FitModelKind {
   return raw === "hoodie" ? "hoodie" : "shirt";
+}
+
+function parseTipKey(raw: unknown): "regular" | "stretch" {
+  return raw === "stretch" ? "stretch" : "regular";
 }
 
 function parseRows(raw: unknown): FitModelRow[] {
@@ -33,8 +59,12 @@ function parseRows(raw: unknown): FitModelRow[] {
     const chest = Number(o.chest);
     const length = Number(o.length);
     const sleeve = Number(o.sleeve);
+    const it = String(o.it ?? "").trim() || DEFAULT_IT[size] || "";
+    const fr = String(o.fr ?? "").trim() || DEFAULT_FR[size] || "";
     out.push({
       size,
+      it,
+      fr,
       chest: Number.isFinite(chest) ? chest : 0,
       length: Number.isFinite(length) ? length : 0,
       sleeve: Number.isFinite(sleeve) ? sleeve : 0,
@@ -66,6 +96,7 @@ export const fitModels: FitModel[] = Object.entries(files)
       slug,
       name: String(data.name ?? slug),
       kind: parseKind(data.kind),
+      tipKey: parseTipKey(data.tipKey),
       rows: parseRows(data.rows),
     };
   })
@@ -89,9 +120,15 @@ export function sizeChartForProduct(fitModelId: string): {
     name: "",
     rows: site.sizeChart.map((r) => ({
       size: r.size,
+      it: DEFAULT_IT[r.size] || "",
+      fr: DEFAULT_FR[r.size] || "",
       chest: r.chest,
       length: r.length,
       sleeve: r.sleeve,
     })),
   };
+}
+
+export function modelHasSleeve(rows: FitModelRow[]): boolean {
+  return rows.some((r) => r.sleeve > 0);
 }

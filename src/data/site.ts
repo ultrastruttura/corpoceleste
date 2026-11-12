@@ -47,14 +47,15 @@ export const site = {
   /**
    * Fallback tabella taglie se il prodotto non ha `fitModel`.
    * Preferisci content/fit-models/*.md (Tina → Modelli capo).
-   * chest = ½ petto. length = spalla–orlo. sleeve = spalla–polsino.
+   * chest = A larghezza (½ petto). length = B lunghezza. sleeve opzionale.
+   * Fonte misure: guida T-shirt FareTessile (cotone regular).
    */
   sizeChart: [
-    { size: "S", chest: 49, length: 69, sleeve: 20 },
-    { size: "M", chest: 52, length: 72, sleeve: 21 },
-    { size: "L", chest: 55, length: 74, sleeve: 22 },
-    { size: "XL", chest: 58, length: 76, sleeve: 23 },
-    { size: "XXL", chest: 61, length: 78, sleeve: 24 },
+    { size: "S", chest: 49, length: 70, sleeve: 0 },
+    { size: "M", chest: 51, length: 71, sleeve: 0 },
+    { size: "L", chest: 54, length: 73, sleeve: 0 },
+    { size: "XL", chest: 57, length: 75, sleeve: 0 },
+    { size: "XXL", chest: 59, length: 77, sleeve: 0 },
   ] as const,
 };
 

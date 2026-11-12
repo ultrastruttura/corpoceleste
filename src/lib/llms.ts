@@ -78,7 +78,7 @@ const copy = {
       "Workshop / corso di serigrafia a mano in studio a Bergamo o nella tua città; lista d’attesa e organizzazione sulla pagina.",
     sizeGuide: "Guida alle taglie",
     sizeGuideNote:
-      "Come misurare maglie Corpoceleste (larghezza, lunghezza, manica) e tabella centimetri — fit regular.",
+      "Misure maglie Corpoceleste (A larghezza, B lunghezza) e tabella Italia/USA/Francia — fit regular.",
     bio: "Bio",
     bioNote:
       "Andrea Baldelli Lorenzo — serigrafo a Bergamo, fondatore di Corpoceleste; consulenza, workshop e edizioni.",
@@ -123,7 +123,7 @@ const copy = {
       "Hand screen-printing workshop in the Bergamo studio or in your city; waitlist and hosting form on the page.",
     sizeGuide: "Size guide",
     sizeGuideNote:
-      "How to measure Corpoceleste shirts (width, length, sleeve) and centimetre chart — regular fit.",
+      "Corpoceleste shirt measurements (A width, B length) and Italy/USA/France chart — regular fit.",
     bio: "Bio",
     bioNote:
       "Andrea Baldelli Lorenzo — screen printer in Bergamo, founder of Corpoceleste; consulting, workshops and editions.",
@@ -168,7 +168,7 @@ const copy = {
       "Handsiebdruck-Workshop im Atelier in Bergamo oder bei euch; Warteliste und Organisationsformular auf der Seite.",
     sizeGuide: "Größenratgeber",
     sizeGuideNote:
-      "So misst du Corpoceleste-Shirts (Breite, Länge, Ärmel) und Zentimeter-Tabelle — Regular Fit.",
+      "Corpoceleste-Shirt-Maße (A Breite, B Länge) und Italien/USA/Frankreich-Tabelle — Regular Fit.",
     bio: "Bio",
     bioNote:
       "Andrea Baldelli Lorenzo — Siebdrucker in Bergamo, Gründer von Corpoceleste; Beratung, Workshops und Editionen.",

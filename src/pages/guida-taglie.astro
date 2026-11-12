@@ -1,13 +1,12 @@
 ---
 import Base from "../layouts/Base.astro";
-import { fitModels } from "../data/fit-models";
+import { fitModels, modelHasSleeve } from "../data/fit-models";
 import { breadcrumbJsonLd, faqPageJsonLd, metaSnippet } from "../lib/seo";
 import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const g = copy.sizeGuide;
-const p = copy.product;
 const models = fitModels.filter((m) => m.rows.length > 0);
 const faq = faqPageJsonLd([
   { question: g.faqMeasureQ, answer: g.faqMeasureA },
@@ -33,6 +32,67 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
     </header>
 
     <div class="prose page-main--article size-guide">
+      {
+        models.map((model) => {
+          const tip = model.tipKey === "stretch" ? g.tipStretch : g.tipRegular;
+          const showSleeve = modelHasSleeve(model.rows);
+          return (
+            <section class="size-guide__model">
+              <h2>{model.name || g.modelFallback}</h2>
+              <p>
+                <strong>{g.tipLabel}</strong> {tip}
+              </p>
+              <div class="size-chart size-chart--guide">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">{g.colItaly}</th>
+                      {model.rows.map((row) => (
+                        <th scope="col">{row.it || "—"}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">{g.colUsa}</th>
+                      {model.rows.map((row) => (
+                        <td>{row.size}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">{g.colFrance}</th>
+                      {model.rows.map((row) => (
+                        <td>{row.fr || "—"}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">{g.colChest}</th>
+                      {model.rows.map((row) => (
+                        <td>{row.chest}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">{g.colLength}</th>
+                      {model.rows.map((row) => (
+                        <td>{row.length}</td>
+                      ))}
+                    </tr>
+                    {showSleeve && (
+                      <tr>
+                        <th scope="row">{g.colSleeve}</th>
+                        {model.rows.map((row) => (
+                          <td>{row.sleeve || "—"}</td>
+                        ))}
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          );
+        })
+      }
+
       <h2>{g.howTitle}</h2>
       <p>{g.howBody}</p>
 
@@ -63,69 +123,13 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
             <circle cx="108" cy="372" r="14" fill="#f3f1ef" stroke="#131313" stroke-width="2.5"></circle>
             <text x="108" y="377" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#131313" stroke="none">B</text>
           </g>
-          <g stroke="#131313" stroke-width="2.5" fill="#131313">
-            <line x1="272" y1="120" x2="328" y2="156"></line>
-            <polyline fill="none" points="278,130 272,120 284,122"></polyline>
-            <polyline fill="none" points="316,158 328,156 322,144"></polyline>
-            <circle cx="342" cy="164" r="14" fill="#f3f1ef" stroke="#131313" stroke-width="2.5"></circle>
-            <text x="342" y="169" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#131313" stroke="none">C</text>
-          </g>
         </svg>
       </figure>
 
       <ol class="size-guide__steps">
         <li>{g.howChest}</li>
         <li>{g.howLength}</li>
-        <li>{g.howSleeve}</li>
       </ol>
-
-      <h2>{g.tipTitle}</h2>
-      <p>{g.tipBody}</p>
-
-      <h2>{g.tableTitle}</h2>
-      <p>{g.tableIntro}</p>
-
-      {
-        models.map((model) => (
-          <section class="size-guide__model">
-            <h3>{model.name || g.modelFallback}</h3>
-            <div class="size-chart size-chart--guide">
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">{g.colSize}</th>
-                    {model.rows.map((row) => (
-                      <th scope="col">{row.size}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">{g.colChest}</th>
-                    {model.rows.map((row) => (
-                      <td>{row.chest}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th scope="row">{g.colLength}</th>
-                    {model.rows.map((row) => (
-                      <td>{row.length}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th scope="row">{g.colSleeve}</th>
-                    {model.rows.map((row) => (
-                      <td>{row.sleeve}</td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-        ))
-      }
-
-      <p class="size-chart-note">{p.sizeChartNote}</p>
     </div>
   </div>
 </Base>
