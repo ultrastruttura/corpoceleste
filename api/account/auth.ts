@@ -74,6 +74,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
 
+    const contentType = String(req.headers["content-type"] || "")
+      .split(";")[0]
+      .trim()
+      .toLowerCase();
+    if (contentType !== "application/json") {
+      return json(res, 415, { error: "Expected application/json" });
+    }
+
     const body = await readJson<{
       action?: string;
       email?: string;

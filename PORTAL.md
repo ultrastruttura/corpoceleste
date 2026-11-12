@@ -43,7 +43,7 @@ Deploy GitHub Pages: compare `/account/` e `/account/auth/`.
 3. Invita artisti, crea un deal col **product id** Tina uguale allo slug prodotto
 4. Le vendite PayPal si collegano da sole; i bonifici si confermano in admin sul deal
 
-Solo in locale / preview: `PORTAL_DEV_LINKS=1` (mai su Production). Con quella flag il login apre la sessione subito, senza mail né link.
+Solo in locale con `PORTAL_DEV_LINKS=1` esplicito (mai su Production/Preview Vercel). Con quella flag il login apre la sessione subito, senza mail né link.
 
 ## Sicurezza (v1)
 

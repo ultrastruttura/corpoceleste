@@ -252,11 +252,12 @@ export async function sendMagicLinkEmail(
   return { ok: result.ok, link, error: result.ok === false ? result.error : undefined };
 }
 
-/** Instant/dev magic links only on local/dev — never Vercel production or preview. */
+/** Instant login only with explicit PORTAL_DEV_LINKS=1 — never on Vercel production/preview. */
 export function allowDevMagicLinks() {
   const vercel = process.env.VERCEL_ENV || "";
   if (vercel === "production" || vercel === "preview") return false;
-  return process.env.PORTAL_DEV_LINKS === "1" || vercel === "development";
+  // Require the flag even for `vercel development` — no silent auto-enable.
+  return process.env.PORTAL_DEV_LINKS === "1";
 }
 
 export type MagicConsumeResult =
