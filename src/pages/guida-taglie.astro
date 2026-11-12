@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { fitModels } from "../data/fit-models";
+import { asset } from "../lib/paths";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
@@ -20,6 +21,18 @@ const models = fitModels.filter((m) => m.rows.length > 0);
     <div class="prose page-main--article size-guide">
       <h2>{g.howTitle}</h2>
       <p>{g.howBody}</p>
+
+      <figure class="size-guide__figure">
+        <img
+          src={asset("images/guida-taglie.svg")}
+          alt={g.figureAlt}
+          width="360"
+          height="420"
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
+
       <ol class="size-guide__steps">
         <li>{g.howChest}</li>
         <li>{g.howLength}</li>
@@ -36,25 +49,35 @@ const models = fitModels.filter((m) => m.rows.length > 0);
         models.map((model) => (
           <section class="size-guide__model">
             <h3>{model.name || g.modelFallback}</h3>
-            <div class="size-chart">
+            <div class="size-chart size-chart--guide">
               <table>
                 <thead>
                   <tr>
-                    <th>{p.size}</th>
-                    <th>{p.sizeChest}</th>
-                    <th>{p.sizeLength}</th>
-                    <th>{p.sizeSleeve}</th>
+                    <th scope="col">{g.colSize}</th>
+                    {model.rows.map((row) => (
+                      <th scope="col">{row.size}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {model.rows.map((row) => (
-                    <tr>
-                      <th scope="row">{row.size}</th>
+                  <tr>
+                    <th scope="row">{g.colChest}</th>
+                    {model.rows.map((row) => (
                       <td>{row.chest}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th scope="row">{g.colLength}</th>
+                    {model.rows.map((row) => (
                       <td>{row.length}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th scope="row">{g.colSleeve}</th>
+                    {model.rows.map((row) => (
                       <td>{row.sleeve}</td>
-                    </tr>
-                  ))}
+                    ))}
+                  </tr>
                 </tbody>
               </table>
             </div>

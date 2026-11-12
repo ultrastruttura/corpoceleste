@@ -398,8 +398,7 @@ const jsonLd = {
         product.kind === "shirt" && sizeChart.rows.length > 0 && (
           <details class="size-chart">
             <summary>
-              {copy.product.sizeChart}
-              {sizeChart.name ? ` · ${sizeChart.name}` : ""} ({copy.product.sizeUnit})
+              {copy.product.sizeChart} ({copy.product.sizeUnit})
             </summary>
             <table>
               <thead>

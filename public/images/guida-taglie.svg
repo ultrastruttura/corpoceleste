@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 420" role="img" aria-labelledby="gtTitle gtDesc">
+  <title id="gtTitle">Come misurare la maglia</title>
+  <desc id="gtDesc">Maglia stesa: A larghezza sotto le ascelle, B lunghezza spallaorlo, C manica.</desc>
+  <g fill="none" stroke="#131313" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+    <!-- T-shirt flat -->
+    <path d="M118 78
+      L148 78
+      C155 78 160 84 160 92
+      L160 108
+      C160 122 172 132 186 132
+      L246 132
+      C260 132 272 122 272 108
+      L272 92
+      C272 84 277 78 284 78
+      L314 78
+      L342 148
+      L302 168
+      L302 352
+      L130 352
+      L130 168
+      L90 148
+      Z"/>
+    <!-- Collar notch -->
+    <path d="M186 132 C196 118 216 118 226 132"/>
+  </g>
+  <!-- A: chest width -->
+  <g stroke="#131313" stroke-width="2.5" fill="#131313">
+    <line x1="136" y1="178" x2="296" y2="178"/>
+    <polyline points="148,170 136,178 148,186" fill="none"/>
+    <polyline points="284,170 296,178 284,186" fill="none"/>
+    <circle cx="318" cy="178" r="14" fill="#f3f1ef" stroke="#131313" stroke-width="2.5"/>
+    <text x="318" y="183" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#131313" stroke="none">A</text>
+  </g>
+  <!-- B: length -->
+  <g stroke="#131313" stroke-width="2.5" fill="#131313">
+    <line x1="108" y1="132" x2="108" y2="352"/>
+    <polyline points="100,144 108,132 116,144" fill="none"/>
+    <polyline points="100,340 108,352 116,340" fill="none"/>
+    <circle cx="108" cy="372" r="14" fill="#f3f1ef" stroke="#131313" stroke-width="2.5"/>
+    <text x="108" y="377" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#131313" stroke="none">B</text>
+  </g>
+  <!-- C: sleeve -->
+  <g stroke="#131313" stroke-width="2.5" fill="#131313">
+    <line x1="272" y1="120" x2="328" y2="156"/>
+    <polyline points="278,130 272,120 284,122" fill="none"/>
+    <polyline points="316,158 328,156 322,144" fill="none"/>
+    <circle cx="342" cy="164" r="14" fill="#f3f1ef" stroke="#131313" stroke-width="2.5"/>
+    <text x="342" y="169" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#131313" stroke="none">C</text>
+  </g>
+</svg>

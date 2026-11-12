@@ -1,5 +1,5 @@
 ---
-name: Tee default
+name: ""
 kind: shirt
 rows:
   - size: S

@@ -242,16 +242,24 @@ const it = {
     lede: "Come scegliere la taglia giusta per le maglie Corpoceleste.",
     howTitle: "Come misurare",
     howBody:
-      "Prendi una maglia che ti sta bene, stendila su un piano e misura in centimetri:",
-    howChest: "A — larghezza: da cucitura a cucitura sotto le ascelle (½ petto, non la circonferenza).",
-    howLength: "B — lunghezza: dal punto più alto della spalla (accanto al collo) fino all’orlo.",
+      "Per non sbagliare, prendi una maglia che ti sta bene, stendila su un piano e misura in centimetri con un metro da sarta (vedi figura):",
+    howChest:
+      "A — larghezza: da cucitura a cucitura sotto le ascelle (½ petto, non la circonferenza del torace).",
+    howLength:
+      "B — lunghezza: dal punto più alto della spalla (accanto al collo) fino all’orlo.",
     howSleeve: "C — manica: dall’attaccatura manica al polsino (se presente).",
-    tipTitle: "Se sei a cavallo tra due taglie",
+    figureAlt: "Maglia stesa con misure A larghezza, B lunghezza e C manica.",
+    tipTitle: "Consigli sulla vestibilità",
     tipBody:
-      "Di solito conviene la taglia superiore per un fit più comodo. Se preferisci più aderente, scegli quella sotto. Tolleranza circa ±1 cm.",
-    tableTitle: "Misure dei modelli",
-    tableIntro: "Capo disteso, in centimetri. Confronta le misure A/B/C con la tua maglia di riferimento.",
-    modelFallback: "Modello maglia",
+      "I modelli sono regular, taglio comodo. Se dopo le misure sei a cavallo tra due taglie, di solito conviene la superiore. Preferisci più aderente? Scegli quella sotto. Tolleranza circa ±1 cm.",
+    tableTitle: "Misure del modello",
+    tableIntro:
+      "Capo disteso, in centimetri. Confronta A / B / C con la tua maglia di riferimento, poi scegli la taglia in tabella.",
+    colSize: "Taglia",
+    colChest: "A. Larghezza (cm)",
+    colLength: "B. Lunghezza (cm)",
+    colSleeve: "C. Manica (cm)",
+    modelFallback: "Maglia",
   },
   thanks: {
     received: "Ricevuto",
@@ -677,16 +685,24 @@ const en: typeof it = {
     lede: "How to pick the right size for Corpoceleste shirts.",
     howTitle: "How to measure",
     howBody:
-      "Take a shirt that fits you well, lay it flat, and measure in centimetres:",
-    howChest: "A — width: seam to seam under the arms (½ chest, not the circumference).",
-    howLength: "B — length: from the top of the shoulder (next to the neck) down to the hem.",
+      "To get it right, take a shirt that fits you well, lay it flat, and measure in centimetres with a tape measure (see figure):",
+    howChest:
+      "A — width: seam to seam under the arms (½ chest, not the body circumference).",
+    howLength:
+      "B — length: from the top of the shoulder (next to the neck) down to the hem.",
     howSleeve: "C — sleeve: from the armhole seam to the cuff (if any).",
-    tipTitle: "If you are between sizes",
+    figureAlt: "Shirt laid flat with A width, B length and C sleeve measurements.",
+    tipTitle: "Fit tips",
     tipBody:
-      "Usually take the larger size for a more relaxed fit. Prefer a closer fit? Take the smaller one. Tolerance about ±1 cm.",
+      "These are regular, casual fits. If you land between two sizes after measuring, take the larger one for comfort. Prefer closer? Take the smaller. Tolerance about ±1 cm.",
     tableTitle: "Model measurements",
-    tableIntro: "Garment laid flat, in centimetres. Compare A/B/C with your reference shirt.",
-    modelFallback: "Shirt model",
+    tableIntro:
+      "Garment laid flat, in centimetres. Compare A / B / C with your reference shirt, then pick the size in the table.",
+    colSize: "Size",
+    colChest: "A. Width (cm)",
+    colLength: "B. Length (cm)",
+    colSleeve: "C. Sleeve (cm)",
+    modelFallback: "Shirt",
   },
   thanks: {
     received: "Received",
@@ -1112,16 +1128,24 @@ const de: typeof it = {
     lede: "So findest du die passende Größe für Corpoceleste-Shirts.",
     howTitle: "So misst du",
     howBody:
-      "Nimm ein Shirt, das dir gut passt, lege es flach hin und miss in Zentimetern:",
-    howChest: "A — Breite: Naht zu Naht unter den Achseln (½ Brust, nicht der Umfang).",
-    howLength: "B — Länge: vom höchsten Punkt der Schulter (neben dem Hals) bis zum Saum.",
+      "Damit es stimmt: nimm ein Shirt, das dir gut passt, lege es flach hin und miss in Zentimetern mit dem Maßband (siehe Abbildung):",
+    howChest:
+      "A — Breite: Naht zu Naht unter den Achseln (½ Brust, nicht der Körperumfang).",
+    howLength:
+      "B — Länge: vom höchsten Punkt der Schulter (neben dem Hals) bis zum Saum.",
     howSleeve: "C — Ärmel: von der Ärmelnaht bis zum Bündchen (falls vorhanden).",
-    tipTitle: "Wenn du zwischen zwei Größen liegst",
+    figureAlt: "Flach liegendes Shirt mit Maßen A Breite, B Länge und C Ärmel.",
+    tipTitle: "Passform-Tipps",
     tipBody:
-      "Meist die größere Größe für einen lockeren Fit. Lieber eng? Nimm die kleinere. Toleranz etwa ±1 cm.",
-    tableTitle: "Maße der Modelle",
-    tableIntro: "Kleidungsstück flach liegend, in Zentimetern. Vergleiche A/B/C mit deinem Referenz-Shirt.",
-    modelFallback: "Shirt-Modell",
+      "Regular Fit, lässiger Schnitt. Landest du nach dem Messen zwischen zwei Größen, nimm meist die größere. Lieber enger? Die kleinere. Toleranz etwa ±1 cm.",
+    tableTitle: "Maße des Modells",
+    tableIntro:
+      "Kleidungsstück flach liegend, in Zentimetern. Vergleiche A / B / C mit deinem Referenz-Shirt und wähle dann die Größe in der Tabelle.",
+    colSize: "Größe",
+    colChest: "A. Breite (cm)",
+    colLength: "B. Länge (cm)",
+    colSleeve: "C. Ärmel (cm)",
+    modelFallback: "Shirt",
   },
   thanks: {
     received: "Angekommen",
