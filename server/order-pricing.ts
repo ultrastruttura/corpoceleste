@@ -228,8 +228,8 @@ export async function priceOrderLines(
 
 /**
  * Paid amount must cover catalog merchandise + shipping for destination.
- * Overpay is accepted; underpay is not.
+ * Overpay is accepted; underpay beyond 1¢ (float/PayPal rounding) is not.
  */
 export function paymentCoversExpected(paid: number, expected: number) {
-  return Number.isFinite(paid) && Number.isFinite(expected) && paid + 0.015 >= expected;
+  return Number.isFinite(paid) && Number.isFinite(expected) && paid + 0.01 >= expected;
 }
