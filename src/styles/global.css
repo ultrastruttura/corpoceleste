@@ -2023,24 +2023,6 @@ body.cart-open {
   margin: 0;
 }
 
-.shop-home-seo {
-  max-width: 40rem;
-  padding: 28px 0 48px;
-  color: #c8c4bf;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.shop-home-seo p {
-  margin: 0 0 12px;
-}
-
-.shop-home-seo a {
-  color: #f3f1ef;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
 /*
   Stage ink = mean letterbox sampled from home-stage.mp4 rim (#0d0c0f).
   CRT falloff is recreated on ::after (not on <video>) so iOS compositing stays safe.
