@@ -48,14 +48,18 @@ export async function handleSendcloudWebhook(req: VercelRequest, res: VercelResp
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const secret = (
-    process.env.SENDCLOUD_WEBHOOK_SECRET ||
-    process.env.SENDCLOUD_SECRET_KEY ||
-    ""
-  ).trim();
+  const dedicated = (process.env.SENDCLOUD_WEBHOOK_SECRET || "").trim();
+  const apiKey = (process.env.SENDCLOUD_SECRET_KEY || "").trim();
+  const secret = dedicated || apiKey;
   if (!secret) {
-    console.warn("[sendcloud-webhook] SENDCLOUD_SECRET_KEY unset — rejecting POST");
+    console.warn("[sendcloud-webhook] SENDCLOUD_WEBHOOK_SECRET unset — rejecting POST");
     return res.status(503).json({ error: "Webhook not configured" });
+  }
+  const vercel = process.env.VERCEL_ENV || "";
+  if (!dedicated && apiKey && (vercel === "production" || vercel === "preview")) {
+    console.warn(
+      "[sendcloud-webhook] using SENDCLOUD_SECRET_KEY for HMAC — set SENDCLOUD_WEBHOOK_SECRET to the signing secret from Sendcloud",
+    );
   }
 
   const headerRaw = req.headers["sendcloud-signature"];

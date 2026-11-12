@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
 import {
@@ -43,9 +44,16 @@ function queryFlag(req: VercelRequest, key: string) {
 
 function cronAuthorized(req: VercelRequest) {
   const secret = (process.env.CRON_SECRET || "").trim();
-  if (!secret) return false;
+  // Reject missing/short secrets so a blank or guessable value never unlocks stock release.
+  if (secret.length < 16) return false;
   const auth = String(req.headers.authorization || "");
-  return auth === `Bearer ${secret}`;
+  const expected = `Bearer ${secret}`;
+  if (auth.length !== expected.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(auth), Buffer.from(expected));
+  } catch {
+    return false;
+  }
 }
 
 /** Release unpaid PayPal holds (30 min) and unpaid bank soft-holds (48h). Cron or CRON_SECRET. */
