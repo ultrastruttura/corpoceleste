@@ -20,7 +20,7 @@ import { sizeChartForProduct } from "../../data/fit-models";
 import { siteSettings } from "../../data/settings";
 import { SHIP_COUNTRIES } from "../../lib/ship-countries";
 import { asset, cardImageUrls, largeImageUrls } from "../../lib/paths";
-import { absoluteUrl, metaSnippet } from "../../lib/seo";
+import { absoluteUrl, breadcrumbJsonLd, metaSnippet } from "../../lib/seo";
 import { currentLocale, pageAbs, pageUrl, t } from "../../i18n";
 
 export function getStaticPaths() {
@@ -82,13 +82,16 @@ const schemaShipIt = "6.90";
 const schemaShipEu = "14.90";
 const handlingDays = Math.max(1, Number.parseInt(site.shippingDays, 10) || 5);
 const euCountries = SHIP_COUNTRIES.filter((c) => c !== "IT");
-const jsonLd = {
+const productJsonLd = {
   "@context": "https://schema.org",
   "@type": "Product",
   name: product.title,
-  description: seoDescription,
+  description: seoDescription || description,
   image: schemaImages,
   sku: product.id,
+  category: "Screen-printed apparel",
+  material: composition || undefined,
+  color: color || undefined,
   brand: {
     "@type": "Brand",
     name: "Corpoceleste",
@@ -181,6 +184,11 @@ const jsonLd = {
     },
   },
 };
+const crumbs = breadcrumbJsonLd(Astro.site, [
+  { name: "Corpoceleste", path: pageUrl(locale) },
+  { name: product.title, path: pageUrl(locale, `prodotto/${product.slug}/`) },
+]);
+const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
 ---
 
 <Base
@@ -188,7 +196,7 @@ const jsonLd = {
   description={seoDescription}
   image={product.print || cover?.jpg}
   type="product"
-  jsonLd={product.hidden ? undefined : jsonLd}
+  jsonLd={jsonLd}
   preloadImage={cover?.webp}
   preloadImageType="image/webp"
   noIndex={Boolean(product.hidden)}

@@ -5,16 +5,32 @@ import FormHoney from "../components/FormHoney.astro";
 import { publicFormAction, site } from "../data/site";
 import { siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
-import { currentLocale, t } from "../i18n";
+import { breadcrumbJsonLd, metaSnippet } from "../lib/seo";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const formAction = publicFormAction(siteSettings.shopEmail);
 const name = siteSettings.andreaName || "Andrea Baldelli";
 const email = siteSettings.shopEmail || site.email;
+const contactDesc = metaSnippet(
+  locale === "en"
+    ? `${name}, Corpoceleste screen printer in Nembro / Bergamo. Write to ${email} for editions, shirts and workshops. Formerly CORPOC.`
+    : locale === "de"
+      ? `${name}, Corpoceleste-Siebdrucker in Nembro / Bergamo. Schreib an ${email} für Editionen, Shirts und Workshops. Früher CORPOC.`
+      : `${name}, serigrafo Corpoceleste a Nembro / Bergamo. Scrivi a ${email} per edizioni, maglie e workshop. Prima CORPOC.`,
+);
+const crumbs = breadcrumbJsonLd(Astro.site, [
+  { name: "Corpoceleste", path: pageUrl(locale) },
+  { name: copy.contact.title, path: pageUrl(locale, "contatti/") },
+]);
 ---
 
-<Base title={`${copy.contact.title} — Corpoceleste`}>
+<Base
+  title={`${copy.contact.title} — Corpoceleste`}
+  description={contactDesc}
+  jsonLd={[crumbs]}
+>
   <div class="wrap page-pad">
     <h1 class="visually-hidden">{copy.contact.title}</h1>
 

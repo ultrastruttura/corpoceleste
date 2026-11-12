@@ -3,12 +3,14 @@ import type { Locale } from "./locales";
 const it = {
   meta: {
     description:
-      "Serigrafia d’artista a un colore, stampata a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand. Spedizione in Italia e in Europa.",
+      "Corpoceleste: serigrafia d’artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, stampe ed edizioni limitate — non print-on-demand. Continuità di CORPOC. Spedizione Italia e UE.",
   },
   home: {
     title: "Serigrafie d’autore",
     lede: "Un colore, stampato a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand.",
     stageAlt: "Corpoceleste — stampa serigrafica olografica",
+    crawl:
+      "Corpoceleste è lo shop di serigrafia a mano di Andrea Baldelli Lorenzo a Nembro (Bergamo): un colore, telaio a mano, maglie e stampe d’artista in edizione limitata — non print-on-demand. Prima c’era CORPOC (2011–2019). Workshop di serigrafia in studio o presso di voi; spedizione in Italia e in Europa.",
   },
   nav: {
     main: "Principale",
@@ -239,7 +241,8 @@ const it = {
   },
   sizeGuide: {
     title: "Guida alle taglie",
-    lede: "Come scegliere la taglia giusta per le maglie Corpoceleste.",
+    lede:
+      "Guida alle taglie delle maglie Corpoceleste: come misurare larghezza, lunghezza e manica a capo disteso, tabella in centimetri, fit regular. Serigrafia a mano a Bergamo.",
     howTitle: "Come misurare",
     howBody:
       "Per non sbagliare, prendi una maglia che ti sta bene, stendila su un piano e misura in centimetri con un metro da sarta (vedi figura):",
@@ -260,6 +263,15 @@ const it = {
     colLength: "B. Lunghezza (cm)",
     colSleeve: "C. Manica (cm)",
     modelFallback: "Maglia",
+    faqMeasureQ: "Come misuro la maglia per scegliere la taglia?",
+    faqMeasureA:
+      "Stendi una maglia che ti sta bene e misura in centimetri: A sotto le ascelle (½ petto), B dalla spalla all’orlo, C dalla cucitura manica al polsino. Confronta con la tabella Corpoceleste.",
+    faqBetweenQ: "Sono a cavallo tra due taglie: quale prendo?",
+    faqBetweenA:
+      "Di solito la superiore per un fit più comodo; se preferisci più aderente, la inferiore. Tolleranza circa ±1 cm.",
+    faqUnitQ: "Le misure sono in centimetri sul capo disteso?",
+    faqUnitA:
+      "Sì: tabella sul capo disteso in centimetri, non la circonferenza del corpo. Vale l’etichetta cucita se indica una composizione diversa.",
   },
   thanks: {
     received: "Ricevuto",
@@ -448,12 +460,14 @@ const it = {
 const en: typeof it = {
   meta: {
     description:
-      "One-colour artist screen printing, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand. Shipping in Italy and across Europe.",
+      "Corpoceleste: one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, artist prints and limited editions — not print-on-demand. Formerly CORPOC. Shipping Italy & EU.",
   },
   home: {
     title: "Author’s screen prints",
     lede: "One colour, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand.",
     stageAlt: "Corpoceleste — holographic screen print",
+    crawl:
+      "Corpoceleste is Andrea Baldelli Lorenzo’s hand screen-printing shop in Nembro (Bergamo): one colour, hand-pulled screens, limited-edition shirts and artist prints — not print-on-demand. Formerly CORPOC (2011–2019). Screen-printing workshops in the studio or on location; shipping in Italy and across Europe.",
   },
   nav: {
     main: "Main",
@@ -682,7 +696,8 @@ const en: typeof it = {
   },
   sizeGuide: {
     title: "Size guide",
-    lede: "How to pick the right size for Corpoceleste shirts.",
+    lede:
+      "Corpoceleste size guide: how to measure shirt width, length and sleeve laid flat, centimetre chart, regular fit. Hand screen printing in Bergamo.",
     howTitle: "How to measure",
     howBody:
       "To get it right, take a shirt that fits you well, lay it flat, and measure in centimetres with a tape measure (see figure):",
@@ -703,6 +718,15 @@ const en: typeof it = {
     colLength: "B. Length (cm)",
     colSleeve: "C. Sleeve (cm)",
     modelFallback: "Shirt",
+    faqMeasureQ: "How do I measure a shirt to pick a size?",
+    faqMeasureA:
+      "Lay flat a shirt that fits you and measure in centimetres: A under the arms (½ chest), B from shoulder to hem, C from sleeve seam to cuff. Compare with the Corpoceleste chart.",
+    faqBetweenQ: "I’m between two sizes — which should I take?",
+    faqBetweenA:
+      "Usually the larger for a more relaxed fit; prefer closer? Take the smaller. Tolerance about ±1 cm.",
+    faqUnitQ: "Are measurements in centimetres on the garment laid flat?",
+    faqUnitA:
+      "Yes: chart on the garment laid flat in centimetres, not body circumference. If the sewn-in label lists a different composition, the label wins.",
   },
   thanks: {
     received: "Received",
@@ -891,12 +915,14 @@ const en: typeof it = {
 const de: typeof it = {
   meta: {
     description:
-      "Einfarbiger Künstlersiebdruck, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand. Versand in Italien und Europa.",
+      "Corpoceleste: einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Künstlerdrucke und limitierte Editionen — kein Print-on-Demand. Früher CORPOC. Versand Italien & EU.",
   },
   home: {
     title: "Siebdrucke von Autoren",
     lede: "Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand.",
     stageAlt: "Corpoceleste — holographischer Siebdruck",
+    crawl:
+      "Corpoceleste ist der Handsiebdruck-Shop von Andrea Baldelli Lorenzo in Nembro (Bergamo): eine Farbe, Handzug, limitierte Shirts und Künstlerdrucke — kein Print-on-Demand. Früher CORPOC (2011–2019). Siebdruck-Workshops im Atelier oder bei euch; Versand in Italien und Europa.",
   },
   nav: {
     main: "Hauptnavigation",
@@ -1125,7 +1151,8 @@ const de: typeof it = {
   },
   sizeGuide: {
     title: "Größenratgeber",
-    lede: "So findest du die passende Größe für Corpoceleste-Shirts.",
+    lede:
+      "Größenratgeber Corpoceleste: Shirt-Breite, Länge und Ärmel flach liegend messen, Tabelle in Zentimetern, Regular Fit. Handsiebdruck in Bergamo.",
     howTitle: "So misst du",
     howBody:
       "Damit es stimmt: nimm ein Shirt, das dir gut passt, lege es flach hin und miss in Zentimetern mit dem Maßband (siehe Abbildung):",
@@ -1146,6 +1173,15 @@ const de: typeof it = {
     colLength: "B. Länge (cm)",
     colSleeve: "C. Ärmel (cm)",
     modelFallback: "Shirt",
+    faqMeasureQ: "Wie messe ich ein Shirt für die richtige Größe?",
+    faqMeasureA:
+      "Lege ein Shirt, das dir passt, flach hin und miss in Zentimetern: A unter den Achseln (½ Brust), B von der Schulter zum Saum, C von der Ärmelnaht zum Bündchen. Vergleiche mit der Corpoceleste-Tabelle.",
+    faqBetweenQ: "Ich liege zwischen zwei Größen — welche nehmen?",
+    faqBetweenA:
+      "Meist die größere für einen lockeren Fit; lieber eng? Die kleinere. Toleranz etwa ±1 cm.",
+    faqUnitQ: "Sind die Maße in Zentimetern am flach liegenden Kleidungsstück?",
+    faqUnitA:
+      "Ja: Tabelle am flach liegenden Kleidungsstück in Zentimetern, nicht Körperumfang. Weicht das eingenähte Etikett in der Zusammensetzung ab, gilt das Etikett.",
   },
   thanks: {
     received: "Angekommen",

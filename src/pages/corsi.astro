@@ -6,15 +6,50 @@ import { pastWorkshops, upcomingWorkshops } from "../data/workshops";
 import { publicFormAction } from "../data/site";
 import { siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
-import { currentLocale, t } from "../i18n";
+import { breadcrumbJsonLd, faqPageJsonLd, metaSnippet } from "../lib/seo";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const formAction = publicFormAction(siteSettings.shopEmail);
 const introParas = copy.workshops.intro.split(/\n\n+/).filter(Boolean);
+const workshopsDesc = metaSnippet(
+  `${copy.workshops.introTitle ? copy.workshops.introTitle + ". " : ""}${copy.workshops.intro}`.slice(
+    0,
+    400,
+  ),
+);
+const faq = faqPageJsonLd([
+  {
+    question:
+      locale === "en"
+        ? "Where are Corpoceleste screen-printing workshops held?"
+        : locale === "de"
+          ? "Wo finden Corpoceleste-Siebdruck-Workshops statt?"
+          : "Dove si tengono i workshop di serigrafia Corpoceleste?",
+    answer: copy.workshops.waitlistBody,
+  },
+  {
+    question:
+      locale === "en"
+        ? "Can you run a workshop in my city?"
+        : locale === "de"
+          ? "Könnt ihr einen Workshop in meiner Stadt machen?"
+          : "Potete organizzare un workshop nella mia città?",
+    answer: copy.workshops.onSiteBody,
+  },
+]);
+const crumbs = breadcrumbJsonLd(Astro.site, [
+  { name: "Corpoceleste", path: pageUrl(locale) },
+  { name: copy.workshops.title, path: pageUrl(locale, "corsi/") },
+]);
 ---
 
-<Base title={`${copy.workshops.title} — Corpoceleste`}>
+<Base
+  title={`${copy.workshops.title} — Corpoceleste`}
+  description={workshopsDesc}
+  jsonLd={[crumbs, ...(faq ? [faq] : [])]}
+>
   <div class="wrap page-pad">
     <h1 class="visually-hidden">{copy.workshops.title}</h1>
 

@@ -1,16 +1,31 @@
 ---
 import Base from "../layouts/Base.astro";
 import { fitModels } from "../data/fit-models";
-import { currentLocale, t } from "../i18n";
+import { breadcrumbJsonLd, faqPageJsonLd, metaSnippet } from "../lib/seo";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const g = copy.sizeGuide;
 const p = copy.product;
 const models = fitModels.filter((m) => m.rows.length > 0);
+const faq = faqPageJsonLd([
+  { question: g.faqMeasureQ, answer: g.faqMeasureA },
+  { question: g.faqBetweenQ, answer: g.faqBetweenA },
+  { question: g.faqUnitQ, answer: g.faqUnitA },
+]);
+const crumbs = breadcrumbJsonLd(Astro.site, [
+  { name: "Corpoceleste", path: pageUrl(locale) },
+  { name: g.title, path: pageUrl(locale, "guida-taglie/") },
+]);
+const jsonLd = [crumbs, ...(faq ? [faq] : [])];
 ---
 
-<Base title={`${g.title} — Corpoceleste`} description={g.lede}>
+<Base
+  title={`${g.title} — Corpoceleste`}
+  description={metaSnippet(g.lede)}
+  jsonLd={jsonLd}
+>
   <div class="wrap page-main">
     <header class="page-hero">
       <h1>{g.title}</h1>

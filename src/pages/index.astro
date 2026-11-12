@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { asset } from "../lib/paths";
 import { metaSnippet } from "../lib/seo";
-import { currentLocale, t } from "../i18n";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
@@ -28,7 +28,6 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
 >
   <div class="shop-home shop-home--closed">
     <h1 class="visually-hidden">{homeTitle}</h1>
-    <p class="visually-hidden">{seoDescription}</p>
     <figure class="shop-home-stage">
       {/*
         Wrapper is layout-only (zoom via box size). Never CSS mask/filter/transform on <video>
@@ -55,5 +54,18 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
         <span class="shop-home-stage__crt" aria-hidden="true"></span>
       </div>
     </figure>
+    {/* Crawlable copy under the closed stage — no extra display titles. */}
+    <div class="shop-home-seo wrap">
+      <p>{copy.home.crawl}</p>
+      <p>
+        <a href={pageUrl(locale, "bio/")}>{copy.nav.bio}</a>
+        {" · "}
+        <a href={pageUrl(locale, "corsi/")}>{copy.nav.workshops}</a>
+        {" · "}
+        <a href={pageUrl(locale, "contatti/")}>{copy.nav.contact}</a>
+        {" · "}
+        <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
+      </p>
+    </div>
   </div>
 </Base>

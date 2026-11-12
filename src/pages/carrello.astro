@@ -6,7 +6,7 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 ---
 
-<Base title={`${copy.cart.title} — Corpoceleste`}>
+<Base title={`${copy.cart.title} — Corpoceleste`} noIndex>
   <div class="wrap page-main page-main--cart">
     <h1>{copy.cart.title}</h1>
     <div class="cart-page-lines" data-cart-page></div>

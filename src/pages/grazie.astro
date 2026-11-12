@@ -6,7 +6,7 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 ---
 
-<Base title={`${copy.thanks.received} — Corpoceleste`}>
+<Base title={`${copy.thanks.received} — Corpoceleste`} noIndex>
   <div class="wrap page-main page-main--thanks">
     <h1 data-thanks-title>{copy.thanks.received}</h1>
     <p data-thanks-body></p>
