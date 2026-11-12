@@ -3,7 +3,6 @@ import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.j
 import {
   capturePayPalOrder,
   createPayPalCheckoutOrder,
-  fetchPayPalOrder,
   type CheckoutShipTo,
 } from "../server/paypal.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
@@ -17,24 +16,19 @@ import {
 } from "../server/stock/reserve-paypal-checkout.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
-/** Only capture orders we created and still hold. Fallback to APPROVED only if the hold store is down. */
+/** Only capture orders we created and still hold — never fall back to “any APPROVED”. */
 async function assertCapturableOrder(orderId: string): Promise<{ ok: true } | { ok: false; error: string }> {
-  if ((process.env.GITHUB_TOKEN || "").trim()) {
-    try {
-      const { getLedger, paypalHoldId } = await import("../server/github-stock.js");
-      const hold = await getLedger(paypalHoldId(orderId));
-      if (hold?.kind === "paypal_hold" && !hold.releasedAt) return { ok: true };
-      return { ok: false, error: "Unknown order" };
-    } catch (err) {
-      console.warn("paypal-create: hold lookup for capture", err);
-    }
+  if (!(process.env.GITHUB_TOKEN || "").trim()) {
+    return { ok: false, error: "Stock hold unavailable" };
   }
   try {
-    const order = await fetchPayPalOrder(orderId);
-    if (String(order.status || "").toUpperCase() === "APPROVED") return { ok: true };
-    return { ok: false, error: "Order not approved" };
-  } catch {
+    const { getLedger, paypalHoldId } = await import("../server/github-stock.js");
+    const hold = await getLedger(paypalHoldId(orderId));
+    if (hold?.kind === "paypal_hold" && !hold.releasedAt) return { ok: true };
     return { ok: false, error: "Unknown order" };
+  } catch (err) {
+    console.warn("paypal-create: hold lookup for capture", err);
+    return { ok: false, error: "Hold lookup failed" };
   }
 }
 
