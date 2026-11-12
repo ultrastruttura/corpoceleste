@@ -1,0 +1,68 @@
+---
+import Base from "../layouts/Base.astro";
+import { fitModels } from "../data/fit-models";
+import { currentLocale, t } from "../i18n";
+
+const locale = currentLocale(Astro.currentLocale);
+const copy = t(locale);
+const g = copy.sizeGuide;
+const p = copy.product;
+const models = fitModels.filter((m) => m.rows.length > 0);
+---
+
+<Base title={`${g.title} — Corpoceleste`} description={g.lede}>
+  <div class="wrap page-main">
+    <header class="page-hero">
+      <h1>{g.title}</h1>
+      <p class="lede">{g.lede}</p>
+    </header>
+
+    <div class="prose page-main--article size-guide">
+      <h2>{g.howTitle}</h2>
+      <p>{g.howBody}</p>
+      <ol class="size-guide__steps">
+        <li>{g.howChest}</li>
+        <li>{g.howLength}</li>
+        <li>{g.howSleeve}</li>
+      </ol>
+
+      <h2>{g.tipTitle}</h2>
+      <p>{g.tipBody}</p>
+
+      <h2>{g.tableTitle}</h2>
+      <p>{g.tableIntro}</p>
+
+      {
+        models.map((model) => (
+          <section class="size-guide__model">
+            <h3>{model.name || g.modelFallback}</h3>
+            <div class="size-chart">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{p.size}</th>
+                    <th>{p.sizeChest}</th>
+                    <th>{p.sizeLength}</th>
+                    <th>{p.sizeSleeve}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {model.rows.map((row) => (
+                    <tr>
+                      <th scope="row">{row.size}</th>
+                      <td>{row.chest}</td>
+                      <td>{row.length}</td>
+                      <td>{row.sleeve}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))
+      }
+
+      <p class="size-chart-note">{p.sizeChartNote}</p>
+    </div>
+  </div>
+</Base>

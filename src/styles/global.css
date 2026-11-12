@@ -1423,6 +1423,30 @@ body.cart-open {
   opacity: 0.7;
 }
 
+.size-guide-link {
+  margin: 8px 0 12px;
+  font-size: 14px;
+}
+
+.size-guide-link a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.size-guide__steps {
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+}
+
+.size-guide__model {
+  margin: 1.5rem 0;
+}
+
+.size-guide__model h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
 .care-guide {
   margin: 16px 0 24px;
   padding: 0;

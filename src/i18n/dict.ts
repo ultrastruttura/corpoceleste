@@ -55,6 +55,7 @@ const it = {
     vatIncluded: "Prezzo IVA inclusa",
     compositionLabel: "Come da etichetta cucita sul capo.",
     sizeChart: "Tabella taglie",
+    sizeGuideLink: "Guida alle taglie",
     sizeChest: "½ petto",
     sizeLength: "Lunghezza",
     sizeSleeve: "Manica",
@@ -235,6 +236,22 @@ const it = {
   artists: {
     title: "Artisti",
     closed: "Elenco in aggiornamento — intanto Bio, Corsi o Contatti.",
+  },
+  sizeGuide: {
+    title: "Guida alle taglie",
+    lede: "Come scegliere la taglia giusta per le maglie Corpoceleste.",
+    howTitle: "Come misurare",
+    howBody:
+      "Prendi una maglia che ti sta bene, stendila su un piano e misura in centimetri:",
+    howChest: "A — larghezza: da cucitura a cucitura sotto le ascelle (½ petto, non la circonferenza).",
+    howLength: "B — lunghezza: dal punto più alto della spalla (accanto al collo) fino all’orlo.",
+    howSleeve: "C — manica: dall’attaccatura manica al polsino (se presente).",
+    tipTitle: "Se sei a cavallo tra due taglie",
+    tipBody:
+      "Di solito conviene la taglia superiore per un fit più comodo. Se preferisci più aderente, scegli quella sotto. Tolleranza circa ±1 cm.",
+    tableTitle: "Misure dei modelli",
+    tableIntro: "Capo disteso, in centimetri. Confronta le misure A/B/C con la tua maglia di riferimento.",
+    modelFallback: "Modello maglia",
   },
   thanks: {
     received: "Ricevuto",
@@ -475,6 +492,7 @@ const en: typeof it = {
     vatIncluded: "Price includes VAT",
     compositionLabel: "As on the sewn-in label.",
     sizeChart: "Size chart",
+    sizeGuideLink: "Size guide",
     sizeChest: "½ chest",
     sizeLength: "Length",
     sizeSleeve: "Sleeve",
@@ -653,6 +671,22 @@ const en: typeof it = {
   artists: {
     title: "Artists",
     closed: "List coming soon — for now see Bio, Workshops or Contact.",
+  },
+  sizeGuide: {
+    title: "Size guide",
+    lede: "How to pick the right size for Corpoceleste shirts.",
+    howTitle: "How to measure",
+    howBody:
+      "Take a shirt that fits you well, lay it flat, and measure in centimetres:",
+    howChest: "A — width: seam to seam under the arms (½ chest, not the circumference).",
+    howLength: "B — length: from the top of the shoulder (next to the neck) down to the hem.",
+    howSleeve: "C — sleeve: from the armhole seam to the cuff (if any).",
+    tipTitle: "If you are between sizes",
+    tipBody:
+      "Usually take the larger size for a more relaxed fit. Prefer a closer fit? Take the smaller one. Tolerance about ±1 cm.",
+    tableTitle: "Model measurements",
+    tableIntro: "Garment laid flat, in centimetres. Compare A/B/C with your reference shirt.",
+    modelFallback: "Shirt model",
   },
   thanks: {
     received: "Received",
@@ -893,6 +927,7 @@ const de: typeof it = {
     vatIncluded: "Preis inkl. MwSt.",
     compositionLabel: "Wie auf dem eingenähten Etikett.",
     sizeChart: "Größentabelle",
+    sizeGuideLink: "Größenratgeber",
     sizeChest: "½ Brust",
     sizeLength: "Länge",
     sizeSleeve: "Ärmel",
@@ -1071,6 +1106,22 @@ const de: typeof it = {
   artists: {
     title: "Künstler",
     closed: "Liste in Vorbereitung — vorerst Bio, Kurse oder Kontakt.",
+  },
+  sizeGuide: {
+    title: "Größenratgeber",
+    lede: "So findest du die passende Größe für Corpoceleste-Shirts.",
+    howTitle: "So misst du",
+    howBody:
+      "Nimm ein Shirt, das dir gut passt, lege es flach hin und miss in Zentimetern:",
+    howChest: "A — Breite: Naht zu Naht unter den Achseln (½ Brust, nicht der Umfang).",
+    howLength: "B — Länge: vom höchsten Punkt der Schulter (neben dem Hals) bis zum Saum.",
+    howSleeve: "C — Ärmel: von der Ärmelnaht bis zum Bündchen (falls vorhanden).",
+    tipTitle: "Wenn du zwischen zwei Größen liegst",
+    tipBody:
+      "Meist die größere Größe für einen lockeren Fit. Lieber eng? Nimm die kleinere. Toleranz etwa ±1 cm.",
+    tableTitle: "Maße der Modelle",
+    tableIntro: "Kleidungsstück flach liegend, in Zentimetern. Vergleiche A/B/C mit deinem Referenz-Shirt.",
+    modelFallback: "Shirt-Modell",
   },
   thanks: {
     received: "Angekommen",

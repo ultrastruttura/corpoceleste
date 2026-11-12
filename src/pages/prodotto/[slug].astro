@@ -297,6 +297,13 @@ const jsonLd = {
                   {sizes.map((s) => <option>{s}</option>)}
                 </select>
               </div>
+              {
+                product.kind === "shirt" && (
+                  <p class="size-guide-link">
+                    <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
+                  </p>
+                )
+              }
               <PrivacyCheck id="re-privacy" />
               <button class="btn" type="submit">{copy.product.reprint}</button>
             </form>
@@ -336,6 +343,13 @@ const jsonLd = {
                   })}
                 </div>
               </fieldset>
+              {
+                product.kind === "shirt" && (
+                  <p class="size-guide-link">
+                    <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
+                  </p>
+                )
+              }
               <button class="btn" type="submit">{copy.product.add}</button>
             </form>
           )
@@ -407,6 +421,9 @@ const jsonLd = {
               </tbody>
             </table>
             <p class="size-chart-note">{copy.product.sizeChartNote}</p>
+            <p class="size-guide-link">
+              <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
+            </p>
           </details>
         )
       }
