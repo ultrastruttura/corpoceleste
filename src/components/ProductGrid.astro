@@ -4,8 +4,9 @@ import ProductCard from "./ProductCard.astro";
 
 type Props = { products: Product[]; class?: string; eager?: number };
 const { products, class: className, eager = 0 } = Astro.props;
+const listed = products.filter((p) => !p.hidden);
 ---
 
 <div class:list={["grid", className]} data-product-grid>
-  {products.map((p, i) => <ProductCard product={p} eager={i < eager} />)}
+  {listed.map((p, i) => <ProductCard product={p} eager={i < eager} />)}
 </div>

@@ -188,9 +188,10 @@ const jsonLd = {
   description={seoDescription}
   image={product.print || cover?.jpg}
   type="product"
-  jsonLd={jsonLd}
+  jsonLd={product.hidden ? undefined : jsonLd}
   preloadImage={cover?.webp}
   preloadImageType="image/webp"
+  noIndex={Boolean(product.hidden)}
 >
   <div class="wrap product-layout">
     <div class:list={["product-stage", sold && "is-sold"]} data-gallery={multi ? "" : undefined}>

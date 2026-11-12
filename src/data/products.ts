@@ -28,6 +28,8 @@ export type Product = {
   artistId: string;
   price: number;
   nuovo?: boolean;
+  /** Se true: pagina e checkout ok, ma fuori dalla griglia shop / discovery. */
+  hidden?: boolean;
   createdAt: string;
   status: ProductStatus;
   kind: ProductKind;
@@ -138,6 +140,7 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     artistId: artistIdFromRef(data.artist),
     price: core.price,
     nuovo: Boolean(data.nuovo),
+    hidden: Boolean(data.hidden),
     createdAt: created || "2017-01-01",
     status: core.status,
     kind: parseKind(data.kind),

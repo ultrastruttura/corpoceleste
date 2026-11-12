@@ -16,6 +16,7 @@ export function isPlaceholderCopy(text: string) {
 }
 
 export function isPlaceholderProduct(product: Product) {
+  if (product.hidden) return true;
   if (/^(Maglia|Stampa|Shirt|Print)\s*\d+$/i.test(product.title.trim())) return true;
   const blob = [
     product.title,
