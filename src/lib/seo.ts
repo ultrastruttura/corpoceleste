@@ -26,7 +26,7 @@ export function metaSnippet(text: string, max = 160) {
 }
 
 const ORG_DESCRIPTION =
-  "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo da Andrea Baldelli Lorenzo. Maglie serigrafate, stampe d'artista ed edizioni limitate (non print-on-demand). Continuità del progetto CORPOC (2011–2019). Spedizione in Italia e in Europa.";
+  "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo da Andrea Baldelli Lorenzo. Maglie serigrafate, stampe d'artista ed edizioni limitate (non print-on-demand). Spedizione in Italia e in Europa.";
 
 /** Sitewide Organization / Store / LocalBusiness for Google + LLM crawlers. */
 export function organizationJsonLd(siteUrl: URL | string | undefined) {
@@ -52,13 +52,7 @@ export function organizationJsonLd(siteUrl: URL | string | undefined) {
     "@type": ["Organization", "Store", "LocalBusiness"],
     "@id": `${origin}/#organization`,
     name: "Corpoceleste",
-    alternateName: [
-      "Corpo Celeste",
-      "CC Corpoceleste",
-      "CORPOC",
-      "Corpoc",
-      "Satellite Press",
-    ],
+    alternateName: ["Corpo Celeste", "CC Corpoceleste"],
     legalName: commerce.legalName,
     url: `${origin}/`,
     logo: {
@@ -94,8 +88,6 @@ export function organizationJsonLd(siteUrl: URL | string | undefined) {
       "wearable art",
       "workshop serigrafia",
       "corso serigrafia Bergamo",
-      "CORPOC",
-      "Satellite Press",
     ],
     address,
     geo,
@@ -107,7 +99,7 @@ export function organizationJsonLd(siteUrl: URL | string | undefined) {
       availableLanguage: ["Italian", "English", "German"],
       areaServed: ["IT", "EU"],
     },
-    sameAs: [site.instagram, site.ultrastruttura, site.corpoc, site.satellite].filter(Boolean),
+    sameAs: [site.instagram, site.ultrastruttura].filter(Boolean),
     makesOffer: {
       "@type": "Offer",
       itemOffered: {
@@ -128,7 +120,7 @@ export function websiteJsonLd(siteUrl: URL | string | undefined) {
     "@type": "WebSite",
     "@id": `${origin}/#website`,
     name: "Corpoceleste",
-    alternateName: ["CORPOC", "Corpo Celeste"],
+    alternateName: ["Corpo Celeste"],
     url: `${origin}/`,
     inLanguage: ["it", "en", "de"],
     description: ORG_DESCRIPTION,
@@ -154,7 +146,7 @@ export function personJsonLd(opts: {
     jobTitle: "Serigrafo",
     description: opts.description
       ? metaSnippet(opts.description, 400)
-      : "Serigrafo a Bergamo, fondatore di Corpoceleste; già CORPOC (2011–2019). Workshop, consulenza ed edizioni limitate.",
+      : "Serigrafo a Bergamo, fondatore di Corpoceleste. Workshop, consulenza ed edizioni limitate.",
     url: `${origin}/bio/`,
     image: opts.image ? absoluteUrl(opts.image, opts.siteUrl) : undefined,
     homeLocation: {
@@ -170,7 +162,7 @@ export function personJsonLd(opts: {
       "stampa su carta",
     ],
     worksFor: { "@id": `${origin}/#organization` },
-    sameAs: [site.instagram, site.ultrastruttura, site.corpoc, site.satellite].filter(Boolean),
+    sameAs: [site.instagram, site.ultrastruttura].filter(Boolean),
   };
 }
 

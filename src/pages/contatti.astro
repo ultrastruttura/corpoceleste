@@ -15,10 +15,10 @@ const name = siteSettings.andreaName || "Andrea Baldelli";
 const email = siteSettings.shopEmail || site.email;
 const contactDesc = metaSnippet(
   locale === "en"
-    ? `${name}, Corpoceleste screen printer in Nembro / Bergamo. Write to ${email} for editions, shirts and workshops. Formerly CORPOC.`
+    ? `${name}, Corpoceleste screen printer in Nembro / Bergamo. Write to ${email} for editions, shirts and workshops.`
     : locale === "de"
-      ? `${name}, Corpoceleste-Siebdrucker in Nembro / Bergamo. Schreib an ${email} für Editionen, Shirts und Workshops. Früher CORPOC.`
-      : `${name}, serigrafo Corpoceleste a Nembro / Bergamo. Scrivi a ${email} per edizioni, maglie e workshop. Prima CORPOC.`,
+      ? `${name}, Corpoceleste-Siebdrucker in Nembro / Bergamo. Schreib an ${email} für Editionen, Shirts und Workshops.`
+      : `${name}, serigrafo Corpoceleste a Nembro / Bergamo. Scrivi a ${email} per edizioni, maglie e workshop.`,
 );
 const crumbs = breadcrumbJsonLd(Astro.site, [
   { name: "Corpoceleste", path: pageUrl(locale) },
@@ -111,7 +111,7 @@ const crumbs = breadcrumbJsonLd(Astro.site, [
 
         <ul class="contact-aside__past">
           <li>
-            Corpoc —
+            Archivio Corpoc (2011–2019) —
             <a href={site.corpoc} rel="noopener noreferrer" target="_blank">sito</a>
           </li>
           {

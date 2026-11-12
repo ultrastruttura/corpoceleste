@@ -2,9 +2,9 @@
 title: SEO e home
 shopEmail: info@corpoceleste.eu
 metaDescription:
-  it: 'Corpoceleste: serigrafia d’artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, stampe ed edizioni limitate — non print-on-demand. Continuità di CORPOC. Spedizione Italia e UE.'
-  en: 'Corpoceleste: one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, artist prints and limited editions — not print-on-demand. Formerly CORPOC. Shipping Italy & EU.'
-  de: 'Corpoceleste: einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Künstlerdrucke und limitierte Editionen — kein Print-on-Demand. Früher CORPOC. Versand Italien & EU.'
+  it: 'Corpoceleste: serigrafia d’artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, stampe ed edizioni limitate — non print-on-demand. Spedizione Italia e UE.'
+  en: 'Corpoceleste: one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, artist prints and limited editions — not print-on-demand. Shipping Italy & EU.'
+  de: 'Corpoceleste: einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Künstlerdrucke und limitierte Editionen — kein Print-on-Demand. Versand Italien & EU.'
 homeTitle:
   it: Serigrafie d’autore
   en: Author’s screen prints
