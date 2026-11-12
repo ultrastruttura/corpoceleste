@@ -31,7 +31,7 @@ export function readSessionCookie(req: VercelRequest): string | null {
 export function setSessionCookie(res: VercelResponse, token: string, expiresAtIso: string) {
   const maxAge = Math.max(
     60,
-    Math.floor((Date.parse(expiresAtIso) - Date.now()) / 1000) || 14 * 86_400,
+    Math.floor((Date.parse(expiresAtIso) - Date.now()) / 1000) || 2 * 86_400,
   );
   const secure = cookieSecure();
   const parts = [
