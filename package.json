@@ -8,6 +8,13 @@
     "build": "tinacms build --local --skip-cloud-checks && astro build",
     "build:cloud": "tinacms build && astro build",
     "build:site": "astro build",
+    "check": "tsc -p tsconfig.ci.json --noEmit",
+    "check:astro": "astro check",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "ci": "npm run check && npm run test:unit && npm run build:site",
     "optimize:prints": "node scripts/optimize-prints.mjs",
     "preview": "astro preview"
   },
@@ -22,6 +29,10 @@
     "tinacms": "^3.15.0"
   },
   "devDependencies": {
-    "@tinacms/cli": "^4.0.4"
+    "@astrojs/check": "^0.9.12",
+    "@playwright/test": "^1.65.0",
+    "@tinacms/cli": "^4.0.4",
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
   }
 }

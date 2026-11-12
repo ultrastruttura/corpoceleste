@@ -1,6 +1,10 @@
 node_modules/
 dist/
 .astro/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
 .DS_Store
 Thumbs.db
 public/admin/

@@ -27,13 +27,15 @@ async function rawBody(req: VercelRequest): Promise<Buffer> {
   return Buffer.alloc(0);
 }
 
-function normalizeSignature(header: string): string {
+/** Exported for unit tests (HMAC header normalization). */
+export function normalizeSignature(header: string): string {
   let got = header.trim().toLowerCase();
   if (got.startsWith("sha256=")) got = got.slice("sha256=".length);
   return got;
 }
 
-function signatureOk(body: Buffer, header: string, secrets: string[]): boolean {
+/** Exported for unit tests — verify Sendcloud-Signature against one or more secrets. */
+export function signatureOk(body: Buffer, header: string, secrets: string[]): boolean {
   const got = normalizeSignature(header);
   if (!got) return false;
   for (const secret of secrets) {

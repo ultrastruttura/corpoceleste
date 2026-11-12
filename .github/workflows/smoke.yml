@@ -1,0 +1,46 @@
+name: Post-deploy smoke
+
+on:
+  workflow_run:
+    workflows: ["Deploy to GitHub Pages"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Live site smoke
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Homepage
+        run: |
+          code=$(curl -sS -o /tmp/home.html -w "%{http_code}" "https://www.corpoceleste.eu/")
+          echo "HTTP $code"
+          test "$code" = "200"
+          grep -qi "corpoceleste" /tmp/home.html
+      - name: Product page
+        run: |
+          code=$(curl -sS -o /tmp/product.html -w "%{http_code}" "https://www.corpoceleste.eu/prodotto/non-scegli-la-tua-casa/")
+          echo "HTTP $code"
+          test "$code" = "200"
+          grep -qi "Non scegli" /tmp/product.html
+      - name: Checkout reachable (noindex page)
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" "https://www.corpoceleste.eu/checkout/")
+          echo "HTTP $code"
+          test "$code" = "200"
+      - name: Summary
+        run: |
+          {
+            echo "## Smoke (non-destructive)"
+            echo "- Homepage, product, checkout HTTP 200"
+            echo "- No payments, emails, or shipments created"
+          } >> "$GITHUB_STEP_SUMMARY"

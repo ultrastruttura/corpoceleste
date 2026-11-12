@@ -1,0 +1,59 @@
+name: Nightly checks
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: true
+
+jobs:
+  audit-full:
+    name: npm audit report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Audit (high+, report only)
+        run: npm audit --audit-level=high || true
+      - name: Audit critical gate
+        run: npm audit --omit=dev --audit-level=critical
+
+  e2e-browsers:
+    name: E2E Chromium Firefox WebKit
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:site
+      - name: Install Playwright browsers
+        run: npx playwright install chromium firefox webkit --with-deps
+      - name: Playwright multi-browser
+        run: npm run test:e2e
+        env:
+          CI: true
+          PLAYWRIGHT_ALL_BROWSERS: "1"
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 14
