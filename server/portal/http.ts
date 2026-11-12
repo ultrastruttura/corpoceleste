@@ -71,17 +71,38 @@ function forbid(req: VercelRequest, res: VercelResponse, message: string) {
 }
 
 export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): boolean {
+  const list = allowedOrigins();
   const origin = requestOrigin(req);
-  if (!origin || !allowedOrigins().includes(origin)) {
+  if (!origin || !list.includes(origin)) {
     forbid(req, res, "Forbidden origin");
     return false;
   }
-  const site = String(req.headers["sec-fetch-site"] || "").toLowerCase();
-  const mode = String(req.headers["sec-fetch-mode"] || "").toLowerCase();
+
   const contentType = String(req.headers["content-type"] || "").toLowerCase();
+  const isJson = contentType.startsWith("application/json");
   const isBrowserFormPost =
     contentType.includes("application/x-www-form-urlencoded") ||
     contentType.includes("multipart/form-data");
+
+  // JSON APIs are CORS fetch from the shop — require Origin (not Referer-only).
+  if (isJson) {
+    const rawOrigin = originOnly(String(req.headers.origin || ""));
+    if (!rawOrigin || !list.includes(rawOrigin)) {
+      forbid(req, res, "Forbidden origin");
+      return false;
+    }
+  }
+
+  const site = String(req.headers["sec-fetch-site"] || "").toLowerCase();
+  const mode = String(req.headers["sec-fetch-mode"] || "").toLowerCase();
+  const vercel = process.env.VERCEL_ENV || "";
+  // On Vercel prod/preview, browsers always send Sec-Fetch-*; curl with a forged
+  // Origin alone is no longer enough. Local/dev stays softer for tooling.
+  if ((vercel === "production" || vercel === "preview") && !site) {
+    forbid(req, res, "Forbidden");
+    return false;
+  }
+
   if (site) {
     if (!["same-origin", "same-site", "cross-site"].includes(site)) {
       forbid(req, res, "Forbidden");
