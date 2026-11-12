@@ -825,10 +825,18 @@ body.cart-open {
   visibility: hidden;
 }
 
+.checkout-page > h1 {
+  margin: 0 0 32px;
+}
+
 .checkout-flow {
   display: flex;
   flex-direction: column;
   gap: 0;
+}
+
+.checkout-flow > .checkout-step:first-child > .checkout-bank-title {
+  margin-top: 0;
 }
 
 .checkout-step + .checkout-step {
@@ -1439,7 +1447,8 @@ body.cart-open {
   max-width: 280px;
 }
 
-.size-guide__figure img {
+.size-guide__figure img,
+.size-guide__figure svg {
   display: block;
   width: 100%;
   height: auto;
