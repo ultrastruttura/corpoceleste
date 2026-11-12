@@ -250,6 +250,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
   <script>
     import { total, clearCart, saveOrderSnapshot, sanitizeCart } from "../scripts/cart";
     import { lineName, renderRecap } from "../scripts/cart-ui";
+    import { hydrateCatalog } from "../scripts/catalog";
     import { normalizeZip } from "../lib/ship-normalize";
     import {
       buildShipTo,
@@ -259,6 +260,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       type CheckoutQuote,
     } from "../scripts/checkout-ship";
     import { PICKUP_BERGAMO, PICKUP_BERGAMO_SERVICE_ID } from "../lib/pickup";
+
+    // Checkout module runs before Base/shop.ts — hydrate catalog before any sanitizeCart.
+    hydrateCatalog();
 
     (function bootPayPalSdk() {
       const boot = document.querySelector<HTMLElement>("[data-paypal-boot]");
@@ -563,7 +567,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
 
       if (!items.length) {
         quoteLoading = false;
-        setStatus(labels.needZip);
+        setStatus("");
         syncPage();
         return;
       }
@@ -667,8 +671,14 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       scheduleQuote();
       syncPage();
     });
+    zipInput?.addEventListener("change", () => {
+      scheduleZipLookup();
+      scheduleQuote();
+      syncPage();
+    });
     zipInput?.addEventListener("blur", () => {
       void runZipLookup();
+      scheduleQuote();
     });
     for (const el of [nameInput, emailInput, phoneInput, streetInput, cityInput, provinceInput]) {
       el?.addEventListener("input", () => {

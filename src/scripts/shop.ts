@@ -2,7 +2,7 @@ import { isPurchasableStatus } from "../lib/product-status";
 import { bindAutoplayVideos } from "./autoplay-video";
 import { addItem } from "./cart";
 import { bindCart, openCart, renderCart } from "./cart-ui";
-import { applyLiveStock, catalogProduct } from "./catalog";
+import { applyLiveStock, catalogProduct, hydrateCatalog } from "./catalog";
 import { bindNav } from "./nav";
 
 const base = import.meta.env.BASE_URL;
@@ -31,19 +31,6 @@ async function refreshLiveStock() {
     if (data.products?.length) applyLiveStock(data.products);
   } catch {
     /* keep build-time catalog */
-  }
-}
-
-function hydrateCatalog() {
-  const node = document.getElementById("cc-catalog");
-  if (!node?.textContent) return;
-  try {
-    const data = JSON.parse(node.textContent) as { products?: unknown };
-    if (data && typeof data === "object") {
-      window.__catalog = data as typeof window.__catalog;
-    }
-  } catch {
-    /* keep empty catalog */
   }
 }
 

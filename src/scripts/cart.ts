@@ -2,6 +2,7 @@ import { isPurchasableStatus } from "../lib/product-status";
 import {
   catalogMaxQty,
   catalogProduct,
+  catalogProducts,
   catalogSizeInStock,
 } from "./catalog";
 
@@ -45,6 +46,9 @@ function write(items: CartItem[]) {
 /** Drop sold-out / unknown lines and force list prices from the built catalog. */
 export function sanitizeCart() {
   const raw = read();
+  // Checkout module can run before `#cc-catalog` is hydrated — never wipe the cart then.
+  if (!catalogProducts().length) return raw;
+
   const merged = new Map<string, CartItem>();
 
   for (const item of raw) {

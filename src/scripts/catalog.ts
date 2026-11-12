@@ -22,6 +22,20 @@ declare global {
   }
 }
 
+/** Parse `#cc-catalog` into `window.__catalog`. Safe to call more than once. */
+export function hydrateCatalog() {
+  const node = document.getElementById("cc-catalog");
+  if (!node?.textContent) return;
+  try {
+    const data = JSON.parse(node.textContent) as { products?: unknown };
+    if (data && typeof data === "object") {
+      window.__catalog = data as typeof window.__catalog;
+    }
+  } catch {
+    /* keep empty catalog */
+  }
+}
+
 export function catalogProducts(): CatalogProduct[] {
   return window.__catalog?.products ?? [];
 }
