@@ -38,7 +38,8 @@ const body = {
     // GitHub Actions job `name:` values (must have run at least once to appear).
     checks: REQUIRED_CHECKS.map((context) => ({ context })),
   },
-  enforce_admins: false,
+  // Even repo admins must use a green PR (keeps Vercel/Pages aligned with CI).
+  enforce_admins: true,
   required_pull_request_reviews: {
     required_approving_review_count: 0,
     dismiss_stale_reviews: false,
