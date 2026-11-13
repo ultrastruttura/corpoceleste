@@ -2,6 +2,20 @@ import { expect, test } from "@playwright/test";
 
 const PRODUCT_PATH = "/prodotto/non-scegli-la-tua-casa/";
 
+/** Mocked server quote — merchandise + shipping must equal total. */
+const QUOTE = {
+  shipping: "6.50",
+  merchandise: "45.00",
+  total: "51.50",
+} as const;
+
+function assertQuoteMath(q: { merchandise: string; shipping: string; total: string }) {
+  const merch = Number(q.merchandise);
+  const ship = Number(q.shipping);
+  const total = Number(q.total);
+  expect(merch + ship, `merchandise (${merch}) + shipping (${ship})`).toBeCloseTo(total, 2);
+}
+
 test.describe("shop checkout smoke", () => {
   test("home loads without fatal page errors", async ({ page }) => {
     const pageErrors: string[] = [];
@@ -12,6 +26,7 @@ test.describe("shop checkout smoke", () => {
   });
 
   test("add to cart, checkout ZIP quote via mocked API", async ({ page }) => {
+    assertQuoteMath(QUOTE);
     const pageErrors: string[] = [];
     page.on("pageerror", (err) => pageErrors.push(err.message));
 
@@ -24,9 +39,7 @@ test.describe("shop checkout smoke", () => {
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          shipping: "6.50",
-          merchandise: "45.00",
-          total: "51.50",
+          ...QUOTE,
           serviceId: "poste:standard",
           carrier: "Poste Italiane Delivery",
           country: "IT",
@@ -51,9 +64,21 @@ test.describe("shop checkout smoke", () => {
     await expect(page.locator("[data-checkout-empty]")).toBeHidden();
 
     await page.locator("[data-ship-zip]").fill("24067");
-    await expect(page.locator("[data-ship-status]")).toContainText(/6\.50/, {
-      timeout: 10_000,
-    });
+    await expect(page.locator("[data-ship-status]")).toContainText(
+      new RegExp(QUOTE.shipping.replace(".", "\\.")),
+      { timeout: 10_000 },
+    );
+
+    // UI total (bonifico due line) = cart merchandise + quoted shipping
+    await page.locator("[data-method][value='bonifico']").check();
+    await expect(page.locator("[data-bank-due]")).toBeVisible();
+    await expect(page.locator("[data-bank-due]")).toContainText(
+      new RegExp(QUOTE.total.replace(".", "\\.")),
+    );
+    await expect(page.locator("[data-bank-due]")).toContainText(
+      new RegExp(QUOTE.shipping.replace(".", "\\.")),
+    );
+    await expect(page.locator("[data-recap]")).toContainText(/45/);
 
     expect(pageErrors, pageErrors.join("\n")).toEqual([]);
   });

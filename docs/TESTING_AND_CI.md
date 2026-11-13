@@ -80,6 +80,7 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 - Home load (no fatal `pageerror`)
 - Product → add to cart → checkout with CAP `24067`
 - Shipping quote via **mocked** `/api/shipping-quote` (no Sendcloud)
+- **Money assert:** mock `merchandise + shipping = total`, and UI `[data-bank-due]` shows that total + shipping
 - Pay box stays locked without address/terms
 - Bonifico: locked without quote/data; amount due after quote; unlock only when complete
 - Mobile viewport smoke on home

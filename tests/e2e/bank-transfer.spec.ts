@@ -20,7 +20,21 @@ async function seedCart(page: import("@playwright/test").Page) {
   });
 }
 
+const QUOTE = {
+  shipping: "6.50",
+  merchandise: "45.00",
+  total: "51.50",
+} as const;
+
+function assertQuoteMath() {
+  expect(Number(QUOTE.merchandise) + Number(QUOTE.shipping)).toBeCloseTo(
+    Number(QUOTE.total),
+    2,
+  );
+}
+
 async function mockShippingQuote(page: import("@playwright/test").Page) {
+  assertQuoteMath();
   await page.route("**/api/shipping-quote", async (route) => {
     if (route.request().method() === "OPTIONS") {
       await route.fulfill({ status: 204 });
@@ -30,9 +44,7 @@ async function mockShippingQuote(page: import("@playwright/test").Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        shipping: "6.50",
-        merchandise: "45.00",
-        total: "51.50",
+        ...QUOTE,
         serviceId: "poste:standard",
         carrier: "Poste Italiane Delivery",
         country: "IT",
@@ -78,9 +90,19 @@ test.describe("bonifico checkout", () => {
     await page.locator("[data-method][value='bonifico']").check();
 
     await page.locator("[data-ship-zip]").fill("24067");
-    await expect(page.locator("[data-ship-status]")).toContainText(/6\.50/, { timeout: 10_000 });
+    await expect(page.locator("[data-ship-status]")).toContainText(
+      new RegExp(QUOTE.shipping.replace(".", "\\.")),
+      { timeout: 10_000 },
+    );
     await expect(page.locator("[data-bank-due]")).toBeVisible();
-    await expect(page.locator("[data-bank-due]")).toContainText(/51\.50/);
+    await expect(page.locator("[data-bank-due]")).toContainText(
+      new RegExp(QUOTE.total.replace(".", "\\.")),
+    );
+    await expect(page.locator("[data-bank-due]")).toContainText(
+      new RegExp(QUOTE.shipping.replace(".", "\\.")),
+    );
+    // Recap line items still show merchandise (45); due line is merch + ship.
+    await expect(page.locator("[data-recap]")).toContainText(/45/);
 
     const form = page.locator("[data-checkout-form]");
     await expect(form).toHaveClass(/is-locked/);
