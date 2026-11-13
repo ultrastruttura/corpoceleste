@@ -92,7 +92,7 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 | `ci.yml` | PR, push, manual | check + unit + build + e2e + critical audit |
 | `deploy.yml` | push `main`, manual | **verify** then Tina/astro build → Pages |
 | `nightly.yml` | weekly Mon 04:17 UTC, manual | audit report + multi-browser e2e |
-| `smoke.yml` | after successful Pages deploy, manual | live HTTP 200 checks |
+| `smoke.yml` | after successful Pages deploy, manual | live HTTP 200 + SEO tags (`title`/`meta`/canonical), `robots.txt`, sitemap, `llms.txt` |
 
 Failed `verify` / CI jobs **block GitHub Pages** deploy when they run in `deploy.yml`.
 

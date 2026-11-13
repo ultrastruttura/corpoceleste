@@ -20,27 +20,82 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Homepage
+      - name: Homepage + SEO tags
         run: |
+          set -euo pipefail
           code=$(curl -sS -o /tmp/home.html -w "%{http_code}" "https://www.corpoceleste.eu/")
           echo "HTTP $code"
           test "$code" = "200"
           grep -qi "corpoceleste" /tmp/home.html
+
+          # Document title (SERP) — brand one word + disambiguation
+          title=$(tr '\n' ' ' </tmp/home.html | grep -oiE '<title>[^<]+</title>' | head -n1 || true)
+          echo "title: $title"
+          echo "$title" | grep -qi "Corpoceleste"
+          echo "$title" | grep -qiE "serigrafia|screen printing|Siebdruck|Bergamo"
+
+          # Meta description present and branded
+          meta=$(tr '\n' ' ' </tmp/home.html | grep -oiE '<meta[^>]+name=["'\'']description["'\''][^>]*>' | head -n1 || true)
+          echo "meta: $meta"
+          test -n "$meta"
+          echo "$meta" | grep -qi "Corpoceleste"
+          echo "$meta" | grep -qiE "Baldelli|Nembro|Bergamo"
+
+          # Canonical
+          grep -qiE 'rel=["'\'']canonical["'\'']' /tmp/home.html
+
       - name: Product page
         run: |
+          set -euo pipefail
           code=$(curl -sS -o /tmp/product.html -w "%{http_code}" "https://www.corpoceleste.eu/prodotto/non-scegli-la-tua-casa/")
           echo "HTTP $code"
           test "$code" = "200"
           grep -qi "Non scegli" /tmp/product.html
+          grep -qiE '<title>[^<]*Corpoceleste' /tmp/product.html
+
       - name: Checkout reachable (noindex page)
         run: |
+          set -euo pipefail
           code=$(curl -sS -o /dev/null -w "%{http_code}" "https://www.corpoceleste.eu/checkout/")
           echo "HTTP $code"
           test "$code" = "200"
+
+      - name: robots.txt
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/robots.txt -w "%{http_code}" "https://www.corpoceleste.eu/robots.txt")
+          echo "HTTP $code"
+          test "$code" = "200"
+          grep -qi "^Sitemap:" /tmp/robots.txt
+          grep -qi "corpoceleste.eu/sitemap" /tmp/robots.txt
+          grep -qi "Disallow: /admin/" /tmp/robots.txt
+
+      - name: sitemap-index.xml
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/sitemap.xml -w "%{http_code}" "https://www.corpoceleste.eu/sitemap-index.xml")
+          echo "HTTP $code"
+          test "$code" = "200"
+          grep -qi "sitemapindex\|urlset" /tmp/sitemap.xml
+          grep -qi "corpoceleste.eu" /tmp/sitemap.xml
+
+      - name: llms.txt
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/llms.txt -w "%{http_code}" "https://www.corpoceleste.eu/llms.txt")
+          echo "HTTP $code"
+          test "$code" = "200"
+          grep -qi "Corpoceleste" /tmp/llms.txt
+          grep -qiE "serigrafia|screen printing|Siebdruck|Bergamo" /tmp/llms.txt
+
       - name: Summary
+        if: always()
         run: |
           {
             echo "## Smoke (non-destructive)"
-            echo "- Homepage, product, checkout HTTP 200"
+            echo "- Homepage HTTP 200 + title/meta/canonical Corpoceleste"
+            echo "- Product + checkout HTTP 200"
+            echo "- robots.txt (Sitemap + Disallow /admin/)"
+            echo "- sitemap-index.xml + llms.txt"
             echo "- No payments, emails, or shipments created"
           } >> "$GITHUB_STEP_SUMMARY"
