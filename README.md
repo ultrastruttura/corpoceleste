@@ -1,92 +1,90 @@
 # Corpoceleste
 
-Sito statico dello shop. Hosting: GitHub Pages (gratis). Webhook magazzino: Vercel (gratis).
+Shop e studio di **serigrafia a mano** di Andrea Baldelli Lorenzo (Nembro / Bergamo).  
+Brand: **Corpoceleste** / **CORPOCELESTE** (una parola — non “Corpo Celeste”).
+
+- Sito: [https://www.corpoceleste.eu](https://www.corpoceleste.eu/)
+- Instagram: [https://www.instagram.com/cccorpocelesteee/](https://www.instagram.com/cccorpocelesteee/)
+- Stack: Astro (statico) + TinaCMS · hosting **GitHub Pages** · API ordini/magazzino su **Vercel**
+
+Lingue: **IT / EN / DE**.
 
 ## Sviluppo
+
+Node **22+** (vedi `engines` in `package.json`).
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Pubblicare su GitHub Pages
+Admin Tina in locale: [http://localhost:4321/admin/index.html](http://localhost:4321/admin/index.html)
 
-1. Push su `https://github.com/ultrastruttura/corpoceleste`.
-2. Su GitHub: **Settings → Pages → Source: GitHub Actions**.
-3. Il workflow in `.github/workflows/deploy.yml` pubblica a ogni push su `main`.
-4. URL: `https://www.corpoceleste.eu/` (dominio custom su GitHub Pages).
+| Script | Cosa fa |
+|--------|---------|
+| `npm run dev` | Tina + Astro |
+| `npm run build` | Build Tina locale + sito |
+| `npm run check` | Typecheck CI |
+| `npm run test:unit` | Test unitari |
+| `npm run test:e2e` | Playwright |
+| `npm run ci` | check + unit + `astro build` |
 
-## Contenuti da cambiare
+Dettaglio CI: [`docs/TESTING_AND_CI.md`](./docs/TESTING_AND_CI.md).
 
-- Email, Instagram, IBAN, PayPal Client ID, `formApi`: Tina → `content/settings/site.md` (fallback in `src/data/site.ts`)
-- Maglie: Tina / `content/products/` (inclusi pezzi magazzino per taglia)
-- Artisti: `content/artists/`
-- News: `content/news/`
-- Corsi: `src/data/workshops.ts`
-- Test e CI: [`docs/TESTING_AND_CI.md`](./docs/TESTING_AND_CI.md)
+## Pubblicare
 
-## Checkout (PayPal, senza abbonamento)
+1. Push su `main` → [`ultrastruttura/corpoceleste`](https://github.com/ultrastruttura/corpoceleste).
+2. GitHub → **Settings → Pages → Source: GitHub Actions**.
+3. Workflow: `.github/workflows/deploy.yml` (Tina Cloud se ci sono i secret `TINA_CLIENT_ID` / `TINA_TOKEN`).
+4. Produzione: `https://www.corpoceleste.eu/` (dominio custom su Pages).
 
-PayPal non ha canone mensile: solo commissione sull’ordine (in Italia circa 3% + 0,35 €).
+Dopo un cambio allo schema Tina (`tina/config.ts`), rigenera e committa `tina/tina-lock.json` (`npx tinacms build --local --skip-cloud-checks`), altrimenti il deploy può fallire con `ERR_CLOUD_CHECK_FAILED`.
 
-1. Account **PayPal Business** (gratis).
-2. [developer.paypal.com](https://developer.paypal.com/) → crea un’app → copia il **Client ID** in Tina (*PayPal client ID* / `content/settings/site.md`) o, in fallback, `src/data/site.ts` → `paypalClientId`.
-3. Senza Client ID il checkout mostra **solo bonifico** (niente form PayPal classico).
+## Contenuti (Tina)
 
-### Magazzino + mail ordine (Vercel webhook)
+Guida operativa: **[ADMIN.md](./ADMIN.md)**.
 
-Guida completa passo-passo: **[MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)**.
+| Cosa | Dove |
+|------|------|
+| Email shop, IBAN, P.IVA, PayPal Client ID, `formApi`, **title/meta SEO home** | Tina → SEO e home · `content/settings/site.md` (fallback `src/data/site.ts`) |
+| Maglie (prezzo, stock, foto, meta) | `content/products/` |
+| Artisti | `content/artists/` |
+| News | `content/news/` |
+| Bio | `content/bio/page.md` |
+| Modelli capo / taglie | `content/fit-models/` |
+| Corsi (date) | `src/data/workshops.ts` |
 
-Dopo `PAYMENT.CAPTURE.COMPLETED` il webhook:
-- abbassa lo stock nei markdown (patch solo delle righe `stock:`)
-- crea spedizione Sendcloud + link etichetta (se `SENDCLOUD_*` è configurato)
-- manda email allo shop (**server-side**, non dal browser)
+### SEO brand (title / meta, non H1)
 
-**Bonifico:** stock a mano in Tina; spedizione quotata in checkout, etichetta Sendcloud a mano.
+In Tina → **SEO e home**:
 
-Limite noto: due acquisti sulla stessa pezza nello stesso minuto possono ancora “oversell”; in quel caso la mail ha oggetto `ATTENZIONE oversell`.
+- *Title tag home* — es. `Corpoceleste — serigrafia a mano, Bergamo` (scheda Google / tab)
+- *Meta description* — max ~155 caratteri; Andrea Baldelli + Nembro/Bergamo
 
-#### Env Vercel (oltre a PayPal/GitHub)
+Non usare “Corpo Celeste” con spazio (omonimi su altri siti).  
+Google Business Profile (Nembro) e backlink da CORPOC → `.eu`: checklist in **[ADMIN.md](./ADMIN.md)** § Brand SEO.
 
-- `SHOP_EMAIL` — stessa inbox di Tina *Email shop* (es. `info@corpoceleste.eu`)
-- vedi `.env.example` per l’elenco completo
+## Checkout e magazzino
 
+PayPal Business: commissione sull’ordine, senza canone. Senza Client ID resta solo **bonifico**.
 
-#### 1. GitHub token
+Ordini PayPal, stock, mail Resend, Sendcloud: guida **[MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md)**.  
+Env: `.env.example`. Area clienti: **[PORTAL.md](./PORTAL.md)**.
 
-1. GitHub → Settings → Developer settings → Personal access tokens (fine-grained).
-2. Repo `ultrastruttura/corpoceleste`, permesso **Contents: Read and write**.
-3. Copia il token.
+In sintesi:
 
-#### 2. Progetto Vercel (solo API)
+1. App PayPal + Client ID in Tina / settings.
+2. Progetto Vercel (API) con le env del `.env.example`.
+3. Webhook `PAYMENT.CAPTURE.COMPLETED` → `…/api/paypal-webhook`.
+4. Stesso Client ID Live sul sito → push Pages.
 
-1. [vercel.com](https://vercel.com) → Import del repo (piano Hobby gratis).
-2. Framework Preset: **Other**.
-3. Build Command: lascia vuoto (usa `vercel.json`).
-4. Deploy.
-5. Project → Settings → Environment Variables (Production), come in `.env.example`:
-   - `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` (stessa app PayPal del sito)
-   - `PAYPAL_WEBHOOK_ID` (dopo lo step 3)
-   - `PAYPAL_MODE=live` (o `sandbox` per prove)
-   - `SHOP_EMAIL` (inbox ordini, es. info@corpoceleste.eu)
-   - `GITHUB_TOKEN`
-   - `GITHUB_REPO=ultrastruttura/corpoceleste`
-   - `GITHUB_BRANCH=main`
-   - `SENDCLOUD_PUBLIC_KEY` + `SENDCLOUD_SECRET_KEY` + `SENDCLOUD_FROM_*` (vedi `.env.example` / [MAGAZZINO-VERCEL.md](./MAGAZZINO-VERCEL.md))
-6. URL funzione: `https://TUO-PROGETTO.vercel.app/api/paypal-webhook`  
-   (GET deve rispondere `{ ok: true }`).
+## Repo
 
-#### 3. Webhook PayPal
-
-1. developer.paypal.com → la tua app → **Webhooks** → Add webhook.
-2. URL: `https://TUO-PROGETTO.vercel.app/api/paypal-webhook`
-3. Evento: **Payment capture completed** (`PAYMENT.CAPTURE.COMPLETED`).
-4. Copia il **Webhook ID** in `PAYPAL_WEBHOOK_ID` su Vercel → Redeploy.
-
-#### 4. Sito
-
-Metti lo stesso **Client ID** Live in Tina / `content/settings/site.md` (o fallback `src/data/site.ts`), push, aspetta Pages.
-
-Dopo un ordine di prova (sandbox o 1€), in repo dovresti vedere:
-- stock aggiornato nel markdown del prodotto (i JSON in `stock-ledger/` restano locali / gitignored)
-- email a `SHOP_EMAIL` via **Resend** dal webhook Vercel (non FormSubmit)
+| Path | Ruolo |
+|------|--------|
+| `src/pages/` | Pagine Astro |
+| `src/lib/seo.ts` | JSON-LD Organization / Product / FAQ |
+| `src/lib/llms.ts` | `llms.txt` / robots |
+| `tina/` | Config + lock TinaCMS |
+| `api/` / Vercel | Webhook, form, account |
+| `stock-ledger/` | Ledger locale (gitignored / non in Pages) |
