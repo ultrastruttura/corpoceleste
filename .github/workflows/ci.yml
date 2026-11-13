@@ -99,6 +99,28 @@ jobs:
             test-results
           retention-days: 7
 
+  tina-lock:
+    name: Tina lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Regenerate lock and fail on drift
+        run: npm run check:tina
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Tina lock"
+            echo "- \`tinacms build --local --skip-cloud-checks\` then \`git diff\` on \`tina/tina-lock.json\`"
+            echo "- Prevents ERR_CLOUD_CHECK_FAILED on Pages when schema changes without committing the lock"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest

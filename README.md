@@ -25,6 +25,7 @@ Admin Tina in locale: [http://localhost:4321/admin/index.html](http://localhost:
 | `npm run dev` | Tina + Astro |
 | `npm run build` | Build Tina locale + sito |
 | `npm run check` | Typecheck CI |
+| `npm run check:tina` | Tina lock vs `tina/config.ts` |
 | `npm run test:unit` | Test unitari |
 | `npm run test:e2e` | Playwright |
 | `npm run ci` | check + unit + `astro build` |

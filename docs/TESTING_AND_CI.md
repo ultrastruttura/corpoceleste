@@ -39,6 +39,7 @@ flowchart TD
 ```bash
 npm ci
 npm run check          # tsc on server/api/lib/scripts/tests (CI gate)
+npm run check:tina     # tinacms local build; fail if tina/tina-lock.json drifts
 npm run check:astro    # full astro check (may report pre-existing page/Tina noise)
 npm run test:unit      # vitest
 npm run build:site     # astro build (no Tina cloud)
@@ -89,7 +90,7 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `ci.yml` | PR, push, manual | check + unit + build + e2e + critical audit |
+| `ci.yml` | PR, push, manual | check + unit + build + e2e + **Tina lock** + critical audit |
 | `deploy.yml` | push `main`, manual | **verify** then Tina/astro build → Pages |
 | `nightly.yml` | weekly Mon 04:17 UTC, manual | audit report + multi-browser e2e |
 | `smoke.yml` | after successful Pages deploy, manual | live HTTP 200 + SEO tags (`title`/`meta`/canonical), `robots.txt`, sitemap, `llms.txt` |
@@ -151,6 +152,7 @@ Without this, CI is advisory only — broken code can still land on `main`.
 - `Unit + check`
 - `Build site`
 - `E2E Chromium`
+- `Tina lock`
 
 Options:
 

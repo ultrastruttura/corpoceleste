@@ -13,7 +13,12 @@ const REPO = "corpoceleste";
 const BRANCH = "main";
 
 /** Job `name:` values from .github/workflows/ci.yml */
-const REQUIRED_CHECKS = ["Unit + check", "Build site", "E2E Chromium"];
+const REQUIRED_CHECKS = [
+  "Unit + check",
+  "Build site",
+  "E2E Chromium",
+  "Tina lock",
+];
 
 function ghApi(method, path, body) {
   const args = ["api", "-X", method, path, "-H", "Accept: application/vnd.github+json"];

@@ -12,6 +12,7 @@
     "build:cloud": "tinacms build && astro build",
     "build:site": "astro build",
     "check": "tsc -p tsconfig.ci.json --noEmit",
+    "check:tina": "node scripts/check-tina-lock.mjs",
     "check:astro": "astro check",
     "test": "vitest run",
     "test:unit": "vitest run",
