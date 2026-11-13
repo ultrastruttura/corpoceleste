@@ -68,6 +68,7 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 - Sendcloud quote selection (pure) — `server/sendcloud/quote-select.ts`
 - PayPal line / SKU encoding — `src/lib/paypal-lines.ts`
 - CAP / country allowlist — `src/lib/ship-normalize.ts`, `src/lib/ship-countries.ts`
+- Shipping quote API handler (origin, rate limit, bad dest, OOS, happy path) — `api/shipping-quote.ts`
 - Stock markdown patch + ledger idempotency (`remainingStockLines`) — `server/stock-patch.ts`, `server/github-stock.ts`
 - PayPal webhook: bad signature, underpay, duplicate done, happy path (all mocked) — `api/paypal-webhook.ts`
 - Artist deal share math — `server/portal/math.ts`
@@ -81,6 +82,7 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 - Product → add to cart → checkout with CAP `24067`
 - Shipping quote via **mocked** `/api/shipping-quote` (no Sendcloud)
 - **Money assert:** mock `merchandise + shipping = total`, and UI `[data-bank-due]` shows that total + shipping
+- **Money hard:** qty×2 totals; unsupported country (injected) → quote fail → pay locked
 - Pay box stays locked without address/terms
 - Bonifico: locked without quote/data; amount due after quote; unlock only when complete
 - Mobile viewport smoke on home
