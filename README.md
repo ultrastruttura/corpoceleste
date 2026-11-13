@@ -31,7 +31,8 @@ Admin Tina in locale: [http://localhost:4321/admin/index.html](http://localhost:
 | `npm run ci` | check + unit + `astro build` |
 
 Dettaglio CI: [`docs/TESTING_AND_CI.md`](./docs/TESTING_AND_CI.md).  
-Branch protection `main` (check obbligatori): `node scripts/apply-branch-protection.mjs` (serve `gh auth login`).
+Branch protection `main` (check obbligatori + admin enforced): `node scripts/apply-branch-protection.mjs`.  
+Flusso: **PR → CI verde → merge** → Pages + Vercel (API). Evita push diretti su `main`.
 
 ## Pubblicare
 

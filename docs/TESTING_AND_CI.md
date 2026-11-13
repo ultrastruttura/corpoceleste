@@ -170,9 +170,13 @@ Notes:
 - Checks appear in the picker only after `ci.yml` has run at least once on the repo.
 - Prefer merging via PR so the required checks gate the merge; `deploy.yml` still runs its own `verify` before Pages.
 
-2. **Vercel**: Actions cannot block Vercel’s Git integration by themselves. Options:
-   - Enable “Ignored Build Step” / wait for a GitHub status check that maps to `ci.yml`, or
-   - Only merge via PRs with required checks (practical default for this shop).
+2. **Vercel (API) aligned with green PRs**
+
+   - Branch protection uses **`enforce_admins: true`**: even admins merge via PR after CI is green. That is the primary gate for production API deploys (Vercel Git builds `main` after merge).
+   - `vercel.json` → `ignoreCommand`: `node scripts/vercel-ignore-build.mjs` — skips Vercel when the commit does not touch API/shop server paths (docs-only / Pages-only noise).
+   - Do **not** push straight to `main` for API changes; open a PR and wait for `Unit + check`, `Build site`, `E2E Chromium`, `Tina lock`.
+   - Re-apply protection after changing required checks: `node scripts/apply-branch-protection.mjs`
+
 3. Confirm Pages Environment still uses the `github-pages` environment in `deploy.yml`.
 
 ## Known limitations
