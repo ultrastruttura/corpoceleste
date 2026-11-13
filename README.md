@@ -29,7 +29,8 @@ Admin Tina in locale: [http://localhost:4321/admin/index.html](http://localhost:
 | `npm run test:e2e` | Playwright |
 | `npm run ci` | check + unit + `astro build` |
 
-Dettaglio CI: [`docs/TESTING_AND_CI.md`](./docs/TESTING_AND_CI.md).
+Dettaglio CI: [`docs/TESTING_AND_CI.md`](./docs/TESTING_AND_CI.md).  
+Branch protection `main` (check obbligatori): `node scripts/apply-branch-protection.mjs` (serve `gh auth login`).
 
 ## Pubblicare
 

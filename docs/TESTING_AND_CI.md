@@ -142,7 +142,31 @@ npx playwright show-report
 
 ## Manual settings you should configure
 
-1. **GitHub branch protection** on `main`: require `Unit + check`, `Build site`, `E2E Chromium` (from `ci.yml`) before merge.
+### 1. Branch protection on `main` (required)
+
+Without this, CI is advisory only — broken code can still land on `main`.
+
+**Required status checks** (exact job names from `ci.yml`):
+
+- `Unit + check`
+- `Build site`
+- `E2E Chromium`
+
+Options:
+
+```bash
+gh auth login
+node scripts/apply-branch-protection.mjs
+```
+
+Or UI: **Settings → Branches → Add branch ruleset / classic protection** → pattern `main` →  
+**Require status checks to pass** → enable the three names above → **Require branches to be up to date** (strict).
+
+Notes:
+
+- Checks appear in the picker only after `ci.yml` has run at least once on the repo.
+- Prefer merging via PR so the required checks gate the merge; `deploy.yml` still runs its own `verify` before Pages.
+
 2. **Vercel**: Actions cannot block Vercel’s Git integration by themselves. Options:
    - Enable “Ignored Build Step” / wait for a GitHub status check that maps to `ci.yml`, or
    - Only merge via PRs with required checks (practical default for this shop).
