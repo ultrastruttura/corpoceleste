@@ -111,8 +111,10 @@ const crumbs = breadcrumbJsonLd(Astro.site, [
 
         <ul class="contact-aside__past">
           <li>
-            Archivio Corpoc (2011–2019) —
-            <a href={site.corpoc} rel="noopener noreferrer" target="_blank">sito</a>
+            Archivio CORPOC (2011–2019) —
+            <a href={site.corpoc} rel="noopener noreferrer" target="_blank">sito storico</a>
+            · progetto attuale
+            <a href={pageUrl(locale)}>{site.name}</a>
           </li>
           {
             site.satellite && (

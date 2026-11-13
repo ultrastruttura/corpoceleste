@@ -26,7 +26,7 @@ export function metaSnippet(text: string, max = 160) {
 }
 
 const ORG_DESCRIPTION =
-  "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo da Andrea Baldelli Lorenzo. Maglie serigrafate, stampe d'artista ed edizioni limitate (non print-on-demand). Spedizione in Italia e in Europa.";
+  "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo da Andrea Baldelli Lorenzo. Maglie serigrafate, stampe d'artista ed edizioni limitate (non print-on-demand). Spedizione in Italia e in Europa. Non confondere con altre attività omonime: questo è lo shop di serigrafia Corpoceleste (corpoceleste.eu).";
 
 /** Sitewide Organization / Store / LocalBusiness for Google + LLM crawlers. */
 export function organizationJsonLd(siteUrl: URL | string | undefined) {
@@ -52,7 +52,7 @@ export function organizationJsonLd(siteUrl: URL | string | undefined) {
     "@type": ["Organization", "Store", "LocalBusiness"],
     "@id": `${origin}/#organization`,
     name: "Corpoceleste",
-    alternateName: ["Corpo Celeste", "CC Corpoceleste"],
+    alternateName: ["CORPOCELESTE", "CC Corpoceleste"],
     legalName: commerce.legalName,
     url: `${origin}/`,
     logo: {
@@ -61,14 +61,20 @@ export function organizationJsonLd(siteUrl: URL | string | undefined) {
     },
     image: [image, logo],
     email: site.email,
-    telephone: site.telefono || undefined,
+    telephone: commerce.telefono || site.telefono || undefined,
     vatID: commerce.vatId || undefined,
     description: ORG_DESCRIPTION,
     slogan: site.tagline,
     foundingDate: "2024",
     foundingLocation: {
       "@type": "Place",
-      name: "Bergamo, Italia",
+      name: "Nembro / Bergamo, Italia",
+    },
+    brand: {
+      "@type": "Brand",
+      name: "Corpoceleste",
+      alternateName: "CORPOCELESTE",
+      url: `${origin}/`,
     },
     areaServed: [
       { "@type": "Country", name: "Italy" },
@@ -120,7 +126,7 @@ export function websiteJsonLd(siteUrl: URL | string | undefined) {
     "@type": "WebSite",
     "@id": `${origin}/#website`,
     name: "Corpoceleste",
-    alternateName: ["Corpo Celeste"],
+    alternateName: ["CORPOCELESTE"],
     url: `${origin}/`,
     inLanguage: ["it", "en", "de"],
     description: ORG_DESCRIPTION,

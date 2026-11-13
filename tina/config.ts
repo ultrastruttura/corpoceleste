@@ -390,12 +390,17 @@ export default defineConfig({
               "Destinazione FormSubmit: ordini (bonifico / PayPal), contatti, newsletter, corsi, consulenza, ristampe. Se vuoto, usa il fallback in codice.",
           },
           localizedText(
+            "metaTitle",
+            "Title tag home (scheda Google / tab browser — es. Corpoceleste — serigrafia a mano, Bergamo). Non è un H1 in pagina.",
+            false,
+          ),
+          localizedText(
             "metaDescription",
-            "Meta description (SEO + anteprima link; non visibile in pagina)",
+            "Meta description (SEO + anteprima link; max ~155 caratteri; non visibile in pagina). Brand sempre Corpoceleste (una parola).",
           ),
           localizedText(
             "homeTitle",
-            "H1 SEO home (es. Serigrafie d’autore — solo nascosto in pagina, non in anteprima link)",
+            "Titolo accessibilità home (visually hidden — non è il title Google)",
             false,
           ),
           localizedText(

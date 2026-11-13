@@ -8,6 +8,8 @@ import { currentLocale, t } from "../i18n";
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
+const documentTitle =
+  localizedSetting("metaTitle", locale) || copy.meta.title || "Corpoceleste";
 const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
@@ -19,7 +21,7 @@ const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
 ---
 
 <Base
-  title="Corpoceleste"
+  title={documentTitle}
   description={seoDescription}
   image={ogImage}
   video="videos/home-stage.mp4"

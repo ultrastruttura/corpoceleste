@@ -1,10 +1,14 @@
 ---
 title: SEO e home
 shopEmail: info@corpoceleste.eu
+metaTitle:
+  it: Corpoceleste — serigrafia a mano, Bergamo
+  en: Corpoceleste — hand screen printing, Bergamo
+  de: Corpoceleste — Handsiebdruck, Bergamo
 metaDescription:
-  it: 'Corpoceleste: serigrafia d’artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, stampe ed edizioni limitate — non print-on-demand. Spedizione Italia e UE.'
-  en: 'Corpoceleste: one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, artist prints and limited editions — not print-on-demand. Shipping Italy & EU.'
-  de: 'Corpoceleste: einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Künstlerdrucke und limitierte Editionen — kein Print-on-Demand. Versand Italien & EU.'
+  it: 'Corpoceleste di Andrea Baldelli: serigrafia a mano a Nembro (BG). Maglie e stampe d’artista in edizione limitata. Spedizione Italia e UE.'
+  en: 'Corpoceleste by Andrea Baldelli: hand screen printing in Nembro (Bergamo). Limited artist shirts and prints. Shipping Italy and EU.'
+  de: 'Corpoceleste von Andrea Baldelli: Handsiebdruck in Nembro (Bergamo). Limitierte Künstler-Shirts und Drucke. Versand Italien und EU.'
 homeTitle:
   it: Serigrafie d’autore
   en: Author’s screen prints
@@ -22,19 +26,19 @@ announcementLink: contatti/
 andreaName: Andrea Lorenzo Baldelli
 andreaBio:
   it: |-
-    Serigrafo a Bergamo. Stampo e imballo le edizioni Corpoceleste: un colore, non print-on-demand — maglie, stampe, pezzi d’artista. Lo shop è qui sul sito.
+    Serigrafo a Bergamo. Stampo e imballo le edizioni Corpoceleste: un colore, non print-on-demand — maglie, stampe, pezzi d’artista. Lo shop è qui su corpoceleste.eu.
 
     Dal 2014 tengo corsi e workshop in studio e presso terzi. Stampo anche dal vivo a eventi, con i telai in sede. Su consulenza (impianti, inchiostri, flussi di lavoro, formazione) scrivimi: la presento caso per caso.
 
     Prima di Corpoceleste: lo shop Corpoc (2012–2019). Dipingo come Ultrastruttura.
   en: |-
-    Screen printer in Bergamo. I print and pack the Corpoceleste editions: one colour, not print-on-demand — shirts, prints, artist pieces. The shop is on this site.
+    Screen printer in Bergamo. I print and pack the Corpoceleste editions: one colour, not print-on-demand — shirts, prints, artist pieces. The shop is on corpoceleste.eu.
 
     I’ve run courses and workshops since 2014, in the studio and on location. I also print live at events. For consulting (setups, inks, workflow, training), write to me — I present it case by case.
 
     Before Corpoceleste: the Corpoc shop (2012–2019). I paint as Ultrastruttura.
   de: |-
-    Siebdrucker in Bergamo. Ich drucke und verpacke die Corpoceleste-Editionen: eine Farbe, kein Print-on-Demand — Shirts, Drucke, Künstlerstücke. Der Shop ist auf dieser Website.
+    Siebdrucker in Bergamo. Ich drucke und verpacke die Corpoceleste-Editionen: eine Farbe, kein Print-on-Demand — Shirts, Drucke, Künstlerstücke. Der Shop ist auf corpoceleste.eu.
 
     Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events. Für Beratung (Anlagen, Farben, Abläufe, Schulung) schreib mir — Fall für Fall.
 
@@ -53,4 +57,3 @@ sdiCode: BA6ET11
 paypalClientId: ''
 formApi: 'https://corpoceleste.vercel.app'
 ---
-

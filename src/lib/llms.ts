@@ -50,7 +50,7 @@ const copy = {
     summary:
       "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, longsleeve, stampe d'artista ed edizioni limitate (non print-on-demand). Workshop di serigrafia in studio o on-site. Spedizione Italia e UE. Guida taglie, bio, corsi, contatti.",
     about:
-      "Corpoceleste è lo shop di Andrea Baldelli Lorenzo (P. IVA IT04952110163), serigrafo a Nembro / Lonno / Bergamo: un colore, telaio a mano, pezzi numerati. Non è print-on-demand. Query utili: maglia serigrafata, longsleeve serigrafata, serigrafia a mano Bergamo, workshop serigrafia Bergamo, corso serigrafia, stampa d'artista, edizione limitata, arte indossabile, guida taglie maglia, Corpoceleste.",
+      "Corpoceleste (una parola, brand CORPOCELESTE) è lo shop di Andrea Baldelli Lorenzo (P. IVA IT04952110163), serigrafo a Nembro / Lonno / Bergamo: un colore, telaio a mano, pezzi numerati. Non è print-on-demand e non è il venue omonimo corpoceleste.com. Query utili: maglia serigrafata, longsleeve serigrafata, serigrafia a mano Bergamo, workshop serigrafia Bergamo, corso serigrafia, stampa d'artista, edizione limitata, arte indossabile, guida taglie maglia, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Prodotti",
     productsEmpty:
@@ -95,7 +95,7 @@ const copy = {
     summary:
       "Corpoceleste — one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, longsleeves, artist prints and limited editions (not print-on-demand). Screen-printing workshops in-studio or on location. Shipping Italy & EU. Size guide, bio, workshops, contact.",
     about:
-      "Corpoceleste is the shop of Andrea Baldelli Lorenzo (VAT IT04952110163), screen printer in Nembro / Lonno / Bergamo: one colour, hand-pulled screens, numbered pieces. Not print-on-demand. Useful queries: screen-printed shirt, hand screen print Bergamo, screen-printing workshop Bergamo, limited edition, artist print, wearable art, size guide, Corpoceleste.",
+      "Corpoceleste (one word, brand CORPOCELESTE) is the shop of Andrea Baldelli Lorenzo (VAT IT04952110163), screen printer in Nembro / Lonno / Bergamo: one colour, hand-pulled screens, numbered pieces. Not print-on-demand and not the unrelated venue corpoceleste.com. Useful queries: screen-printed shirt, hand screen print Bergamo, screen-printing workshop Bergamo, limited edition, artist print, wearable art, size guide, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Products",
     productsEmpty:
@@ -140,7 +140,7 @@ const copy = {
     summary:
       "Corpoceleste — einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Longsleeves, Künstlerdrucke und limitierte Editionen (kein Print-on-Demand). Siebdruck-Workshops im Atelier oder vor Ort. Versand Italien & EU. Größenratgeber, Bio, Kurse, Kontakt.",
     about:
-      "Corpoceleste ist der Shop von Andrea Baldelli Lorenzo (USt-IdNr. IT04952110163), Siebdrucker in Nembro / Lonno / Bergamo: eine Farbe, Handzug, nummerierte Stücke. Kein Print-on-Demand. Nützliche Suchen: Siebdruck-Shirt, Handsiebdruck Bergamo, Siebdruck-Workshop Bergamo, limitierte Edition, Künstlerdruck, wearable art, Größenratgeber, Corpoceleste.",
+      "Corpoceleste (ein Wort, Marke CORPOCELESTE) ist der Shop von Andrea Baldelli Lorenzo (USt-IdNr. IT04952110163), Siebdrucker in Nembro / Lonno / Bergamo: eine Farbe, Handzug, nummerierte Stücke. Kein Print-on-Demand und nicht die gleichnamige Location corpoceleste.com. Nützliche Suchen: Siebdruck-Shirt, Handsiebdruck Bergamo, Siebdruck-Workshop Bergamo, limitierte Edition, Künstlerdruck, wearable art, Größenratgeber, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Produkte",
     productsEmpty:

@@ -10,7 +10,7 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 | **Artisti** | Aggiungere / togliere artisti, bio, **meta SEO**. Puoi eliminare un artista anche se ha maglie: Tina stacca il collegamento da solo. |
 | **News** | Aggiungere / togliere / modificare articoli |
 | **Bio** | Nome, testo bio IT/EN/DE, sezioni stampa e stampa dal vivo |
-| **SEO e home** | Meta description, H1 home, immagine Open Graph, **email shop**, **Website ID Umami Analytics** |
+| **SEO e home** | **Title tag** + meta description (SERP), titolo accessibilità home, immagine Open Graph, **email shop**, **Website ID Umami** |
 
 Le foto vanno caricate dal pannello (finiscono in `public/uploads/`).
 
@@ -88,6 +88,23 @@ Bonifico e recesso, più la conferma PayPal dal webhook, devono partire **da Ver
 3. In `src/data/site.ts` imposta `formApi` sull’URL Vercel (es. `https://corpoceleste-xxxx.vercel.app`)
 
 Finché `formApi` è vuoto, bonifico e recesso restano su FormSubmit — solo per lo sviluppo. Le mail al cliente **non** sono una conferma legale finché Resend non è acceso.
+
+## Brand SEO (Corpoceleste = una parola)
+
+Title e meta home si impostano in Tina → **SEO e home** → *Title tag home* / *Meta description* (non sono H1 in pagina). Brand sempre **Corpoceleste** / **CORPOCELESTE**, mai “Corpo Celeste” (omonimi su altri siti).
+
+### Google Business Profile (Nembro)
+
+Da fare con l’account Google di Andrea (non automatizzabile dal repo):
+
+1. [business.google.com](https://business.google.com) → crea attività  
+2. Nome: **Corpoceleste**  
+3. Categoria: es. *Negozio di abbigliamento* / *Artista* / *Centro di formazione* (quella più vicina; puoi aggiungerne secondarie)  
+4. Indirizzo: **Via Moroni 51, Lonno, 24027 Nembro (BG)** (come in Tina / sito)  
+5. Sito: `https://www.corpoceleste.eu` · Email: `info@corpoceleste.eu` · telefono se lo pubblicate  
+6. Descrizione: serigrafia a mano, maglie/stampe edizione limitata, workshop a Bergamo — **Corpoceleste**, non print-on-demand  
+7. Foto: logo stella, studio, stampa, prodotti  
+8. Dopo la verifica, chiedi a chi cita ancora CORPOC (AIAP, partner workshop, WordPress CORPOC) di linkare `https://www.corpoceleste.eu` come progetto attuale
 
 ## Tabella taglie
 

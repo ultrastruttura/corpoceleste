@@ -2,8 +2,9 @@ import type { Locale } from "./locales";
 
 const it = {
   meta: {
+    title: "Corpoceleste — serigrafia a mano, Bergamo",
     description:
-      "Corpoceleste: serigrafia d’artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, stampe ed edizioni limitate — non print-on-demand. Spedizione Italia e UE.",
+      "Corpoceleste di Andrea Baldelli: serigrafia a mano a Nembro (BG). Maglie e stampe d’artista in edizione limitata. Spedizione Italia e UE.",
   },
   home: {
     title: "Serigrafie d’autore",
@@ -457,8 +458,9 @@ const it = {
 
 const en: typeof it = {
   meta: {
+    title: "Corpoceleste — hand screen printing, Bergamo",
     description:
-      "Corpoceleste: one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, artist prints and limited editions — not print-on-demand. Shipping Italy & EU.",
+      "Corpoceleste by Andrea Baldelli: hand screen printing in Nembro (Bergamo). Limited artist shirts and prints. Shipping Italy and EU.",
   },
   home: {
     title: "Author’s screen prints",
@@ -910,8 +912,9 @@ const en: typeof it = {
 
 const de: typeof it = {
   meta: {
+    title: "Corpoceleste — Handsiebdruck, Bergamo",
     description:
-      "Corpoceleste: einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Künstlerdrucke und limitierte Editionen — kein Print-on-Demand. Versand Italien & EU.",
+      "Corpoceleste von Andrea Baldelli: Handsiebdruck in Nembro (Bergamo). Limitierte Künstler-Shirts und Drucke. Versand Italien und EU.",
   },
   home: {
     title: "Siebdrucke von Autoren",

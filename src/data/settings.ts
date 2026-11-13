@@ -31,6 +31,8 @@ const shopEmailFromCms = String(data.shopEmail ?? "").trim();
 export const siteSettings = {
   /** FormSubmit destination; falls back to `site.email` if empty in CMS. */
   shopEmail: shopEmailFromCms || site.email,
+  /** Document `<title>` (SERP / tab). Empty = dict.meta.title. Not an on-page H1. */
+  metaTitle: asLocalized(data.metaTitle),
   metaDescription: asLocalized(data.metaDescription),
   homeTitle: asLocalized(data.homeTitle),
   homeLede: asLocalized(data.homeLede),
@@ -70,7 +72,12 @@ export const siteSettings = {
 export function localizedSetting(
   field: keyof Pick<
     typeof siteSettings,
-    "metaDescription" | "homeTitle" | "homeLede" | "andreaBio" | "announcementText"
+    | "metaTitle"
+    | "metaDescription"
+    | "homeTitle"
+    | "homeLede"
+    | "andreaBio"
+    | "announcementText"
   >,
   locale: Locale,
 ) {

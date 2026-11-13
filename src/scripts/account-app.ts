@@ -2001,7 +2001,7 @@ if (!root || !app) {
       <div class="account-stack-form__row">
         <label class="account-stack-form__field">
           <span>Nome artista</span>
-          <input name="name" required autocomplete="off" placeholder="es. Matteo Baldelli" />
+          <input name="name" required autocomplete="off" placeholder="es. Mario Rossi" />
         </label>
         <label class="account-stack-form__field">
           <span>Email artista</span>

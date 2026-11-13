@@ -15,7 +15,7 @@ body:
 
     Prima di CORPOCELESTE ho creato etichette e progetti di edizione indipendenti.
 
-    Con [CORPOC](https://ccoorrppoocc.wordpress.com/) tra il 2011 e il 2019 abbiamo curato, stampato e distribuito edizioni limitate in vari formati: t-shirts, stampe d’arte, dischi (in particolare in vinile) e libri a fumetti, di artisti italiani e internazionali.
+    Con [CORPOC](https://ccoorrppoocc.wordpress.com/) tra il 2011 e il 2019 abbiamo curato, stampato e distribuito edizioni limitate in vari formati: t-shirts, stampe d’arte, dischi (in particolare in vinile) e libri a fumetti, di artisti italiani e internazionali. L’archivio CORPOC resta su quel sito; il progetto attuale è **Corpoceleste** su [corpoceleste.eu](https://www.corpoceleste.eu/).
 
     Con [Satellite Press](https://www.instagram.com/satellitepress/) abbiamo progettato e realizzato stampe e libri d’artista in tiratura limitata, utilizzando non solo la serigrafia ma anche le tecniche calcografiche o la stampa giclée.
 
@@ -35,7 +35,7 @@ body:
 
     Before CORPOCELESTE I started independent labels and edition projects.
 
-    With [CORPOC](https://ccoorrppoocc.wordpress.com/), from 2011 to 2019, we curated, printed and distributed limited editions in many formats: t-shirts, art prints, records (especially vinyl) and comics, by Italian and international artists.
+    With [CORPOC](https://ccoorrppoocc.wordpress.com/), from 2011 to 2019, we curated, printed and distributed limited editions in many formats: t-shirts, art prints, records (especially vinyl) and comics, by Italian and international artists. The CORPOC archive stays there; the current project is **Corpoceleste** at [corpoceleste.eu](https://www.corpoceleste.eu/).
 
     With [Satellite Press](https://www.instagram.com/satellitepress/) we designed and made limited artist prints and books, using not only screen printing but also intaglio and giclée.
 
@@ -55,7 +55,7 @@ body:
 
     Vor CORPOCELESTE habe ich unabhängige Labels und Editionsprojekte aufgebaut.
 
-    Mit [CORPOC](https://ccoorrppoocc.wordpress.com/) haben wir von 2011 bis 2019 limitierte Editionen in vielen Formaten kuratiert, gedruckt und vertrieben: T-Shirts, Kunstdrucke, Platten (vor allem Vinyl) und Comics, von italienischen und internationalen Künstler:innen.
+    Mit [CORPOC](https://ccoorrppoocc.wordpress.com/) haben wir von 2011 bis 2019 limitierte Editionen in vielen Formaten kuratiert, gedruckt und vertrieben: T-Shirts, Kunstdrucke, Platten (vor allem Vinyl) und Comics, von italienischen und internationalen Künstler:innen. Das CORPOC-Archiv bleibt dort; das aktuelle Projekt ist **Corpoceleste** auf [corpoceleste.eu](https://www.corpoceleste.eu/).
 
     Mit [Satellite Press](https://www.instagram.com/satellitepress/) haben wir limitierte Künstlerdrucke und -bücher entworfen und umgesetzt, nicht nur im Siebdruck, sondern auch mit Tiefdruck und Giclée.
 

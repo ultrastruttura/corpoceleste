@@ -9,7 +9,7 @@ import {
 } from "../data/products";
 
 const PLACEHOLDER_RE =
-  /placeholder|platzhalter|in aggiornamento|coming soon|Inhalt folgt|scheda artista\s*\d|artist\s*\d\s+profile|Künstler\s*\d|Artista\s*\d/i;
+  /placeholder|platzhalter|bla\s*bla|hehehe|in aggiornamento|coming soon|Inhalt folgt|scheda artista\s*\d|artist\s*\d\s+profile|Künstler\s*\d|Artista\s*\d/i;
 
 export function isPlaceholderCopy(text: string) {
   return PLACEHOLDER_RE.test(text);
