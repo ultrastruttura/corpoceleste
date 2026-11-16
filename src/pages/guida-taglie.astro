@@ -23,13 +23,12 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
 
 <Base
   title={`${g.title} — Corpoceleste`}
-  description={metaSnippet(g.lede)}
+  description={metaSnippet(g.howBody)}
   jsonLd={jsonLd}
 >
   <div class="wrap page-main">
     <header class="page-hero">
       <h1>{g.title}</h1>
-      <p class="lede">{g.lede}</p>
     </header>
 
     <div class="prose page-main--article size-guide">
@@ -55,7 +54,7 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
                   </thead>
                   <tbody>
                     <tr>
-                      <th scope="row">{g.colUsa}</th>
+                      <th scope="row">{g.colSize}</th>
                       {model.rows.map((row) => (
                         <td>{row.size}</td>
                       ))}
