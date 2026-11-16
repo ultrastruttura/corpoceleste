@@ -55,7 +55,7 @@ Guida operativa: **[ADMIN.md](./ADMIN.md)**.
 | News | `content/news/` |
 | Bio | `content/bio/page.md` |
 | Modelli capo / taglie | `content/fit-models/` |
-| Corsi (date) | `src/data/workshops.ts` |
+| Corsi (date) | Tina → Prossimi workshop / Workshop passati · `content/workshops/` |
 
 ### SEO brand (title / meta, non H1)
 
