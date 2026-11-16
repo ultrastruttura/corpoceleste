@@ -1,60 +1,52 @@
 ---
 import Base from "../layouts/Base.astro";
+import ProductGrid from "../components/ProductGrid.astro";
+import { availableProducts, soldOutProducts } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
-import { asset } from "../lib/paths";
+import { shuffle } from "../lib/shuffle";
+import { cardImageUrls } from "../lib/paths";
 import { metaSnippet } from "../lib/seo";
 import { currentLocale, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
+const available = availableProducts();
+const listed = [
+  ...available.filter((p) => p.nuovo),
+  ...shuffle(available.filter((p) => !p.nuovo)),
+];
+const sold = soldOutProducts();
 const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
 const documentTitle =
   localizedSetting("metaTitle", locale) || copy.meta.title || "Corpoceleste";
 const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
-const videoMp4 = asset("videos/home-stage.mp4");
-const videoMp4Mobile = asset("videos/home-stage-mobile.mp4");
-const posterSrc = asset("videos/og-stage.jpg");
-/* Frame from home-stage.mp4 — WhatsApp shows og:image, not the video. */
-const ogImage = siteSettings.ogImage || "videos/og-stage.jpg";
+const lcp = listed[0]?.images[0] ? cardImageUrls(listed[0].images[0]) : null;
 ---
 
 <Base
   title={documentTitle}
   description={seoDescription}
-  image={ogImage}
-  video="videos/home-stage.mp4"
-  preloadImage={posterSrc}
-  preloadImageType="image/jpeg"
+  image={siteSettings.ogImage}
+  preloadImage={lcp?.webp}
+  preloadImageType="image/webp"
 >
-  <div class="shop-home shop-home--closed">
+  <div class="wrap shop-home">
     <h1 class="visually-hidden">{homeTitle}</h1>
-    <figure class="shop-home-stage">
-      {/*
-        Wrapper is layout-only (zoom via box size). Never CSS mask/filter/transform on <video>
-        — Safari/iOS can freeze decoded frames. src on <video> (not only <source>) for iOS autoplay.
-      */}
-      <div class="shop-home-stage__media">
-        <video
-          class="shop-home-stage__video"
-          data-autoplay-video
-          src={videoMp4}
-          data-src-mobile={videoMp4Mobile}
-          poster={posterSrc}
-          autoplay
-          muted
-          loop
-          playsinline
-          webkit-playsinline
-          disablePictureInPicture
-          preload="auto"
-          aria-label={copy.home.stageAlt}
-        ></video>
-        {/* Early src swap for mobile — external file so CSP can omit unsafe-inline. */}
-        <script is:inline src={asset("early-video.js")}></script>
-        <span class="shop-home-stage__crt" aria-hidden="true"></span>
-      </div>
-    </figure>
+    <p class="visually-hidden">{seoDescription}</p>
+
+    <ProductGrid products={listed} eager={1} />
+
+    {
+      sold.length > 0 && (
+        <section class="shop-home-sold" aria-labelledby="shop-sold-heading">
+          <h2 id="shop-sold-heading" class="shop-home-sold-title">
+            {copy.shop.soldOut}
+          </h2>
+          <ProductGrid products={sold} />
+        </section>
+      )
+    }
   </div>
 </Base>

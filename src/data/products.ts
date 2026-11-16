@@ -164,6 +164,16 @@ export function productBySlug(slug: string) {
 
 export { artistName, artists };
 
+/** In vetrina: acquistabili e non nascosti (ProductGrid filtra di nuovo `hidden`). */
+export function availableProducts() {
+  return products.filter((p) => !p.hidden && isInStock(p));
+}
+
+/** Esaurite / non acquistabili, escluse le hidden di test. */
+export function soldOutProducts() {
+  return products.filter((p) => !p.hidden && !isInStock(p));
+}
+
 export function formatPrice(n: number) {
   return `${n} €`;
 }
