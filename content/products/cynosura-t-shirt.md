@@ -5,7 +5,7 @@ price: 40
 status: preorder
 kind: shirt
 fitModel: ''
-nuovo: true
+nuovo: false
 createdAt: 2026-11-16T12:52:00.872Z
 colorName: Nero
 sizes:
