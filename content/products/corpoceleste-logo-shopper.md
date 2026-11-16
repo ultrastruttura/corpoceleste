@@ -1,6 +1,6 @@
 ---
 title: Corpoceleste logo shopper
-artist: ''
+artist: content/artists/corpoceleste.md
 price: 12
 status: preorder
 kind: shirt
