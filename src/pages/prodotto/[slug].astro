@@ -204,24 +204,18 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
       {
         cover ? (
           <div class="product-stage-frame" data-gallery-frame>
-            <picture>
-              {
-                /\.webp$/i.test(cover.full) && (
-                  <source type="image/webp" srcset={cover.full} data-product-main-webp />
-                )
-              }
-              <img
-                src={cover.full}
-                alt={alt}
-                width="1200"
-                height="1200"
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-                data-product-main
-                draggable="false"
-              />
-            </picture>
+            {/* Plain img only — <picture>+fake webp source blocked reliable swaps. */}
+            <img
+              src={cover.full}
+              alt={alt}
+              width="1200"
+              height="1200"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              data-product-main
+              draggable="false"
+            />
             {
               multi && (
                 <>
@@ -258,8 +252,7 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
                 class:list={["product-thumb", i === 0 && "is-active"]}
                 data-product-thumb
                 data-index={i}
-                data-jpg={img.full}
-                data-webp={img.full}
+                data-src={img.full}
                 data-alt={productImageAlt(product, artist, locale, { index: i })}
                 aria-selected={i === 0 ? "true" : "false"}
                 aria-label={`${product.title} ${i + 1}`}
@@ -417,89 +410,6 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
     </div>
   </div>
 
-  <script>
-    const root = document.querySelector<HTMLElement>("[data-gallery]");
-    const main = document.querySelector<HTMLImageElement>("[data-product-main]");
-    const mainWebp = document.querySelector<HTMLSourceElement>("[data-product-main-webp]");
-    const indexEl = document.querySelector<HTMLElement>("[data-gallery-index]");
-    const thumbs = [...document.querySelectorAll<HTMLButtonElement>("[data-product-thumb]")];
-    if (!main || thumbs.length < 2) {
-      /* single image: nothing to wire */
-    } else {
-      let i = 0;
-      const total = thumbs.length;
-
-      const show = (next: number) => {
-        i = ((next % total) + total) % total;
-        const btn = thumbs[i];
-        const jpg = btn.dataset.jpg;
-        const webp = btn.dataset.webp;
-        if (!jpg) return;
-        main.src = jpg;
-        if (mainWebp && webp) mainWebp.srcset = webp;
-        if (btn.dataset.alt) main.alt = btn.dataset.alt;
-        thumbs.forEach((t, n) => {
-          const on = n === i;
-          t.classList.toggle("is-active", on);
-          t.setAttribute("aria-selected", on ? "true" : "false");
-        });
-        if (indexEl) indexEl.textContent = `${i + 1} / ${total}`;
-      };
-
-      thumbs.forEach((btn) => {
-        btn.addEventListener("click", () => show(Number(btn.dataset.index) || 0));
-      });
-
-      document.querySelector("[data-gallery-prev]")?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        show(i - 1);
-      });
-      document.querySelector("[data-gallery-next]")?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        show(i + 1);
-      });
-
-      const frame = document.querySelector<HTMLElement>("[data-gallery-frame]");
-      let x0: number | null = null;
-      let y0 = 0;
-      frame?.addEventListener(
-        "touchstart",
-        (e) => {
-          // Pinch-zoom is not a swipe.
-          if (e.touches.length > 1) {
-            x0 = null;
-            return;
-          }
-          x0 = e.changedTouches[0]?.clientX ?? null;
-          y0 = e.changedTouches[0]?.clientY ?? 0;
-        },
-        { passive: true, capture: true },
-      );
-      frame?.addEventListener(
-        "touchend",
-        (e) => {
-          if (x0 == null) return;
-          const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-          const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
-          x0 = null;
-          // Mostly-vertical drags are page scrolls, not gallery swipes.
-          if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-          show(i + (dx < 0 ? 1 : -1));
-        },
-        { passive: true, capture: true },
-      );
-
-      root?.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          show(i - 1);
-        }
-        if (e.key === "ArrowRight") {
-          e.preventDefault();
-          show(i + 1);
-        }
-      });
-      if (root && !root.hasAttribute("tabindex")) root.tabIndex = 0;
-    }
-  </script>
+  {/* External file: CSP blocks inline page scripts (that is why thumbs did nothing). */}
+  <script is:inline src={asset("product-gallery.js")} defer></script>
 </Base>
