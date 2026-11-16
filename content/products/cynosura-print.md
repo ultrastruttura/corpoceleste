@@ -5,7 +5,7 @@ price: 50
 status: preorder
 kind: print
 fitModel: ''
-nuovo: true
+nuovo: false
 createdAt: 2026-11-16T12:48:05.439Z
 colorName: ''
 sizes:
