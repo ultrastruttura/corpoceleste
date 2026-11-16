@@ -1467,6 +1467,17 @@ body.cart-open {
   margin: 1.5rem 0;
 }
 
+.size-guide__model h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.size-guide__model > p {
+  margin: 0 0 1rem;
+}
+
 .size-guide__model h3 {
   margin: 0 0 0.5rem;
   font-size: 1.05rem;
