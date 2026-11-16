@@ -2187,6 +2187,75 @@ body:has(.site-announce) .shop-home-stage {
   font-size: 15px;
 }
 
+.name-list {
+  list-style: none;
+  margin: 0 0 48px;
+  padding: 0;
+}
+
+.name-list li {
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.name-list a {
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.name-list a:hover {
+  text-decoration: underline;
+}
+
+.name-list .date {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.artist-letter {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.artist-directory {
+  margin-bottom: 48px;
+}
+
+.artist-directory__group {
+  margin-top: 1.25rem;
+}
+
+.artist-directory__group:first-child {
+  margin-top: 0;
+}
+
+.artist-directory__group .artist-letter {
+  margin: 0 0 0.35rem;
+}
+
+.artist-directory__group .name-list {
+  margin-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .artist-directory {
+    column-width: 11rem;
+    column-gap: 2.5rem;
+  }
+
+  .artist-directory__group {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
 .page-photo {
   width: min(100%, 320px);
   aspect-ratio: 4 / 5;
