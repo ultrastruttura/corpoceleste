@@ -10,6 +10,7 @@ import {
   productImageAlt,
   isInStock,
   isLowStock,
+  productHasSizes,
   sizeInStock,
   stockOf,
 } from "../../data/products";
@@ -35,14 +36,17 @@ const artist = artistName(product.artistId);
 const sold = !isInStock(product);
 const lowStock = !sold && isLowStock(product, siteSettings.lowStockThreshold);
 const preorder = product.status === "preorder" && !sold;
+const showSizes = productHasSizes(product);
 const alt = productImageAlt(product, artist, locale);
 const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
 const sizeChart = sizeChartForProduct(product.fitModelId);
 const sizeChartHasSleeve = modelHasSleeve(sizeChart.rows);
-const defaultSize = inStockSizes.includes("M")
-  ? "M"
-  : inStockSizes[0] ?? sizes[0];
+const defaultSize = showSizes
+  ? inStockSizes.includes("M")
+    ? "M"
+    : inStockSizes[0] ?? sizes[0]
+  : sizes[0];
 const color = copy.product.colors[product.colorName] ?? product.colorName;
 const composition = product.composition
   ? copy.product.compositions[product.composition] ?? product.composition
@@ -294,39 +298,43 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
               <input type="hidden" name="price" value={product.price} />
               <input type="hidden" name="color" value={product.color} />
               <input type="hidden" name="print" value={product.print} />
-              <fieldset class="size-fieldset">
-                <legend class="field-label">{copy.product.size}</legend>
-                <div class="size-row">
-                  {sizes.map((s) => {
-                    const available = sizeInStock(product, s);
-                    const qty = stockOf(product, s);
-                    return (
-                      <label class:list={{ "is-oos": !available }}>
-                        <input
-                          type="radio"
-                          name="size"
-                          value={s}
-                          checked={s === defaultSize}
-                          disabled={!available}
-                        />
-                        <span>
-                          {s}
-                        </span>
-                        {available && qty <= 3 && (
-                          <span class="visually-hidden">
-                            {copy.product.stockLeft(qty)}
-                          </span>
-                        )}
-                      </label>
-                    );
-                  })}
-                </div>
-              </fieldset>
               {
-                product.kind === "shirt" && (
-                  <p class="size-guide-link">
-                    <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
-                  </p>
+                showSizes ? (
+                  <>
+                    <fieldset class="size-fieldset">
+                      <legend class="field-label">{copy.product.size}</legend>
+                      <div class="size-row">
+                        {sizes.map((s) => {
+                          const available = sizeInStock(product, s);
+                          const qty = stockOf(product, s);
+                          return (
+                            <label class:list={{ "is-oos": !available }}>
+                              <input
+                                type="radio"
+                                name="size"
+                                value={s}
+                                checked={s === defaultSize}
+                                disabled={!available}
+                              />
+                              <span>
+                                {s}
+                              </span>
+                              {available && qty <= 3 && (
+                                <span class="visually-hidden">
+                                  {copy.product.stockLeft(qty)}
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </fieldset>
+                    <p class="size-guide-link">
+                      <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
+                    </p>
+                  </>
+                ) : (
+                  <input type="hidden" name="size" value={defaultSize} />
                 )
               }
               <button class="btn" type="submit">{copy.product.add}</button>
@@ -373,7 +381,7 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
         <li>{copy.product.vatIncluded}</li>
       </ul>
       {
-        product.kind === "shirt" && sizeChart.rows.length > 0 && (
+        showSizes && sizeChart.rows.length > 0 && (
           <details class="size-chart">
             <summary>
               {copy.product.sizeChart} ({copy.product.sizeUnit})

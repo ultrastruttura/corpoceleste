@@ -68,12 +68,17 @@ const it = {
     galleryNext: "Foto successiva",
     shipLine: "Spedizione in Italia e in Europa — costo calcolato in checkout.",
     /** Alt SEO commerciale: tipo + opera + artista + keyword vendita. */
-    imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
+    imageAlt: (kind: "shirt" | "print" | "shopper" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
         return withArtist
           ? `Stampa d'artista «${title}» di ${artist}, edizione limitata Corpoceleste Bergamo`
           : `Stampa d'artista «${title}», edizione limitata Corpoceleste Bergamo`;
+      }
+      if (kind === "shopper") {
+        return withArtist
+          ? `Shopper serigrafata «${title}» di ${artist}, stampa a mano Corpoceleste Bergamo`
+          : `Shopper serigrafata «${title}», stampa a mano Corpoceleste Bergamo`;
       }
       if (kind === "edition") {
         return withArtist
@@ -523,12 +528,17 @@ const en: typeof it = {
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
     shipLine: "Shipping in Italy and across Europe — cost calculated at checkout.",
-    imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
+    imageAlt: (kind: "shirt" | "print" | "shopper" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
         return withArtist
           ? `Artist print “${title}” by ${artist}, limited edition Corpoceleste Bergamo`
           : `Artist print “${title}”, limited edition Corpoceleste Bergamo`;
+      }
+      if (kind === "shopper") {
+        return withArtist
+          ? `Screen-printed tote “${title}” by ${artist}, hand-printed Corpoceleste Bergamo`
+          : `Screen-printed tote “${title}”, hand-printed Corpoceleste Bergamo`;
       }
       if (kind === "edition") {
         return withArtist
@@ -977,12 +987,17 @@ const de: typeof it = {
     galleryPrev: "Vorheriges Foto",
     galleryNext: "Nächstes Foto",
     shipLine: "Versand in Italien und Europa — Kosten an der Kasse.",
-    imageAlt: (kind: "shirt" | "print" | "edition", title: string, artist: string) => {
+    imageAlt: (kind: "shirt" | "print" | "shopper" | "edition", title: string, artist: string) => {
       const withArtist = artist && artist !== title;
       if (kind === "print") {
         return withArtist
           ? `Künstlerdruck „${title}“ von ${artist}, limitierte Edition Corpoceleste Bergamo`
           : `Künstlerdruck „${title}“, limitierte Edition Corpoceleste Bergamo`;
+      }
+      if (kind === "shopper") {
+        return withArtist
+          ? `Siebgedruckte Shopper „${title}“ von ${artist}, handgedruckt Corpoceleste Bergamo`
+          : `Siebgedruckte Shopper „${title}“, handgedruckt Corpoceleste Bergamo`;
       }
       if (kind === "edition") {
         return withArtist

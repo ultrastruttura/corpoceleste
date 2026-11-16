@@ -8,6 +8,7 @@ export type CatalogProduct = {
   id: string;
   title: string;
   artistName: string;
+  kind?: string;
   sizes: string[];
   stock: Record<string, number>;
   price: number;
@@ -15,6 +16,10 @@ export type CatalogProduct = {
   print: string;
   imageAlt: string;
 };
+
+export function catalogHasSizes(p: CatalogProduct) {
+  return (p.kind ?? "shirt") === "shirt";
+}
 
 declare global {
   interface Window {

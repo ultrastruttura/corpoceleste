@@ -36,4 +36,29 @@ stock:
 `;
     expect(patchStockQty(md, "XXL", 0)).toBeNull();
   });
+
+  it("updates flat stockS", () => {
+    const md = `---
+title: Tee
+stockS: 10
+stockM: 4
+---
+`;
+    const out = patchStockQty(md, "M", 2);
+    expect(out?.before).toBe(4);
+    expect(out?.content).toContain("stockM: 2");
+    expect(out?.content).toContain("stockS: 10");
+  });
+
+  it("updates flat stockQty for one-size products", () => {
+    const md = `---
+title: Shopper
+kind: shopper
+stockQty: 12
+---
+`;
+    const out = patchStockQty(md, "unica", 9);
+    expect(out?.before).toBe(12);
+    expect(out?.content).toContain("stockQty: 9");
+  });
 });

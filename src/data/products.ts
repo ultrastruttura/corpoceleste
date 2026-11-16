@@ -1,5 +1,8 @@
 import matter from "gray-matter";
-import { parseProductFrontmatter } from "../lib/product-frontmatter";
+import {
+  isSizedKind,
+  parseProductFrontmatter,
+} from "../lib/product-frontmatter";
 import {
   isPurchasableStatus,
   maxQtyForStatus,
@@ -12,9 +15,10 @@ import { ui } from "../i18n/dict";
 import type { Locale } from "../i18n/locales";
 
 export type { ProductStatus };
+export { isSizedKind };
 
 /** Forma dell’oggetto in vendita — guida alt immagine e (dopo) UI. */
-export type ProductKind = "shirt" | "print" | "edition";
+export type ProductKind = "shirt" | "print" | "shopper" | "edition";
 
 export type Localized = { it: string; en: string; de: string };
 
@@ -71,8 +75,13 @@ function artistIdFromRef(ref: unknown): string {
 }
 
 function parseKind(raw: unknown): ProductKind {
-  if (raw === "print" || raw === "edition") return raw;
+  if (raw === "print" || raw === "edition" || raw === "shopper") return raw;
   return "shirt";
+}
+
+/** True when the product uses garment sizes (S–XXL) in shop UI. */
+export function productHasSizes(product: Pick<Product, "kind">) {
+  return isSizedKind(product.kind);
 }
 
 export function isPurchasable(status: ProductStatus) {
