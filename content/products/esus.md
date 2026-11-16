@@ -1,13 +1,13 @@
 ---
+colorName: ''
 title: '"Esus" t-shirt'
 artist: content/artists/108-guido-bisagni.md
 price: 40
-status: available
+status: preorder
 kind: shirt
 fitModel: content/fit-models/t-shirt-cotone-205gr.md
 nuovo: true
 createdAt: 2026-11-16T17:08:38.205Z
-colorName: ''
 composition: 100% cotone
 sizes:
   - S
