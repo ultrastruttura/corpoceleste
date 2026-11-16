@@ -5,7 +5,7 @@ price: 40
 status: preorder
 kind: shirt
 fitModel: content/fit-models/t-shirt-cotone-205gr.md
-nuovo: true
+nuovo: false
 createdAt: 2026-11-12T17:08:38.205Z
 colorName: ''
 composition: 100% cotone
