@@ -1,5 +1,5 @@
 ---
-title: Zain
+title: '"Zain" t-shirt'
 artist: content/artists/totemica.md
 price: 40
 status: preorder
