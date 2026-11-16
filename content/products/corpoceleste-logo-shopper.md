@@ -1,13 +1,13 @@
 ---
+colorName: Nero
 title: Corpoceleste logo shopper
 artist: content/artists/corpoceleste.md
 price: 12
-status: available
+status: preorder
 kind: shopper
 fitModel: ''
 nuovo: true
 createdAt: 2026-11-16T12:53:06.622Z
-colorName: Nero
 composition: 100% cotone
 sizes: []
 stockM: 0
