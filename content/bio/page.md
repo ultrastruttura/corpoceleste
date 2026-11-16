@@ -49,7 +49,7 @@ body:
 
     Ich habe um 2007 drucken gelernt und die Siebdrucktechnik seither in vielen Kontexten angewandt: Lohnfertigung — manuell und automatisch —, eigene Produktion (wie bei CORPOCELESTE), technische Beratung für andere Siebdruckereien und Unterricht an Grafikschulen, in Galerien und Kulturvereinen, in Italien und im Ausland.
 
-    Wenn du Beratung zu Anlagen, Farben, Abläufen oder Personalschulung brauchst, schreib mir: ich baue sie Fall für Fall.
+    Wenn du Beratung zu Anlagen, Farben, Abläufen oder Personalschulung brauchst, schreib mir: ich baue sie individuell, je nach Fall.
 
     Unter anderem habe ich als Berater den Aufbau einer manuellen Siebdruckerei in Asmara, Eritrea, begleitet, wo ich mehrfach war, um Personal zu schulen und Abläufe zu schärfen; ich habe am IED Mailand in einem Kurs zu Entwurf und Siebdruck mit der Illustratorin Sarah Mazzetti unterrichtet; ich war Leiter der Forschungs- und Entwicklungsabteilung eines bekannten norditalienischen Herstellers von Farben und Druckmaterialien und betreue dort heute als Berater weiterhin Farbtests — besonders wasserbasierte — und entwickle patentierte Formulierungen für internationale Kunden.
 
