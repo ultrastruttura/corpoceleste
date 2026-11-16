@@ -5,10 +5,10 @@ title: Test pagamento
 artist: content/artists/andrea-baldelli.md
 price: 1
 status: available
-kind: shirt
+kind: shopper
 fitModel: content/fit-models/t-shirt-cotone-205gr.md
 nuovo: true
-createdAt: 2026-11-12T14:00:00.000Z
+createdAt: 2026-11-16T14:00:00.000Z
 composition: 100% cotone
 sizes: []
 stockS: 20
