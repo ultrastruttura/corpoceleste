@@ -2,7 +2,7 @@
 title: Esus
 artist: content/artists/108-guido-bisagni.md
 price: 40
-status: soldout
+status: preorder
 kind: shirt
 fitModel: ''
 nuovo: true
