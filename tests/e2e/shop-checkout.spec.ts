@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const PRODUCT_PATH = "/prodotto/non-scegli-la-tua-casa/";
 
@@ -16,10 +16,23 @@ function assertQuoteMath(q: { merchandise: string; shipping: string; total: stri
   expect(merch + ship, `merchandise (${merch}) + shipping (${ship})`).toBeCloseTo(total, 2);
 }
 
+/**
+ * WebKit turns cancelled/refused fetch diagnostics into pageerror even when
+ * the app catches the rejection ("… due to access control checks.").
+ * @see https://github.com/microsoft/playwright/issues/44015
+ */
+function collectFatalPageErrors(page: Page) {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (err) => {
+    if (/due to access control checks\.?$/i.test(err.message)) return;
+    pageErrors.push(err.message);
+  });
+  return pageErrors;
+}
+
 test.describe("shop checkout smoke", () => {
   test("home loads without fatal page errors", async ({ page }) => {
-    const pageErrors: string[] = [];
-    page.on("pageerror", (err) => pageErrors.push(err.message));
+    const pageErrors = collectFatalPageErrors(page);
     await page.goto("/");
     await expect(page.locator("body")).toBeVisible();
     expect(pageErrors, pageErrors.join("\n")).toEqual([]);
@@ -27,8 +40,15 @@ test.describe("shop checkout smoke", () => {
 
   test("add to cart, checkout ZIP quote via mocked API", async ({ page }) => {
     assertQuoteMath(QUOTE);
-    const pageErrors: string[] = [];
-    page.on("pageerror", (err) => pageErrors.push(err.message));
+    const pageErrors = collectFatalPageErrors(page);
+
+    await page.route("**/api/live-stock", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ products: [] }),
+      });
+    });
 
     await page.route("**/api/shipping-quote", async (route) => {
       if (route.request().method() === "OPTIONS") {
