@@ -4,7 +4,7 @@ const it = {
   meta: {
     title: "Corpoceleste — maglie e stampe serigrafate a mano, Bergamo",
     description:
-      "Corpoceleste, Andrea Baldelli a Nembro (BG): maglie serigrafate, shopper e stampe d’artista a un colore. Edizioni limitate a mano, non print-on-demand. Spedizione Italia e UE.",
+      "Corpoceleste a Nembro (BG): maglie serigrafate, shopper e stampe d’artista a un colore, a mano. Edizioni limitate, non print-on-demand. Spedizione Italia e UE.",
   },
   home: {
     title: "Maglie e stampe serigrafate a mano",

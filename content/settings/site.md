@@ -6,7 +6,7 @@ metaTitle:
   en: 'Corpoceleste — hand screen-printed shirts & prints, Bergamo'
   de: 'Corpoceleste — handgesiebte Shirts & Drucke, Bergamo'
 metaDescription:
-  it: 'Corpoceleste, Andrea Baldelli a Nembro (BG): maglie serigrafate, shopper e stampe d’artista a un colore. Edizioni limitate a mano, non print-on-demand. Spedizione Italia e UE.'
+  it: 'Corpoceleste a Nembro (BG): maglie serigrafate, shopper e stampe d’artista a un colore, a mano. Edizioni limitate, non print-on-demand. Spedizione Italia e UE.'
   en: 'Corpoceleste, Andrea Baldelli in Nembro (Bergamo): hand screen-printed shirts, totes and artist prints. Limited editions, not print-on-demand. Ship Italy & EU.'
   de: 'Corpoceleste, Andrea Baldelli in Nembro (Bergamo): handgesiebte Shirts, Shopper und Künstlerdrucke. Limitierte Editionen, kein Print-on-Demand. Versand IT/EU.'
 homeTitle:
