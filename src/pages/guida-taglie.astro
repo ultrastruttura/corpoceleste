@@ -46,25 +46,13 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
                 <table>
                   <thead>
                     <tr>
-                      <th scope="col">{g.colItaly}</th>
+                      <th scope="col">{g.colSize}</th>
                       {model.rows.map((row) => (
-                        <th scope="col">{row.it || "—"}</th>
+                        <th scope="col">{row.size}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">{g.colSize}</th>
-                      {model.rows.map((row) => (
-                        <td>{row.size}</td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <th scope="row">{g.colFrance}</th>
-                      {model.rows.map((row) => (
-                        <td>{row.fr || "—"}</td>
-                      ))}
-                    </tr>
                     <tr>
                       <th scope="row">{g.colChest}</th>
                       {model.rows.map((row) => (
