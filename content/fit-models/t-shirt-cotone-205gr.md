@@ -5,5 +5,8 @@ rows:
   - size: S
     chest: 44
     length: 71
+  - size: M
+    chest: 49
+    length: 76
 ---
 
