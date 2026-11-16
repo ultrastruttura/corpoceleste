@@ -40,8 +40,8 @@ description:
 
     Jedes Stück in diesem Shop ist ein Unikat, von Hand gedruckt in limitierter Auflage. Der Handdruck bringt unvermeidliche Abweichungen zwischen den einzelnen Stücken mit sich: Position, Druck und Farbdeckung der Tinte können von Stück zu Stück leicht variieren. Diese Unterschiede sind keine Mängel, sondern das Kennzeichen handwerklicher Arbeit und machen jedes Stück einzigartig. Die Fotos dienen ausschließlich der Veranschaulichung. Das tatsächliche Produkt kann gegenüber der Darstellung im Internet leichte Abweichungen in Farbe und Textur aufweisen. Mit dem Kauf erklärt der Kunde, sich der handwerklichen und limitierten Natur des Artikels bewusst zu sein, und akzeptiert die beschriebenen Abweichungen als wesentlichen Bestandteil des Produktwerts. Diese Unterschiede stellen keinen Grund für Rückgabe, Widerruf oder Reklamation dar.
 seoDescription:
-  it: ''
-  en: ''
-  de: ''
+  it: 'Shopper in cotone 100% 130g naturale, stampata a mano fronte e retro con inchiostro all’acqua blu navy. Pezzo unico in edizione limitata di soli 35 esemplari.'
+  en: 'Tote bag in 100% natural cotton (130 gsm), hand-printed front and back with navy blue water-based ink. Each is one of a kind, limited edition of only 35 pieces.'
+  de: 'Shopper aus 100 % Naturbaumwolle (130 g), handbedruckt vorne und hinten mit wasserbasierter Tinte in Marineblau. Unikat in limitierter Auflage von nur 35 Stück.'
 ---
 
