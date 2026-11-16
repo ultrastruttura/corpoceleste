@@ -12,7 +12,7 @@ Chi gestisce lo shop **non deve programmare**. Apre il pannello, modifica, salva
 | **Bio** | Nome, testo bio IT/EN/DE, sezioni stampa e stampa dal vivo |
 | **SEO e home** | **Title tag** + meta description (SERP), titolo accessibilità home, immagine Open Graph, **email shop**, **Website ID Umami** |
 
-Le foto vanno caricate dal pannello (finiscono in `public/uploads/`).
+Le foto vanno caricate dal pannello (finiscono in `public/uploads/`). Il sito usa **quel path così com’è** (niente ridimensionamenti automatici). Non cancellare un file dalla media library se è ancora collegato a una maglia — la CI (`npm run check:media`) fallisce se manca il file.
 
 ## In locale (sul PC)
 
