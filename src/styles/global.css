@@ -1214,13 +1214,14 @@ body.cart-open {
   font-size: 12px;
   letter-spacing: 0.08em;
   color: var(--muted);
-  text-align: left;
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
 .product-thumbs {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
   margin-top: 8px;
   background: var(--white);
