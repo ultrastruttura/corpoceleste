@@ -1,5 +1,5 @@
 ---
-title: Cynosura print
+title: '"Cynosura" print'
 artist: content/artists/andrea-baldelli.md
 price: 50
 status: preorder
