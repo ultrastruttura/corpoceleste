@@ -1,6 +1,7 @@
 import { ui } from "../i18n/dict";
 import { currentLocale } from "../i18n/runtime";
 import {
+  catalogHasSizes,
   catalogMaxQty,
   catalogProduct,
   catalogProducts,
@@ -52,7 +53,12 @@ export function renderRecap(root: Element, items: CartItem[], shipping: number) 
   for (const item of items) {
     merce += item.price * item.qty;
     const row = el("div", "recap-row");
-    row.append(el("span", undefined, `${lineName(item)} · ${item.size} × ${item.qty}`));
+    const product = catalogProduct(item.id);
+    const sized = product ? catalogHasSizes(product) : item.size !== "unica";
+    const label = sized
+      ? `${lineName(item)} · ${item.size} × ${item.qty}`
+      : `${lineName(item)} × ${item.qty}`;
+    row.append(el("span", undefined, label));
     row.append(el("span", undefined, `${item.price * item.qty} €`));
     root.append(row);
   }
@@ -107,39 +113,45 @@ function lineEl(item: CartItem) {
 
   const labels = copy();
   const product = catalogProduct(item.id);
-  const sizeField = el("fieldset", "cart-sizes");
-  const legend = el("legend", "visually-hidden", labels.cart.sizeOf(item.title));
-  sizeField.append(legend);
-  const sizeRow = el("div", "cart-size-row");
+  const sized = product ? catalogHasSizes(product) : true;
 
-  for (const s of sizesFor(item.id)) {
-    const inStock = product ? catalogSizeInStock(product, s) : false;
-    const stock = product ? catalogStock(product, s) : 0;
-    const label = el("label", inStock ? undefined : "is-oos");
-    const input = el("input") as HTMLInputElement;
-    input.type = "radio";
-    input.name = `cart-size-${item.id}-${item.size}`;
-    input.value = s;
-    input.checked = s === item.size;
-    input.disabled = !inStock && s !== item.size;
-    input.dataset.changeSize = item.id;
-    input.dataset.fromSize = item.size;
-    if (!inStock && s === item.size) {
-      // Current line kept only if catalog still has stock; if not, mark clearly.
-      input.disabled = true;
+  if (sized) {
+    const sizeField = el("fieldset", "cart-sizes");
+    const legend = el("legend", "visually-hidden", labels.cart.sizeOf(item.title));
+    sizeField.append(legend);
+    const sizeRow = el("div", "cart-size-row");
+
+    for (const s of sizesFor(item.id)) {
+      const inStock = product ? catalogSizeInStock(product, s) : false;
+      const stock = product ? catalogStock(product, s) : 0;
+      const label = el("label", inStock ? undefined : "is-oos");
+      const input = el("input") as HTMLInputElement;
+      input.type = "radio";
+      input.name = `cart-size-${item.id}-${item.size}`;
+      input.value = s;
+      input.checked = s === item.size;
+      input.disabled = !inStock && s !== item.size;
+      input.dataset.changeSize = item.id;
+      input.dataset.fromSize = item.size;
+      if (!inStock && s === item.size) {
+        // Current line kept only if catalog still has stock; if not, mark clearly.
+        input.disabled = true;
+      }
+
+      const text = el("span", undefined, s);
+      if (inStock && stock <= 3) {
+        text.append(el("span", "cart-size-left", ` · ${labels.product.stockLeft(stock)}`));
+      }
+      label.append(input, text);
+      sizeRow.append(label);
     }
+    sizeField.append(sizeRow);
+    meta.append(sizeField);
 
-    const text = el("span", undefined, s);
-    if (inStock && stock <= 3) {
-      text.append(el("span", "cart-size-left", ` · ${labels.product.stockLeft(stock)}`));
+    if (product && !catalogSizeInStock(product, item.size)) {
+      meta.append(el("p", "cart-line-warn", labels.cart.sizeUnavailable));
     }
-    label.append(input, text);
-    sizeRow.append(label);
-  }
-  sizeField.append(sizeRow);
-  meta.append(sizeField);
-
-  if (product && !catalogSizeInStock(product, item.size)) {
+  } else if (product && !catalogSizeInStock(product, item.size)) {
     meta.append(el("p", "cart-line-warn", labels.cart.sizeUnavailable));
   }
 

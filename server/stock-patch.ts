@@ -1,5 +1,12 @@
 import type { OrderLine } from "./paypal.js";
 
+/** One-size products (print / shopper / edition) store qty in flat `stockQty`. */
+export const ONE_SIZE = "unica";
+
+export function flatStockKey(size: string) {
+  return size === ONE_SIZE ? "stockQty" : `stock${size}`;
+}
+
 /**
  * Match a stock qty line: `  SIZE: N`, `  "SIZE": N`, or `  'SIZE': N`.
  * Groups: 1=indent, 2=key+colon+spaces, 3=qty.
@@ -11,6 +18,28 @@ export function stockQtyLineRe(size: string): RegExp {
     `^([ \\t]+)((?:"${sizeEsc}"|'${sizeEsc}'|${sizeEsc}):[ \\t]*)(\\d+)[ \\t]*$`,
     "m",
   );
+}
+
+/** Flat Tina line: `stockS: 10` or `stockQty: 10`. Groups: 1=prefix, 2=qty. */
+export function flatStockQtyLineRe(size: string): RegExp {
+  const key = flatStockKey(size).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^(${key}:[ \\t]*)(\\d+)[ \\t]*$`, "m");
+}
+
+/** Current on-hand qty for a size (nested stock block or flat Tina field). */
+export function readStockQty(markdown: string, size: string): number | null {
+  const source = markdown.replace(/^\uFEFF/, "");
+  const nested = source.match(stockQtyLineRe(size));
+  if (nested) {
+    const n = Math.floor(Number(nested[3]));
+    return Number.isFinite(n) ? Math.max(0, n) : null;
+  }
+  const flat = source.match(flatStockQtyLineRe(size));
+  if (flat) {
+    const n = Math.floor(Number(flat[2]));
+    return Number.isFinite(n) ? Math.max(0, n) : null;
+  }
+  return null;
 }
 
 function patchNestedStockQty(
@@ -38,17 +67,13 @@ function patchNestedStockQty(
   return { front: newFront, before };
 }
 
-/** Flat Tina fields: `stockS: 10` (no nested `stock:` block). */
+/** Flat Tina fields: `stockS: 10` or `stockQty: 10` (no nested `stock:` block). */
 function patchFlatStockQty(
   front: string,
   size: string,
   qty: number,
 ): { front: string; before: number } | null {
-  const sizeEsc = size.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const lineRe = new RegExp(
-    `^(stock${sizeEsc}:[ \\t]*)(\\d+)[ \\t]*$`,
-    "m",
-  );
+  const lineRe = flatStockQtyLineRe(size);
   const lineMatch = front.match(lineRe);
   if (!lineMatch) return null;
 
@@ -60,7 +85,7 @@ function patchFlatStockQty(
   return { front: newFront, before };
 }
 
-/** Surgical stock patch: nested `stock:` block or flat `stockS` / `stockM` / … keys. */
+/** Surgical stock patch: nested `stock:` block or flat `stockS` / `stockQty` keys. */
 export function patchStockQty(
   markdown: string,
   size: string,

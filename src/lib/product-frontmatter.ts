@@ -4,6 +4,9 @@ import { parseProductStatus, type ProductStatus } from "./product-status.js";
 
 const DEFAULT_SIZES = ["S", "M", "L", "XL", "XXL"];
 
+/** One-size key for print / shopper / edition (no garment sizes). */
+export const ONE_SIZE = "unica";
+
 export type ProductFrontmatterCore = {
   title: string;
   price: number;
@@ -11,6 +14,10 @@ export type ProductFrontmatterCore = {
   sizes: string[];
   stock: Record<string, number>;
 };
+
+export function isSizedKind(kind: unknown): boolean {
+  return String(kind ?? "shirt") === "shirt";
+}
 
 export function parseSizes(raw: unknown): string[] {
   const sizes = Array.isArray(raw) ? raw.map((x) => String(x)) : [...DEFAULT_SIZES];
@@ -52,11 +59,34 @@ export function stockFromProductData(
   return out;
 }
 
+function oneSizeStock(data: Record<string, unknown>): Record<string, number> {
+  const nested =
+    data.stock && typeof data.stock === "object" && !Array.isArray(data.stock)
+      ? Number((data.stock as Record<string, unknown>)[ONE_SIZE])
+      : NaN;
+  const fromQty = Number(data.stockQty);
+  const n = Number.isFinite(fromQty)
+    ? fromQty
+    : Number.isFinite(nested)
+      ? nested
+      : 0;
+  return { [ONE_SIZE]: Math.max(0, Math.floor(n)) };
+}
+
 /** Core commerce fields from gray-matter `data` (or live_stock JSON). */
 export function parseProductFrontmatter(
   data: Record<string, unknown>,
   fallbackTitle = "",
 ): ProductFrontmatterCore {
+  if (!isSizedKind(data.kind)) {
+    return {
+      title: String(data.title ?? fallbackTitle),
+      price: Number(data.price ?? 0),
+      status: parseProductStatus(data.status),
+      sizes: [ONE_SIZE],
+      stock: oneSizeStock(data),
+    };
+  }
   const sizes = parseSizes(data.sizes);
   return {
     title: String(data.title ?? fallbackTitle),
