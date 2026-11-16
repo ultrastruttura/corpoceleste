@@ -47,7 +47,6 @@ const defaultSize = showSizes
     ? "M"
     : inStockSizes[0] ?? sizes[0]
   : sizes[0];
-const color = copy.product.colors[product.colorName] ?? product.colorName;
 const composition = product.composition
   ? copy.product.compositions[product.composition] ?? product.composition
   : "";
@@ -93,7 +92,6 @@ const productJsonLd = {
   sku: product.id,
   category: "Screen-printed apparel",
   material: composition || undefined,
-  color: color || undefined,
   brand: {
     "@type": "Brand",
     name: "Corpoceleste",
@@ -296,7 +294,7 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
               <input type="hidden" name="slug" value={product.slug} />
               <input type="hidden" name="title" value={product.title} />
               <input type="hidden" name="price" value={product.price} />
-              <input type="hidden" name="color" value={product.color} />
+              <input type="hidden" name="color" value="" />
               <input type="hidden" name="print" value={product.print} />
               {
                 showSizes ? (
@@ -367,7 +365,6 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
       }
 
       <ul class="attrs">
-        <li>{color}</li>
         {
           composition && (
             <li>
