@@ -1,5 +1,5 @@
 ---
-title: Non scegli la tua casa
+title: '"Non scegli la tua casa" longsleeve'
 artist: content/artists/lapis-niger.md
 price: 45
 status: preorder
