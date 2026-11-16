@@ -4,10 +4,10 @@ artist: content/artists/lapis-niger.md
 price: 1
 status: available
 kind: shirt
-fitModel: content/fit-models/tee-default.md
+fitModel: null
 hidden: true
 nuovo: false
-createdAt: 2026-11-12T14:00:00.000Z
+createdAt: '2026-11-12T14:00:00.000Z'
 colorName: Nero
 composition: 100% cotone
 sizes:
@@ -32,3 +32,4 @@ seoDescription:
   en: placeholder payment test
   de: placeholder Zahlungstest
 ---
+
