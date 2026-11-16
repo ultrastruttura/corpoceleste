@@ -171,6 +171,10 @@ export function productBySlug(slug: string) {
   return products.find((p) => p.slug === slug);
 }
 
+export function productsByArtist(artistId: string) {
+  return products.filter((p) => p.artistId === artistId && !p.hidden);
+}
+
 export { artistName, artists };
 
 /** In vetrina: acquistabili e non nascosti (ProductGrid filtra di nuovo `hidden`). */
