@@ -80,7 +80,6 @@ export default defineConfig({
             kind: "shirt",
             nuovo: false,
             createdAt: new Date().toISOString(),
-            colorName: "Nero",
             sizes: ["S", "M", "L", "XL", "XXL"],
             stockS: 0,
             stockM: 0,
@@ -140,24 +139,6 @@ export default defineConfig({
           },
           { type: "boolean", name: "nuovo", label: "Nuovo (in cima allo shop)" },
           { type: "datetime", name: "createdAt", label: "Data", required: false },
-          {
-            type: "string",
-            name: "colorName",
-            label: "Colore",
-            required: false,
-            options: [
-              { value: "Nero", label: "Nero" },
-              { value: "Viola", label: "Viola" },
-            ],
-          },
-          // Kept optional so older admin/form state that still sends `color` can save.
-          // Shop ignores this and uses colorName.
-          {
-            type: "string",
-            name: "color",
-            label: "Colore hex (non usare)",
-            required: false,
-          },
           {
             type: "string",
             name: "composition",

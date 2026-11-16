@@ -153,9 +153,8 @@ export const products: Product[] = Object.entries(files).map(([path, raw]) => {
     createdAt: created || "2017-01-01",
     status: core.status,
     kind: parseKind(data.kind),
-    colorName: String(data.colorName ?? "Nero"),
-    // Hex derived from colorName (no Tina hex field).
-    color: String(data.colorName ?? "Nero") === "Viola" ? "#5b3a8c" : "#141414",
+    colorName: String(data.colorName ?? ""),
+    color: "",
     composition: String(data.composition ?? ""),
     images,
     print: images[0] ?? "",
