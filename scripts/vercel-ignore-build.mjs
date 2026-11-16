@@ -4,9 +4,10 @@
  *
  * Exit 0 = skip build · Exit 1 = continue build (Vercel convention).
  *
- * Skips deploys that cannot affect the Vercel API (docs/CI-only), so production
- * API redeploys track shop/server changes. GitHub branch protection still
- * requires green CI before merge to main.
+ * Vercel hosts only the shop APIs. The Astro/Tina site deploys on GitHub Pages.
+ * Tina content pushes must NOT force an API redeploy (stock is read from GitHub
+ * at runtime). Note: on Hobby, canceled/ignored builds still count toward the
+ * 100 deployments/day quota — also disable Preview Deployments in the dashboard.
  */
 import { execFileSync } from "node:child_process";
 
@@ -33,21 +34,22 @@ if (!files) {
   process.exit(1);
 }
 
+/** Paths that are bundled into Vercel serverless functions. */
 const affectsApi = files.some((f) => {
   if (f.startsWith("api/")) return true;
   if (f.startsWith("server/")) return true;
   if (f === "vercel.json" || f === "package.json" || f === "package-lock.json") return true;
-  if (f.startsWith("src/data/") || f.startsWith("src/lib/") || f.startsWith("src/scripts/"))
-    return true;
-  if (f.startsWith("content/products/") || f.startsWith("content/settings/")) return true;
+  // Shared modules imported by api/* (types + product-status, paypal-lines, …).
+  if (f.startsWith("src/lib/")) return true;
   return false;
 });
 
 if (!affectsApi) {
-  console.log("Skip Vercel build — no API/shop server paths in diff:");
+  console.log("Skip Vercel build — no API paths in diff (Tina/Pages-only is fine):");
   for (const f of files) console.log(`  ${f}`);
   process.exit(0);
 }
 
 console.log("Continue Vercel build — API-related changes detected");
 process.exit(1);
+}
