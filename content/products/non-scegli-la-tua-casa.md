@@ -4,9 +4,9 @@ artist: content/artists/lapis-niger.md
 price: 45
 status: preorder
 kind: shirt
-fitModel: null
-nuovo: true
-createdAt: '2026-11-16T17:28:31.008Z'
+fitModel: ''
+nuovo: false
+createdAt: 2026-11-16T17:28:31.008Z
 colorName: Nero
 composition: 100% cotone
 sizes:
@@ -31,5 +31,4 @@ seoDescription:
   en: 'Hand screen-printed longsleeve “Non scegli la tua casa” by Lapis Niger — black cotton, one colour, Corpoceleste edition in Bergamo. Sizes S–XXL, shipping Italy & EU.'
   de: 'Handsiebdruck-Longsleeve „Non scegli la tua casa“ von Lapis Niger — schwarze Baumwolle, eine Farbe, Corpoceleste-Edition in Bergamo. Größen S–XXL, Versand Italien & EU.'
 ---
-
 
