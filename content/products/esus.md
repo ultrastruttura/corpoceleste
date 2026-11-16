@@ -26,7 +26,10 @@ images:
   - /uploads/108-Esus-EDIT-(3).jpg
   - /uploads/108-Esus-EDIT-(4).jpg
 description:
-  it: Prova italiano
+  it: |-
+    50 pezzi, stampati a mano con inchiostro all'acqua.
+    Stampa nera con effetti metallici dati dalla porporina.
+    Maglie 100% cotone
   en: Prova inglese
   de: Prova tedesco
 seoDescription:
