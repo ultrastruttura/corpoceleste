@@ -1,5 +1,5 @@
 ---
-title: Esus
+title: '"Esus" t-shirt'
 artist: content/artists/108-guido-bisagni.md
 price: 40
 status: preorder
