@@ -9,4 +9,9 @@ describe("tina-lock shopper schema", () => {
     expect(lock).toContain('"value":"shopper"');
     expect(lock).toContain('"name":"stockQty"');
   });
+
+  it("includes workshop upcoming and past collections", () => {
+    expect(lock).toContain('"name":"workshopUpcoming"');
+    expect(lock).toContain('"name":"workshopPast"');
+  });
 });

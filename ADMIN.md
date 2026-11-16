@@ -119,9 +119,16 @@ Le misure (cm, capo disteso: A larghezza, B lunghezza) sono in `content/fit-mode
 5. Push (o salva online via Tina Cloud)
 6. Lo shop si aggiorna al prossimo build
 
+## Flusso tipico: workshop
+
+- **Prossimi workshop** → Create New: quando, dove, organizzatore, link iscrizione (nota opz.). Elimina il documento quando la data è passata (e, se vuoi, ricrealo sotto Workshop passati).
+- **Workshop passati** → Create New: anno + testo riga archivio. Ogni voce è un file: puoi modificarla o eliminarla singolarmente.
+
 ## File contenuti (per chi vuole vedere il repo)
 
 - `content/products/` — maglie
 - `content/artists/` — artisti
 - `content/news/` — news
+- `content/workshops/upcoming/` — prossimi workshop
+- `content/workshops/past/` — archivio workshop (una voce = un file)
 - `public/uploads/` — immagini caricate

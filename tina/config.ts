@@ -344,6 +344,97 @@ export default defineConfig({
         ],
       },
       {
+        name: "workshopUpcoming",
+        label: "Prossimi workshop",
+        path: "content/workshops/upcoming",
+        format: "md",
+        ui: {
+          filename: {
+            slugify: (values) =>
+              [values?.when, values?.organizer, values?.where]
+                .filter(Boolean)
+                .join("-")
+                .toString()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "") || "prossimo-workshop",
+          },
+          defaultItem: () => ({
+            when: "",
+            where: "",
+            organizer: "",
+            signupUrl: "https://",
+            note: "",
+          }),
+        },
+        fields: [
+          {
+            type: "string",
+            name: "when",
+            label: "Quando",
+            description: "Es. 14 Novembre",
+            isTitle: true,
+            required: true,
+          },
+          { type: "string", name: "where", label: "Dove", required: true },
+          { type: "string", name: "organizer", label: "Organizzatore", required: true },
+          {
+            type: "string",
+            name: "signupUrl",
+            label: "Link iscrizione",
+            description: "URL pagina evento / iscrizione dell’organizzatore",
+            required: true,
+          },
+          {
+            type: "string",
+            name: "note",
+            label: "Nota (opz.)",
+            required: false,
+          },
+        ],
+      },
+      {
+        name: "workshopPast",
+        label: "Workshop passati",
+        path: "content/workshops/past",
+        format: "md",
+        ui: {
+          filename: {
+            slugify: (values) =>
+              `${values?.year || "anno"}-${values?.title || "workshop"}`
+                .toString()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "")
+                .slice(0, 80),
+          },
+          defaultItem: () => ({
+            year: new Date().getFullYear(),
+            title: "",
+          }),
+        },
+        fields: [
+          {
+            type: "string",
+            name: "title",
+            label: "Voce archivio",
+            description: "Testo in elenco, es. «20 agosto — Lonno (BG), workshop privato in studio»",
+            isTitle: true,
+            required: true,
+          },
+          {
+            type: "number",
+            name: "year",
+            label: "Anno",
+            required: true,
+          },
+        ],
+      },
+      {
         name: "bio",
         label: "Bio",
         path: "content/bio",
