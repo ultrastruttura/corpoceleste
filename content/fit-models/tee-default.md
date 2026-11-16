@@ -3,11 +3,11 @@ tipKey: regular
 name: T-shirt cotone 205gr
 kind: shirt
 rows:
-  - size: XL
+  - size: XXL
     it: 3 – 46
     fr: '42'
-    chest: 60
-    length: 81.5
+    chest: 65
+    length: 83
   - size: M
     it: 4 – 48
     fr: '44'
