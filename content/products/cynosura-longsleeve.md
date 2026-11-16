@@ -4,9 +4,9 @@ artist: content/artists/andrea-baldelli.md
 price: 45
 status: preorder
 kind: shirt
-fitModel: content/fit-models/tee-default.md
+fitModel: null
 nuovo: true
-createdAt: 2026-11-16T12:46:37.251Z
+createdAt: '2026-11-16T12:46:37.251Z'
 colorName: Nero
 composition: 100% cotone
 sizes:
@@ -31,4 +31,5 @@ seoDescription:
   en: ''
   de: ''
 ---
+
 
