@@ -2,13 +2,13 @@ import type { Locale } from "./locales";
 
 const it = {
   meta: {
-    title: "Corpoceleste — serigrafia a mano, Bergamo",
+    title: "Corpoceleste — maglie e stampe serigrafate a mano, Bergamo",
     description:
-      "Corpoceleste di Andrea Baldelli: serigrafia a mano a Nembro (BG). Maglie e stampe d’artista in edizione limitata. Spedizione Italia e UE.",
+      "Corpoceleste, Andrea Baldelli a Nembro (BG): maglie serigrafate, shopper e stampe d’artista a un colore. Edizioni limitate a mano, non print-on-demand. Spedizione Italia e UE.",
   },
   home: {
-    title: "Serigrafie d’autore",
-    lede: "Un colore, stampato a mano a Bergamo. Maglie, stampe ed edizioni — non print-on-demand.",
+    title: "Maglie e stampe serigrafate a mano",
+    lede: "Corpoceleste: serigrafia d’artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, shopper, stampe ed edizioni limitate — pezzi numerati, non print-on-demand. Spedizione in Italia e in Europa.",
     stageAlt: "Corpoceleste — stampa serigrafica olografica",
   },
   nav: {
@@ -463,13 +463,13 @@ const it = {
 
 const en: typeof it = {
   meta: {
-    title: "Corpoceleste — hand screen printing, Bergamo",
+    title: "Corpoceleste — hand screen-printed shirts & prints, Bergamo",
     description:
-      "Corpoceleste by Andrea Baldelli: hand screen printing in Nembro (Bergamo). Limited artist shirts and prints. Shipping Italy and EU.",
+      "Corpoceleste, Andrea Baldelli in Nembro (Bergamo): hand screen-printed shirts, totes and artist prints. Limited editions, not print-on-demand. Ship Italy & EU.",
   },
   home: {
-    title: "Author’s screen prints",
-    lede: "One colour, hand-printed in Bergamo. Shirts, prints and editions — not print-on-demand.",
+    title: "Hand screen-printed shirts and prints",
+    lede: "Corpoceleste: one-colour artist screen printing, hand-pulled in Nembro / Bergamo. Screen-printed shirts, totes, artist prints and limited editions — numbered pieces, not print-on-demand. Shipping across Italy and Europe.",
     stageAlt: "Corpoceleste — holographic screen print",
   },
   nav: {
@@ -922,13 +922,13 @@ const en: typeof it = {
 
 const de: typeof it = {
   meta: {
-    title: "Corpoceleste — Handsiebdruck, Bergamo",
+    title: "Corpoceleste — handgesiebte Shirts & Drucke, Bergamo",
     description:
-      "Corpoceleste von Andrea Baldelli: Handsiebdruck in Nembro (Bergamo). Limitierte Künstler-Shirts und Drucke. Versand Italien und EU.",
+      "Corpoceleste, Andrea Baldelli in Nembro (Bergamo): handgesiebte Shirts, Shopper und Künstlerdrucke. Limitierte Editionen, kein Print-on-Demand. Versand IT/EU.",
   },
   home: {
-    title: "Siebdrucke von Autoren",
-    lede: "Eine Farbe, handgedruckt in Bergamo. Shirts, Drucke und Editionen — kein Print-on-Demand.",
+    title: "Handgesiebte Shirts und Drucke",
+    lede: "Corpoceleste: einfarbiger Künstlersiebdruck, von Hand gezogen in Nembro / Bergamo. Siebgedruckte Shirts, Shopper, Künstlerdrucke und limitierte Editionen — nummerierte Stücke, kein Print-on-Demand. Versand in Italien und Europa.",
     stageAlt: "Corpoceleste — holographischer Siebdruck",
   },
   nav: {

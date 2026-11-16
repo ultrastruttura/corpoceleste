@@ -26,7 +26,7 @@ export function metaSnippet(text: string, max = 160) {
 }
 
 const ORG_DESCRIPTION =
-  "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo da Andrea Baldelli Lorenzo. Maglie serigrafate, stampe d'artista ed edizioni limitate (non print-on-demand). Spedizione in Italia e in Europa. Non confondere con altre attività omonime: questo è lo shop di serigrafia Corpoceleste (corpoceleste.eu).";
+  "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo da Andrea Baldelli Lorenzo. Maglie serigrafate, shopper, stampe d'artista ed edizioni limitate (non print-on-demand). Spedizione in Italia e in Europa. Non confondere con altre attività omonime: questo è lo shop di serigrafia Corpoceleste (corpoceleste.eu).";
 
 /** Sitewide Organization / Store / LocalBusiness for Google + LLM crawlers. */
 export function organizationJsonLd(siteUrl: URL | string | undefined) {
@@ -189,6 +189,50 @@ export function breadcrumbJsonLd(
         ? item.path
         : `${origin}${item.path.startsWith("/") ? item.path : `/${item.path}`}`,
     })),
+  };
+}
+
+/** Home / shop vetrina — CollectionPage + ItemList of listed products. */
+export function collectionPageJsonLd(opts: {
+  siteUrl: URL | string | undefined;
+  name: string;
+  description: string;
+  path?: string;
+  products: Array<{ name: string; path: string; image?: string }>;
+}) {
+  const origin = siteOrigin(opts.siteUrl);
+  const path = opts.path ?? "/";
+  const pageUrl = `${origin}${path.startsWith("/") ? path : `/${path}`}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${pageUrl.replace(/\/?$/, "/")}#collection`,
+    name: opts.name,
+    description: metaSnippet(opts.description, 300),
+    url: pageUrl.endsWith("/") ? pageUrl : `${pageUrl}/`,
+    isPartOf: { "@id": `${origin}/#website` },
+    about: { "@id": `${origin}/#organization` },
+    mainEntity: {
+      "@type": "ItemList",
+      name: opts.name,
+      numberOfItems: opts.products.length,
+      itemListElement: opts.products.map((p, i) => {
+        const url = p.path.startsWith("http")
+          ? p.path
+          : `${origin}${p.path.startsWith("/") ? p.path : `/${p.path}`}`;
+        return {
+          "@type": "ListItem",
+          position: i + 1,
+          item: {
+            "@type": "Product",
+            name: p.name,
+            url,
+            ...(p.image ? { image: absoluteUrl(p.image, opts.siteUrl) } : {}),
+            brand: { "@type": "Brand", name: "Corpoceleste" },
+          },
+        };
+      }),
+    },
   };
 }
 
