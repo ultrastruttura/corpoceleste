@@ -2,9 +2,9 @@
 title: SEO e home
 shopEmail: info@corpoceleste.eu
 metaTitle:
-  it: Corpoceleste — serigrafia a mano, Bergamo
-  en: Corpoceleste — hand screen printing, Bergamo
-  de: Corpoceleste — Handsiebdruck, Bergamo
+  it: 'Corpoceleste — serigrafia a mano, Bergamo'
+  en: 'Corpoceleste — hand screen printing, Bergamo'
+  de: 'Corpoceleste — Handsiebdruck, Bergamo'
 metaDescription:
   it: 'Corpoceleste di Andrea Baldelli: serigrafia a mano a Nembro (BG). Maglie e stampe d’artista in edizione limitata. Spedizione Italia e UE.'
   en: 'Corpoceleste by Andrea Baldelli: hand screen printing in Nembro (Bergamo). Limited artist shirts and prints. Shipping Italy and EU.'
@@ -17,7 +17,7 @@ homeLede:
   it: ''
   en: ''
   de: ''
-announcementEnabled: true
+announcementEnabled: false
 announcementText:
   it: +++ Edizioni in stampa — iscriviti / scrivi a info@corpoceleste.eu +++
   en: +++ Editions in print — subscribe / write to info@corpoceleste.eu +++
@@ -57,3 +57,4 @@ sdiCode: BA6ET11
 paypalClientId: ''
 formApi: 'https://corpoceleste.vercel.app'
 ---
+
