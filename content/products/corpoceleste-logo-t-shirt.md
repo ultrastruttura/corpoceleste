@@ -1,6 +1,6 @@
 ---
 title: Corpoceleste logo t-shirt
-artist: ''
+artist: content/artists/corpoceleste.md
 price: 20
 status: preorder
 kind: shirt
