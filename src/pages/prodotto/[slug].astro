@@ -329,9 +329,6 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
                         })}
                       </div>
                     </fieldset>
-                    <p class="size-guide-link">
-                      <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
-                    </p>
                   </>
                 ) : (
                   <input type="hidden" name="size" value={defaultSize} />
