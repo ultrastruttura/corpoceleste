@@ -680,19 +680,21 @@ body.cart-open {
   font-size: 13px;
   font-weight: 400;
   color: var(--muted);
-  margin-bottom: 2px;
+  margin: 0 0 2px;
 }
 
 .card-title {
   font-size: 16px;
   font-weight: 700;
-  margin-bottom: 4px;
+  line-height: 1.25;
+  margin: 0 0 4px;
 }
 
 .card-price {
   font-size: 15px;
   color: var(--muted);
   font-weight: 400;
+  margin: 0;
 }
 
 .badge {
@@ -2055,7 +2057,7 @@ body.cart-open {
 }
 
 .shop-home .card-artist {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .shop-home .card-title {

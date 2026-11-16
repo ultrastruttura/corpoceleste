@@ -5,8 +5,8 @@ import { availableProducts, soldOutProducts } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { shuffle } from "../lib/shuffle";
 import { cardImageUrls } from "../lib/paths";
-import { metaSnippet } from "../lib/seo";
-import { currentLocale, t } from "../i18n";
+import { collectionPageJsonLd, metaSnippet } from "../lib/seo";
+import { currentLocale, pageUrl, t } from "../i18n";
 
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
@@ -16,7 +16,10 @@ const listed = [
   ...shuffle(available.filter((p) => !p.nuovo)),
 ];
 const sold = soldOutProducts();
-const homeTitle = localizedSetting("homeTitle", locale) || copy.home.title;
+const homeTitle =
+  localizedSetting("homeTitle", locale) || copy.home.title;
+const homeLede =
+  localizedSetting("homeLede", locale) || copy.home.lede;
 const documentTitle =
   localizedSetting("metaTitle", locale) || copy.meta.title || "Corpoceleste";
 const seoDescription = metaSnippet(
@@ -24,6 +27,20 @@ const seoDescription = metaSnippet(
 );
 const lcp = listed[0]?.images[0] ? cardImageUrls(listed[0].images[0]).full : "";
 const lcpType = /\.webp$/i.test(lcp) ? "image/webp" : "image/jpeg";
+
+const catalogForSchema = [...listed, ...sold].filter((p) => !p.hidden);
+const homePath = pageUrl(locale);
+const collectionLd = collectionPageJsonLd({
+  siteUrl: Astro.site,
+  name: homeTitle,
+  description: homeLede || seoDescription,
+  path: homePath,
+  products: catalogForSchema.map((p) => ({
+    name: p.title,
+    path: pageUrl(locale, `prodotto/${p.slug}/`),
+    image: p.images[0],
+  })),
+});
 ---
 
 <Base
@@ -32,10 +49,11 @@ const lcpType = /\.webp$/i.test(lcp) ? "image/webp" : "image/jpeg";
   image={siteSettings.ogImage}
   preloadImage={lcp || undefined}
   preloadImageType={lcp ? lcpType : undefined}
+  jsonLd={collectionLd}
 >
   <div class="wrap shop-home">
     <h1 class="visually-hidden">{homeTitle}</h1>
-    <p class="visually-hidden">{seoDescription}</p>
+    {homeLede && <p class="visually-hidden">{homeLede}</p>}
 
     <ProductGrid products={listed} eager={1} />
 

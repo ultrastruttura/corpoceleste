@@ -48,8 +48,8 @@ const cover = product.images[0] ? mediaUrl(product.images[0]) : "";
     }
   </div>
   <div class="card-meta">
-    {product.artistId !== "studio" && <div class="card-artist">{artist}</div>}
-    {hasTitle && <div class="card-title">{product.title}</div>}
-    <div class="card-price">{formatPrice(product.price)}</div>
+    {product.artistId !== "studio" && <p class="card-artist">{artist}</p>}
+    {hasTitle && <h2 class="card-title">{product.title}</h2>}
+    <p class="card-price">{formatPrice(product.price)}</p>
   </div>
 </a>
