@@ -26,16 +26,11 @@ const FOCUSABLE =
 
 let lastFocus: HTMLElement | null = null;
 
+/** Cart thumbs use the Tina upload path as stored on the product (no invented derivatives). */
 function thumbSrc(print: string) {
   if (!print) return "";
   if (/^https?:\/\//i.test(print)) return print;
-  const clean = print.replace(/^\//, "");
-  const file = clean.split("/").pop() || "";
-  const stem = file.replace(/\.[^.]+$/, "");
   const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-  if (stem && clean.includes("uploads/prints/")) {
-    return `${base}/uploads/prints/card/${stem}.jpg`;
-  }
   if (print.startsWith("/")) return `${base}${print}`;
   return "";
 }

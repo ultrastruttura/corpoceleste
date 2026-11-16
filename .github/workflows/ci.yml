@@ -28,6 +28,8 @@ jobs:
       - run: npm ci
       - name: Typecheck (server/api/lib)
         run: npm run check
+      - name: Product media paths exist
+        run: npm run check:media
       - name: Unit tests
         run: mkdir -p test-results && npm run test:unit -- --reporter=default --reporter=junit --outputFile=test-results/unit-junit.xml
       - name: Upload unit JUnit

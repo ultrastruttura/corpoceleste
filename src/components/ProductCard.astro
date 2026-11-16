@@ -2,7 +2,7 @@
 import type { Product } from "../data/products";
 import { artistName, formatPrice, isInStock, isLowStock, productImageAlt } from "../data/products";
 import { siteSettings } from "../data/settings";
-import { cardImageUrls } from "../lib/paths";
+import { mediaUrl } from "../lib/paths";
 import { currentLocale, pageUrl, t } from "../i18n";
 
 type Props = { product: Product; eager?: boolean };
@@ -15,7 +15,7 @@ const lowStock = !sold && isLowStock(product, siteSettings.lowStockThreshold);
 const preorder = product.status === "preorder" && !sold && !lowStock;
 const hasTitle = artist !== product.title;
 const alt = productImageAlt(product, artist, locale);
-const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
+const cover = product.images[0] ? mediaUrl(product.images[0]) : "";
 ---
 
 <a
@@ -31,20 +31,17 @@ const cover = product.images[0] ? cardImageUrls(product.images[0]) : null;
     {preorder && <span class="badge badge--quiet">{copy.shop.preorderBadge}</span>}
     {
       cover ? (
-        <picture>
-          <source type="image/webp" srcset={cover.webp} />
-          <img
-            class="print"
-            src={cover.jpg}
-            alt={alt}
-            width="800"
-            height="800"
-            sizes="(max-width: 359px) 92vw, (max-width: 1023px) 46vw, 280px"
-            loading={eager ? "eager" : "lazy"}
-            decoding="async"
-            fetchpriority={eager ? "high" : "low"}
-          />
-        </picture>
+        <img
+          class="print"
+          src={cover}
+          alt={alt}
+          width="800"
+          height="800"
+          sizes="(max-width: 359px) 92vw, (max-width: 1023px) 46vw, 280px"
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          fetchpriority={eager ? "high" : "low"}
+        />
       ) : (
         <div class="card-frame__empty" aria-hidden="true" />
       )
