@@ -21,10 +21,17 @@ function printStem(path: string) {
   return file.replace(/\.[^.]+$/, "");
 }
 
-/** Grid thumbnails: /uploads/prints/foo.jpg → /uploads/prints/card/foo.webp */
+/** True for legacy `/uploads/prints/...` originals that have card/lg derivatives. */
+function hasPrintDerivatives(path: string) {
+  if (/^https?:\/\//i.test(path)) return false;
+  return path.replace(/^\//, "").startsWith("uploads/prints/");
+}
+
+/** Grid thumbnails: /uploads/prints/foo.jpg → /uploads/prints/card/foo.webp.
+ *  Tina media in /uploads/... has no derivatives — use the original file. */
 export function cardImageUrls(path: string) {
   const stem = printStem(path);
-  if (!stem || /^https?:\/\//i.test(path)) {
+  if (!stem || !hasPrintDerivatives(path)) {
     const full = mediaUrl(path);
     return { webp: full, jpg: full, full };
   }
@@ -35,10 +42,10 @@ export function cardImageUrls(path: string) {
   };
 }
 
-/** Product stage large derivative. */
+/** Product stage large derivative (same Tina fallback as card). */
 export function largeImageUrls(path: string) {
   const stem = printStem(path);
-  if (!stem || /^https?:\/\//i.test(path)) {
+  if (!stem || !hasPrintDerivatives(path)) {
     const full = mediaUrl(path);
     return { webp: full, jpg: full, full };
   }
