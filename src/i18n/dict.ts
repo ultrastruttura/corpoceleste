@@ -245,8 +245,7 @@ const it = {
   },
   sizeGuide: {
     title: "Guida alle taglie — modelli T-shirt",
-    lede:
-      "Misure del modello T-shirt / maglia in cotone: tabella Italia / USA / Francia, A larghezza e B lunghezza a capo disteso. Serigrafia a mano a Bergamo.",
+    lede: "",
     howTitle: "Come misurarsi correttamente",
     howBody:
       "Prendi una maglia che ti sta bene, stendila su un piano e misura in centimetri con un metro da sarta (vedi figura):",
@@ -261,8 +260,8 @@ const it = {
     tipStretch:
       "modello con vestibilità aderente al corpo. Se dopo aver preso le misure ed aver consultato la tabella scopri che sei a cavallo tra due taglie, dovrai decidere in funzione dei tuoi gusti e delle tue abitudini personali tra la taglia inferiore (più attillata) o quella superiore (più ampia).",
     colItaly: "Italia",
-    colUsa: "usa",
-    colFrance: "francia",
+    colSize: "Taglia",
+    colFrance: "Francia",
     colChest: "A. larghezza (cm)",
     colLength: "B. lunghezza (cm)",
     colSleeve: "C. manica (cm)",
@@ -704,8 +703,7 @@ const en: typeof it = {
   },
   sizeGuide: {
     title: "Size guide — T-shirt models",
-    lede:
-      "Cotton T-shirt / shirt model measurements: Italy / USA / France chart, A width and B length laid flat. Hand screen printing in Bergamo.",
+    lede: "",
     howTitle: "How to measure correctly",
     howBody:
       "Take a shirt that fits you well, lay it flat, and measure in centimetres with a tape measure (see figure):",
@@ -720,8 +718,8 @@ const en: typeof it = {
     tipStretch:
       "the garment is styled with a tight fit. If after having taken the measurements and having consulted the table, we see that we are between two sizes, we should decide according to our tastes and habits between the lower (more tight) or the higher (wider) size.",
     colItaly: "Italy",
-    colUsa: "usa",
-    colFrance: "france",
+    colSize: "Size",
+    colFrance: "France",
     colChest: "A. width (cm)",
     colLength: "B. length (cm)",
     colSleeve: "C. sleeve (cm)",
@@ -1163,8 +1161,7 @@ const de: typeof it = {
   },
   sizeGuide: {
     title: "Größenratgeber — T-Shirt-Modelle",
-    lede:
-      "Maße des Baumwoll-T-Shirt / Shirt-Modells: Italien / USA / Frankreich, A Breite und B Länge flach liegend. Handsiebdruck in Bergamo.",
+    lede: "",
     howTitle: "Richtig messen",
     howBody:
       "Nimm ein Shirt, das dir gut passt, lege es flach hin und miss in Zentimetern mit dem Maßband (siehe Abbildung):",
@@ -1179,8 +1176,8 @@ const de: typeof it = {
     tipStretch:
       "engerer Schnitt am Körper. Liegt man nach dem Messen und der Tabelle zwischen zwei Größen, wählt man nach Geschmack die kleinere (enger) oder die größere (weiter).",
     colItaly: "Italien",
-    colUsa: "usa",
-    colFrance: "frankreich",
+    colSize: "Größe",
+    colFrance: "Frankreich",
     colChest: "A. Breite (cm)",
     colLength: "B. Länge (cm)",
     colSleeve: "C. Ärmel (cm)",
