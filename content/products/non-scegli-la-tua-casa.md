@@ -21,7 +21,6 @@ stockL: 15
 stockXL: 8
 stockXXL: 2
 images:
-  - /uploads/Lapis-niger-fronte-corrosione.webp
   - /uploads/Lapis-preview.jpg
 description:
   it: 'Longsleeve in cotone nero, serigrafia a un colore di Lapis Niger. Stampata a mano a Bergamo da Corpoceleste — edizione limitata.'
