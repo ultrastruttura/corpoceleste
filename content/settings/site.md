@@ -4,19 +4,19 @@ shopEmail: info@corpoceleste.eu
 metaTitle:
   it: 'Corpoceleste — maglie e stampe serigrafate a mano, Bergamo'
   en: 'Corpoceleste — hand screen-printed shirts & prints, Bergamo'
-  de: 'Corpoceleste — handgesiebte Shirts & Drucke, Bergamo'
+  de: 'Corpoceleste — Shirts und Drucke im Handsiebdruck, Bergamo'
 metaDescription:
   it: 'Corpoceleste a Nembro (BG): maglie serigrafate, shopper e stampe d’artista a un colore, a mano. Edizioni limitate, non print-on-demand. Spedizione Italia e UE.'
-  en: 'Corpoceleste, Andrea Baldelli in Nembro (Bergamo): hand screen-printed shirts, totes and artist prints. Limited editions, not print-on-demand. Ship Italy & EU.'
-  de: 'Corpoceleste, Andrea Baldelli in Nembro (Bergamo): handgesiebte Shirts, Shopper und Künstlerdrucke. Limitierte Editionen, kein Print-on-Demand. Versand IT/EU.'
+  en: 'Corpoceleste, Andrea Baldelli in Nembro (Bergamo): hand screen-printed shirts, totes and artist prints. Limited editions, not print-on-demand. Shipping to Italy & the EU.'
+  de: 'Corpoceleste, Andrea Baldelli in Nembro (Bergamo): Shirts, Shopper und Künstlerdrucke im Handsiebdruck. Limitierte Editionen, kein Print-on-Demand. Versand nach Italien und in die EU.'
 homeTitle:
   it: Maglie e stampe serigrafate a mano
   en: Hand screen-printed shirts and prints
-  de: Handgesiebte Shirts und Drucke
+  de: Shirts und Drucke im Handsiebdruck
 homeLede:
   it: 'Corpoceleste: serigrafia d’artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, shopper, stampe ed edizioni limitate — pezzi numerati, non print-on-demand. Spedizione in Italia e in Europa.'
-  en: 'Corpoceleste: one-colour artist screen printing, hand-pulled in Nembro / Bergamo. Screen-printed shirts, totes, artist prints and limited editions — numbered pieces, not print-on-demand. Shipping across Italy and Europe.'
-  de: 'Corpoceleste: einfarbiger Künstlersiebdruck, von Hand gezogen in Nembro / Bergamo. Siebgedruckte Shirts, Shopper, Künstlerdrucke und limitierte Editionen — nummerierte Stücke, kein Print-on-Demand. Versand in Italien und Europa.'
+  en: 'Corpoceleste: one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, totes, artist prints and limited editions — numbered pieces, not print-on-demand. Shipping across Italy and Europe.'
+  de: 'Corpoceleste: einfarbiger Künstlersiebdruck, von Hand gedruckt in Nembro / Bergamo. Siebgedruckte Shirts, Shopper, Künstlerdrucke und limitierte Editionen — nummerierte Stücke, kein Print-on-Demand. Versand in Italien und Europa.'
 announcementEnabled: false
 announcementText:
   it: +++ Edizioni in stampa — iscriviti / scrivi a info@corpoceleste.eu +++
@@ -40,7 +40,7 @@ andreaBio:
   de: |-
     Siebdrucker in Bergamo. Ich drucke und verpacke die Corpoceleste-Editionen: eine Farbe, kein Print-on-Demand — Shirts, Drucke, Künstlerstücke. Der Shop ist auf corpoceleste.eu.
 
-    Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events. Für Beratung (Anlagen, Farben, Abläufe, Schulung) schreib mir — Fall für Fall.
+    Seit 2014 gebe ich Kurse und Workshops, im Atelier und vor Ort. Ich drucke auch live auf Events. Für Beratung (Anlagen, Farben, Abläufe, Schulung) schreib mir — individuell, je nach Fall.
 
     Vor Corpoceleste: der Shop Corpoc (2012–2019). Ich male als Ultrastruttura.
 umamiWebsiteId: 546938a2-aa92-4654-bc29-85bba09323b4

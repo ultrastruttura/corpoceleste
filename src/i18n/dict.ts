@@ -462,11 +462,11 @@ const en: typeof it = {
   meta: {
     title: "Corpoceleste — hand screen-printed shirts & prints, Bergamo",
     description:
-      "Corpoceleste, Andrea Baldelli in Nembro (Bergamo): hand screen-printed shirts, totes and artist prints. Limited editions, not print-on-demand. Ship Italy & EU.",
+      "Corpoceleste, Andrea Baldelli in Nembro (Bergamo): hand screen-printed shirts, totes and artist prints. Limited editions, not print-on-demand. Shipping to Italy & the EU.",
   },
   home: {
     title: "Hand screen-printed shirts and prints",
-    lede: "Corpoceleste: one-colour artist screen printing, hand-pulled in Nembro / Bergamo. Screen-printed shirts, totes, artist prints and limited editions — numbered pieces, not print-on-demand. Shipping across Italy and Europe.",
+    lede: "Corpoceleste: one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, totes, artist prints and limited editions — numbered pieces, not print-on-demand. Shipping across Italy and Europe.",
     stageAlt: "Corpoceleste — holographic screen print",
   },
   nav: {
@@ -481,7 +481,7 @@ const en: typeof it = {
     menu: "Menu",
     language: "Language",
     skip: "Skip to content",
-    tagline: "Author’s screen prints",
+    tagline: "Artist screen prints",
     brandMark: "Corpoceleste",
     brandWord: "Corpoceleste",
   },
@@ -543,8 +543,8 @@ const en: typeof it = {
           : `Artist edition “${title}”, hand screen print Corpoceleste Bergamo`;
       }
       return withArtist
-        ? `Screen-printed shirt “${title}” by ${artist}, wearable art cotton hand-printed in Bergamo — Corpoceleste`
-        : `Screen-printed shirt “${title}”, wearable art cotton hand-printed in Bergamo — Corpoceleste`;
+        ? `Screen-printed shirt “${title}” by ${artist}, cotton hand-printed in Bergamo — Corpoceleste`
+        : `Screen-printed shirt “${title}”, cotton hand-printed in Bergamo — Corpoceleste`;
     },
     imageAltDetail: (base: string, n: number) => `${base} — detail ${n}`,
     colors: {
@@ -587,7 +587,7 @@ const en: typeof it = {
     privacyLink: "privacy notice",
     shipTo: "Shipping",
     deliveryCourier: "Home delivery",
-    deliveryPickup: "Hand pickup in the Bergamo area — €0",
+    deliveryPickup: "Local pickup in the Bergamo area — €0",
     deliveryPickupNote:
       "We’ll agree on a place, day and time that works for both of us. I’ll write after you order.",
     shipCountry: "Country",
@@ -597,7 +597,7 @@ const en: typeof it = {
     shippingQuoteLoading: "Calculating shipping…",
     shippingQuoteError: "Shipping is not available for this country or postcode. Check it or write to me.",
     shippingQuoteNeedZip: "Choose country and postcode (Italy or EU) to calculate shipping.",
-    shippingPickupReady: "Hand pickup · €0.00",
+    shippingPickupReady: "Local pickup · €0.00",
     paypal: "PayPal",
     paypalBack: "Back to Corpoceleste",
     payTitle: "Choose how to pay",
@@ -606,7 +606,7 @@ const en: typeof it = {
     googlePay: "Google Pay",
     bank: "Bank transfer",
     bankNote:
-      "The amount to transfer includes goods and shipping (same Sendcloud quote as PayPal). Send the form: you get an email right away with IBAN, amount and the order number to put in the payment reference. The order is confirmed when payment arrives (5-day hold).",
+      "The amount to transfer includes goods and shipping (same Sendcloud quote as PayPal). Send the form: you get an email right away with IBAN, amount and the order number to put in the payment reference. The order is confirmed when payment arrives — until then the piece isn’t reserved.",
     bankAmountDue: "Amount to transfer",
     bankAmountOfWhichShip: "of which shipping",
     name: "Full name",
@@ -661,7 +661,7 @@ const en: typeof it = {
     onSite: "Workshop organisation",
     onSiteBody:
       "Write to me to organise a workshop in your city. I have a portable version of all the equipment needed — you only need a room, a table and running water.",
-    spaceName: "Name and space",
+    spaceName: "Name / venue",
     city: "City / venue",
     archive: "Archive",
     since: "Past screen-printing workshops.",
@@ -681,7 +681,7 @@ const en: typeof it = {
       "Staff training for Za.Er. in Asmara, in the studio and in Eritrea. Head of R&D at Quaglia.",
     live: "Live printing",
     liveBody: "Screens on site at events.",
-    about: "What is this about",
+    about: "What’s this about",
     optPrint: "Print consulting",
     optStaff: "Staff training",
     optLive: "Live printing",
@@ -712,9 +712,9 @@ const en: typeof it = {
     figureAlt: "Shirt laid flat with A width and B length measurements.",
     tipLabel: "Fit tips:",
     tipRegular:
-      "the garment is styled in a classic and regular fit. If after having taken the measurements and having consulted the table, we see that we are between two sizes, we recommend the larger size.",
+      "regular fit, casual cut. If you’re between two sizes after measuring and checking the chart, we recommend the larger size.",
     tipStretch:
-      "the garment is styled with a tight fit. If after having taken the measurements and having consulted the table, we see that we are between two sizes, we should decide according to our tastes and habits between the lower (more tight) or the higher (wider) size.",
+      "closer fit to the body. If you’re between two sizes after measuring and checking the chart, choose by taste between the smaller (tighter) and the larger (roomier).",
     colSize: "Size",
     colChest: "A. width (cm)",
     colLength: "B. length (cm)",
@@ -741,7 +741,7 @@ const en: typeof it = {
       "I couldn’t send the confirmation email. Try again in a moment, or write to info@corpoceleste.eu.",
     reprint: "If I reprint, I’ll let you know.",
     waitlist: "When the group is together, I’ll set the date.",
-    bank: "Check your email: IBAN, amount and the order number for the payment reference are there. The order stands when payment arrives (5-day hold).",
+    bank: "Check your email: IBAN, amount and the order number for the payment reference are there. The order is confirmed when payment arrives.",
     bankWithRef: (ref: string) =>
       `Your order number is ${ref}. Check your email: IBAN, amount and payment reference. Write ${ref} in the payment reference when you transfer. The order stands when payment arrives.`,
     paypal:
@@ -916,13 +916,13 @@ const en: typeof it = {
 
 const de: typeof it = {
   meta: {
-    title: "Corpoceleste — handgesiebte Shirts & Drucke, Bergamo",
+    title: "Corpoceleste — Shirts und Drucke im Handsiebdruck, Bergamo",
     description:
-      "Corpoceleste, Andrea Baldelli in Nembro (Bergamo): handgesiebte Shirts, Shopper und Künstlerdrucke. Limitierte Editionen, kein Print-on-Demand. Versand IT/EU.",
+      "Corpoceleste, Andrea Baldelli in Nembro (Bergamo): Shirts, Shopper und Künstlerdrucke im Handsiebdruck. Limitierte Editionen, kein Print-on-Demand. Versand nach Italien und in die EU.",
   },
   home: {
-    title: "Handgesiebte Shirts und Drucke",
-    lede: "Corpoceleste: einfarbiger Künstlersiebdruck, von Hand gezogen in Nembro / Bergamo. Siebgedruckte Shirts, Shopper, Künstlerdrucke und limitierte Editionen — nummerierte Stücke, kein Print-on-Demand. Versand in Italien und Europa.",
+    title: "Shirts und Drucke im Handsiebdruck",
+    lede: "Corpoceleste: einfarbiger Künstlersiebdruck, von Hand gedruckt in Nembro / Bergamo. Siebgedruckte Shirts, Shopper, Künstlerdrucke und limitierte Editionen — nummerierte Stücke, kein Print-on-Demand. Versand in Italien und Europa.",
     stageAlt: "Corpoceleste — holographischer Siebdruck",
   },
   nav: {
@@ -937,19 +937,19 @@ const de: typeof it = {
     menu: "Menü",
     language: "Sprache",
     skip: "Zum Inhalt",
-    tagline: "Siebdrucke von Autoren",
+    tagline: "Künstlerischer Siebdruck",
     brandMark: "Corpoceleste",
     brandWord: "Corpoceleste",
   },
   footer: {
     studio: "Atelier",
-    subscribe: "Anmelden",
+    subscribe: "Abonnieren",
     made: "Made in Bergamo.",
     social: "Social",
     terms: "AGB",
     privacy: "Datenschutz",
     cookies: "Cookies",
-    account: "Bereich",
+    account: "Konto",
   },
   shop: {
     soldOut: "Ausverkauft",
@@ -999,8 +999,8 @@ const de: typeof it = {
           : `Künstleredition „${title}“, handgemachter Siebdruck Corpoceleste Bergamo`;
       }
       return withArtist
-        ? `Siebgedrucktes Shirt „${title}“ von ${artist}, Wearable Art Baumwolle handgedruckt in Bergamo — Corpoceleste`
-        : `Siebgedrucktes Shirt „${title}“, Wearable Art Baumwolle handgedruckt in Bergamo — Corpoceleste`;
+        ? `Siebgedrucktes Shirt „${title}“ von ${artist}, Baumwolle handgedruckt in Bergamo — Corpoceleste`
+        : `Siebgedrucktes Shirt „${title}“, Baumwolle handgedruckt in Bergamo — Corpoceleste`;
     },
     imageAltDetail: (base: string, n: number) => `${base} — Detail ${n}`,
     colors: {
@@ -1076,7 +1076,7 @@ const de: typeof it = {
     unlockPay: "AGB und Datenschutz akzeptieren, Daten ausfüllen und (bei Versand) die Berechnung abwarten.",
   },
   account: {
-    title: "Persönlicher Bereich",
+    title: "Konto",
     authTitle: "Anmeldung",
     loading: "Wird geladen…",
     authStatus: "Link wird geprüft…",
@@ -1087,7 +1087,7 @@ const de: typeof it = {
     message: "Nachricht",
     notes: "Anmerkungen",
     send: "Senden",
-    subscribe: "Anmelden",
+    subscribe: "Abonnieren",
     newsletterEmail: "E-Mail für den Newsletter",
     privacy: "Datenschutzhinweise",
     privacyCheck: (privacy: string) => `Ich habe die ${privacy} gelesen.`,
@@ -1149,7 +1149,7 @@ const de: typeof it = {
     imageAlt: (title: string) =>
       `${title} — Corpoceleste News, siebgedruckte Shirts und Künstlerdrucke Bergamo`,
     imageAltGallery: (title: string, n: number) =>
-      `${title} — Corpoceleste Galerie, künstlerischer Siebdruck und Wearable Art (${n})`,
+      `${title} — Corpoceleste Galerie, künstlerischer Siebdruck und tragbare Kunst (${n})`,
   },
   artists: {
     title: "Künstler",
@@ -1187,8 +1187,8 @@ const de: typeof it = {
       "Ja: Tabelle am flach liegenden Kleidungsstück in Zentimetern, nicht Körperumfang. Weicht das eingenähte Etikett in der Zusammensetzung ab, gilt das Etikett.",
   },
   thanks: {
-    received: "Angekommen",
-    order: "Bestellung angekommen",
+    received: "Erhalten",
+    order: "Bestellung eingegangen",
     contact: "Ich antworte per E-Mail.",
     newsletter: "Ich habe dir eine Bestätigungs-E-Mail geschickt: Link klicken, um den Newsletter zu aktivieren.",
     newsletterDoneTitle: "Danke",
