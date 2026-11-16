@@ -70,6 +70,8 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 - CAP / country allowlist — `src/lib/ship-normalize.ts`, `src/lib/ship-countries.ts`
 - Shipping quote API handler (origin, rate limit, bad dest, OOS, happy path) — `api/shipping-quote.ts`
 - Stock markdown patch + ledger idempotency (`remainingStockLines`) — `server/stock-patch.ts`, `server/github-stock.ts`
+- One-size frontmatter (`shopper` / `print` → `unica` + `stockQty`) — `src/lib/product-frontmatter.ts`
+- Tina lock still declares `shopper` + `stockQty` — `tina/tina-lock.json`
 - PayPal webhook: bad signature, underpay, duplicate done, happy path (all mocked) — `api/paypal-webhook.ts`
 - Artist deal share math — `server/portal/math.ts`
 - Sendcloud webhook HMAC — `server/sendcloud-webhook-handler.ts`
@@ -86,8 +88,10 @@ PLAYWRIGHT_ALL_BROWSERS=1 npm run test:e2e
 - Pay box stays locked without address/terms
 - Bonifico: locked without quote/data; amount due after quote; unlock only when complete
 - Mobile viewport smoke on home
+- **Product gallery:** thumbs + next change main image / `1 / N` index; asserts `product-gallery.js` is present (CSP regression — inline scripts do nothing)
+- **One-size UI:** print product has no size fieldset / size guide / size chart
 
-**Not automated:** real PayPal capture, Apple/Google Pay on device, Resend delivery, Sendcloud label creation, Turso writes, GitHub stock commits.
+**Not automated:** real PayPal capture, Apple/Google Pay on device, Resend delivery, Sendcloud label creation, Turso writes, GitHub stock commits, Tina admin UI clicks.
 
 ## GitHub Actions workflows
 
