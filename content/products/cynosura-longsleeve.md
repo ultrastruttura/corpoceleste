@@ -1,5 +1,5 @@
 ---
-title: Cynosura longsleeve
+title: '"Cynosura" longsleeve'
 artist: content/artists/andrea-baldelli.md
 price: 45
 status: preorder
