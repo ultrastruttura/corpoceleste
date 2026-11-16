@@ -11,5 +11,8 @@ rows:
   - size: L
     chest: 54
     length: 78
+  - size: XL
+    chest: 60
+    length: 81.5
 ---
 
