@@ -4,9 +4,9 @@ artist: content/artists/totemica.md
 price: 40
 status: preorder
 kind: shirt
-fitModel: null
-nuovo: true
-createdAt: '2026-11-16T11:45:05.503Z'
+fitModel: ''
+nuovo: false
+createdAt: 2026-11-16T11:45:05.503Z
 colorName: Nero
 composition: 100% cotone
 sizes:
@@ -31,5 +31,4 @@ seoDescription:
   en: ''
   de: ''
 ---
-
 
