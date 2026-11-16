@@ -8,13 +8,13 @@ kind: shopper
 fitModel: ''
 nuovo: true
 createdAt: 2026-11-16T12:53:06.622Z
-composition: 100% cotone
+composition: 100% cotone 130 gr
 sizes: []
 stockM: 0
 stockL: 0
 stockXL: 0
 stockXXL: 0
-stockQty: 33
+stockQty: 32
 images:
   - /uploads/Shopper-logo-EDIT.jpg
   - /uploads/Shopper-logo-EDIT-(2).jpg
