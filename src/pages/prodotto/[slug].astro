@@ -1,7 +1,5 @@
 ---
 import Base from "../../layouts/Base.astro";
-import PrivacyCheck from "../../components/PrivacyCheck.astro";
-import FormHoney from "../../components/FormHoney.astro";
 import {
   productBySlug,
   formatPrice,
@@ -15,7 +13,7 @@ import {
   sizeInStock,
   stockOf,
 } from "../../data/products";
-import { site, publicFormAction } from "../../data/site";
+import { site } from "../../data/site";
 import { modelHasSleeve, sizeChartForProduct } from "../../data/fit-models";
 import { siteSettings } from "../../data/settings";
 import { SHIP_COUNTRIES } from "../../lib/ship-countries";
@@ -42,7 +40,6 @@ const sizes = product.sizes.length ? product.sizes : [...site.sizes];
 const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
 const sizeChart = sizeChartForProduct(product.fitModelId);
 const sizeChartHasSleeve = modelHasSleeve(sizeChart.rows);
-const formAction = publicFormAction(siteSettings.shopEmail);
 const defaultSize = inStockSizes.includes("M")
   ? "M"
   : inStockSizes[0] ?? sizes[0];
@@ -291,32 +288,7 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
       <div class="product-buy">
         {
           sold ? (
-            <form class="form" action={formAction} method="POST">
-              <input type="hidden" name="_subject" value={`Ristampa: ${product.title}`} />
-              <input type="hidden" name="_next" data-next-grazie="ristampa" />
-              <input type="hidden" name="prodotto" value={product.title} />
-              <FormHoney />
-              <p>{copy.product.sold}</p>
-              <div>
-                <label for="re-email">{copy.forms.email}</label>
-                <input id="re-email" type="email" name="email" autocomplete="email" required />
-              </div>
-              <div>
-                <label for="re-size">{copy.product.size}</label>
-                <select id="re-size" name="taglia">
-                  {sizes.map((s) => <option>{s}</option>)}
-                </select>
-              </div>
-              {
-                product.kind === "shirt" && (
-                  <p class="size-guide-link">
-                    <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
-                  </p>
-                )
-              }
-              <PrivacyCheck id="re-privacy" />
-              <button class="btn" type="submit">{copy.product.reprint}</button>
-            </form>
+            <p class="product-status">{copy.product.sold}</p>
           ) : (
             <form data-add-form>
               <input type="hidden" name="id" value={product.id} />
