@@ -2,23 +2,19 @@
 title: Corpoceleste logo shopper
 artist: content/artists/corpoceleste.md
 price: 12
-status: preorder
-kind: shirt
+status: available
+kind: shopper
 fitModel: ''
-nuovo: false
+nuovo: true
 createdAt: 2026-11-16T12:53:06.622Z
 colorName: Nero
-sizes:
-  - S
-  - M
-  - L
-  - XL
-  - XXL
-stockS: 35
+composition: 100% cotone
+sizes: []
 stockM: 0
 stockL: 0
 stockXL: 0
 stockXXL: 0
+stockQty: 33
 images:
   - /uploads/Shopper-logo-EDIT.jpg
   - /uploads/Shopper-logo-EDIT-(2).jpg
