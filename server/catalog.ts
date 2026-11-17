@@ -24,7 +24,7 @@ export async function loadCatalogProduct(id: string): Promise<CatalogProduct | n
   if (!file) return null;
   const { data } = matter(file.content);
   const core = parseProductFrontmatter(data as Record<string, unknown>, safe);
-  const overlay = await getRuntimeStockMap(safe);
+  const overlay = await getRuntimeStockMap(safe, core.stock);
   const stock = { ...core.stock };
   for (const [size, qty] of Object.entries(overlay)) {
     stock[size] = qty;

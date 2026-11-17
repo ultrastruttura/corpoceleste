@@ -42,7 +42,7 @@ export async function listLiveCatalogProducts(): Promise<LiveCatalogProduct[]> {
     const raw = await fetch(f.download_url).then((r) => r.text());
     const { data } = matter(raw);
     const core = parseProductFrontmatter(data as Record<string, unknown>, id);
-    const overlay = await getRuntimeStockMap(id);
+    const overlay = await getRuntimeStockMap(id, core.stock);
     const stock = { ...core.stock };
     for (const [size, qty] of Object.entries(overlay)) {
       stock[size] = qty;
