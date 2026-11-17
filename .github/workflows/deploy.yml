@@ -72,7 +72,7 @@ jobs:
             console.log('injected robots noindex into admin');
           }
           "
-      - run: npx astro build
+      - run: npm run build:site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -197,8 +197,8 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
   image={product.print || cover?.jpg}
   type="product"
   jsonLd={jsonLd}
-  preloadImage={cover?.full}
-  preloadImageType={cover?.full && /\.webp$/i.test(cover.full) ? "image/webp" : "image/jpeg"}
+  preloadImage={cover?.lg}
+  preloadImageType={cover?.lg && /\.webp$/i.test(cover.lg) ? "image/webp" : "image/jpeg"}
   noIndex={Boolean(product.hidden)}
 >
   <div class="wrap product-layout">
@@ -208,10 +208,10 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
           <div class="product-stage-frame" data-gallery-frame>
             {/* Plain img only — <picture>+fake webp source blocked reliable swaps. */}
             <img
-              src={cover.full}
+              src={cover.lg}
               alt={alt}
-              width="1200"
-              height="1200"
+              width="1280"
+              height="1280"
               loading="eager"
               fetchpriority="high"
               decoding="async"
@@ -255,13 +255,13 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
                   class:list={["product-thumb", i === 0 && "is-active"]}
                   data-product-thumb
                   data-index={i}
-                  data-src={img.full}
+                  data-src={img.lg}
                   data-alt={productImageAlt(product, artist, locale, { index: i })}
                   aria-selected={i === 0 ? "true" : "false"}
                   aria-label={`${product.title} ${i + 1}`}
                 >
                   <img
-                    src={img.thumb.full}
+                    src={img.thumb.card}
                     alt={productImageAlt(product, artist, locale, { index: i })}
                     width="160"
                     height="160"
