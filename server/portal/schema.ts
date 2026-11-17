@@ -122,6 +122,15 @@ CREATE TABLE IF NOT EXISTS stock_holds (
 );
 
 CREATE INDEX IF NOT EXISTS idx_stock_holds_open ON stock_holds(open, at_ms);
+
+/** Live on-hand qty (seeded from Tina). Avoids GitHub PUTs blocked by main PR ruleset. */
+CREATE TABLE IF NOT EXISTS stock_levels (
+  product_id TEXT NOT NULL,
+  size TEXT NOT NULL,
+  qty INTEGER NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (product_id, size)
+);
 CREATE INDEX IF NOT EXISTS idx_shop_orders_status ON shop_orders(status);
 CREATE INDEX IF NOT EXISTS idx_shop_orders_created ON shop_orders(created_at);
 `;
