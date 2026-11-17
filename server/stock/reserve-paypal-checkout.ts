@@ -62,6 +62,14 @@ export async function reservePaypalCheckoutHold(
         detail: sanitizeDetail(msg),
       };
     }
+    if (/Repository rule violations|Changes must be made through a pull request/i.test(msg)) {
+      return {
+        ok: false,
+        http: 503,
+        error: "Stock backend misconfigured",
+        detail: sanitizeDetail(msg),
+      };
+    }
     return {
       ok: false,
       http: 503,

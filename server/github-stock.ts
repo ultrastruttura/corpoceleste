@@ -437,6 +437,14 @@ export async function applyStockDecrementCheckpointed(
   return working;
 }
 
+function isPreorderMarkdown(content: string) {
+  return /^status:\s*preorder\s*$/m.test(content);
+}
+
+/**
+ * Preorder: never PUT product markdown (repo ruleset requires PRs on main).
+ * Hold lives in Turso; qty in Tina is informational until fulfillment.
+ */
 async function decrementProduct(line: OrderLine): Promise<string> {
   const filePath = `content/products/${line.id}.md`;
   let lastErr: unknown;
@@ -451,11 +459,10 @@ async function decrementProduct(line: OrderLine): Promise<string> {
       if (before == null) {
         throw new Error(`no stock line ${line.id} ${line.size}`);
       }
+      if (isPreorderMarkdown(file.content)) {
+        return `${line.id} ${line.size} preorder (magazzino ${before}, non scalato)`;
+      }
       if (before < line.qty) {
-        // Pre-order may sell with 0 on hand — do not block or go negative.
-        if (/^status:\s*preorder\s*$/m.test(file.content)) {
-          return `${line.id} ${line.size} preorder (magazzino ${before}, non scalato)`;
-        }
         throw new Error(
           `INSUFFICIENT_STOCK ${line.id} ${line.size}: aveva ${before}, ordine ×${line.qty}`,
         );
@@ -486,6 +493,10 @@ async function decrementProduct(line: OrderLine): Promise<string> {
       ) {
         throw err;
       }
+      // Repo ruleset "pull request only" is not a transient SHA race — don't retry.
+      if (/Repository rule violations|Changes must be made through a pull request/i.test(msg)) {
+        throw err;
+      }
       if (status === 409 || /409/.test(msg)) {
         await sleep(150 * (attempt + 1));
         continue;
@@ -514,6 +525,9 @@ async function incrementProduct(line: OrderLine): Promise<string> {
       if (before == null) {
         throw new Error(`no stock line ${line.id} ${line.size}`);
       }
+      if (isPreorderMarkdown(file.content)) {
+        return `${line.id} ${line.size} preorder restore skipped (non scalato)`;
+      }
       const after = before + line.qty;
       const patched = patchStockQty(file.content, line.size, after);
       if (!patched) {
@@ -537,6 +551,9 @@ async function incrementProduct(line: OrderLine): Promise<string> {
         msg.startsWith("no stock") ||
         msg.startsWith("patch failed")
       ) {
+        throw err;
+      }
+      if (/Repository rule violations|Changes must be made through a pull request/i.test(msg)) {
         throw err;
       }
       if (status === 409 || /409/.test(msg)) {
