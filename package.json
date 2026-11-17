@@ -8,9 +8,10 @@
   },
   "scripts": {
     "dev": "node --disable-warning=DEP0190 ./node_modules/@tinacms/cli/bin/tinacms dev -c \"astro dev\"",
-    "build": "tinacms build --local --skip-cloud-checks && astro build",
-    "build:cloud": "tinacms build && astro build",
-    "build:site": "astro build",
+    "derive:images": "node scripts/derive-product-images.mjs",
+    "build": "tinacms build --local --skip-cloud-checks && npm run derive:images && astro build",
+    "build:cloud": "tinacms build && npm run derive:images && astro build",
+    "build:site": "npm run derive:images && astro build",
     "check": "tsc -p tsconfig.ci.json --noEmit",
     "check:media": "node scripts/check-product-media.mjs",
     "check:tina": "node scripts/check-tina-lock.mjs",

@@ -25,7 +25,7 @@ const documentTitle =
 const seoDescription = metaSnippet(
   localizedSetting("metaDescription", locale) || copy.meta.description,
 );
-const lcp = listed[0]?.images[0] ? cardImageUrls(listed[0].images[0]).full : "";
+const lcp = listed[0]?.images[0] ? cardImageUrls(listed[0].images[0]).card : "";
 const lcpType = /\.webp$/i.test(lcp) ? "image/webp" : "image/jpeg";
 
 const catalogForSchema = [...listed, ...sold].filter((p) => !p.hidden);

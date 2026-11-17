@@ -1,3 +1,7 @@
+import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { basename, extname, join } from "node:path";
+
 export function url(path = "") {
   const base = import.meta.env.BASE_URL;
   const clean = path.replace(/^\//, "");
@@ -15,18 +19,42 @@ export function mediaUrl(path: string) {
   return asset(path.replace(/^\//, ""));
 }
 
-/**
- * Shop/product image URLs.
- * Tina writes the real file under `public/uploads/` — always serve that path.
- * Do not invent `/uploads/prints/card|lg/` derivatives (they are not generated).
- */
-export function cardImageUrls(path: string) {
-  const full = mediaUrl(path);
-  return { webp: full, jpg: full, full };
+function uploadBasename(path: string) {
+  const clean = path.replace(/^\//, "").replace(/^uploads\//, "");
+  return basename(clean);
 }
 
-/** Same as card: original Tina media only. */
+/** Same naming as scripts/derive-product-images.mjs */
+function derivedFileName(uploadFile: string) {
+  const stem = basename(uploadFile, extname(uploadFile));
+  const tag = createHash("sha1").update(uploadFile).digest("hex").slice(0, 8);
+  return `${stem}.${tag}.webp`;
+}
+
+function derivedUrl(path: string, kind: "card" | "lg") {
+  if (!path || /^https?:\/\//i.test(path)) return "";
+  const file = uploadBasename(path);
+  if (!file) return "";
+  const rel = `derived/${kind}/${derivedFileName(file)}`;
+  if (!existsSync(join(process.cwd(), "public", rel))) return "";
+  return asset(rel);
+}
+
+/**
+ * Shop/product image URLs.
+ * Prefer build-time WebP derivatives (npm run derive:images); fall back to Tina original.
+ */
+export function cardImageUrls(path: string) {
+  const original = mediaUrl(path);
+  const card = derivedUrl(path, "card") || original;
+  const lg = derivedUrl(path, "lg") || original;
+  return { webp: card, jpg: original, full: card, card, lg, original };
+}
+
+/** Product stage / OG: prefer lg WebP. */
 export function largeImageUrls(path: string) {
-  const full = mediaUrl(path);
-  return { webp: full, jpg: full, full };
+  const original = mediaUrl(path);
+  const card = derivedUrl(path, "card") || original;
+  const lg = derivedUrl(path, "lg") || original;
+  return { webp: lg, jpg: original, full: lg, card, lg, original };
 }

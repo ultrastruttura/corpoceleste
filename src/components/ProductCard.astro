@@ -2,7 +2,7 @@
 import type { Product } from "../data/products";
 import { artistName, formatPrice, isInStock, isLowStock, productImageAlt } from "../data/products";
 import { siteSettings } from "../data/settings";
-import { mediaUrl } from "../lib/paths";
+import { cardImageUrls } from "../lib/paths";
 import { currentLocale, pageUrl, t } from "../i18n";
 
 type Props = { product: Product; eager?: boolean };
@@ -15,7 +15,7 @@ const lowStock = !sold && isLowStock(product, siteSettings.lowStockThreshold);
 const preorder = product.status === "preorder" && !sold && !lowStock;
 const hasTitle = artist !== product.title;
 const alt = productImageAlt(product, artist, locale);
-const cover = product.images[0] ? mediaUrl(product.images[0]) : "";
+const urls = product.images[0] ? cardImageUrls(product.images[0]) : null;
 ---
 
 <a
@@ -30,13 +30,14 @@ const cover = product.images[0] ? mediaUrl(product.images[0]) : "";
     {lowStock && <span class="badge badge--quiet">{copy.shop.lowStockBadge}</span>}
     {preorder && <span class="badge badge--quiet">{copy.shop.preorderBadge}</span>}
     {
-      cover ? (
+      urls ? (
         <img
           class="print"
-          src={cover}
+          src={urls.card}
+          srcset={`${urls.card} 640w, ${urls.lg} 1280w`}
           alt={alt}
-          width="800"
-          height="800"
+          width="640"
+          height="640"
           sizes="(max-width: 359px) 92vw, (max-width: 1023px) 46vw, 280px"
           loading={eager ? "eager" : "lazy"}
           decoding="async"
