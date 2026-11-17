@@ -70,12 +70,12 @@ function forbid(req: VercelRequest, res: VercelResponse, message: string) {
   json(res, 403, { error: message });
 }
 
-export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): boolean {
+/** Origin / Sec-Fetch gate without writing the response (for soft-fail read APIs). */
+export function checkSiteOrigin(req: VercelRequest): { ok: true } | { ok: false; message: string } {
   const list = allowedOrigins();
   const origin = requestOrigin(req);
   if (!origin || !list.includes(origin)) {
-    forbid(req, res, "Forbidden origin");
-    return false;
+    return { ok: false, message: "Forbidden origin" };
   }
 
   const contentType = String(req.headers["content-type"] || "").toLowerCase();
@@ -88,8 +88,7 @@ export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): bool
   if (isJson) {
     const rawOrigin = originOnly(String(req.headers.origin || ""));
     if (!rawOrigin || !list.includes(rawOrigin)) {
-      forbid(req, res, "Forbidden origin");
-      return false;
+      return { ok: false, message: "Forbidden origin" };
     }
   }
 
@@ -99,23 +98,29 @@ export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): bool
   // On Vercel prod/preview, browsers always send Sec-Fetch-*; curl with a forged
   // Origin alone is no longer enough. Local/dev stays softer for tooling.
   if ((vercel === "production" || vercel === "preview") && !site) {
-    forbid(req, res, "Forbidden");
-    return false;
+    return { ok: false, message: "Forbidden" };
   }
 
   if (site) {
     if (!["same-origin", "same-site", "cross-site"].includes(site)) {
-      forbid(req, res, "Forbidden");
-      return false;
+      return { ok: false, message: "Forbidden" };
     }
     // fetch → mode cors; HTML form POST (bonifico / recesso / form) → mode navigate.
     if (site === "cross-site" && mode) {
       const okMode = mode === "cors" || (mode === "navigate" && isBrowserFormPost);
       if (!okMode) {
-        forbid(req, res, "Forbidden");
-        return false;
+        return { ok: false, message: "Forbidden" };
       }
     }
+  }
+  return { ok: true };
+}
+
+export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): boolean {
+  const gate = checkSiteOrigin(req);
+  if (!gate.ok) {
+    forbid(req, res, gate.message);
+    return false;
   }
   return true;
 }

@@ -115,6 +115,21 @@ describe("shipping-quote handler", () => {
     expect(res.body).toEqual({ error: "Method not allowed" });
   });
 
+  it("live_stock GET soft-fails bad origin with empty products (no 403)", async () => {
+    const res = mockRes();
+    await handler(
+      {
+        method: "GET",
+        query: { live_stock: "1" },
+        headers: { origin: "https://evil.example" },
+      } as never,
+      res as never,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toMatchObject({ products: [] });
+    expect(mocks.abuseLimit).not.toHaveBeenCalled();
+  });
+
   it("stops when origin gate fails", async () => {
     mocks.requireSiteOrigin.mockReturnValue(false);
     const res = mockRes();

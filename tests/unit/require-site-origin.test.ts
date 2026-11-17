@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { requireSiteOrigin } from "../../server/portal/http";
+import { checkSiteOrigin, requireSiteOrigin } from "../../server/portal/http";
 
 function mockRes() {
   const res = {
@@ -77,5 +77,6 @@ describe("requireSiteOrigin", () => {
     const res = mockRes();
     expect(requireSiteOrigin(req as never, res as never)).toBe(false);
     expect(res.statusCode).toBe(403);
+    expect(checkSiteOrigin(req as never)).toEqual({ ok: false, message: "Forbidden" });
   });
 });
