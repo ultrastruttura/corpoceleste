@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { abuseLimit } from "../server/abuse-limit.js";
 import { listLiveCatalogProducts } from "../server/live-catalog.js";
 import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.js";
-import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
+import { checkSiteOrigin, cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
 /**
@@ -15,7 +15,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") return res.status(204).end();
 
   if (req.method === "GET" && (req.query.live_stock === "1" || req.query.live_stock === "true")) {
-    if (!requireSiteOrigin(req, res)) return;
+    // Soft-fail bad Origin/Sec-Fetch: shop keeps build-time catalog; avoids PSI 403 console noise.
+    if (!checkSiteOrigin(req).ok) {
+      res.setHeader("Cache-Control", "private, max-age=30");
+      return json(res, 200, { products: [], at: new Date().toISOString() });
+    }
     const limited = await abuseLimit(req, "live-stock", 30, 15 * 60);
     if (!limited.ok) {
       if (limited.unavailable) {
