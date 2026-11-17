@@ -2,6 +2,7 @@
 
 import matter from "gray-matter";
 import { parseProductFrontmatter } from "../src/lib/product-frontmatter.js";
+import { getRuntimeStockMap } from "./stock/runtime-stock.js";
 
 export type LiveCatalogProduct = {
   id: string;
@@ -41,10 +42,15 @@ export async function listLiveCatalogProducts(): Promise<LiveCatalogProduct[]> {
     const raw = await fetch(f.download_url).then((r) => r.text());
     const { data } = matter(raw);
     const core = parseProductFrontmatter(data as Record<string, unknown>, id);
+    const overlay = await getRuntimeStockMap(id);
+    const stock = { ...core.stock };
+    for (const [size, qty] of Object.entries(overlay)) {
+      stock[size] = qty;
+    }
     products.push({
       id,
       title: core.title || id,
-      stock: core.stock,
+      stock,
       status: core.status,
       price: core.price,
     });

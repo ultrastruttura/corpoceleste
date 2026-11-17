@@ -5,8 +5,14 @@ import {
   getHold,
   holdStoreActive,
   listExpiredOpenHolds,
+  listOpenBankHolds,
   putHold,
 } from "./stock/hold-store.js";
+import {
+  consumeRuntimeStock,
+  restoreRuntimeStock,
+  runtimeStockActive,
+} from "./stock/runtime-stock.js";
 
 type GhFile = {
   content: string;
@@ -220,8 +226,7 @@ export async function assertGithubStockAccess(): Promise<void> {
   }
 }
 
-export async function getLedger(captureId: string): Promise<LedgerRecord | null> {
-  if (holdStoreActive(captureId)) return getHold(captureId);
+async function readGithubLedger(captureId: string): Promise<LedgerRecord | null> {
   const file = await getRepoFile(ledgerPath(captureId));
   if (!file) return null;
   try {
@@ -231,6 +236,24 @@ export async function getLedger(captureId: string): Promise<LedgerRecord | null>
   } catch {
     return { captureId, lines: [], status: "done", at: new Date().toISOString() };
   }
+}
+
+export async function getLedger(captureId: string): Promise<LedgerRecord | null> {
+  if (holdStoreActive(captureId)) {
+    const fromTurso = await getHold(captureId);
+    if (fromTurso) return fromTurso;
+    // Historical captures/holds written to GitHub before Turso-only path.
+    return readGithubLedger(captureId);
+  }
+  return readGithubLedger(captureId);
+}
+
+/** True when a stock note actually changed on-hand qty (skip no-op preorder rows on restore). */
+export function stockNoteMutated(note: string) {
+  if (/\bnon scalato\b/i.test(note)) return false;
+  const m = note.match(/(\d+)\s*→\s*(\d+)/);
+  if (m) return Number(m[1]) !== Number(m[2]);
+  return true;
 }
 
 function ledgerAgeMs(ledger: LedgerRecord) {
@@ -403,7 +426,10 @@ export async function applyStockDecrementCheckpointed(
     try {
       const note = await decrementProduct(line);
       const stockNotes = [...(working.stockNotes || []), note];
-      const stockAppliedKeys = [...(working.stockAppliedKeys || []), stockLineKey(line)];
+      // Preorder no-ops (0→0 / non scalato) must not be restored later as +qty.
+      const stockAppliedKeys = stockNoteMutated(note)
+        ? [...(working.stockAppliedKeys || []), stockLineKey(line)]
+        : [...(working.stockAppliedKeys || [])];
       working = {
         ...working,
         status: "processing",
@@ -437,6 +463,14 @@ export async function applyStockDecrementCheckpointed(
   return working;
 }
 
+function isPreorderMarkdown(content: string) {
+  return /^status:\s*preorder\s*$/m.test(content);
+}
+
+/**
+ * Prefer Turso runtime stock (portal) — GitHub main is PR-only and blocks Contents PUTs.
+ * Fallback: GitHub PUT when Turso is not configured (local/dev).
+ */
 async function decrementProduct(line: OrderLine): Promise<string> {
   const filePath = `content/products/${line.id}.md`;
   let lastErr: unknown;
@@ -447,20 +481,34 @@ async function decrementProduct(line: OrderLine): Promise<string> {
         throw new Error(`missing product ${line.id}`);
       }
 
-      const before = readStockQty(file.content, line.size);
-      if (before == null) {
+      const tinaQty = readStockQty(file.content, line.size);
+      if (tinaQty == null) {
         throw new Error(`no stock line ${line.id} ${line.size}`);
       }
-      if (before < line.qty) {
-        // Pre-order may sell with 0 on hand — do not block or go negative.
-        if (/^status:\s*preorder\s*$/m.test(file.content)) {
-          return `${line.id} ${line.size} preorder (magazzino ${before}, non scalato)`;
-        }
+      const preorder = isPreorderMarkdown(file.content);
+
+      if (runtimeStockActive()) {
+        const { before, after } = await consumeRuntimeStock(
+          line.id,
+          line.size,
+          line.qty,
+          tinaQty,
+          { allowOversell: preorder },
+        );
+        return preorder
+          ? `${line.id} ${line.size} preorder ${before}→${after} (turso)`
+          : `${line.id} ${line.size} ${before}→${after}`;
+      }
+
+      if (preorder) {
+        return `${line.id} ${line.size} preorder (magazzino ${tinaQty}, non scalato)`;
+      }
+      if (tinaQty < line.qty) {
         throw new Error(
-          `INSUFFICIENT_STOCK ${line.id} ${line.size}: aveva ${before}, ordine ×${line.qty}`,
+          `INSUFFICIENT_STOCK ${line.id} ${line.size}: aveva ${tinaQty}, ordine ×${line.qty}`,
         );
       }
-      const after = before - line.qty;
+      const after = tinaQty - line.qty;
       const patched = patchStockQty(file.content, line.size, after);
       if (!patched) {
         throw new Error(`patch failed ${line.id} ${line.size}`);
@@ -470,10 +518,10 @@ async function decrementProduct(line: OrderLine): Promise<string> {
           filePath,
           file.sha,
           patched.content,
-          `stock: ${line.id} ${line.size} ${before}→${after} (−${line.qty})`,
+          `stock: ${line.id} ${line.size} ${tinaQty}→${after} (−${line.qty})`,
         );
       }
-      return `${line.id} ${line.size} ${before}→${after}`;
+      return `${line.id} ${line.size} ${tinaQty}→${after}`;
     } catch (err) {
       lastErr = err;
       const status = (err as { status?: number }).status;
@@ -482,8 +530,12 @@ async function decrementProduct(line: OrderLine): Promise<string> {
         msg.startsWith("INSUFFICIENT_STOCK") ||
         msg.startsWith("missing product") ||
         msg.startsWith("no stock") ||
-        msg.startsWith("patch failed")
+        msg.startsWith("patch failed") ||
+        msg.startsWith("stock race")
       ) {
+        throw err;
+      }
+      if (/Repository rule violations|Changes must be made through a pull request/i.test(msg)) {
         throw err;
       }
       if (status === 409 || /409/.test(msg)) {
@@ -510,11 +562,25 @@ async function incrementProduct(line: OrderLine): Promise<string> {
         throw new Error(`missing product ${line.id}`);
       }
 
-      const before = readStockQty(file.content, line.size);
-      if (before == null) {
+      const tinaQty = readStockQty(file.content, line.size);
+      if (tinaQty == null) {
         throw new Error(`no stock line ${line.id} ${line.size}`);
       }
-      const after = before + line.qty;
+
+      if (runtimeStockActive()) {
+        const { before, after } = await restoreRuntimeStock(
+          line.id,
+          line.size,
+          line.qty,
+          tinaQty,
+        );
+        return `${line.id} ${line.size} ${before}→${after} (+${line.qty})`;
+      }
+
+      if (isPreorderMarkdown(file.content)) {
+        return `${line.id} ${line.size} preorder restore skipped (non scalato)`;
+      }
+      const after = tinaQty + line.qty;
       const patched = patchStockQty(file.content, line.size, after);
       if (!patched) {
         throw new Error(`patch failed ${line.id} ${line.size}`);
@@ -524,10 +590,10 @@ async function incrementProduct(line: OrderLine): Promise<string> {
           filePath,
           file.sha,
           patched.content,
-          `stock: restore ${line.id} ${line.size} ${before}→${after} (+${line.qty})`,
+          `stock: restore ${line.id} ${line.size} ${tinaQty}→${after} (+${line.qty})`,
         );
       }
-      return `${line.id} ${line.size} ${before}→${after} (+${line.qty})`;
+      return `${line.id} ${line.size} ${tinaQty}→${after} (+${line.qty})`;
     } catch (err) {
       lastErr = err;
       const status = (err as { status?: number }).status;
@@ -535,8 +601,12 @@ async function incrementProduct(line: OrderLine): Promise<string> {
       if (
         msg.startsWith("missing product") ||
         msg.startsWith("no stock") ||
-        msg.startsWith("patch failed")
+        msg.startsWith("patch failed") ||
+        msg.startsWith("stock race")
       ) {
+        throw err;
+      }
+      if (/Repository rule violations|Changes must be made through a pull request/i.test(msg)) {
         throw err;
       }
       if (status === 409 || /409/.test(msg)) {
@@ -772,16 +842,17 @@ export async function releaseExpiredBankHolds(
   now = Date.now(),
 ): Promise<string[]> {
   const out: string[] = [];
-  const files = await listLedgerSummaries();
-  for (const file of files) {
-    if (!file.id.startsWith("bank_")) continue;
-    const ledger = await getLedger(file.id);
+  const candidates = holdStoreActive()
+    ? (await listOpenBankHolds()).map((l) => l.captureId)
+    : (await listLedgerSummaries()).map((f) => f.id).filter((id) => id.startsWith("bank_"));
+  for (const id of candidates) {
+    const ledger = await getLedger(id);
     if (!ledger) continue;
     if (ledger.kind && ledger.kind !== "bank") continue;
     if (ledger.releasedAt) continue;
     if (!ledger.stockComplete) continue;
     if (ledgerAgeMs(ledger) < BANK_HOLD_TTL_MS) continue;
-    if (await isPaid(file.id)) continue;
+    if (await isPaid(id)) continue;
     const notes = await applyStockIncrement(ledger.lines || []);
     await writeLedger({
       ...ledger,
@@ -791,7 +862,7 @@ export async function releaseExpiredBankHolds(
       error: `released unpaid bank hold after 48h; ${notes.join("; ")}`,
       at: new Date(now).toISOString(),
     });
-    out.push(file.id);
+    out.push(id);
   }
   return out;
 }

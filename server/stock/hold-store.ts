@@ -1,14 +1,18 @@
-/** PayPal hold ledgers in Turso: one indexed query finds expired holds instead of listing every GitHub ledger file. */
+/** Ledgers in Turso when portal is configured — avoids GitHub Contents PUTs on protected main. */
 
 import type { LedgerRecord } from "../github-stock.js";
 import { ensureSchema, getDb, portalConfigured } from "../portal/db.js";
 
-export function holdStoreActive(id: string) {
-  return id.startsWith("hold_") && portalConfigured();
+export function holdStoreActive(_id?: string) {
+  return portalConfigured();
 }
 
 function isOpen(ledger: LedgerRecord) {
-  return ledger.kind === "paypal_hold" && !ledger.releasedAt && !ledger.consumedBy ? 1 : 0;
+  if (ledger.releasedAt || ledger.consumedBy) return 0;
+  if (ledger.kind === "paypal_hold") return 1;
+  // Soft bank holds awaiting payment / cron release.
+  if (ledger.kind === "bank" && ledger.stockComplete) return 1;
+  return 0;
 }
 
 function atMs(ledger: LedgerRecord) {
@@ -47,6 +51,15 @@ export async function listExpiredOpenHolds(cutoffMs: number): Promise<LedgerReco
   const res = await getDb().execute({
     sql: "SELECT data FROM stock_holds WHERE open = 1 AND at_ms < ? ORDER BY at_ms LIMIT 50",
     args: [cutoffMs],
+  });
+  return res.rows.map((r) => JSON.parse(String(r.data)) as LedgerRecord);
+}
+
+/** Open bank soft-holds (for 48h unpaid release). */
+export async function listOpenBankHolds(): Promise<LedgerRecord[]> {
+  await ensureSchema();
+  const res = await getDb().execute({
+    sql: "SELECT data FROM stock_holds WHERE open = 1 AND id LIKE 'bank_%' ORDER BY at_ms LIMIT 100",
   });
   return res.rows.map((r) => JSON.parse(String(r.data)) as LedgerRecord);
 }
