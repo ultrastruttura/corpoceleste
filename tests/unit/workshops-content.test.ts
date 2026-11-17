@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import matter from "gray-matter";
 import { describe, expect, it } from "vitest";
@@ -7,9 +7,10 @@ const upcomingDir = resolve("content/workshops/upcoming");
 const pastDir = resolve("content/workshops/past");
 
 describe("workshops content", () => {
-  it("has upcoming workshop markdown with signup URL", () => {
+  it("validates upcoming workshop markdown when any exist", () => {
+    // Empty upcoming is valid (page shows “nessuna data pubblica”).
+    if (!existsSync(upcomingDir)) return;
     const files = readdirSync(upcomingDir).filter((f) => f.endsWith(".md"));
-    expect(files.length).toBeGreaterThan(0);
     for (const file of files) {
       const { data } = matter(readFileSync(resolve(upcomingDir, file), "utf8"));
       expect(String(data.when ?? "").trim()).toBeTruthy();
