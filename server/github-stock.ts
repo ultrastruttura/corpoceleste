@@ -226,8 +226,7 @@ export async function assertGithubStockAccess(): Promise<void> {
   }
 }
 
-export async function getLedger(captureId: string): Promise<LedgerRecord | null> {
-  if (holdStoreActive(captureId)) return getHold(captureId);
+async function readGithubLedger(captureId: string): Promise<LedgerRecord | null> {
   const file = await getRepoFile(ledgerPath(captureId));
   if (!file) return null;
   try {
@@ -237,6 +236,24 @@ export async function getLedger(captureId: string): Promise<LedgerRecord | null>
   } catch {
     return { captureId, lines: [], status: "done", at: new Date().toISOString() };
   }
+}
+
+export async function getLedger(captureId: string): Promise<LedgerRecord | null> {
+  if (holdStoreActive(captureId)) {
+    const fromTurso = await getHold(captureId);
+    if (fromTurso) return fromTurso;
+    // Historical captures/holds written to GitHub before Turso-only path.
+    return readGithubLedger(captureId);
+  }
+  return readGithubLedger(captureId);
+}
+
+/** True when a stock note actually changed on-hand qty (skip no-op preorder rows on restore). */
+export function stockNoteMutated(note: string) {
+  if (/\bnon scalato\b/i.test(note)) return false;
+  const m = note.match(/(\d+)\s*→\s*(\d+)/);
+  if (m) return Number(m[1]) !== Number(m[2]);
+  return true;
 }
 
 function ledgerAgeMs(ledger: LedgerRecord) {
@@ -409,7 +426,10 @@ export async function applyStockDecrementCheckpointed(
     try {
       const note = await decrementProduct(line);
       const stockNotes = [...(working.stockNotes || []), note];
-      const stockAppliedKeys = [...(working.stockAppliedKeys || []), stockLineKey(line)];
+      // Preorder no-ops (0→0 / non scalato) must not be restored later as +qty.
+      const stockAppliedKeys = stockNoteMutated(note)
+        ? [...(working.stockAppliedKeys || []), stockLineKey(line)]
+        : [...(working.stockAppliedKeys || [])];
       working = {
         ...working,
         status: "processing",
