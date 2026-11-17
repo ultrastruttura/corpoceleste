@@ -119,9 +119,9 @@ const it = {
   checkout: {
     title: "Checkout",
     empty: "Il carrello è vuoto.",
-    shippingTitle: "Spedizioni",
+    shippingTitle: "Due parole sulle spedizioni",
     shippingBody:
-      "Studio di una persona: stampo e imballo io. Spedisco due volte a settimana. Se ti serve per una data precisa, scrivi prima di ordinare.",
+      "Dietro questo shop c’è una sola persona: progetto, stampo, imballo e spedisco tutto io, a mano. Le spedizioni partono due volte a settimana e il codice di tracking ti arriva appena il pacco è affidato al corriere, quindi non sempre in giornata. Rispondo alle email appena posso, in genere entro qualche giorno lavorativo. Se ti serve il pacco per una data precisa, scrivimi prima di ordinare e ti dico se è fattibile.",
     termsLead: "Ho letto i tempi di spedizione e le ",
     termsLink: "condizioni di vendita",
     termsTail: ", recesso e garanzia inclusi.",
@@ -575,9 +575,9 @@ const en: typeof it = {
   checkout: {
     title: "Checkout",
     empty: "Your cart is empty.",
-    shippingTitle: "Shipping",
+    shippingTitle: "A few words on shipping",
     shippingBody:
-      "One-person studio: I print and pack the shirts myself. I ship twice a week. If you need them by a given date, write before you order.",
+      "There’s just one person behind this shop: I design, print, pack and ship everything myself, by hand. Orders ship twice a week, and you’ll get your tracking code as soon as the parcel is handed over to the courier, so not always on the same day. I reply to emails as soon as I can, usually within a few working days. If you need your parcel by a specific date, write to me before ordering and I’ll let you know if it’s doable.",
     termsLead: "I have read the shipping times and the ",
     termsLink: "terms of sale",
     termsTail: ", including withdrawal and legal guarantee.",
@@ -1031,9 +1031,9 @@ const de: typeof it = {
   checkout: {
     title: "Kasse",
     empty: "Der Warenkorb ist leer.",
-    shippingTitle: "Versand",
+    shippingTitle: "Kurz zum Versand",
     shippingBody:
-      "Ein-Personen-Atelier: ich drucke und packe selbst. Ich schicke zweimal die Woche. Wenn du die Shirts zu einem bestimmten Datum brauchst, schreib vor der Bestellung.",
+      "Hinter diesem Shop steht nur eine Person: Ich entwerfe, drucke, verpacke und verschicke alles selbst, von Hand. Der Versand erfolgt zweimal pro Woche, und den Tracking-Code erhältst du, sobald das Paket an den Paketdienst übergeben wurde, also nicht immer am selben Tag. Ich beantworte E-Mails, sobald ich kann, in der Regel innerhalb weniger Werktage. Wenn du das Paket zu einem bestimmten Termin brauchst, schreib mir bitte vor der Bestellung, dann sage ich dir, ob es machbar ist.",
     termsLead: "Ich habe die Versandzeiten und die ",
     termsLink: "Verkaufsbedingungen",
     termsTail: " gelesen, inklusive Widerruf und Gewährleistung.",
