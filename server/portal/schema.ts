@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS stock_levels (
   product_id TEXT NOT NULL,
   size TEXT NOT NULL,
   qty INTEGER NOT NULL,
+  tina_base INTEGER,
   updated_at TEXT NOT NULL,
   PRIMARY KEY (product_id, size)
 );
