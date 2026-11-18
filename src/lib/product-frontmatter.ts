@@ -4,6 +4,11 @@ import { parseProductStatus, type ProductStatus } from "./product-status.js";
 
 const DEFAULT_SIZES = ["S", "M", "L", "XL", "XXL"];
 
+/** Canonical garment order — Tina checkboxes often reshuffle YAML. */
+const SIZE_RANK = new Map(
+  ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "unica"].map((s, i) => [s, i]),
+);
+
 /** One-size key for print / shopper / edition (no garment sizes). */
 export const ONE_SIZE = "unica";
 
@@ -19,9 +24,21 @@ export function isSizedKind(kind: unknown): boolean {
   return String(kind ?? "shirt") === "shirt";
 }
 
+function sortSizes(sizes: string[]): string[] {
+  return [...sizes].sort((a, b) => {
+    const ra = SIZE_RANK.get(a);
+    const rb = SIZE_RANK.get(b);
+    if (ra != null && rb != null) return ra - rb;
+    if (ra != null) return -1;
+    if (rb != null) return 1;
+    return a.localeCompare(b, "it");
+  });
+}
+
 export function parseSizes(raw: unknown): string[] {
   const sizes = Array.isArray(raw) ? raw.map((x) => String(x)) : [...DEFAULT_SIZES];
-  return sizes.length ? sizes : [...DEFAULT_SIZES];
+  if (!sizes.length) return [...DEFAULT_SIZES];
+  return sortSizes(sizes);
 }
 
 export function parseStockMap(raw: unknown, sizes: string[]): Record<string, number> {
