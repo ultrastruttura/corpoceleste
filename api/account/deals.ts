@@ -17,6 +17,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     if (req.method === "GET") {
+      // Magazzino (?stock=1 / rewrite from /api/account/stock) — Hobby: no extra function.
+      if (String(req.query.stock || "") === "1") {
+        const { buildAccountStockPayload } = await import("../../server/portal/account-stock.js");
+        return json(res, 200, await buildAccountStockPayload(user));
+      }
+
       // Tina catalog options for deal product_id dropdown (admin).
       if (String(req.query.products || "") === "1") {
         if (user.role !== "admin") return json(res, 403, { error: "Admin only" });
