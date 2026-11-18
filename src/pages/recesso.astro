@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import FormHoney from "../components/FormHoney.astro";
+import PrivacyCheck from "../components/PrivacyCheck.astro";
 import { formEndpoint } from "../data/site";
 import { siteSettings } from "../data/settings";
 import { currentLocale, pageUrl, t } from "../i18n";
@@ -9,7 +10,7 @@ const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const w = copy.withdrawal;
 const shopEmail = siteSettings.shopEmail;
-const withdrawAction = formEndpoint("withdrawal") || `https://formsubmit.co/${shopEmail}`;
+const withdrawAction = formEndpoint("withdrawal");
 ---
 
 <Base title={`${w.entry} — Corpoceleste`}>
@@ -20,6 +21,8 @@ const withdrawAction = formEndpoint("withdrawal") || `https://formsubmit.co/${sh
     </header>
 
     <div class="split">
+      {
+        withdrawAction ? (
       <form
         class="form"
         action={withdrawAction}
@@ -59,6 +62,8 @@ const withdrawAction = formEndpoint("withdrawal") || `https://formsubmit.co/${sh
             <p class="field-help" id="wd-note-help">{w.noteHelp}</p>
           </div>
 
+          <PrivacyCheck id="wd-privacy" />
+
           <button class="btn" type="button" data-withdraw-continue>{w.continue}</button>
         </fieldset>
 
@@ -71,6 +76,12 @@ const withdrawAction = formEndpoint("withdrawal") || `https://formsubmit.co/${sh
           </div>
         </div>
       </form>
+        ) : (
+          <p class="prose">
+            {w.alt} <a href={`mailto:${shopEmail}`}>{shopEmail}</a>.
+          </p>
+        )
+      }
 
       <div class="prose">
         <p>{w.intro}</p>
