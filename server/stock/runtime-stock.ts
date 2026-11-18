@@ -108,11 +108,11 @@ export async function getRuntimeStockMap(
   await ensureSchema();
 
   if (tinaStock) {
-    const out: Record<string, number> = {};
-    for (const [size, tinaQty] of Object.entries(tinaStock)) {
-      out[size] = await syncRuntimeStockFromTina(productId, size, tinaQty);
-    }
-    return out;
+    const entries = Object.entries(tinaStock);
+    const synced = await Promise.all(
+      entries.map(async ([size, tinaQty]) => [size, await syncRuntimeStockFromTina(productId, size, tinaQty)] as const),
+    );
+    return Object.fromEntries(synced);
   }
 
   const res = await getDb().execute({

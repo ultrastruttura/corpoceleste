@@ -35,25 +35,26 @@ export async function listLiveCatalogProducts(): Promise<LiveCatalogProduct[]> {
   );
   if (!listRes.ok) throw new Error(`Could not list products (${listRes.status})`);
   const files = (await listRes.json()) as Array<{ name?: string; download_url?: string }>;
-  const products: LiveCatalogProduct[] = [];
-  for (const f of files) {
-    if (!f.name?.endsWith(".md") || !f.download_url) continue;
-    const id = f.name.replace(/\.md$/, "");
-    const raw = await fetch(f.download_url).then((r) => r.text());
-    const { data } = matter(raw);
-    const core = parseProductFrontmatter(data as Record<string, unknown>, id);
-    const overlay = await getRuntimeStockMap(id, core.stock);
-    const stock = { ...core.stock };
-    for (const [size, qty] of Object.entries(overlay)) {
-      stock[size] = qty;
-    }
-    products.push({
-      id,
-      title: core.title || id,
-      stock,
-      status: core.status,
-      price: core.price,
-    });
-  }
+  const mdFiles = files.filter((f) => f.name?.endsWith(".md") && f.download_url);
+  const products = await Promise.all(
+    mdFiles.map(async (f) => {
+      const id = String(f.name).replace(/\.md$/, "");
+      const raw = await fetch(String(f.download_url)).then((r) => r.text());
+      const { data } = matter(raw);
+      const core = parseProductFrontmatter(data as Record<string, unknown>, id);
+      const overlay = await getRuntimeStockMap(id, core.stock);
+      const stock = { ...core.stock };
+      for (const [size, qty] of Object.entries(overlay)) {
+        stock[size] = qty;
+      }
+      return {
+        id,
+        title: core.title || id,
+        stock,
+        status: core.status,
+        price: core.price,
+      } satisfies LiveCatalogProduct;
+    }),
+  );
   return products;
 }
