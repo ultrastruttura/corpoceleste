@@ -85,14 +85,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       shipTo?: Partial<CheckoutShipTo>;
     }>(req);
 
-    // Google Pay (and similar) confirm then capture server-side.
+    // Google Pay / Apple Pay / PayPal Buttons: capture server-side after approval.
     if (body.action === "capture") {
       const orderId = String(body.orderId || "").trim();
       if (!orderId) return json(res, 400, { error: "Missing orderId" });
       const allowed = await assertCapturableOrder(orderId);
       if (allowed.ok === false) return json(res, 403, { error: allowed.error });
-      const captured = await capturePayPalOrder(orderId);
-      return json(res, 200, { ok: true, id: captured.id, status: captured.status });
+      try {
+        const captured = await capturePayPalOrder(orderId);
+        return json(res, 200, { ok: true, id: captured.id, status: captured.status });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("paypal-create-order capture", msg);
+        const declined = /INSTRUMENT_DECLINED/i.test(msg);
+        return json(res, declined ? 422 : 502, {
+          error: declined ? "INSTRUMENT_DECLINED" : "Capture failed",
+          details: declined ? [{ issue: "INSTRUMENT_DECLINED" }] : undefined,
+        });
+      }
     }
 
     const lines = Array.isArray(body.lines) ? body.lines : [];

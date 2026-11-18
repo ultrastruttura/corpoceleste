@@ -849,9 +849,34 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           return actions.resolve();
         },
         createOrder: async () => createServerOrder(),
-        onApprove: async (_: unknown, actions: { order: { capture: () => Promise<unknown> } }) => {
+        // Server capture (same path as Google Pay). Client `actions.order.capture()`
+        // often stalls or fails after Apple Pay approval on a server-created order.
+        onApprove: async (
+          data: { orderID?: string; orderId?: string },
+          actions: { restart?: () => Promise<void> },
+        ) => {
+          const orderId = String(data.orderID || data.orderId || "").trim();
+          if (!orderId) throw new Error("Missing PayPal order id");
           saveOrderSnapshot(shippingAmount());
-          await actions.order.capture();
+          const cap = await fetch(`${createApi}/api/paypal-create-order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "capture", orderId }),
+          });
+          if (!cap.ok) {
+            let issue = "";
+            try {
+              const body = (await cap.json()) as { error?: string; details?: Array<{ issue?: string }> };
+              issue = String(body.details?.[0]?.issue || body.error || "");
+            } catch {
+              /* ignore */
+            }
+            if (issue === "INSTRUMENT_DECLINED" && actions.restart) {
+              return actions.restart();
+            }
+            console.error("paypal capture failed", cap.status, issue);
+            throw new Error(issue || "Capture failed");
+          }
           clearCart();
           location.href = `${base}${prefix}grazie/?from=paypal`;
         },
