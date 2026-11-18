@@ -173,7 +173,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                       <button type="button" class="wallet-btn wallet-btn--apple" data-apple-fallback>
                         {copy.checkout.applePay}
                       </button>
-                      <div id="applepay-button" class="pay-buttons__sdk" hidden></div>
                     </div>
                     <div class="pay-buttons__slot" data-googlepay-slot>
                       <button type="button" class="wallet-btn wallet-btn--google" data-google-fallback>
@@ -269,7 +268,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       const sdkLocale = boot.dataset.sdkLocale || "it_IT";
       if (!clientId) return;
       const s = document.createElement("script");
-      s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay&enable-funding=applepay&disable-funding=paylater,venmo`;
+      s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay,applepay&disable-funding=paylater,venmo`;
       s.onerror = () => {
         (window as Window & { __paypalSdkFailed?: boolean }).__paypalSdkFailed = true;
       };
@@ -295,6 +294,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         "Akzeptiere AGB und Datenschutz, vervollständige die Adresse und warte auf die Versandberechnung.",
       );
     let googlePayReady: (() => void) | null = null;
+    let applePayReady: (() => void) | null = null;
     let createErrorShown = false;
     let buttonsMounted = false;
     const page = document.querySelector<HTMLElement>(".checkout-page");
@@ -724,7 +724,19 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       },
     );
 
-    // Apple Pay only exists in Safari on Apple devices — elsewhere the button would only show an alert.
+    document.querySelector<HTMLButtonElement>("[data-apple-fallback]")?.addEventListener("click", () => {
+      if (!unlocked()) {
+        window.alert(lockHint?.textContent?.trim() || lockFallback());
+        return;
+      }
+      if (applePayReady) {
+        applePayReady();
+        return;
+      }
+      window.alert(say("Apple Pay non è disponibile al momento. Usa PayPal o il bonifico.", "Apple Pay is unavailable right now. Use PayPal or bank transfer.", "Apple Pay ist derzeit nicht verfügbar. Nutze PayPal oder Überweisung."));
+    });
+
+    // Hide Apple Pay when the browser has no native payment session.
     if (!("ApplePaySession" in window)) {
       document.querySelector<HTMLElement>("[data-applepay-slot]")?.setAttribute("hidden", "");
     }
@@ -733,7 +745,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     syncPage();
 
     function mountButtons() {
-      type Funding = { PAYPAL: string; APPLEPAY?: string };
+      type Funding = { PAYPAL: string };
       type ButtonsFactory = (o: object) => {
         render: (s: string) => Promise<void> | void;
         isEligible?: () => boolean;
@@ -754,12 +766,24 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         }) => Promise<{ status?: string }>;
         initiatePayerAction?: (o: { orderId: string }) => Promise<unknown>;
       };
+      type ApplePayConfig = {
+        isEligible: boolean;
+        countryCode: string;
+        merchantCapabilities: string[];
+        supportedNetworks: string[];
+      };
+      type ApplePayApi = {
+        config: () => Promise<ApplePayConfig>;
+        validateMerchant: (o: { validationUrl: string; displayName: string }) => Promise<{ merchantSession: unknown }>;
+        confirmOrder: (o: { orderId: string; token: unknown; billingContact: unknown }) => Promise<unknown>;
+      };
       const paypal = (
         window as unknown as {
           paypal?: {
             Buttons: ButtonsFactory;
             FUNDING: Funding;
             Googlepay?: () => GooglePayApi;
+            Applepay?: () => ApplePayApi;
           };
         }
       ).paypal;
@@ -901,46 +925,101 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           .render("#paypal-button");
       }
 
-      const appleFallback = document.querySelector<HTMLButtonElement>("[data-apple-fallback]");
-      const appleSdk = document.querySelector<HTMLElement>("#applepay-button");
-      let appleRendered = false;
-
-      if (appleSdk && paypal.FUNDING.APPLEPAY) {
-        const appleBtn = paypal.Buttons({
-          ...shared,
-          fundingSource: paypal.FUNDING.APPLEPAY,
-          style: { ...shared.style, color: "black", label: "pay" },
-        });
-        const eligible = !appleBtn.isEligible || appleBtn.isEligible();
-        if (eligible) {
-          void appleBtn
-            .render("#applepay-button")
-            .then(() => {
-              appleRendered = true;
-              appleSdk.hidden = false;
-              if (appleFallback) appleFallback.hidden = true;
-            })
-            .catch((err: unknown) => {
-              console.warn("Apple Pay render skipped", err);
-              appleSdk.hidden = true;
-              if (appleFallback) appleFallback.hidden = false;
-            });
-        }
-      }
-
-      appleFallback?.addEventListener("click", () => {
-        if (!unlocked() || appleRendered) return;
-        // On Safari the SDK button replaces this; elsewhere explain availability.
-        window.alert(
-          say(
-            "Apple Pay è disponibile in Safari su dispositivi Apple.",
-            "Apple Pay is available in Safari on Apple devices.",
-            "Apple Pay ist in Safari auf Apple-Geräten verfügbar.",
-          ),
-        );
-      });
+      void mountApplePay(paypal, createApi, createServerOrder);
 
       void mountGooglePay(paypal, createApi, createServerOrder);
+    }
+
+    async function mountApplePay(
+      paypal: { Applepay?: () => {
+        config: () => Promise<{ isEligible: boolean; countryCode: string; merchantCapabilities: string[]; supportedNetworks: string[] }>;
+        validateMerchant: (o: { validationUrl: string; displayName: string }) => Promise<{ merchantSession: unknown }>;
+        confirmOrder: (o: { orderId: string; token: unknown; billingContact: unknown }) => Promise<unknown>;
+      } },
+      createApi: string,
+      createServerOrder: () => Promise<string>,
+    ) {
+      const button = document.querySelector<HTMLButtonElement>("[data-apple-fallback]");
+      if (!button) return;
+      const sessionClass = (window as unknown as { ApplePaySession?: {
+        new (version: number, request: object): {
+          onvalidatemerchant: ((event: { validationURL: string }) => void) | null;
+          onpaymentauthorized: ((event: { payment: { token: unknown; billingContact: unknown } }) => void) | null;
+          completeMerchantValidation: (session: unknown) => void;
+          completePayment: (status: number) => void;
+          abort: () => void;
+          begin: () => void;
+        };
+        canMakePayments: () => boolean;
+        STATUS_SUCCESS: number;
+        STATUS_FAILURE: number;
+      } }).ApplePaySession;
+      if (!sessionClass?.canMakePayments() || !paypal.Applepay) {
+        document.querySelector<HTMLElement>("[data-applepay-slot]")?.setAttribute("hidden", "");
+        return;
+      }
+      const applepay = paypal.Applepay();
+      let config: Awaited<ReturnType<typeof applepay.config>>;
+      try {
+        config = await applepay.config();
+      } catch (err) {
+        console.warn("Apple Pay config failed", err);
+        return;
+      }
+      if (!config.isEligible) {
+        document.querySelector<HTMLElement>("[data-applepay-slot]")?.setAttribute("hidden", "");
+        return;
+      }
+
+      applePayReady = () => {
+        try {
+          // Apple requires session creation and begin() in the original tap handler.
+          const session = new sessionClass(4, {
+            countryCode: config.countryCode,
+            currencyCode: "EUR",
+            merchantCapabilities: config.merchantCapabilities,
+            supportedNetworks: config.supportedNetworks,
+            requiredBillingContactFields: ["postalAddress"],
+            total: { label: "Corpoceleste", type: "final", amount: (total() + shippingAmount()).toFixed(2) },
+          });
+          session.onvalidatemerchant = ({ validationURL }) => {
+            void applepay.validateMerchant({ validationUrl: validationURL, displayName: "Corpoceleste" })
+              .then(({ merchantSession }) => session.completeMerchantValidation(merchantSession))
+              .catch((err) => {
+                console.error("Apple Pay merchant validation", err);
+                session.abort();
+                window.alert(say("Apple Pay non è disponibile al momento. Usa PayPal o il bonifico.", "Apple Pay is unavailable right now. Use PayPal or bank transfer.", "Apple Pay ist derzeit nicht verfügbar. Nutze PayPal oder Überweisung."));
+              });
+          };
+          session.onpaymentauthorized = ({ payment }) => {
+            void (async () => {
+              try {
+                const orderId = await createServerOrder();
+                await applepay.confirmOrder({ orderId, token: payment.token, billingContact: payment.billingContact });
+                const cap = await fetch(`${createApi}/api/paypal-create-order`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ action: "capture", orderId }),
+                });
+                if (!cap.ok) throw new Error(`Capture failed: ${cap.status}`);
+                const captured = (await cap.json()) as { status?: string };
+                if (captured.status !== "COMPLETED") throw new Error(`Capture status: ${captured.status || "missing"}`);
+                session.completePayment(sessionClass.STATUS_SUCCESS);
+                saveOrderSnapshot(shippingAmount());
+                clearCart();
+                location.href = `${base}${prefix}grazie/?from=paypal`;
+              } catch (err) {
+                console.error("Apple Pay authorization", err);
+                session.completePayment(sessionClass.STATUS_FAILURE);
+              }
+            })();
+          };
+          session.begin();
+        } catch (err) {
+          console.error("Apple Pay start", err);
+          window.alert(say("Apple Pay non si è aperto. Riprova o usa PayPal.", "Apple Pay couldn't open. Try again or use PayPal.", "Apple Pay konnte nicht geöffnet werden. Versuche es erneut oder nutze PayPal."));
+        }
+      };
     }
 
     async function mountGooglePay(
