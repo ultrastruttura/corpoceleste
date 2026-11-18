@@ -3,7 +3,7 @@ colorName: Nero
 title: Corpoceleste logo shopper
 artist: content/artists/corpoceleste.md
 price: 12
-status: preorder
+status: available
 kind: shopper
 fitModel: ''
 nuovo: true
