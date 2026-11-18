@@ -994,9 +994,15 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             void applepay.validateMerchant({ validationUrl: validationURL, displayName: "Corpoceleste" })
               .then(({ merchantSession }) => session.completeMerchantValidation(merchantSession))
               .catch((err) => {
-                console.error("Apple Pay merchant validation", err);
+                console.error("Apple Pay merchant validation", err, validationURL);
                 session.abort();
-                window.alert(say("Apple Pay non è disponibile al momento. Usa PayPal o il bonifico.", "Apple Pay is unavailable right now. Use PayPal or bank transfer.", "Apple Pay ist derzeit nicht verfügbar. Nutze PayPal oder Überweisung."));
+                window.alert(
+                  say(
+                    "Apple Pay: verifica dominio fallita. In PayPal (Live) riscarica il file domain association, mettilo in /.well-known/ e registra di nuovo www.corpoceleste.eu. Oppure usa PayPal.",
+                    "Apple Pay: domain verification failed. In PayPal (Live) re-download the domain association file, host it at /.well-known/, and register www.corpoceleste.eu again. Or use PayPal.",
+                    "Apple Pay: Domain-Verifizierung fehlgeschlagen. In PayPal (Live) Domain-Association neu laden, unter /.well-known/ hosten und www.corpoceleste.eu erneut registrieren. Oder PayPal nutzen.",
+                  ),
+                );
               });
           };
           session.onpaymentauthorized = ({ payment }) => {
