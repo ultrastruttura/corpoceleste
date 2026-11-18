@@ -26,7 +26,7 @@ description:
 
     Stampa frontale e posteriore: inchiostro all'acqua con pigmento blu navy
 
-    Ogni maglia in questo shop è un pezzo unico, stampato a mano in edizione limitata. La stampa manuale comporta inevitabili variazioni fra i capi: posizione, pressione e resa dell'inchiostro possono differire leggermente da una maglia all'altra. Queste differenze non sono difetti, ma la firma del lavoro manuale e rendono ogni pezzo irripetibile. Le foto hanno scopo puramente illustrativo. Il prodotto reale può presentare lievi differenze cromatiche e di texture rispetto a quanto visualizzato online. Acquistando, il cliente dichiara di essere a conoscenza della natura artigianale e limitata del capo e accetta le variazioni descritte come parte integrante del valore del prodotto. Tali differenze non costituiscono motivo di reso, recesso o reclamo.
+    UN PAIO DI COSE DA TENERE IN CONSIDERAZIONE: Ogni maglia in questo shop è un pezzo unico, stampato a mano in edizione limitata. La stampa manuale comporta inevitabili variazioni fra i capi: posizione, pressione e resa dell'inchiostro possono differire leggermente da una maglia all'altra. Queste differenze non sono difetti, ma la firma del lavoro manuale e rendono ogni pezzo irripetibile. Le foto hanno scopo puramente illustrativo. Il prodotto reale può presentare lievi differenze cromatiche e di texture rispetto a quanto visualizzato online. Acquistando, il cliente dichiara di essere a conoscenza della natura artigianale e limitata del capo e accetta le variazioni descritte come parte integrante del valore del prodotto. Tali differenze non costituiscono motivo di reso, recesso o reclamo.
   en: |-
     Tote bag, 100% cotton, 130 g, natural cotton color (off-white), 35 pieces
 
