@@ -4,6 +4,7 @@ import Footer from "../components/Footer.astro";
 import SiteAnnounce from "../components/SiteAnnounce.astro";
 import { asset } from "../lib/paths";
 import { absoluteUrl, organizationJsonLd, websiteJsonLd } from "../lib/seo";
+import { scriptJson } from "../lib/script-json";
 import { llmsFullTxtUrl, llmsTxtUrl } from "../lib/llms";
 import { products, artistName, productImageAlt } from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
@@ -178,7 +179,7 @@ const umamiId = noAnalytics ? "" : siteSettings.umamiWebsiteId;
     <link rel="alternate" href={llmsTxtUrl("de")} type="text/plain" title="llms.txt (de)" hreflang="de" />
     {
       jsonLdBlocks.map((block) => (
-        <script type="application/ld+json" set:html={JSON.stringify(block)} />
+        <script type="application/ld+json" set:html={scriptJson(block)} />
       ))
     }
   </head>
@@ -220,7 +221,7 @@ const umamiId = noAnalytics ? "" : siteSettings.umamiWebsiteId;
       </div>
     </aside>
 
-    <script type="application/json" id="cc-catalog" set:html={JSON.stringify(catalog)} />
+    <script type="application/json" id="cc-catalog" set:html={scriptJson(catalog)} />
 
     <script>
       import "../scripts/shop.ts";

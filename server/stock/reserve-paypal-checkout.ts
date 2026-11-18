@@ -26,7 +26,7 @@ export async function reservePaypalCheckoutHold(
   expectedTotal: number,
 ): Promise<ReservePaypalResult> {
   if (!(process.env.GITHUB_TOKEN || "").trim()) {
-    if (process.env.VERCEL_ENV === "production") {
+    if (process.env.VERCEL_ENV === "production" || process.env.VERCEL_ENV === "preview") {
       return { ok: false, http: 503, error: "Stock backend misconfigured" };
     }
     return { ok: true, tmpHoldId: "" };
@@ -94,10 +94,9 @@ export async function bindPaypalCheckoutHold(
   paypalOrderId: string,
 ): Promise<void> {
   if (!tmpHoldId) return;
-  try {
-    const { bindPaypalHold } = await import("../github-stock.js");
-    await bindPaypalHold(tmpHoldId, paypalOrderId);
-  } catch (err) {
-    console.error("reserve-paypal: bind hold failed", err);
+  const { bindPaypalHold } = await import("../github-stock.js");
+  const bound = await bindPaypalHold(tmpHoldId, paypalOrderId);
+  if (!bound || bound.kind !== "paypal_hold" || bound.releasedAt || !bound.stockComplete) {
+    throw new Error("PayPal stock hold could not be bound");
   }
 }

@@ -712,13 +712,29 @@ export async function bindPaypalHold(
     status: "done",
     at: new Date().toISOString(),
   };
-  await writeLedger(finalLedger);
+  // Close the temporary hold first. If creating the final hold then fails,
+  // cron must not restore units that may already be represented by finalId.
   await writeLedger({
     ...tmp,
     consumedBy: finalId,
     at: new Date().toISOString(),
     error: "bound to paypal order",
   });
+  try {
+    await writeLedger(finalLedger);
+  } catch (err) {
+    // If the final write definitely did not land, reopen the temporary hold
+    // so the normal expiry job can restore its stock. An uncertain write stays
+    // closed to avoid restoring units that also belong to the final hold.
+    try {
+      if (!(await getLedger(finalId))) {
+        await writeLedger({ ...tmp, at: new Date().toISOString() });
+      }
+    } catch (recoveryErr) {
+      console.error("stock: PayPal hold bind recovery failed", recoveryErr);
+    }
+    throw err;
+  }
   return finalLedger;
 }
 
