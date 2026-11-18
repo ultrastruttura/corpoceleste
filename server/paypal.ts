@@ -121,7 +121,7 @@ export async function fetchPayPalOrder(orderId: string): Promise<PayPalOrder> {
   return (await res.json()) as PayPalOrder;
 }
 
-/** Capture an approved order (used by Google Pay after confirmOrder). */
+/** Capture an approved order (used by Google Pay / Apple Pay after confirmOrder). */
 export async function capturePayPalOrder(orderId: string): Promise<{
   id?: string;
   status?: string;
@@ -140,6 +140,11 @@ export async function capturePayPalOrder(orderId: string): Promise<{
   });
   if (!res.ok) {
     const text = await res.text();
+    // Apple Pay confirmOrder with intent=CAPTURE can already capture; treat as success.
+    if (/ORDER_ALREADY_CAPTURED|already.?captured/i.test(text)) {
+      const existing = await fetchPayPalOrder(id);
+      return { id: existing.id || id, status: existing.status || "COMPLETED" };
+    }
     throw new Error(`PayPal capture failed: ${res.status} ${text}`);
   }
   return (await res.json()) as { id?: string; status?: string };

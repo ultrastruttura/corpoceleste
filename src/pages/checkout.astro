@@ -795,7 +795,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         return;
       }
 
-      async function createServerOrder(): Promise<string> {
+      async function createServerOrder(): Promise<{ id: string; total: string }> {
         const items = sanitizeCart();
         if (!quote) throw new Error("Missing shipping quote");
         if (!hasCompleteAddress()) throw new Error("Missing shipping address");
@@ -859,9 +859,26 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           createErrorShown = true;
           throw new Error("Order create failed");
         }
-        const data = (await res.json()) as { id?: string };
+        const data = (await res.json()) as { id?: string; total?: string };
         if (!data.id) throw new Error("Missing order id");
-        return data.id;
+        return { id: data.id, total: String(data.total || "") };
+      }
+
+      async function captureServerOrder(orderId: string): Promise<void> {
+        const cap = await fetch(`${createApi}/api/paypal-create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "capture", orderId }),
+        });
+        if (!cap.ok) {
+          const body = await cap.text();
+          throw new Error(`Capture failed: ${cap.status} ${body.slice(0, 200)}`);
+        }
+        const captured = (await cap.json()) as { status?: string; ok?: boolean };
+        const status = String(captured.status || "").toUpperCase();
+        if (captured.ok === false || (status && status !== "COMPLETED")) {
+          throw new Error(`Capture status: ${captured.status || "missing"}`);
+        }
       }
 
       const shared = {
@@ -870,7 +887,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           if (!unlocked()) return actions.reject();
           return actions.resolve();
         },
-        createOrder: async () => createServerOrder(),
+        createOrder: async () => (await createServerOrder()).id,
         // Server capture (same path as Google Pay). Client `actions.order.capture()`
         // often stalls or fails after Apple Pay approval on a server-created order.
         onApprove: async (
@@ -880,24 +897,15 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           const orderId = String(data.orderID || data.orderId || "").trim();
           if (!orderId) throw new Error("Missing PayPal order id");
           saveOrderSnapshot(shippingAmount());
-          const cap = await fetch(`${createApi}/api/paypal-create-order`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "capture", orderId }),
-          });
-          if (!cap.ok) {
-            let issue = "";
-            try {
-              const body = (await cap.json()) as { error?: string; details?: Array<{ issue?: string }> };
-              issue = String(body.details?.[0]?.issue || body.error || "");
-            } catch {
-              /* ignore */
-            }
-            if (issue === "INSTRUMENT_DECLINED" && actions.restart) {
+          try {
+            await captureServerOrder(orderId);
+          } catch (err) {
+            const issue = err instanceof Error ? err.message : String(err);
+            if (/INSTRUMENT_DECLINED/i.test(issue) && actions.restart) {
               return actions.restart();
             }
-            console.error("paypal capture failed", cap.status, issue);
-            throw new Error(issue || "Capture failed");
+            console.error("paypal capture failed", issue);
+            throw err;
           }
           clearCart();
           location.href = `${base}${prefix}grazie/?from=paypal`;
@@ -937,7 +945,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         confirmOrder: (o: { orderId: string; token: unknown; billingContact: unknown }) => Promise<unknown>;
       } },
       createApi: string,
-      createServerOrder: () => Promise<string>,
+      createServerOrder: () => Promise<{ id: string; total: string }>,
     ) {
       const button = document.querySelector<HTMLButtonElement>("[data-apple-fallback]");
       if (!button) return;
@@ -993,24 +1001,50 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           };
           session.onpaymentauthorized = ({ payment }) => {
             void (async () => {
+              const sheetAmount = (total() + shippingAmount()).toFixed(2);
               try {
-                const orderId = await createServerOrder();
-                await applepay.confirmOrder({ orderId, token: payment.token, billingContact: payment.billingContact });
-                const cap = await fetch(`${createApi}/api/paypal-create-order`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ action: "capture", orderId }),
+                const order = await createServerOrder();
+                // Apple decrypt fails or leaves a pending auth if sheet ≠ PayPal order total.
+                if (order.total && order.total !== sheetAmount) {
+                  throw new Error(`Amount mismatch sheet=${sheetAmount} order=${order.total}`);
+                }
+                await applepay.confirmOrder({
+                  orderId: order.id,
+                  token: payment.token,
+                  billingContact: payment.billingContact,
                 });
-                if (!cap.ok) throw new Error(`Capture failed: ${cap.status}`);
-                const captured = (await cap.json()) as { status?: string };
-                if (captured.status !== "COMPLETED") throw new Error(`Capture status: ${captured.status || "missing"}`);
+                // Docs: complete Apple session after confirm, then capture on the server.
                 session.completePayment(sessionClass.STATUS_SUCCESS);
+                try {
+                  await captureServerOrder(order.id);
+                } catch (capErr) {
+                  console.error("Apple Pay capture after confirm", capErr);
+                  window.alert(
+                    say(
+                      "Apple Pay ha autorizzato ma la conferma shop non è andata a buon fine. Controlla PayPal / scrivimi: non riprovare subito lo stesso pagamento.",
+                      "Apple Pay authorized, but shop confirmation failed. Check PayPal / write to me — don’t retry the same payment immediately.",
+                      "Apple Pay hat autorisiert, die Shop-Bestätigung ist fehlgeschlagen. Prüfe PayPal / schreib mir — dieselbe Zahlung nicht sofort wiederholen.",
+                    ),
+                  );
+                  return;
+                }
                 saveOrderSnapshot(shippingAmount());
                 clearCart();
                 location.href = `${base}${prefix}grazie/?from=paypal`;
               } catch (err) {
                 console.error("Apple Pay authorization", err);
-                session.completePayment(sessionClass.STATUS_FAILURE);
+                try {
+                  session.completePayment(sessionClass.STATUS_FAILURE);
+                } catch {
+                  /* session may already be finished */
+                }
+                window.alert(
+                  say(
+                    "Il pagamento Apple Pay non è andato a buon fine. Non ti dovrebbe essere addebitato nulla (eventuale sospeso si sblocca da solo). Riprova o usa PayPal.",
+                    "Apple Pay didn’t complete. You shouldn’t be charged (any hold clears on its own). Try again or use PayPal.",
+                    "Apple Pay ist fehlgeschlagen. Es sollte nichts abgebucht werden (eine Sperre löst sich von selbst). Versuche es erneut oder nutze PayPal.",
+                  ),
+                );
               }
             })();
           };
@@ -1041,7 +1075,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         };
       },
       createApi: string,
-      createServerOrder: () => Promise<string>,
+      createServerOrder: () => Promise<{ id: string; total: string }>,
     ) {
       const googleFallback = document.querySelector<HTMLButtonElement>("[data-google-fallback]");
       const gpaySdk = document.querySelector<HTMLElement>("#googlepay-button");
@@ -1161,7 +1195,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           paymentDataCallbacks: {
             onPaymentAuthorized: async (paymentData: { paymentMethodData: unknown }) => {
               try {
-                const orderId = await createServerOrder();
+                const order = await createServerOrder();
+                const orderId = order.id;
                 const gp = deps.gp();
                 let confirm = await gp.confirmOrder({
                   orderId,
@@ -1175,12 +1210,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                   });
                 }
                 if (confirm.status === "APPROVED" || confirm.status === "COMPLETED") {
-                  const cap = await fetch(`${createApi}/api/paypal-create-order`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "capture", orderId }),
-                  });
-                  if (!cap.ok) throw new Error("Capture failed");
+                  await captureServerOrder(orderId);
                   saveOrderSnapshot(shippingAmount());
                   clearCart();
                   location.href = `${base}${prefix}grazie/?from=paypal`;

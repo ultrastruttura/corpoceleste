@@ -93,7 +93,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (allowed.ok === false) return json(res, 403, { error: allowed.error });
       try {
         const captured = await capturePayPalOrder(orderId);
-        return json(res, 200, { ok: true, id: captured.id, status: captured.status });
+        return json(res, 200, {
+          ok: true,
+          id: captured.id,
+          status: captured.status || "COMPLETED",
+        });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         console.error("paypal-create-order capture", msg);
