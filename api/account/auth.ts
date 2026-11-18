@@ -201,20 +201,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         kind: "invite",
         minutes: magic.minutes,
       });
-      console.info("[portal] invite →", user.email, user.name, user.role, sent.ok ? "mailed" : "mail-failed");
+      console.info(
+        "[portal] invite →",
+        user.email,
+        user.name,
+        user.role,
+        sent.ok ? "mailed" : "mail-failed",
+      );
       const payload: Record<string, unknown> = {
         ok: true,
         user,
         emailed: sent.ok,
-        message: sent.ok
-          ? `Invito artista inviato a ${user.name} <${user.email}>. Controlla che nome e mail siano quelli dell’artista (non admin).`
-          : `Utente creato, ma email non inviata. ${sent.error || "Controlla RESEND_API_KEY e MAIL_FROM su Vercel."}`,
+        message:
+          sent.ok === true
+            ? `Invito artista inviato a ${user.name} <${user.email}>. Controlla che nome e mail siano quelli dell’artista (non admin).`
+            : `Utente creato, ma email non inviata. ${sent.error || "Controlla RESEND_API_KEY e MAIL_FROM su Vercel."}`,
       };
-      if (!sent.ok && allowDevMagicLinks()) {
+      if (sent.ok === false && allowDevMagicLinks()) {
         console.info("[portal] invite magic link (dev only)", sent.link);
         payload.devLink = sent.link;
       }
-      if (!sent.ok) console.warn("[portal] invite email failed", user.email, sent.error);
+      if (sent.ok === false) console.warn("[portal] invite email failed", user.email, sent.error);
       return json(res, 200, payload);
     }
 
