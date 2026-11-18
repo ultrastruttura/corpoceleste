@@ -55,8 +55,10 @@ async function ensureCartUi() {
 
 /** cart-ui + live-stock are not needed for first paint / LCP — load after idle. */
 async function bootShopChrome() {
+  const already = cartBound && stockSynced;
   const mod = await ensureCartUi();
-  mod.renderCart();
+  // Avoid re-render on every drawer tap — that destroys qty/size controls mid-click.
+  if (!already) mod.renderCart();
   // Never block cart/checkout UI on live-stock (can take several seconds).
   if (!stockSynced) {
     stockSynced = true;
@@ -123,14 +125,13 @@ function bind() {
     });
   });
 
-  // Early cart click before idle: start loading cart-ui immediately.
-  // Skip checkout links — they must navigate without waiting on stock/boot.
+  // Prefetch cart UI only when opening the bag or adding — never on drawer controls
+  // (+/− / taglie / rimuovi): those pointerdowns used to re-render and cancel the click.
   document.addEventListener(
     "pointerdown",
     (e) => {
       const el = e.target as Element | null;
-      if (!el || el.closest("[data-cart-checkout]")) return;
-      if (!el.closest("[data-open-cart], [data-cart-drawer], [data-cart-bg], [data-add-form]")) return;
+      if (!el?.closest("[data-open-cart], [data-add-form]")) return;
       void bootShopChrome();
     },
     { capture: true, passive: true },
