@@ -9,11 +9,11 @@ nuovo: false
 createdAt: 2026-11-16T13:01:07.215Z
 colorName: Nero
 sizes:
+  - S
   - M
   - L
   - XL
   - XXL
-  - S
 stockS: 5
 stockM: 7
 stockL: 7

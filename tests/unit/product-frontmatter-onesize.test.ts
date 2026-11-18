@@ -35,4 +35,20 @@ describe("parseProductFrontmatter one-size kinds", () => {
     expect(core.sizes).toEqual(["S", "M"]);
     expect(core.stock).toEqual({ S: 3, M: 5 });
   });
+
+  it("sorts garment sizes S→XXL even if Tina YAML is shuffled", () => {
+    const core = parseProductFrontmatter({
+      title: "Tee",
+      kind: "shirt",
+      price: 20,
+      status: "preorder",
+      sizes: ["M", "L", "XL", "XXL", "S"],
+      stockS: 1,
+      stockM: 1,
+      stockL: 1,
+      stockXL: 1,
+      stockXXL: 1,
+    });
+    expect(core.sizes).toEqual(["S", "M", "L", "XL", "XXL"]);
+  });
 });
