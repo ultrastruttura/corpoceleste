@@ -11,9 +11,7 @@ const copy = t(locale);
 const shopEmail = siteSettings.shopEmail;
 const paypalClientId = commerce.paypalClientId;
 const paypalSdk = Boolean(paypalClientId);
-const orderAction = commerce.formApi
-  ? `${commerce.formApi}/api/order`
-  : `https://formsubmit.co/${shopEmail}`;
+const orderAction = commerce.formApi ? `${commerce.formApi}/api/order` : "";
 const regionNames = new Intl.DisplayNames([locale, "en"], { type: "region" });
 const shipCountries = SHIP_COUNTRIES.map((code) => ({
   code,

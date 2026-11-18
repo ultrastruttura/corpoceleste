@@ -308,7 +308,7 @@ const it = {
     contact: "Contatto:",
     cookies: "Cookie e storage",
     cookiesP1:
-      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Il carrello resta solo nel tuo browser. Umami Analytics conta le visite in forma aggregata, senza cookie sul dispositivo.",
+      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Il carrello resta solo nel tuo browser. Umami Analytics conta le visite in forma aggregata, senza cookie sul dispositivo, e rispetta Do Not Track. Nell’area artisti usiamo un cookie tecnico di sessione HttpOnly (cc_portal_session), necessario al login.",
     cookiesP3:
       "Il carrello e il riepilogo ordine stanno sul tuo dispositivo, non su un server nostro.",
     cookiesPaypal:
@@ -332,31 +332,35 @@ const it = {
       "Newsletter — consenso (art. 6.1 a), fino alla disiscrizione. Dopo resta solo l’indirizzo segnato come «disiscritto», per non scriverti più.",
       "Area artisti — contratto con l’artista (art. 6.1 b), per la durata della collaborazione e poi 10 anni per i conti.",
       "Protezione da abusi dei moduli — legittimo interesse (art. 6.1 f). Indirizzo IP cancellato entro 24 ore.",
-      "Statistiche Umami — legittimo interesse, dati aggregati e anonimi, nessun cookie.",
+      "Statistiche Umami — legittimo interesse (art. 6.1 f), dati aggregati e anonimi, nessun cookie; lo script rispetta Do Not Track del browser.",
     ],
     basisTail:
       "I dati d’ordine servono per spedire; tutto il resto è facoltativo. Nessuna decisione automatizzata.",
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
-      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Database di ordini, newsletter e area artisti su Turso (società USA). Statistiche di visita su Umami Cloud (società USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA). Dove non c’è una decisione di adeguatezza della Commissione europea, i trasferimenti verso questi fornitori avvengono con le Clausole Contrattuali Standard (SCC) della Commissione e/o, se il fornitore è certificato, nell’ambito del EU–US Data Privacy Framework (DPF), oltre alle misure tecniche del servizio (HTTPS, accessi limitati).",
+      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Database di ordini, newsletter e area artisti su Turso (società USA). Statistiche di visita su Umami Cloud (società USA). Pagamenti su PayPal. I form del sito passano solo dall’API Vercel (niente FormSubmit in produzione). Dove non c’è una decisione di adeguatezza della Commissione europea, i trasferimenti verso questi fornitori avvengono con le Clausole Contrattuali Standard (SCC) della Commissione e/o, se il fornitore è certificato, nell’ambito del EU–US Data Privacy Framework (DPF), oltre alle misure tecniche del servizio (HTTPS, accessi limitati).",
     formsubmit:
-      "fallback dei form se Vercel non è configurato. Società USA. Informativa:",
+      "non usato in produzione. Se compare qui, l’API form non è configurata. Società USA. Informativa:",
     paypalRecv: "se paghi con PayPal (sede europea, gruppo anche USA).",
     github: "hosting delle pagine pubbliche. Informativa su github.com.",
     vercel: "webhook PayPal, magazzino, form del sito, area artisti, mail di conferma. Dati d’ordine, non la carta.",
     resend: "invio delle mail (ordini, recesso, contatti, newsletter, corsi), mittente Corpoceleste.",
-    umami: "statistiche di visita aggregate, senza cookie e senza profilazione. Informativa:",
+    umami:
+      "statistiche di visita aggregate, senza cookie e senza profilazione; rispetta Do Not Track. Informativa:",
     turso: "database di ordini, iscritti alla newsletter e area artisti.",
     sendcloud: "calcolo della spedizione in checkout (paese e CAP) ed etichette di spedizione (nome, indirizzo, telefono).",
     googlePay: "se paghi con Google Pay: il pagamento passa poi da PayPal.",
     couriers: "Corrieri, solo per spedire un ordine.",
     noSell: "I dati non si vendono e non si cedono per marketing di terzi.",
+    minors: "Minori",
+    minorsBody:
+      "Il sito e lo shop non sono destinati ai minori di 18 anni. Non raccogliamo consapevolmente dati di minori.",
     rights: "Diritti",
     rightsBody:
       "Puoi chiedere accesso, rettifica, cancellazione, limitazione, opposizione e, dove applicabile, portabilità, scrivendo a",
     rightsTail:
-      "Revoca la newsletter quando vuoi. Reclamo: Garante privacy,",
+      "Indica nella email quale diritto eserciti e un modo per identificarti (es. email usata per l’ordine o la newsletter). Rispondo di norma entro 30 giorni. Revoca la newsletter quando vuoi (link in fondo alle mail o scrivimi). Reclamo: Garante privacy,",
     orderBank: "Ordine (bonifico)",
     payPaypal: "Pagamento PayPal",
     formsLabel: "Contatti, corsi, consulenza, richiesta ristampa",
@@ -365,25 +369,26 @@ const it = {
   cookiePolicy: {
     title: "Cookie policy",
     lede: "Niente profilazione. Carrello nel browser. Analytics senza cookie. PayPal e Google Pay in checkout.",
-    updated: "Ultimo aggiornamento: 28 ottobre 2026.",
+    updated: "Ultimo aggiornamento: 18 novembre 2026.",
     noBanner: "Niente banner",
     noBannerBody:
-      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Non usiamo Google Analytics né pixel pubblicitari.",
+      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Non usiamo Google Analytics né pixel pubblicitari. Umami rispetta Do Not Track del browser.",
     onSite: "Sul tuo browser",
     onSiteBody:
-      "Carrello e riepilogo dopo il checkout restano sul tuo dispositivo (localStorage / sessionStorage), non su un server nostro. Servono solo a far funzionare lo shop.",
+      "Carrello e riepilogo dopo il checkout restano sul tuo dispositivo (localStorage / sessionStorage), non su un server nostro. Servono solo a far funzionare lo shop. Nell’area artisti, dopo il login, impostiamo un cookie tecnico HttpOnly di sessione (nome: cc_portal_session), necessario all’autenticazione e non di profilazione.",
     third: "Terze parti",
     thirdBody:
-      "Umami Analytics: statistiche di visita aggregate, senza cookie. La pagina di checkout carica gli script di PayPal e Google Pay necessari al pagamento: valgono i loro cookie e le loro informative. Se scrivi il CAP in checkout, solo paese e CAP vanno a zippopotam.us per suggerirti la città.",
+      "Umami Analytics: statistiche di visita aggregate, senza cookie; se il browser ha Do Not Track attivo, lo script non traccia. La pagina di checkout carica gli script di PayPal e Google Pay necessari al pagamento: valgono i loro cookie e le loro informative. Se scrivi il CAP in checkout, solo paese e CAP vanno a zippopotam.us per suggerirti la città.",
     manage: "Come toglierli",
-    manageBody: "Impostazioni del browser → dati del sito. Oppure svuota il carrello da qui. Per PayPal, gestisci i cookie dal tuo account o dalle impostazioni del browser.",
+    manageBody:
+      "Impostazioni del browser → dati del sito. Oppure svuota il carrello da qui. Per l’area artisti, esci dall’account (il cookie di sessione scade). Per PayPal, gestisci i cookie dal tuo account o dalle impostazioni del browser. Puoi anche bloccare lo script Umami con un content blocker.",
     privacyLink: "Informativa privacy completa",
     contact: "Contatto titolare:",
   },
   terms: {
     title: "Condizioni di vendita",
     lede: "Chi vende, cosa compri, come si paga, come si recede.",
-    updated: "Ultimo aggiornamento: 28 ottobre 2026.",
+    updated: "Ultimo aggiornamento: 18 novembre 2026.",
     seller: "Venditore",
     vatLabel: "Partita IVA:",
     reaLabel: "REA:",
@@ -395,7 +400,7 @@ const it = {
     contactLabel: "Contatto:",
     scope: "Cosa regolano",
     scopeBody:
-      "Queste condizioni valgono per gli acquisti fatti su questo sito. Sono scritte per chi compra come consumatore, cioè fuori da attività d’impresa o professione. Comprando accetti queste condizioni nella versione pubblicata al momento dell’ordine.",
+      "Queste condizioni valgono per gli acquisti fatti su questo sito. Sono scritte per chi compra come consumatore, cioè fuori da attività d’impresa o professione. Il sito e lo shop non sono destinati ai minori di 18 anni. Comprando accetti queste condizioni nella versione pubblicata al momento dell’ordine.",
     products: "Cosa vendo",
     productsBody:
       "Serigrafie stampate a mano, una per volta, in tiratura limitata: maglie, stampe su carta, pezzi numerati. Essendo stampa manuale, piccole differenze di registro, inchiostro e posizione fanno parte del pezzo e non sono difetti. Le foto sono indicative: colore e resa possono variare leggermente da schermo a schermo.",
@@ -764,7 +769,7 @@ const en: typeof it = {
     contact: "Contact:",
     cookies: "Cookies and storage",
     cookiesP1:
-      "No profiling or advertising cookies: that is why there is no banner. The cart stays only in your browser. Umami Analytics counts visits in aggregate, without cookies on your device.",
+      "No profiling or advertising cookies: that is why there is no banner. The cart stays only in your browser. Umami Analytics counts visits in aggregate, without cookies on your device, and respects Do Not Track. In the artist area we use a technical HttpOnly session cookie (cc_portal_session), required for login.",
     cookiesP3:
       "The cart and order summary stay on your device, not on a server of ours.",
     cookiesPaypal:
@@ -788,31 +793,35 @@ const en: typeof it = {
       "Newsletter — consent (art. 6(1)(a)), until you unsubscribe. Afterwards only the address marked “unsubscribed” is kept, so we never write again.",
       "Artist area — contract with the artist (art. 6(1)(b)), for the length of the collaboration and then 10 years for the accounts.",
       "Form abuse protection — legitimate interest (art. 6(1)(f)). IP address deleted within 24 hours.",
-      "Umami statistics — legitimate interest, aggregated anonymous data, no cookies.",
+      "Umami statistics — legitimate interest (art. 6(1)(f)), aggregated anonymous data, no cookies; the script respects browser Do Not Track.",
     ],
     basisTail:
       "Order data is needed to ship; everything else is optional. No automated decision-making.",
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
-      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Orders, newsletter and artist-area database on Turso (US company). Visit statistics on Umami Cloud (US company). Payments on PayPal. If the API is off, forms may use FormSubmit (USA). Where there is no European Commission adequacy decision, transfers to these providers rely on the Commission’s Standard Contractual Clauses (SCCs) and/or, if the provider is certified, the EU–US Data Privacy Framework (DPF), together with the service’s technical measures (HTTPS, limited access).",
+      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Orders, newsletter and artist-area database on Turso (US company). Visit statistics on Umami Cloud (US company). Payments on PayPal. Site forms go only through the Vercel API (no FormSubmit in production). Where there is no European Commission adequacy decision, transfers to these providers rely on the Commission’s Standard Contractual Clauses (SCCs) and/or, if the provider is certified, the EU–US Data Privacy Framework (DPF), together with the service’s technical measures (HTTPS, limited access).",
     formsubmit:
-      "form fallback if Vercel is not configured. US company. Notice:",
+      "not used in production. If it appears here, the form API is not configured. US company. Notice:",
     paypalRecv: "if you pay with PayPal (European seat, group also in the USA).",
     github: "hosts the public pages. Notice on github.com.",
     vercel: "PayPal webhook, stock, site forms, artist area, confirmation mail. Order data, not the card.",
     resend: "sends mail (orders, withdrawal, contact, newsletter, workshops), from Corpoceleste.",
-    umami: "aggregated visit statistics, no cookies and no profiling. Notice:",
+    umami:
+      "aggregated visit statistics, no cookies and no profiling; respects Do Not Track. Notice:",
     turso: "database for orders, newsletter subscribers and the artist area.",
     sendcloud: "shipping quote at checkout (country and postcode) and shipping labels (name, address, phone).",
     googlePay: "if you pay with Google Pay; the payment then goes through PayPal.",
     couriers: "Couriers, only to ship an order.",
     noSell: "Data is not sold or passed on for third-party marketing.",
+    minors: "Minors",
+    minorsBody:
+      "The site and shop are not directed at anyone under 18. We do not knowingly collect data from minors.",
     rights: "Rights",
     rightsBody:
       "You can ask for access, rectification, erasure, restriction, objection and, where it applies, portability, by writing to",
     rightsTail:
-      "Withdraw the newsletter whenever you want. Complaint: Garante privacy,",
+      "In the email say which right you are exercising and how we can identify you (e.g. the email used for the order or newsletter). I normally reply within 30 days. Withdraw the newsletter whenever you want (link in emails or write to me). Complaint: Garante privacy,",
     orderBank: "Order (bank transfer)",
     payPaypal: "PayPal payment",
     formsLabel: "Contact, workshops, consulting, reprint request",
@@ -821,25 +830,26 @@ const en: typeof it = {
   cookiePolicy: {
     title: "Cookie policy",
     lede: "No profiling. Cart in the browser. Cookieless analytics. PayPal and Google Pay at checkout.",
-    updated: "Last updated: 28 October 2026.",
+    updated: "Last updated: 18 November 2026.",
     noBanner: "No banner",
     noBannerBody:
-      "No profiling or advertising cookies: that is why there is no banner. We do not use Google Analytics or advertising pixels.",
+      "No profiling or advertising cookies: that is why there is no banner. We do not use Google Analytics or advertising pixels. Umami respects browser Do Not Track.",
     onSite: "On your browser",
     onSiteBody:
-      "Cart and post-checkout summary stay on your device (localStorage / sessionStorage), not on a server of ours. They only make the shop work.",
+      "Cart and post-checkout summary stay on your device (localStorage / sessionStorage), not on a server of ours. They only make the shop work. In the artist area, after login, we set a technical HttpOnly session cookie (name: cc_portal_session), required for authentication and not for profiling.",
     third: "Third parties",
     thirdBody:
-      "Umami Analytics: aggregated visit statistics, no cookies. The checkout page loads the PayPal and Google Pay scripts needed for payment: their cookies and notices apply. Typing a postcode at checkout sends only country and postcode to zippopotam.us to suggest the city.",
+      "Umami Analytics: aggregated visit statistics, no cookies; if the browser has Do Not Track on, the script does not track. The checkout page loads the PayPal and Google Pay scripts needed for payment: their cookies and notices apply. Typing a postcode at checkout sends only country and postcode to zippopotam.us to suggest the city.",
     manage: "How to remove them",
-    manageBody: "Browser settings → site data. Or empty the cart from here. For PayPal, manage cookies in your account or browser settings.",
+    manageBody:
+      "Browser settings → site data. Or empty the cart from here. For the artist area, sign out (the session cookie expires). For PayPal, manage cookies in your account or browser settings. You can also block the Umami script with a content blocker.",
     privacyLink: "Full privacy notice",
     contact: "Controller contact:",
   },
   terms: {
     title: "Terms of sale",
     lede: "Who sells, what you buy, how you pay, how you withdraw.",
-    updated: "Last updated: 28 October 2026.",
+    updated: "Last updated: 18 November 2026.",
     seller: "Seller",
     vatLabel: "VAT number:",
     reaLabel: "Business register:",
@@ -851,7 +861,7 @@ const en: typeof it = {
     contactLabel: "Contact:",
     scope: "What these terms cover",
     scopeBody:
-      "These terms apply to purchases made on this site. They are written for people buying as consumers, that is outside a business or profession. By ordering you accept the version published at the time of your order.",
+      "These terms apply to purchases made on this site. They are written for people buying as consumers, that is outside a business or profession. The site and shop are not directed at anyone under 18. By ordering you accept the version published at the time of your order.",
     products: "What I sell",
     productsBody:
       "Hand-pulled screen prints in limited runs: shirts, prints on paper, numbered pieces. Because printing is manual, small differences in registration, ink and placement are part of the piece and are not defects. Photos are indicative: colour can vary slightly from screen to screen.",
@@ -1220,7 +1230,7 @@ const de: typeof it = {
     contact: "Kontakt:",
     cookies: "Cookies und Speicher",
     cookiesP1:
-      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Der Warenkorb bleibt nur in deinem Browser. Umami Analytics zählt Besuche aggregiert, ohne Cookies auf dem Gerät.",
+      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Der Warenkorb bleibt nur in deinem Browser. Umami Analytics zählt Besuche aggregiert, ohne Cookies auf dem Gerät, und respektiert Do Not Track. Im Künstlerbereich nutzen wir ein technisches HttpOnly-Sitzungs-Cookie (cc_portal_session), nötig für den Login.",
     cookiesP3:
       "Warenkorb und Bestellübersicht bleiben auf deinem Gerät, nicht auf einem Server von uns.",
     cookiesPaypal:
@@ -1244,31 +1254,35 @@ const de: typeof it = {
       "Newsletter — Einwilligung (Art. 6 Abs. 1 lit. a), bis zur Abmeldung. Danach bleibt nur die als „abgemeldet“ markierte Adresse, damit wir dir nicht mehr schreiben.",
       "Künstlerbereich — Vertrag mit dem Künstler (Art. 6 Abs. 1 lit. b), für die Dauer der Zusammenarbeit und danach 10 Jahre für die Abrechnung.",
       "Schutz der Formulare vor Missbrauch — berechtigtes Interesse (Art. 6 Abs. 1 lit. f). IP-Adresse innerhalb von 24 Stunden gelöscht.",
-      "Umami-Statistiken — berechtigtes Interesse, aggregierte anonyme Daten, keine Cookies.",
+      "Umami-Statistiken — berechtigtes Interesse (Art. 6 Abs. 1 lit. f), aggregierte anonyme Daten, keine Cookies; das Skript respektiert Do Not Track.",
     ],
     basisTail:
       "Bestelldaten sind für den Versand nötig; alles andere ist freiwillig. Keine automatisierten Entscheidungen.",
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
-      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Datenbank für Bestellungen, Newsletter und Künstlerbereich auf Turso (US-Unternehmen). Besuchsstatistiken auf Umami Cloud (US-Unternehmen). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen. Liegt kein Angemessenheitsbeschluss der Europäischen Kommission vor, erfolgen Übermittlungen an diese Anbieter über die Standardvertragsklauseln (SCC) der Kommission und/oder — sofern der Anbieter zertifiziert ist — im Rahmen des EU–US Data Privacy Framework (DPF), ergänzt durch die technischen Maßnahmen des Dienstes (HTTPS, eingeschränkte Zugänge).",
+      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Datenbank für Bestellungen, Newsletter und Künstlerbereich auf Turso (US-Unternehmen). Besuchsstatistiken auf Umami Cloud (US-Unternehmen). Zahlungen auf PayPal. Formulare laufen nur über die Vercel-API (kein FormSubmit in Produktion). Liegt kein Angemessenheitsbeschluss der Europäischen Kommission vor, erfolgen Übermittlungen an diese Anbieter über die Standardvertragsklauseln (SCC) der Kommission und/oder — sofern der Anbieter zertifiziert ist — im Rahmen des EU–US Data Privacy Framework (DPF), ergänzt durch die technischen Maßnahmen des Dienstes (HTTPS, eingeschränkte Zugänge).",
     formsubmit:
-      "Formular-Fallback, wenn Vercel nicht konfiguriert ist. US-Unternehmen. Hinweise:",
+      "in Produktion nicht genutzt. Wenn es hier erscheint, ist die Formular-API nicht konfiguriert. US-Unternehmen. Hinweise:",
     paypalRecv: "wenn du mit PayPal zahlst (Sitz in Europa, Gruppe auch in den USA).",
     github: "hostet die öffentlichen Seiten. Hinweise auf github.com.",
     vercel: "PayPal-Webhook, Bestand, Formulare, Künstlerbereich, Bestätigungsmails. Bestelldaten, keine Karte.",
     resend: "versendet Mails (Bestellung, Widerruf, Kontakt, Newsletter, Kurse), Absender Corpoceleste.",
-    umami: "aggregierte Besuchsstatistiken, ohne Cookies und ohne Profiling. Hinweise:",
+    umami:
+      "aggregierte Besuchsstatistiken, ohne Cookies und ohne Profiling; respektiert Do Not Track. Hinweise:",
     turso: "Datenbank für Bestellungen, Newsletter-Abonnenten und Künstlerbereich.",
     sendcloud: "Versandberechnung an der Kasse (Land und PLZ) und Versandetiketten (Name, Adresse, Telefon).",
     googlePay: "wenn du mit Google Pay zahlst; die Zahlung läuft dann über PayPal.",
     couriers: "Paketdienste, nur zum Versand einer Bestellung.",
     noSell: "Daten werden nicht verkauft und nicht für Werbung Dritter weitergegeben.",
+    minors: "Minderjährige",
+    minorsBody:
+      "Website und Shop richten sich nicht an Personen unter 18 Jahren. Wir erheben wissentlich keine Daten von Minderjährigen.",
     rights: "Rechte",
     rightsBody:
       "Du kannst Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und, soweit es gilt, Datenübertragbarkeit verlangen, per Mail an",
     rightsTail:
-      "Newsletter jederzeit widerrufen. Beschwerde: Garante privacy,",
+      "Schreib in der E-Mail, welches Recht du ausübst, und wie wir dich erkennen können (z. B. die E-Mail der Bestellung oder des Newsletters). Ich antworte in der Regel innerhalb von 30 Tagen. Newsletter jederzeit widerrufen (Link in den Mails oder schreib mir). Beschwerde: Garante privacy,",
     orderBank: "Bestellung (Überweisung)",
     payPaypal: "PayPal-Zahlung",
     formsLabel: "Kontakt, Kurse, Beratung, Nachdruck",
@@ -1277,25 +1291,26 @@ const de: typeof it = {
   cookiePolicy: {
     title: "Cookie-Richtlinie",
     lede: "Kein Profiling. Warenkorb im Browser. Analytics ohne Cookies. PayPal und Google Pay an der Kasse.",
-    updated: "Stand: 28. Oktober 2026.",
+    updated: "Stand: 18. November 2026.",
     noBanner: "Kein Banner",
     noBannerBody:
-      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Wir nutzen weder Google Analytics noch Werbe-Pixel.",
+      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Wir nutzen weder Google Analytics noch Werbe-Pixel. Umami respektiert Do Not Track im Browser.",
     onSite: "In deinem Browser",
     onSiteBody:
-      "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät (localStorage / sessionStorage), nicht auf einem Server von uns. Sie dienen nur dem Shop.",
+      "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät (localStorage / sessionStorage), nicht auf einem Server von uns. Sie dienen nur dem Shop. Im Künstlerbereich setzen wir nach dem Login ein technisches HttpOnly-Sitzungs-Cookie (Name: cc_portal_session), nötig zur Authentifizierung und nicht zum Profiling.",
     third: "Dritte",
     thirdBody:
-      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
+      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies; bei aktivem Do Not Track trackt das Skript nicht. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
     manage: "Wie du sie entfernst",
-    manageBody: "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen verwalten.",
+    manageBody:
+      "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Im Künstlerbereich: abmelden (das Sitzungs-Cookie läuft ab). Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen verwalten. Du kannst das Umami-Skript auch mit einem Content-Blocker sperren.",
     privacyLink: "Vollständiger Datenschutzhinweis",
     contact: "Kontakt Verantwortlicher:",
   },
   terms: {
     title: "Verkaufsbedingungen",
     lede: "Wer verkauft, was du kaufst, wie bezahlt wird, wie du widerrufst.",
-    updated: "Stand: 28. Oktober 2026.",
+    updated: "Stand: 18. November 2026.",
     seller: "Verkäufer",
     vatLabel: "USt-IdNr.:",
     reaLabel: "Handelsregister:",
@@ -1307,7 +1322,7 @@ const de: typeof it = {
     contactLabel: "Kontakt:",
     scope: "Geltungsbereich",
     scopeBody:
-      "Diese Bedingungen gelten für Käufe auf dieser Website. Sie sind für Verbraucher geschrieben, also für Käufe außerhalb einer gewerblichen oder beruflichen Tätigkeit. Mit der Bestellung akzeptierst du die zum Zeitpunkt der Bestellung veröffentlichte Fassung.",
+      "Diese Bedingungen gelten für Käufe auf dieser Website. Sie sind für Verbraucher geschrieben, also für Käufe außerhalb einer gewerblichen oder beruflichen Tätigkeit. Website und Shop richten sich nicht an Personen unter 18 Jahren. Mit der Bestellung akzeptierst du die zum Zeitpunkt der Bestellung veröffentlichte Fassung.",
     products: "Was ich verkaufe",
     productsBody:
       "Von Hand gedruckte Siebdrucke in limitierter Auflage: Shirts, Papierdrucke, nummerierte Stücke. Weil von Hand gedruckt wird, gehören kleine Abweichungen bei Register, Farbe und Position zum Stück und sind keine Mängel. Fotos sind Anhaltspunkte: Farben können je nach Bildschirm leicht abweichen.",

@@ -31,7 +31,7 @@ export const site = {
     "BAAM0t3KcdroiWYnkmi328SdvzTkYVhsGK9W2sRAOgmXuAF0cP8B7bPs-Pu7EJGvMRRxhLyteIrIUMyd-I",
   /**
    * URL del progetto Vercel (senza slash finale), es. https://corpoceleste-xxxx.vercel.app
-   * Se vuoto, bonifico e recesso restano su FormSubmit. Con URL: mail transazionali da Vercel.
+   * Se vuoto, form/checkout API non partono (niente FormSubmit). Con URL: mail e form su Vercel.
    */
   formApi: "https://corpoceleste.vercel.app",
   sede: "Nembro (BG), Italia",
@@ -64,9 +64,9 @@ export function formEndpoint(kind: "order" | "withdrawal" | "form") {
   return base ? `${base}/api/${kind}` : "";
 }
 
-/** Contact / newsletter / workshops / consulting / reprint. Falls back to FormSubmit. */
-export function publicFormAction(shopEmail: string) {
-  return formEndpoint("form") || `https://formsubmit.co/${shopEmail}`;
+/** Contact / newsletter / workshops / consulting / reprint. Empty if formApi unset (no FormSubmit). */
+export function publicFormAction(_shopEmail?: string) {
+  return formEndpoint("form");
 }
 
 /** Base URL for Vercel APIs (orders, portal). Empty = not configured. */
