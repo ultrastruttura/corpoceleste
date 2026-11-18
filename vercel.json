@@ -3,6 +3,12 @@
   "buildCommand": "",
   "installCommand": "npm install --omit=dev",
   "ignoreCommand": "node scripts/vercel-ignore-build.mjs",
+  "headers": [
+    {
+      "source": "/.well-known/apple-developer-merchantid-domain-association",
+      "headers": [{ "key": "Content-Type", "value": "application/octet-stream" }]
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron-stock-release",
