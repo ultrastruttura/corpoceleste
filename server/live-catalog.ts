@@ -7,15 +7,27 @@ import { getRuntimeStockMap } from "./stock/runtime-stock.js";
 export type LiveCatalogProduct = {
   id: string;
   title: string;
+  /** On-hand qty after Turso overlay (orders / holds). */
   stock: Record<string, number>;
+  /** Seed qty from Tina frontmatter (pre-sale baseline). */
+  tinaStock: Record<string, number>;
   status: string;
   price: number;
+  artistSlug: string;
 };
 
 function repoParts() {
   const full = process.env.GITHUB_REPO || "ultrastruttura/corpoceleste";
   const [owner, name] = full.split("/");
   return { owner, name, branch: process.env.GITHUB_BRANCH || "main" };
+}
+
+function artistSlugFromRef(ref: unknown): string {
+  if (ref == null || ref === "") return "";
+  const s = String(ref).trim();
+  if (!s || s === "null" || s === "undefined") return "";
+  const match = s.match(/artists\/([^/]+?)(?:\.md)?$/);
+  return match?.[1] ?? s;
 }
 
 export async function listLiveCatalogProducts(): Promise<LiveCatalogProduct[]> {
@@ -42,6 +54,7 @@ export async function listLiveCatalogProducts(): Promise<LiveCatalogProduct[]> {
       const raw = await fetch(String(f.download_url)).then((r) => r.text());
       const { data } = matter(raw);
       const core = parseProductFrontmatter(data as Record<string, unknown>, id);
+      const tinaStock = { ...core.stock };
       const overlay = await getRuntimeStockMap(id, core.stock);
       const stock = { ...core.stock };
       for (const [size, qty] of Object.entries(overlay)) {
@@ -51,8 +64,10 @@ export async function listLiveCatalogProducts(): Promise<LiveCatalogProduct[]> {
         id,
         title: core.title || id,
         stock,
+        tinaStock,
         status: core.status,
         price: core.price,
+        artistSlug: artistSlugFromRef((data as Record<string, unknown>).artist),
       } satisfies LiveCatalogProduct;
     }),
   );
