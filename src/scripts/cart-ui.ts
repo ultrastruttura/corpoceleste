@@ -332,6 +332,19 @@ export function bindCart() {
       openCart();
     });
   });
+  // iOS/WebKit: navigating while body.cart-open { overflow:hidden } can leave the next
+  // page unscrollable / “frozen”. Close the drawer, then navigate on the next frame.
+  document.querySelectorAll<HTMLAnchorElement>("[data-cart-checkout]").forEach((node) => {
+    node.addEventListener("click", (e) => {
+      const href = node.href;
+      if (!href) return;
+      e.preventDefault();
+      closeCart();
+      requestAnimationFrame(() => {
+        location.assign(href);
+      });
+    });
+  });
   document.querySelector("[data-close-cart]")?.addEventListener("click", closeCart);
   document.querySelector("[data-cart-bg]")?.addEventListener("click", closeCart);
   document.addEventListener("keydown", onDrawerKey);

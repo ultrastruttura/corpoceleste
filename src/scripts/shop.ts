@@ -56,11 +56,12 @@ async function ensureCartUi() {
 /** cart-ui + live-stock are not needed for first paint / LCP — load after idle. */
 async function bootShopChrome() {
   const mod = await ensureCartUi();
+  mod.renderCart();
+  // Never block cart/checkout UI on live-stock (can take several seconds).
   if (!stockSynced) {
     stockSynced = true;
-    await refreshLiveStock();
+    void refreshLiveStock().then(() => mod.renderCart());
   }
-  mod.renderCart();
 }
 
 function whenIdle(fn: () => void) {
@@ -123,11 +124,13 @@ function bind() {
   });
 
   // Early cart click before idle: start loading cart-ui immediately.
+  // Skip checkout links — they must navigate without waiting on stock/boot.
   document.addEventListener(
     "pointerdown",
     (e) => {
       const el = e.target as Element | null;
-      if (!el?.closest("[data-open-cart], [data-cart-drawer], [data-cart-bg], [data-add-form]")) return;
+      if (!el || el.closest("[data-cart-checkout]")) return;
+      if (!el.closest("[data-open-cart], [data-cart-drawer], [data-cart-bg], [data-add-form]")) return;
       void bootShopChrome();
     },
     { capture: true, passive: true },
