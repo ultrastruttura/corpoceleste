@@ -163,7 +163,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       const magic = await issueMagicLink(user.id);
       const sent = await sendMagicLinkEmail(user, magic.token, { minutes: magic.minutes });
-      if (!sent.ok) {
+      if (sent.ok === false) {
         // Same client body as success — do not leak that the email exists via Resend errors.
         console.warn("[portal] magic link email failed for", user.email, sent.error);
         await padLoginTiming(started);

@@ -213,7 +213,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const mail = await sendShippedCustomerMail(current);
           mailed = mail.ok;
           mailError = mail.error || "";
-          if (!mail.ok) {
+          if (mail.ok === false) {
             console.error("orders: shipped mail failed", current.id, mail.error);
           } else {
             await markShopOrderShippedMail(current.id);

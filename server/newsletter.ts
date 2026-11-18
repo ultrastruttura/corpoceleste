@@ -246,7 +246,7 @@ export async function confirmNewsletterSubscriber(email: string, locale: string)
   if (!alreadyActive) {
     const welcome = await sendNewsletterWelcomeEmail({ email: normalized, locale: loc });
     welcomed = welcome.ok;
-    if (!welcome.ok) {
+    if (welcome.ok === false) {
       console.error("newsletter: welcome mail failed", welcome.error);
     }
   }
@@ -271,7 +271,7 @@ async function notifyShopUnsubscribe(email: string) {
       "L’indirizzo resta in elenco come disiscritto (non riceverà più invii).",
     ].join("\n"),
   });
-  if (!result.ok) {
+  if (result.ok === false) {
     console.error("newsletter: unsub notify failed", result.error);
   }
 }
@@ -314,7 +314,7 @@ export async function unsubscribeNewsletterSubscriber(
   if (!opts?.skipResend) {
     const resend = await unsubscribeResendContact(normalized);
     resendOk = resend.ok;
-    resendError = resend.ok ? "" : resend.error;
+    resendError = resend.ok === false ? resend.error : "";
   }
   if (wasActive) {
     await notifyShopUnsubscribe(normalized);

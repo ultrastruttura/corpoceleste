@@ -52,4 +52,3 @@ if (!affectsApi) {
 
 console.log("Continue Vercel build — API-related changes detected");
 process.exit(1);
-}
