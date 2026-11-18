@@ -191,7 +191,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (fromKey === "newsletter") {
     const locale = field(body, "locale") || "it";
     const sent = await sendNewsletterConfirmEmail({ email, locale });
-    if (!sent.ok) {
+    if (sent.ok === false) {
       console.error("form: newsletter confirm mail failed", sent.error);
       // Reuse client _next (locale path) so we never show a blank Vercel error page.
       try {

@@ -25,7 +25,7 @@ export async function notifyOrder(opts: {
       subject: opts.shopSubject,
       text: opts.shopBody,
     });
-    if (!sent.ok) {
+    if (sent.ok === false) {
       console.error("notifyOrder: shop mail failed", to, sent.error);
       shopOk = false;
     }
@@ -38,7 +38,7 @@ export async function notifyOrder(opts: {
       subject: opts.customerSubject,
       text: opts.customerBody,
     });
-    if (!cust.ok) {
+    if (cust.ok === false) {
       console.error("notifyOrder: customer mail failed", cust.error);
     }
   }
