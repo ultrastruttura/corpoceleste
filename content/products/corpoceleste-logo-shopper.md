@@ -15,11 +15,6 @@ stockL: 0
 stockXL: 0
 stockXXL: 0
 stockQty: 32
-images:
-  - /uploads/Shopper-logo-EDIT.jpg
-  - /uploads/Shopper-logo-EDIT-(2).jpg
-  - /uploads/Shopper-logo-EDIT-(3).jpg
-  - /uploads/Shopper-logo-EDIT-(4).jpg
 description:
   it: |-
     Shopper 100% cotone 130gr, colore cotone naturale (off-white), 35 pezzi
