@@ -300,7 +300,7 @@ const it = {
   privacy: {
     title: "Privacy",
     lede: "Chi tratta i dati, perché, e a chi arrivano.",
-    updated: "Ultimo aggiornamento: 3 novembre 2026.",
+    updated: "Ultimo aggiornamento: 18 novembre 2026.",
     controller: "Titolare",
     controllerBody: (name: string, sede: string) =>
       `${name}, per il sito Corpoceleste. Sede: ${sede}.`,
@@ -339,7 +339,7 @@ const it = {
     recipients: "Chi riceve i dati",
     transfers: "Trasferimenti extra-UE",
     transfersBody:
-      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Database di ordini, newsletter e area artisti su Turso (società USA). Statistiche di visita su Umami Cloud (società USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA).",
+      "Pagine su GitHub (USA). Magazzino, webhook PayPal, form e mail su Vercel e Resend (USA). Database di ordini, newsletter e area artisti su Turso (società USA). Statistiche di visita su Umami Cloud (società USA). Pagamenti su PayPal. Se l’API non è attiva, i form possono passare da FormSubmit (USA). Dove non c’è una decisione di adeguatezza della Commissione europea, i trasferimenti verso questi fornitori avvengono con le Clausole Contrattuali Standard (SCC) della Commissione e/o, se il fornitore è certificato, nell’ambito del EU–US Data Privacy Framework (DPF), oltre alle misure tecniche del servizio (HTTPS, accessi limitati).",
     formsubmit:
       "fallback dei form se Vercel non è configurato. Società USA. Informativa:",
     paypalRecv: "se paghi con PayPal (sede europea, gruppo anche USA).",
@@ -756,7 +756,7 @@ const en: typeof it = {
   privacy: {
     title: "Privacy",
     lede: "Who processes the data, why, and who receives it.",
-    updated: "Last updated: 3 November 2026.",
+    updated: "Last updated: 18 November 2026.",
     controller: "Controller",
     controllerBody: (name: string, sede: string) =>
       `${name}, for the Corpoceleste site. Address: ${sede}.`,
@@ -795,7 +795,7 @@ const en: typeof it = {
     recipients: "Who receives the data",
     transfers: "Transfers outside the EU",
     transfersBody:
-      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Orders, newsletter and artist-area database on Turso (US company). Visit statistics on Umami Cloud (US company). Payments on PayPal. If the API is off, forms may use FormSubmit (USA).",
+      "Pages on GitHub (USA). Stock, PayPal webhook, forms and mail on Vercel and Resend (USA). Orders, newsletter and artist-area database on Turso (US company). Visit statistics on Umami Cloud (US company). Payments on PayPal. If the API is off, forms may use FormSubmit (USA). Where there is no European Commission adequacy decision, transfers to these providers rely on the Commission’s Standard Contractual Clauses (SCCs) and/or, if the provider is certified, the EU–US Data Privacy Framework (DPF), together with the service’s technical measures (HTTPS, limited access).",
     formsubmit:
       "form fallback if Vercel is not configured. US company. Notice:",
     paypalRecv: "if you pay with PayPal (European seat, group also in the USA).",
@@ -1212,7 +1212,7 @@ const de: typeof it = {
   privacy: {
     title: "Datenschutz",
     lede: "Wer die Daten verarbeitet, wozu, und wer sie erhält.",
-    updated: "Stand: 3. November 2026.",
+    updated: "Stand: 18. November 2026.",
     controller: "Verantwortlicher",
     controllerBody: (name: string, sede: string) =>
       `${name}, für die Website Corpoceleste. Sitz: ${sede}.`,
@@ -1251,7 +1251,7 @@ const de: typeof it = {
     recipients: "Wer die Daten erhält",
     transfers: "Übermittlungen außerhalb der EU",
     transfersBody:
-      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Datenbank für Bestellungen, Newsletter und Künstlerbereich auf Turso (US-Unternehmen). Besuchsstatistiken auf Umami Cloud (US-Unternehmen). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen.",
+      "Seiten auf GitHub (USA). Bestand, PayPal-Webhook, Formulare und Mails auf Vercel und Resend (USA). Datenbank für Bestellungen, Newsletter und Künstlerbereich auf Turso (US-Unternehmen). Besuchsstatistiken auf Umami Cloud (US-Unternehmen). Zahlungen auf PayPal. Ist die API aus, können Formulare über FormSubmit (USA) laufen. Liegt kein Angemessenheitsbeschluss der Europäischen Kommission vor, erfolgen Übermittlungen an diese Anbieter über die Standardvertragsklauseln (SCC) der Kommission und/oder — sofern der Anbieter zertifiziert ist — im Rahmen des EU–US Data Privacy Framework (DPF), ergänzt durch die technischen Maßnahmen des Dienstes (HTTPS, eingeschränkte Zugänge).",
     formsubmit:
       "Formular-Fallback, wenn Vercel nicht konfiguriert ist. US-Unternehmen. Hinweise:",
     paypalRecv: "wenn du mit PayPal zahlst (Sitz in Europa, Gruppe auch in den USA).",
