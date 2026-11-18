@@ -247,8 +247,20 @@ type AdminRoute =
   | { name: "artists" }
   | { name: "artist"; id: string }
   | { name: "orders" }
+  | { name: "stock" }
   | { name: "newsletter" }
   | { name: "settings" };
+
+type StockSizeRow = { size: string; tina: number; live: number; sold: number };
+type StockProduct = {
+  id: string;
+  title: string;
+  status: string;
+  artistSlug: string;
+  tinaTotal: number;
+  liveTotal: number;
+  sizes: StockSizeRow[];
+};
 
 type ShopOrder = {
   id: string;
@@ -817,10 +829,117 @@ if (!root || !app) {
     return box;
   }
 
+  async function renderStockPanel(
+    mount: HTMLElement,
+    opts?: { title?: string; lede?: string },
+  ) {
+    mount.append(
+      el("h2", "account-section-title", opts?.title ?? "Magazzino"),
+      el(
+        "p",
+        "account-lede",
+        opts?.lede ??
+          "Tina = pezzi caricati a catalogo. Live = disponibili dopo ordini e hold PayPal. Venduti ≈ Tina − Live.",
+      ),
+    );
+    const msg = el("p", "account-msg");
+    msg.hidden = true;
+    mount.append(msg);
+
+    const host = el("div", "account-stock");
+    mount.append(host);
+
+    let data: { products: StockProduct[] };
+    try {
+      data = (await apiFetch(base, "stock")) as { products: StockProduct[] };
+    } catch (err) {
+      setMsg(msg, err instanceof Error ? err.message : "Errore caricamento magazzino");
+      return;
+    }
+
+    if (!data.products.length) {
+      host.append(el("p", "account-lede", "Nessun prodotto in magazzino per questo profilo."));
+      return;
+    }
+
+    const totals = data.products.reduce(
+      (acc, p) => {
+        acc.tina += p.tinaTotal;
+        acc.live += p.liveTotal;
+        return acc;
+      },
+      { tina: 0, live: 0 },
+    );
+    host.append(
+      metrics([
+        ["Tina (catalogo)", String(totals.tina)],
+        ["Live (disponibili)", String(totals.live)],
+        ["Venduti / riservati", String(Math.max(0, totals.tina - totals.live))],
+      ]),
+    );
+
+    for (const p of data.products) {
+      const block = el("section", "account-stock-product");
+      const head = el("div", "account-stock-product__head");
+      const title = el("strong", "", p.title);
+      const meta = el(
+        "small",
+        "account-stock-product__meta",
+        [
+          p.status,
+          p.artistSlug ? `artista: ${p.artistSlug}` : "",
+          `Tina ${p.tinaTotal} · Live ${p.liveTotal}`,
+        ]
+          .filter(Boolean)
+          .join(" · "),
+      );
+      head.append(title, meta);
+      block.append(head);
+
+      if (!p.sizes.length) {
+        block.append(el("p", "account-lede", "Nessuna taglia in stock."));
+        host.append(block);
+        continue;
+      }
+
+      const table = el("div", "account-table account-stock-table");
+      const thead = el("div", "account-table__head");
+      thead.append(
+        el("span", "", "Taglia"),
+        el("span", "account-table__num", "Tina"),
+        el("span", "account-table__num", "Live"),
+        el("span", "account-table__num", "Venduti"),
+      );
+      table.append(thead);
+      for (const row of p.sizes) {
+        const tr = el("div", "account-table__row");
+        if (row.live === 0) tr.classList.add("account-stock-row--empty");
+        tr.append(
+          el("span", "", row.size),
+          el("span", "account-table__num", String(row.tina)),
+          el("span", "account-table__num", String(row.live)),
+          el("span", "account-table__num", String(row.sold)),
+        );
+        table.append(tr);
+      }
+      block.append(table);
+      host.append(block);
+    }
+  }
+
   async function renderArtist(user: User, dashPrefetch?: Dashboard) {
     root!.classList.remove("account-page--admin");
     app!.innerHTML = "";
-    app!.append(toolbar(user), el("h2", "", "Il tuo prospetto"));
+    app!.append(toolbar(user));
+
+    const stockHost = el("section", "account-stock-artist");
+    app!.append(stockHost);
+    await renderStockPanel(stockHost, {
+      title: "Magazzino",
+      lede: "I tuoi pezzi: Tina (catalogo) vs Live (dopo gli ordini).",
+    });
+
+    app!.append(el("h2", "", "Il tuo prospetto"));
     const dashFull =
       dashPrefetch ||
       ((await apiFetch(base, "settle?dashboard=1")) as Dashboard);
@@ -872,6 +991,7 @@ if (!root || !app) {
       if (id) return { name: "artist", id };
     }
     if (raw === "ordini") return { name: "orders" };
+    if (raw === "magazzino") return { name: "stock" };
     if (raw === "newsletter") return { name: "newsletter" };
     if (raw === "impostazioni") return { name: "settings" };
     return { name: "artists" };
@@ -883,11 +1003,13 @@ if (!root || !app) {
         ? "#artisti"
         : route.name === "orders"
           ? "#ordini"
-          : route.name === "newsletter"
-            ? "#newsletter"
-            : route.name === "settings"
-              ? "#impostazioni"
-              : `#artista/${encodeURIComponent(route.id)}`;
+          : route.name === "stock"
+            ? "#magazzino"
+            : route.name === "newsletter"
+              ? "#newsletter"
+              : route.name === "settings"
+                ? "#impostazioni"
+                : `#artista/${encodeURIComponent(route.id)}`;
     if (location.hash === next) return;
     location.hash = next;
   }
@@ -971,15 +1093,17 @@ if (!root || !app) {
 
   function syncAdminNav(nav: HTMLElement, route: ReturnType<typeof parseAdminRoute>) {
     const tabs = nav.querySelectorAll<HTMLButtonElement>(".account-subnav__tab");
-    const labels = ["Ordini", "Artisti", "Newsletter", "Impostazioni"];
+    const labels = ["Ordini", "Magazzino", "Artisti", "Newsletter", "Impostazioni"];
     const activeIdx =
       route.name === "orders"
         ? 0
-        : route.name === "artists" || route.name === "artist"
+        : route.name === "stock"
           ? 1
-          : route.name === "newsletter"
+          : route.name === "artists" || route.name === "artist"
             ? 2
-            : 3;
+            : route.name === "newsletter"
+              ? 3
+              : 4;
     tabs.forEach((btn, i) => {
       btn.classList.toggle("is-active", i === activeIdx);
       if (!btn.dataset.bound) {
@@ -987,6 +1111,7 @@ if (!root || !app) {
         btn.type = "button";
         btn.addEventListener("click", () => {
           if (labels[i] === "Ordini") setAdminRoute({ name: "orders" });
+          else if (labels[i] === "Magazzino") setAdminRoute({ name: "stock" });
           else if (labels[i] === "Artisti") setAdminRoute({ name: "artists" });
           else if (labels[i] === "Newsletter") setAdminRoute({ name: "newsletter" });
           else setAdminRoute({ name: "settings" });
@@ -1026,7 +1151,13 @@ if (!root || !app) {
     let shell = app!.querySelector<HTMLElement>(".account-shell");
     let main = app!.querySelector<HTMLElement>(".account-shell__main");
     let nav = app!.querySelector<HTMLElement>(".account-subnav");
-    const canReuse = Boolean(shell && main && nav && !opts?.force);
+    const hasStockTab = Boolean(
+      nav &&
+        [...nav.querySelectorAll(".account-subnav__tab")].some(
+          (b) => b.textContent === "Magazzino",
+        ),
+    );
+    const canReuse = Boolean(shell && main && nav && hasStockTab && !opts?.force);
 
     if (!canReuse) {
       app!.innerHTML = "";
@@ -1045,7 +1176,13 @@ if (!root || !app) {
       shell = el("div", "account-shell");
       nav = el("nav", "account-subnav");
       nav.setAttribute("aria-label", "Sezioni admin");
-      for (const label of ["Ordini", "Artisti", "Newsletter", "Impostazioni"]) {
+      for (const label of [
+        "Ordini",
+        "Magazzino",
+        "Artisti",
+        "Newsletter",
+        "Impostazioni",
+      ]) {
         nav.append(el("button", "account-subnav__tab", label));
       }
       shell.append(nav);
@@ -1058,6 +1195,7 @@ if (!root || !app) {
     main!.replaceChildren();
 
     if (route.name === "orders") await renderAdminOrders(main!);
+    else if (route.name === "stock") await renderStockPanel(main!);
     else if (route.name === "newsletter") await renderAdminNewsletter(main!);
     else if (route.name === "artists")
       await renderAdminArtists(main!, user, artists, shellData);

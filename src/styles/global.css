@@ -3653,6 +3653,42 @@ body:has(.site-announce) .shop-home-stage {
   }
 }
 
+.account-stock {
+  margin-bottom: 1.5rem;
+}
+
+.account-stock-product {
+  margin-top: 1.35rem;
+}
+
+.account-stock-product__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.85rem;
+  margin-bottom: 0.45rem;
+}
+
+.account-stock-product__meta {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.account-stock-table .account-table__head,
+.account-stock-table .account-table__row {
+  grid-template-columns: minmax(5rem, 1.2fr) repeat(3, minmax(3.5rem, 1fr));
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.account-stock-row--empty {
+  color: var(--muted);
+}
+
+.account-stock-artist {
+  margin-bottom: 2rem;
+}
+
 .account-sales-table .account-table__head,
 .account-sales-table .account-table__row {
   grid-template-columns: 6.75rem minmax(4.5rem, 1.1fr) 3rem 4rem 5.5rem 5rem;
