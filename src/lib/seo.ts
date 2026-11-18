@@ -192,13 +192,25 @@ export function breadcrumbJsonLd(
   };
 }
 
+function schemaAvailability(status: string | undefined) {
+  if (status === "soldout") return "https://schema.org/OutOfStock";
+  if (status === "preorder") return "https://schema.org/PreOrder";
+  return "https://schema.org/InStock";
+}
+
 /** Home / shop vetrina — CollectionPage + ItemList of listed products. */
 export function collectionPageJsonLd(opts: {
   siteUrl: URL | string | undefined;
   name: string;
   description: string;
   path?: string;
-  products: Array<{ name: string; path: string; image?: string }>;
+  products: Array<{
+    name: string;
+    path: string;
+    image?: string;
+    price: number;
+    status?: string;
+  }>;
 }) {
   const origin = siteOrigin(opts.siteUrl);
   const path = opts.path ?? "/";
@@ -229,6 +241,15 @@ export function collectionPageJsonLd(opts: {
             url,
             ...(p.image ? { image: absoluteUrl(p.image, opts.siteUrl) } : {}),
             brand: { "@type": "Brand", name: "Corpoceleste" },
+            // Google Product rich results require offers | review | aggregateRating.
+            offers: {
+              "@type": "Offer",
+              url,
+              priceCurrency: "EUR",
+              price: String(p.price),
+              availability: schemaAvailability(p.status),
+              itemCondition: "https://schema.org/NewCondition",
+            },
           },
         };
       }),

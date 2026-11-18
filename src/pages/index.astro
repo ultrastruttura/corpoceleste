@@ -39,6 +39,8 @@ const collectionLd = collectionPageJsonLd({
     name: p.title,
     path: pageUrl(locale, `prodotto/${p.slug}/`),
     image: p.images[0],
+    price: p.price,
+    status: p.status,
   })),
 });
 ---
