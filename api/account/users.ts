@@ -40,7 +40,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (action === "sync") {
           const result = await syncAllNewsletterToResend();
-          if (!result.ok) return json(res, 400, { error: result.error });
+          if (result.ok === false) return json(res, 400, { error: result.error });
           return json(res, 200, result);
         }
 
@@ -50,7 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             text: String(body.text || ""),
             name: body.name ? String(body.name) : undefined,
           });
-          if (!result.ok) return json(res, 400, { error: result.error });
+          if (result.ok === false) return json(res, 400, { error: result.error });
           return json(res, 200, result);
         }
 

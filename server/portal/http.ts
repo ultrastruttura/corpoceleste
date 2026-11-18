@@ -118,7 +118,7 @@ export function checkSiteOrigin(req: VercelRequest): { ok: true } | { ok: false;
 
 export function requireSiteOrigin(req: VercelRequest, res: VercelResponse): boolean {
   const gate = checkSiteOrigin(req);
-  if (!gate.ok) {
+  if (gate.ok === false) {
     forbid(req, res, gate.message);
     return false;
   }

@@ -40,7 +40,8 @@ async function sendShippedCustomerMail(order: ShopOrder): Promise<{ ok: boolean;
     subject: shippedOrderSubject(locale, order.number || order.external_id),
     text,
   });
-  return sent.ok ? { ok: true } : { ok: false, error: sent.error };
+  if (sent.ok === false) return { ok: false, error: sent.error };
+  return { ok: true };
 }
 
 function csvEscape(raw: string) {
