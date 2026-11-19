@@ -1,14 +1,26 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const bindPaypalHold = vi.hoisted(() => vi.fn());
+const abandonPaypalHold = vi.hoisted(() => vi.fn());
+const paypalHoldId = vi.hoisted(() => vi.fn((id: string) => `hold_${id}`));
 
-vi.mock("../../server/github-stock.js", () => ({ bindPaypalHold }));
+vi.mock("../../server/github-stock.js", () => ({
+  bindPaypalHold,
+  abandonPaypalHold,
+  paypalHoldId,
+}));
 
-import { bindPaypalCheckoutHold, reservePaypalCheckoutHold } from "../../server/stock/reserve-paypal-checkout";
+import {
+  abandonPaypalCheckoutOrderHold,
+  bindPaypalCheckoutHold,
+  reservePaypalCheckoutHold,
+} from "../../server/stock/reserve-paypal-checkout";
 
 afterEach(() => {
   vi.unstubAllEnvs();
   bindPaypalHold.mockReset();
+  abandonPaypalHold.mockReset();
+  paypalHoldId.mockClear();
 });
 
 describe("PayPal checkout hold binding", () => {
@@ -39,5 +51,12 @@ describe("PayPal checkout hold binding", () => {
       ok: false,
       http: 503,
     });
+  });
+
+  it("abandons a bound order hold by PayPal order id", async () => {
+    abandonPaypalHold.mockResolvedValueOnce(undefined);
+    await abandonPaypalCheckoutOrderHold("ORDER-9");
+    expect(paypalHoldId).toHaveBeenCalledWith("ORDER-9");
+    expect(abandonPaypalHold).toHaveBeenCalledWith("hold_ORDER-9");
   });
 });
