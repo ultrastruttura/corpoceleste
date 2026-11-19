@@ -12,6 +12,7 @@ import { abuseLimit } from "../server/abuse-limit.js";
 import { isEmail } from "../server/form-body.js";
 import {
   abandonPaypalCheckoutHold,
+  abandonPaypalCheckoutOrderHold,
   bindPaypalCheckoutHold,
   releaseExpiredPaypalHoldsBestEffort,
   reservePaypalCheckoutHold,
@@ -137,6 +138,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           details: declined ? [{ issue: "INSTRUMENT_DECLINED" }] : undefined,
         });
       }
+    }
+
+    // Apple Pay / Google Pay: user closed the sheet after create+hold — restore stock.
+    if (body.action === "abandon") {
+      const limitedAbandon = await abuseLimit(req, "paypal-abandon", 30, 15 * 60);
+      if (!limitedAbandon.ok) {
+        if (limitedAbandon.unavailable) {
+          return json(res, 503, { error: "Service unavailable", retryAfterSec: limitedAbandon.retryAfterSec });
+        }
+        return json(res, 429, { error: "Too many requests", retryAfterSec: limitedAbandon.retryAfterSec });
+      }
+      const orderId = String(body.orderId || "").trim();
+      if (!orderId || !/^[A-Z0-9_-]+$/i.test(orderId)) {
+        return json(res, 400, { error: "Missing orderId" });
+      }
+      try {
+        const existing = await fetchPayPalOrder(orderId);
+        const st = String(existing.status || "").toUpperCase();
+        if (paypalOrderIsCaptured(existing) || st === "COMPLETED" || st === "APPROVED") {
+          // Payment in flight or done — never restore stock here.
+          return json(res, 200, { ok: true, skipped: true, status: st || "protected" });
+        }
+      } catch (err) {
+        console.warn("paypal-create-order abandon lookup", err);
+        // Still try hold release if PayPal GET fails (orphan CREATED hold).
+      }
+      try {
+        await abandonPaypalCheckoutOrderHold(orderId);
+      } catch (err) {
+        console.error("paypal-create-order abandon hold", err);
+        return json(res, 502, { error: "Abandon failed" });
+      }
+      return json(res, 200, { ok: true });
     }
 
     const limited = await abuseLimit(req, "paypal-create", 15, 15 * 60);

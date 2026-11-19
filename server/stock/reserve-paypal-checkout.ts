@@ -100,3 +100,11 @@ export async function bindPaypalCheckoutHold(
     throw new Error("PayPal stock hold could not be bound");
   }
 }
+
+/** Restore stock for a bound PayPal order hold (Apple/Google sheet cancelled before capture). */
+export async function abandonPaypalCheckoutOrderHold(paypalOrderId: string): Promise<void> {
+  const id = String(paypalOrderId || "").trim();
+  if (!id) return;
+  const { abandonPaypalHold, paypalHoldId } = await import("../github-stock.js");
+  await abandonPaypalHold(paypalHoldId(id));
+}

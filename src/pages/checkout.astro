@@ -257,6 +257,13 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       type CheckoutQuote,
     } from "../scripts/checkout-ship";
     import { PICKUP_BERGAMO, PICKUP_BERGAMO_SERVICE_ID } from "../lib/pickup";
+    import {
+      decideApplePaySettlement,
+      freezeCheckoutTotal,
+      normalizeConfirmStatus,
+      shouldAbandonPreauthOrder,
+      totalsMatch,
+    } from "../lib/apple-pay-checkout";
 
     // Checkout module runs before Base/shop.ts — hydrate catalog before any sanitizeCart.
     hydrateCatalog();
@@ -957,9 +964,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           .render("#paypal-button");
       }
 
-      void mountApplePay(paypal, createApi, createServerOrder);
+      void mountApplePay(paypal, createApi, createServerOrder, captureServerOrder);
 
-      void mountGooglePay(paypal, createApi, createServerOrder);
+      void mountGooglePay(paypal, createApi, createServerOrder, captureServerOrder);
     }
 
     async function mountApplePay(
@@ -973,14 +980,19 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         }) => Promise<{ status?: string } | unknown>;
       } },
       createApi: string,
-      createServerOrder: () => Promise<{ id: string; total: string }>,
+      createServerOrder: (expectedTotal?: string) => Promise<{ id: string; total: string }>,
+      captureServerOrder: (orderId: string) => Promise<void>,
     ) {
+      const hideAppleSlot = () => {
+        document.querySelector<HTMLElement>("[data-applepay-slot]")?.setAttribute("hidden", "");
+      };
       const button = document.querySelector<HTMLButtonElement>("[data-apple-fallback]");
       if (!button) return;
       const sessionClass = (window as unknown as { ApplePaySession?: {
         new (version: number, request: object): {
           onvalidatemerchant: ((event: { validationURL: string }) => void) | null;
           onpaymentauthorized: ((event: { payment: { token: unknown; billingContact: unknown } }) => void) | null;
+          oncancel: (() => void) | null;
           completeMerchantValidation: (session: unknown) => void;
           completePayment: (status: number) => void;
           abort: () => void;
@@ -991,7 +1003,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         STATUS_FAILURE: number;
       } }).ApplePaySession;
       if (!sessionClass?.canMakePayments() || !paypal.Applepay) {
-        document.querySelector<HTMLElement>("[data-applepay-slot]")?.setAttribute("hidden", "");
+        hideAppleSlot();
         return;
       }
       const applepay = paypal.Applepay();
@@ -1000,15 +1012,38 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         config = await applepay.config();
       } catch (err) {
         console.warn("Apple Pay config failed", err);
+        hideAppleSlot();
         return;
       }
       if (!config.isEligible) {
-        document.querySelector<HTMLElement>("[data-applepay-slot]")?.setAttribute("hidden", "");
+        hideAppleSlot();
         return;
       }
 
+      const abandonServerOrder = (orderId: string) => {
+        void fetch(`${createApi}/api/paypal-create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "abandon", orderId }),
+          keepalive: true,
+        }).catch((err) => console.warn("Apple Pay abandon", err));
+      };
+
       applePayReady = () => {
         try {
+          // Freeze amount at begin() — quote must not drift into the sheet.
+          const sheetAmount = freezeCheckoutTotal(total(), shippingAmount());
+          let pendingOrderId: string | null = null;
+          let paymentCompleted = false;
+          let orderPromise: Promise<{ id: string; total: string }> | null = null;
+
+          const abandonIfNeeded = () => {
+            if (!shouldAbandonPreauthOrder({ orderId: pendingOrderId, paymentCompleted })) return;
+            const id = String(pendingOrderId || "").trim();
+            pendingOrderId = null;
+            if (id) abandonServerOrder(id);
+          };
+
           // Apple requires session creation and begin() in the original tap handler.
           const session = new sessionClass(4, {
             countryCode: config.countryCode,
@@ -1016,66 +1051,130 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             merchantCapabilities: config.merchantCapabilities,
             supportedNetworks: config.supportedNetworks,
             requiredBillingContactFields: ["postalAddress"],
-            total: { label: "Corpoceleste", type: "final", amount: (total() + shippingAmount()).toFixed(2) },
+            total: { label: "Corpoceleste", type: "final", amount: sheetAmount },
           });
+
+          // Create+hold BEFORE Face ID (same moment as merchant validation).
           session.onvalidatemerchant = ({ validationURL }) => {
-            void applepay.validateMerchant({ validationUrl: validationURL, displayName: "Corpoceleste" })
-              .then(({ merchantSession }) => session.completeMerchantValidation(merchantSession))
-              .catch((err) => {
-                console.error("Apple Pay merchant validation", err, validationURL);
-                session.abort();
-                window.alert(
-                  say(
-                    "Apple Pay: verifica dominio fallita. In PayPal (Live) riscarica il file domain association, mettilo in /.well-known/ e registra di nuovo www.corpoceleste.eu. Oppure usa PayPal.",
-                    "Apple Pay: domain verification failed. In PayPal (Live) re-download the domain association file, host it at /.well-known/, and register www.corpoceleste.eu again. Or use PayPal.",
-                    "Apple Pay: Domain-Verifizierung fehlgeschlagen. In PayPal (Live) Domain-Association neu laden, unter /.well-known/ hosten und www.corpoceleste.eu erneut registrieren. Oder PayPal nutzen.",
-                  ),
-                );
-              });
+            orderPromise = createServerOrder(sheetAmount);
+            void Promise.allSettled([
+              applepay.validateMerchant({ validationUrl: validationURL, displayName: "Corpoceleste" }),
+              orderPromise,
+            ]).then(([merchantResult, orderResult]) => {
+              if (orderResult.status === "fulfilled") {
+                pendingOrderId = orderResult.value.id;
+              }
+
+              const failSheet = (alertDomain: boolean, amountMismatch = false) => {
+                abandonIfNeeded();
+                try {
+                  session.abort();
+                } catch {
+                  /* sheet may already be closing */
+                }
+                if (amountMismatch) {
+                  window.alert(
+                    say(
+                      "Il totale non combacia più con il carrello. Ricarica la pagina e riprova, oppure usa PayPal.",
+                      "The total no longer matches the cart. Reload and try again, or use PayPal.",
+                      "Der Betrag stimmt nicht mehr mit dem Warenkorb überein. Seite neu laden oder PayPal nutzen.",
+                    ),
+                  );
+                  return;
+                }
+                if (alertDomain) {
+                  window.alert(
+                    say(
+                      "Apple Pay: verifica dominio fallita. In PayPal (Live) riscarica il file domain association, mettilo in /.well-known/ e registra di nuovo www.corpoceleste.eu. Oppure usa PayPal.",
+                      "Apple Pay: domain verification failed. In PayPal (Live) re-download the domain association file, host it at /.well-known/, and register www.corpoceleste.eu again. Or use PayPal.",
+                      "Apple Pay: Domain-Verifizierung fehlgeschlagen. In PayPal (Live) Domain-Association neu laden, unter /.well-known/ hosten und www.corpoceleste.eu erneut registrieren. Oder PayPal nutzen.",
+                    ),
+                  );
+                }
+              };
+
+              if (orderResult.status === "rejected") {
+                console.error("Apple Pay create during validate", orderResult.reason);
+                // createServerOrder already alerted for stock/total/API errors.
+                failSheet(false);
+                return;
+              }
+              if (merchantResult.status === "rejected") {
+                console.error("Apple Pay merchant validation", merchantResult.reason, validationURL);
+                failSheet(true);
+                return;
+              }
+
+              const order = orderResult.value;
+              if (!totalsMatch(sheetAmount, order.total)) {
+                console.error("Apple Pay amount mismatch at validate", sheetAmount, order.total);
+                failSheet(false, true);
+                return;
+              }
+
+              session.completeMerchantValidation(merchantResult.value.merchantSession);
+            });
           };
+
+          session.oncancel = () => {
+            abandonIfNeeded();
+          };
+
           session.onpaymentauthorized = ({ payment }) => {
             void (async () => {
-              const sheetAmount = (total() + shippingAmount()).toFixed(2);
               try {
-                // Lock sheet total into create — server 409s before PayPal if quote drifted.
-                const order = await createServerOrder(sheetAmount);
-                if (order.total && order.total !== sheetAmount) {
+                const order = orderPromise ? await orderPromise : null;
+                if (!order?.id) {
+                  throw new Error("Missing Apple Pay order");
+                }
+                pendingOrderId = order.id;
+                if (!totalsMatch(sheetAmount, order.total)) {
                   throw new Error(`Amount mismatch sheet=${sheetAmount} order=${order.total}`);
                 }
+
                 const confirmed = await applepay.confirmOrder({
                   orderId: order.id,
                   token: payment.token,
                   billingContact: payment.billingContact,
                 });
-                const confirmStatus = String(
-                  (confirmed as { status?: string } | null)?.status || "",
-                ).toUpperCase();
-                // Docs: complete Apple session after confirm, then capture on the server.
-                session.completePayment(sessionClass.STATUS_SUCCESS);
+                const confirmStatus = normalizeConfirmStatus(confirmed);
+
+                let captureOk = false;
                 try {
                   // intent=CAPTURE: confirmOrder may already complete; server + retries handle that.
                   await captureServerOrder(order.id);
+                  captureOk = true;
                 } catch (capErr) {
                   console.error("Apple Pay capture after confirm", capErr, confirmStatus);
-                  // COMPLETED from confirm = money taken; webhook will fulfill. Don't strand UX.
                   if (confirmStatus === "COMPLETED") {
-                    saveOrderSnapshot(shippingAmount());
-                    clearCart();
-                    location.href = `${base}${prefix}grazie/?from=paypal`;
-                    return;
+                    captureOk = true; // money taken; webhook fulfills
                   }
-                  window.alert(
-                    say(
-                      "Apple Pay ha autorizzato ma la conferma shop non è andata a buon fine. Controlla PayPal / scrivimi: non riprovare subito lo stesso pagamento.",
-                      "Apple Pay authorized, but shop confirmation failed. Check PayPal / write to me — don’t retry the same payment immediately.",
-                      "Apple Pay hat autorisiert, die Shop-Bestätigung ist fehlgeschlagen. Prüfe PayPal / schreib mir — dieselbe Zahlung nicht sofort wiederholen.",
-                    ),
-                  );
+                }
+
+                const decision = decideApplePaySettlement({
+                  confirmStatus,
+                  captureOk,
+                  amountMismatch: false,
+                });
+
+                if (decision.complete === "success") {
+                  session.completePayment(sessionClass.STATUS_SUCCESS);
+                  paymentCompleted = true;
+                  pendingOrderId = null;
+                  saveOrderSnapshot(shippingAmount());
+                  clearCart();
+                  location.href = `${base}${prefix}grazie/?from=paypal`;
                   return;
                 }
-                saveOrderSnapshot(shippingAmount());
-                clearCart();
-                location.href = `${base}${prefix}grazie/?from=paypal`;
+
+                session.completePayment(sessionClass.STATUS_FAILURE);
+                window.alert(
+                  say(
+                    "Apple Pay ha autorizzato ma la conferma shop non è andata a buon fine. Controlla PayPal / scrivimi: non riprovare subito lo stesso pagamento.",
+                    "Apple Pay authorized, but shop confirmation failed. Check PayPal / write to me — don’t retry the same payment immediately.",
+                    "Apple Pay hat autorisiert, die Shop-Bestätigung ist fehlgeschlagen. Prüfe PayPal / schreib mir — dieselbe Zahlung nicht sofort wiederholen.",
+                  ),
+                );
               } catch (err) {
                 console.error("Apple Pay authorization", err);
                 try {
@@ -1083,9 +1182,9 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                 } catch {
                   /* session may already be finished */
                 }
+                abandonIfNeeded();
                 const issue = err instanceof Error ? err.message : String(err);
                 if (issue === "Total changed" || /Amount mismatch/i.test(issue)) {
-                  // createServerOrder already alerted for Total changed; avoid duplicate noise.
                   if (/Amount mismatch/i.test(issue)) {
                     window.alert(
                       say(
@@ -1097,6 +1196,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                   }
                   return;
                 }
+                if (issue === "Order create failed") return;
                 window.alert(
                   say(
                     "Il pagamento Apple Pay non è andato a buon fine. Non ti dovrebbe essere addebitato nulla (eventuale sospeso si sblocca da solo). Riprova o usa PayPal.",
@@ -1134,7 +1234,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         };
       },
       createApi: string,
-      createServerOrder: () => Promise<{ id: string; total: string }>,
+      createServerOrder: (expectedTotal?: string) => Promise<{ id: string; total: string }>,
+      captureServerOrder: (orderId: string) => Promise<void>,
     ) {
       const googleFallback = document.querySelector<HTMLButtonElement>("[data-google-fallback]");
       const gpaySdk = document.querySelector<HTMLElement>("#googlepay-button");
@@ -1254,7 +1355,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
           paymentDataCallbacks: {
             onPaymentAuthorized: async (paymentData: { paymentMethodData: unknown }) => {
               try {
-                const order = await createServerOrder();
+                const order = await createServerOrder(price);
                 const orderId = order.id;
                 const gp = deps.gp();
                 let confirm = await gp.confirmOrder({
