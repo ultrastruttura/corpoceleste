@@ -79,14 +79,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
   if (!requireSiteOrigin(req, res)) return;
 
-  const limited = await abuseLimit(req, "paypal-create", 15, 15 * 60);
-  if (!limited.ok) {
-    if (limited.unavailable) {
-      return json(res, 503, { error: "Service unavailable", retryAfterSec: limited.retryAfterSec });
-    }
-    return json(res, 429, { error: "Too many requests", retryAfterSec: limited.retryAfterSec });
-  }
-
   try {
     const body = await readJson<{
       action?: string;
@@ -95,11 +87,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       country?: string;
       zip?: string;
       delivery?: string;
+      expectedTotal?: string;
       shipTo?: Partial<CheckoutShipTo>;
     }>(req);
 
     // Google Pay / Apple Pay / PayPal Buttons: capture server-side after approval.
+    // Separate abuse bucket so create retries do not block capture.
     if (body.action === "capture") {
+      const limitedCap = await abuseLimit(req, "paypal-capture", 30, 15 * 60);
+      if (!limitedCap.ok) {
+        if (limitedCap.unavailable) {
+          return json(res, 503, { error: "Service unavailable", retryAfterSec: limitedCap.retryAfterSec });
+        }
+        return json(res, 429, { error: "Too many requests", retryAfterSec: limitedCap.retryAfterSec });
+      }
       const orderId = String(body.orderId || "").trim();
       if (!orderId) return json(res, 400, { error: "Missing orderId" });
       const allowed = await assertCapturableOrder(orderId);
@@ -138,6 +139,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    const limited = await abuseLimit(req, "paypal-create", 15, 15 * 60);
+    if (!limited.ok) {
+      if (limited.unavailable) {
+        return json(res, 503, { error: "Service unavailable", retryAfterSec: limited.retryAfterSec });
+      }
+      return json(res, 429, { error: "Too many requests", retryAfterSec: limited.retryAfterSec });
+    }
+
     const lines = Array.isArray(body.lines) ? body.lines : [];
     const delivery = String(body.delivery || "").trim() === "pickup" ? "pickup" : "ship";
     const dest = parseShipDest({
@@ -155,6 +164,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const priced = await priceOrderLines(lines, dest, { delivery });
     if (priced.ok === false) return json(res, 400, { error: priced.error });
+
+    // Apple Pay sheet amount is fixed at begin() — refuse before PayPal create if quote drifted.
+    const expectedTotal = String(body.expectedTotal || "").trim();
+    const serverTotal = money(priced.order.total);
+    if (expectedTotal && expectedTotal !== serverTotal) {
+      return json(res, 409, {
+        error: "Total changed",
+        total: serverTotal,
+        expectedTotal,
+      });
+    }
 
     const stockLines = priced.order.lines.map((l) => ({
       id: l.id,
