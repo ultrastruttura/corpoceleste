@@ -795,7 +795,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
         return;
       }
 
-      async function createServerOrder(): Promise<{ id: string; total: string }> {
+      async function createServerOrder(expectedTotal?: string): Promise<{ id: string; total: string }> {
         const items = sanitizeCart();
         if (!quote) throw new Error("Missing shipping quote");
         if (!hasCompleteAddress()) throw new Error("Missing shipping address");
@@ -808,6 +808,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             country: quote.country,
             zip: quote.zip,
             delivery: isPickup() ? "pickup" : "ship",
+            ...(expectedTotal ? { expectedTotal } : {}),
             shipTo: {
               fullName: a.fullName,
               email: a.email,
@@ -831,7 +832,15 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             /* ignore */
           }
           if (apiDetail) console.error("paypal-create-order detail", apiDetail);
-          if (apiError === "Out of stock" || res.status === 409) {
+          if (apiError === "Total changed") {
+            window.alert(
+              say(
+                "Il totale è cambiato (spedizione). Chiudi Apple Pay, ricarica il preventivo e riprova.",
+                "The total changed (shipping). Close Apple Pay, refresh the quote and try again.",
+                "Der Gesamtbetrag hat sich geändert (Versand). Apple Pay schließen, Angebot neu laden und erneut versuchen.",
+              ),
+            );
+          } else if (apiError === "Out of stock" || (res.status === 409 && apiError !== "Total changed")) {
             window.alert(
               say(
                 "Uno o più articoli non sono più disponibili. Aggiorna il carrello e riprova.",
@@ -857,7 +866,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             );
           }
           createErrorShown = true;
-          throw new Error("Order create failed");
+          throw new Error(apiError === "Total changed" ? "Total changed" : "Order create failed");
         }
         const data = (await res.json()) as { id?: string; total?: string };
         if (!data.id) throw new Error("Missing order id");
@@ -865,20 +874,35 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       }
 
       async function captureServerOrder(orderId: string): Promise<void> {
-        const cap = await fetch(`${createApi}/api/paypal-create-order`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "capture", orderId }),
-        });
-        if (!cap.ok) {
-          const body = await cap.text();
-          throw new Error(`Capture failed: ${cap.status} ${body.slice(0, 200)}`);
+        const attempt = async () => {
+          const cap = await fetch(`${createApi}/api/paypal-create-order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "capture", orderId }),
+          });
+          if (!cap.ok) {
+            const body = await cap.text();
+            throw new Error(`Capture failed: ${cap.status} ${body.slice(0, 200)}`);
+          }
+          const captured = (await cap.json()) as { status?: string; ok?: boolean };
+          const status = String(captured.status || "").toUpperCase();
+          if (captured.ok === false || (status && status !== "COMPLETED")) {
+            throw new Error(`Capture status: ${captured.status || "missing"}`);
+          }
+        };
+        let lastErr: unknown;
+        for (let i = 0; i < 3; i++) {
+          try {
+            await attempt();
+            return;
+          } catch (err) {
+            lastErr = err;
+            const msg = err instanceof Error ? err.message : String(err);
+            if (/INSTRUMENT_DECLINED/i.test(msg)) throw err;
+            await new Promise((r) => setTimeout(r, 400 * (i + 1)));
+          }
         }
-        const captured = (await cap.json()) as { status?: string; ok?: boolean };
-        const status = String(captured.status || "").toUpperCase();
-        if (captured.ok === false || (status && status !== "COMPLETED")) {
-          throw new Error(`Capture status: ${captured.status || "missing"}`);
-        }
+        throw lastErr instanceof Error ? lastErr : new Error(String(lastErr || "Capture failed"));
       }
 
       const shared = {
@@ -1013,8 +1037,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
             void (async () => {
               const sheetAmount = (total() + shippingAmount()).toFixed(2);
               try {
-                const order = await createServerOrder();
-                // Apple decrypt fails or leaves a pending auth if sheet ≠ PayPal order total.
+                // Lock sheet total into create — server 409s before PayPal if quote drifted.
+                const order = await createServerOrder(sheetAmount);
                 if (order.total && order.total !== sheetAmount) {
                   throw new Error(`Amount mismatch sheet=${sheetAmount} order=${order.total}`);
                 }
@@ -1029,12 +1053,12 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                 // Docs: complete Apple session after confirm, then capture on the server.
                 session.completePayment(sessionClass.STATUS_SUCCESS);
                 try {
-                  // intent=CAPTURE: confirmOrder may already complete; server treats that as ok.
+                  // intent=CAPTURE: confirmOrder may already complete; server + retries handle that.
                   await captureServerOrder(order.id);
                 } catch (capErr) {
                   console.error("Apple Pay capture after confirm", capErr, confirmStatus);
+                  // COMPLETED from confirm = money taken; webhook will fulfill. Don't strand UX.
                   if (confirmStatus === "COMPLETED") {
-                    // Money already taken — do not strand the buyer on an error alert.
                     saveOrderSnapshot(shippingAmount());
                     clearCart();
                     location.href = `${base}${prefix}grazie/?from=paypal`;
@@ -1058,6 +1082,20 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                   session.completePayment(sessionClass.STATUS_FAILURE);
                 } catch {
                   /* session may already be finished */
+                }
+                const issue = err instanceof Error ? err.message : String(err);
+                if (issue === "Total changed" || /Amount mismatch/i.test(issue)) {
+                  // createServerOrder already alerted for Total changed; avoid duplicate noise.
+                  if (/Amount mismatch/i.test(issue)) {
+                    window.alert(
+                      say(
+                        "Il totale non combacia più con il carrello. Ricarica la pagina e riprova, oppure usa PayPal.",
+                        "The total no longer matches the cart. Reload and try again, or use PayPal.",
+                        "Der Betrag stimmt nicht mehr mit dem Warenkorb überein. Seite neu laden oder PayPal nutzen.",
+                      ),
+                    );
+                  }
+                  return;
                 }
                 window.alert(
                   say(

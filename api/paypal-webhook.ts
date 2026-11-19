@@ -285,11 +285,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Consume hold BEFORE pricing so cron cannot release units mid-webhook.
+    // Turso holds work without GITHUB_TOKEN — don't gate on GitHub.
     const relatedOrderId = String(
       event.resource?.supplementary_data?.related_ids?.order_id || order?.id || "",
     ).trim();
     let earlyHold: LedgerRecord | null = null;
-    if (relatedOrderId && (process.env.GITHUB_TOKEN || "").trim()) {
+    if (relatedOrderId) {
       try {
         const { consumePaypalHold } = await import("../server/github-stock.js");
         earlyHold = await consumePaypalHold(relatedOrderId, captureId);
