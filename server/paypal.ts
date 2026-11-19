@@ -33,6 +33,9 @@ export type PayPalOrder = {
       };
     };
     items?: PayPalItem[];
+    payments?: {
+      captures?: Array<{ id?: string; status?: string }>;
+    };
     shipping?: {
       name?: { full_name?: string };
       phone?: { phone_number?: { national_number?: string; country_code?: string } };
@@ -121,6 +124,14 @@ export async function fetchPayPalOrder(orderId: string): Promise<PayPalOrder> {
   return (await res.json()) as PayPalOrder;
 }
 
+/** True when PayPal already finished capture (Apple confirmOrder often does this). */
+export function paypalOrderIsCaptured(order: PayPalOrder): boolean {
+  if (String(order.status || "").toUpperCase() === "COMPLETED") return true;
+  return (order.purchase_units?.[0]?.payments?.captures || []).some(
+    (c) => String(c.status || "").toUpperCase() === "COMPLETED",
+  );
+}
+
 /** Capture an approved order (used by Google Pay / Apple Pay after confirmOrder). */
 export async function capturePayPalOrder(orderId: string): Promise<{
   id?: string;
@@ -145,9 +156,22 @@ export async function capturePayPalOrder(orderId: string): Promise<{
       const existing = await fetchPayPalOrder(id);
       return { id: existing.id || id, status: existing.status || "COMPLETED" };
     }
+    // Network/race: confirm may have completed capture while this POST failed.
+    try {
+      const existing = await fetchPayPalOrder(id);
+      if (paypalOrderIsCaptured(existing)) {
+        return { id: existing.id || id, status: "COMPLETED" };
+      }
+    } catch {
+      /* fall through with original error */
+    }
     throw new Error(`PayPal capture failed: ${res.status} ${text}`);
   }
-  return (await res.json()) as { id?: string; status?: string };
+  const body = (await res.json()) as PayPalOrder;
+  if (paypalOrderIsCaptured(body)) {
+    return { id: body.id || id, status: "COMPLETED" };
+  }
+  return { id: body.id || id, status: body.status };
 }
 
 /** Indirizzo di spedizione raccolto nel checkout (non quello del wallet PayPal). */

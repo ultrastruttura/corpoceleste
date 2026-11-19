@@ -3,6 +3,8 @@ import { money, parseShipDest, priceOrderLines } from "../server/order-pricing.j
 import {
   capturePayPalOrder,
   createPayPalCheckoutOrder,
+  fetchPayPalOrder,
+  paypalOrderIsCaptured,
   type CheckoutShipTo,
 } from "../server/paypal.js";
 import { cors, json, readJson, requireSiteOrigin } from "../server/portal/http.js";
@@ -16,18 +18,29 @@ import {
 } from "../server/stock/reserve-paypal-checkout.js";
 import type { OrderLine } from "../src/lib/paypal-lines.js";
 
-/** Only capture orders we created and still hold — never fall back to “any APPROVED”. */
-async function assertCapturableOrder(orderId: string): Promise<{ ok: true } | { ok: false; error: string }> {
-  if (!(process.env.GITHUB_TOKEN || "").trim()) {
-    return { ok: false, error: "Stock hold unavailable" };
-  }
+/**
+ * Prefer an open checkout hold; if missing (Turso blip / Apple race), fall back to a
+ * merchant-scoped PayPal GET — our token only sees our orders.
+ */
+async function assertCapturableOrder(
+  orderId: string,
+): Promise<{ ok: true; alreadyCaptured?: boolean } | { ok: false; error: string }> {
   try {
     const { getLedger, paypalHoldId } = await import("../server/github-stock.js");
     const hold = await getLedger(paypalHoldId(orderId));
     if (hold?.kind === "paypal_hold" && !hold.releasedAt) return { ok: true };
-    return { ok: false, error: "Unknown order" };
   } catch (err) {
     console.warn("paypal-create: hold lookup for capture", err);
+  }
+
+  try {
+    const order = await fetchPayPalOrder(orderId);
+    const st = String(order.status || "").toUpperCase();
+    if (paypalOrderIsCaptured(order)) return { ok: true, alreadyCaptured: true };
+    if (st === "APPROVED") return { ok: true };
+    return { ok: false, error: `Order not capturable (${st || "unknown"})` };
+  } catch (err) {
+    console.warn("paypal-create: order lookup for capture", err);
     return { ok: false, error: "Hold lookup failed" };
   }
 }
@@ -91,6 +104,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!orderId) return json(res, 400, { error: "Missing orderId" });
       const allowed = await assertCapturableOrder(orderId);
       if (allowed.ok === false) return json(res, 403, { error: allowed.error });
+      if (allowed.alreadyCaptured) {
+        return json(res, 200, { ok: true, id: orderId, status: "COMPLETED" });
+      }
       try {
         const captured = await capturePayPalOrder(orderId);
         return json(res, 200, {
@@ -102,6 +118,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const msg = err instanceof Error ? err.message : String(err);
         console.error("paypal-create-order capture", msg);
         const declined = /INSTRUMENT_DECLINED/i.test(msg);
+        // Last resort: Apple confirmOrder may have completed capture despite POST error.
+        try {
+          const existing = await fetchPayPalOrder(orderId);
+          if (paypalOrderIsCaptured(existing)) {
+            return json(res, 200, {
+              ok: true,
+              id: existing.id || orderId,
+              status: "COMPLETED",
+            });
+          }
+        } catch {
+          /* keep original failure */
+        }
         return json(res, declined ? 422 : 502, {
           error: declined ? "INSTRUMENT_DECLINED" : "Capture failed",
           details: declined ? [{ issue: "INSTRUMENT_DECLINED" }] : undefined,
