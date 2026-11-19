@@ -942,7 +942,11 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       paypal: { Applepay?: () => {
         config: () => Promise<{ isEligible: boolean; countryCode: string; merchantCapabilities: string[]; supportedNetworks: string[] }>;
         validateMerchant: (o: { validationUrl: string; displayName: string }) => Promise<{ merchantSession: unknown }>;
-        confirmOrder: (o: { orderId: string; token: unknown; billingContact: unknown }) => Promise<unknown>;
+        confirmOrder: (o: {
+          orderId: string;
+          token: unknown;
+          billingContact: unknown;
+        }) => Promise<{ status?: string } | unknown>;
       } },
       createApi: string,
       createServerOrder: () => Promise<{ id: string; total: string }>,
@@ -1014,17 +1018,28 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
                 if (order.total && order.total !== sheetAmount) {
                   throw new Error(`Amount mismatch sheet=${sheetAmount} order=${order.total}`);
                 }
-                await applepay.confirmOrder({
+                const confirmed = await applepay.confirmOrder({
                   orderId: order.id,
                   token: payment.token,
                   billingContact: payment.billingContact,
                 });
+                const confirmStatus = String(
+                  (confirmed as { status?: string } | null)?.status || "",
+                ).toUpperCase();
                 // Docs: complete Apple session after confirm, then capture on the server.
                 session.completePayment(sessionClass.STATUS_SUCCESS);
                 try {
+                  // intent=CAPTURE: confirmOrder may already complete; server treats that as ok.
                   await captureServerOrder(order.id);
                 } catch (capErr) {
-                  console.error("Apple Pay capture after confirm", capErr);
+                  console.error("Apple Pay capture after confirm", capErr, confirmStatus);
+                  if (confirmStatus === "COMPLETED") {
+                    // Money already taken — do not strand the buyer on an error alert.
+                    saveOrderSnapshot(shippingAmount());
+                    clearCart();
+                    location.href = `${base}${prefix}grazie/?from=paypal`;
+                    return;
+                  }
                   window.alert(
                     say(
                       "Apple Pay ha autorizzato ma la conferma shop non è andata a buon fine. Controlla PayPal / scrivimi: non riprovare subito lo stesso pagamento.",
