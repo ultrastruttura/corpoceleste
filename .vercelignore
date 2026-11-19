@@ -1,11 +1,11 @@
 # Site is on GitHub Pages — Vercel only serves api/. Skip heavy static/content
 # so each Function deploy stays smaller (Hobby Function Storage is 10 GB).
+# Keep `scripts/` — vercel.json ignoreCommand needs scripts/vercel-ignore-build.mjs.
 content
 public
 dist
 .astro
 admin
-scripts
 src/pages
 src/components
 src/layouts
