@@ -21,6 +21,8 @@ body:
 
     Con [TDD records](https://www.discogs.com/it/label/152921-TDD-Records), etichetta indipendente, ho prodotto e distribuito dischi di gruppi legati al circuito DIY hardcore.
 
+    Sono aperto a collaborazioni: stampe d’autore e serigrafie con artisti e con band. Porto in queste collaborazioni l’esperienza del mio passato DIY nell’ambito discografico.
+
     Quando ho modo dipingo, e in questo campo cerco — guardacaso — di stare piuttosto lontano dalla serigrafia: riprodurre in stampa i miei lavori sarebbe decisamente complesso, sia per texture che per trasparenze. Immagino non sia un caso. Puoi dare un’occhiata [qui](https://ultrastruttura.com/).
   en: |-
     I was born in 1984; I live and work (near) Bergamo, northern Italy.
@@ -41,6 +43,8 @@ body:
 
     With [TDD records](https://www.discogs.com/it/label/152921-TDD-Records), an independent label, I produced and distributed records by bands in the DIY hardcore circuit.
 
+    I’m open to collaborations: artist prints and screen printing with artists and with bands. I bring to those projects the experience of my DIY past in the record world.
+
     When I can, I paint — and in that field I try, unsurprisingly, to stay rather far from screen printing: reproducing my work in print would be very complex, for texture and transparencies alike. I don’t think that’s a coincidence. You can have a look [here](https://ultrastruttura.com/).
   de: |-
     Ich wurde 1984 geboren und lebe und arbeite (in der Nähe von) Bergamo, Norditalien.
@@ -60,6 +64,8 @@ body:
     Mit [Satellite Press](https://www.instagram.com/satellitepress/) haben wir limitierte Künstlerdrucke und -bücher entworfen und umgesetzt, nicht nur im Siebdruck, sondern auch mit Tiefdruck und Giclée.
 
     Mit [TDD records](https://www.discogs.com/it/label/152921-TDD-Records), einem unabhängigen Label, habe ich Platten von Bands aus dem DIY-Hardcore-Kreis produziert und vertrieben.
+
+    Ich bin offen für Kollaborationen: Künstlerdrucke und Siebdruck mit Künstler:innen und mit Bands. In diese Projekte bringe ich die Erfahrung aus meiner DIY-Vergangenheit im Plattenbereich mit.
 
     Wenn ich kann, male ich — und dabei halte ich mich, wie der Zufall will, eher fern vom Siebdruck: meine Arbeiten in Druck zu reproduzieren wäre sehr komplex, wegen Textur und Transparenz. Das ist wohl kein Zufall. Du kannst [hier](https://ultrastruttura.com/) vorbeischauen.
 ---

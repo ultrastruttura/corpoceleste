@@ -65,7 +65,7 @@ const copy = {
     summary:
       "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, shopper, longsleeve, stampe d'artista ed edizioni limitate (non print-on-demand). Workshop di serigrafia in studio o on-site. Spedizione Italia e UE. Guida taglie, bio, corsi, contatti.",
     about:
-      "Corpoceleste (una parola, brand CORPOCELESTE) è lo shop di Andrea Baldelli Lorenzo (P. IVA IT04952110163), serigrafo a Nembro / Lonno / Bergamo: un colore, telaio a mano, pezzi unici in edizione limitata. Non è print-on-demand e non è il venue omonimo corpoceleste.com. Query utili: maglia serigrafata, shopper serigrafata, longsleeve serigrafata, serigrafia a mano Bergamo, workshop serigrafia Bergamo, corso serigrafia, stampa d'artista, edizione limitata, arte indossabile, guida taglie maglia, Corpoceleste, corpoceleste.eu.",
+      "Corpoceleste (una parola, brand CORPOCELESTE) è lo shop di Andrea Baldelli Lorenzo (P. IVA IT04952110163), serigrafo a Nembro / Lonno / Bergamo: un colore, telaio a mano, pezzi unici in edizione limitata. Aperto a collaborazioni (stampe d’autore, serigrafie) con artisti e band, con esperienza DIY discografica (CORPOC, TDD records). Non è print-on-demand e non è il venue omonimo corpoceleste.com. Query utili: maglia serigrafata, shopper serigrafata, longsleeve serigrafata, serigrafia a mano Bergamo, workshop serigrafia Bergamo, corso serigrafia, stampa d'artista, edizione limitata, arte indossabile, collaborazione artisti band, merch DIY, guida taglie maglia, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Prodotti",
     productsEmpty:
@@ -102,7 +102,9 @@ const copy = {
       "Misure maglie Corpoceleste (A larghezza, B lunghezza) per taglia S–XXL — fit regular.",
     bio: "Bio",
     bioNote:
-      "Andrea Baldelli Lorenzo — serigrafo a Bergamo, fondatore di Corpoceleste; consulenza, workshop e edizioni.",
+      "Andrea Baldelli Lorenzo — serigrafo a Bergamo, fondatore di Corpoceleste; consulenza, workshop, edizioni e collaborazioni con artisti e band.",
+    collab:
+      "Aperto a collaborazioni: stampe d’autore e serigrafie con artisti e band. Esperienza DIY discografica (CORPOC, TDD records / hardcore indipendente) + studio a Bergamo. Scrivi da Contatti.",
     archive: "Archivio workshop",
     upcoming: "Prossimi workshop",
     terms: "Condizioni di vendita",
@@ -138,13 +140,16 @@ const copy = {
     faqPayQ: "Come si paga?",
     faqPayA:
       "PayPal (carta / Apple Pay / Google Pay) oppure bonifico. Con bonifico il pezzo non è riservato finché non arriva il pagamento.",
+    faqCollabQ: "Fate collaborazioni con artisti o band?",
+    faqCollabA:
+      "Sì: stampe d’autore e serigrafie con artisti e band. Porto l’esperienza DIY discografica (edizioni limitate, merch, circuiti indipendenti) e il lavoro in studio a Bergamo — scrivi da Contatti.",
     faqWorkshopQ: "Dove si tengono i workshop di serigrafia?",
   },
   en: {
     summary:
       "Corpoceleste — one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, totes, longsleeves, artist prints and limited editions (not print-on-demand). Screen-printing workshops in-studio or on location. Shipping Italy & EU. Size guide, bio, workshops, contact.",
     about:
-      "Corpoceleste (one word, brand CORPOCELESTE) is the shop of Andrea Baldelli Lorenzo (VAT IT04952110163), screen printer in Nembro / Lonno / Bergamo: one colour, hand-printed screens, unique limited-edition pieces. Not print-on-demand and not the unrelated venue corpoceleste.com. Useful queries: screen-printed shirt, screen-printed tote, hand screen print Bergamo, screen-printing workshop Bergamo, limited edition, artist print, wearable art, size guide, Corpoceleste, corpoceleste.eu.",
+      "Corpoceleste (one word, brand CORPOCELESTE) is the shop of Andrea Baldelli Lorenzo (VAT IT04952110163), screen printer in Nembro / Lonno / Bergamo: one colour, hand-printed screens, unique limited-edition pieces. Open to collaborations (artist prints, screen printing) with artists and bands, with a DIY record-world background (CORPOC, TDD records). Not print-on-demand and not the unrelated venue corpoceleste.com. Useful queries: screen-printed shirt, screen-printed tote, hand screen print Bergamo, screen-printing workshop Bergamo, limited edition, artist print, wearable art, artist band collaboration, DIY merch, size guide, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Products",
     productsEmpty:
@@ -181,7 +186,9 @@ const copy = {
       "Corpoceleste shirt measurements (A width, B length) by size S–XXL — regular fit.",
     bio: "Bio",
     bioNote:
-      "Andrea Baldelli Lorenzo — screen printer in Bergamo, founder of Corpoceleste; consulting, workshops and editions.",
+      "Andrea Baldelli Lorenzo — screen printer in Bergamo, founder of Corpoceleste; consulting, workshops, editions and collaborations with artists and bands.",
+    collab:
+      "Open to collaborations: artist prints and screen printing with artists and bands. DIY record-world experience (CORPOC, TDD records / independent hardcore) + Bergamo studio. Write via Contact.",
     archive: "Workshop archive",
     upcoming: "Upcoming workshops",
     terms: "Terms of sale",
@@ -217,13 +224,16 @@ const copy = {
     faqPayQ: "How do I pay?",
     faqPayA:
       "PayPal (card / Apple Pay / Google Pay) or bank transfer. With bank transfer the piece is not reserved until payment arrives.",
+    faqCollabQ: "Do you collaborate with artists or bands?",
+    faqCollabA:
+      "Yes: artist prints and screen printing with artists and bands. I bring DIY record-world experience (limited editions, merch, independent circuits) and studio work in Bergamo — write via Contact.",
     faqWorkshopQ: "Where are Corpoceleste screen-printing workshops held?",
   },
   de: {
     summary:
       "Corpoceleste — einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Shopper, Longsleeves, Künstlerdrucke und limitierte Editionen (kein Print-on-Demand). Siebdruck-Workshops im Atelier oder vor Ort. Versand Italien & EU. Größenratgeber, Bio, Kurse, Kontakt.",
     about:
-      "Corpoceleste (ein Wort, Marke CORPOCELESTE) ist der Shop von Andrea Baldelli Lorenzo (USt-IdNr. IT04952110163), Siebdrucker in Nembro / Lonno / Bergamo: eine Farbe, von Hand gedruckt, Unikate in limitierter Auflage. Kein Print-on-Demand und nicht die gleichnamige Location corpoceleste.com. Nützliche Suchen: Siebdruck-Shirt, Siebdruck-Shopper, Handsiebdruck Bergamo, Siebdruck-Workshop Bergamo, limitierte Edition, Künstlerdruck, tragbare Kunst, Größenratgeber, Corpoceleste, corpoceleste.eu.",
+      "Corpoceleste (ein Wort, Marke CORPOCELESTE) ist der Shop von Andrea Baldelli Lorenzo (USt-IdNr. IT04952110163), Siebdrucker in Nembro / Lonno / Bergamo: eine Farbe, von Hand gedruckt, Unikate in limitierter Auflage. Offen für Kollaborationen (Künstlerdrucke, Siebdruck) mit Künstler:innen und Bands, mit DIY-Erfahrung aus der Plattenwelt (CORPOC, TDD records). Kein Print-on-Demand und nicht die gleichnamige Location corpoceleste.com. Nützliche Suchen: Siebdruck-Shirt, Siebdruck-Shopper, Handsiebdruck Bergamo, Siebdruck-Workshop Bergamo, limitierte Edition, Künstlerdruck, tragbare Kunst, Band-Merch Kollaboration, DIY Merch, Größenratgeber, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Produkte",
     productsEmpty:
@@ -260,7 +270,9 @@ const copy = {
       "Corpoceleste-Shirt-Maße (A Breite, B Länge) nach Größe S–XXL — Regular Fit.",
     bio: "Bio",
     bioNote:
-      "Andrea Baldelli Lorenzo — Siebdrucker in Bergamo, Gründer von Corpoceleste; Beratung, Workshops und Editionen.",
+      "Andrea Baldelli Lorenzo — Siebdrucker in Bergamo, Gründer von Corpoceleste; Beratung, Workshops, Editionen und Kollaborationen mit Künstler:innen und Bands.",
+    collab:
+      "Offen für Kollaborationen: Künstlerdrucke und Siebdruck mit Künstler:innen und Bands. DIY-Platten-Erfahrung (CORPOC, TDD records / unabhängiger Hardcore) + Atelier in Bergamo. Schreib über Kontakt.",
     archive: "Workshop-Archiv",
     upcoming: "Nächste Workshops",
     terms: "Verkaufsbedingungen",
@@ -296,6 +308,9 @@ const copy = {
     faqPayQ: "Wie zahle ich?",
     faqPayA:
       "PayPal (Karte / Apple Pay / Google Pay) oder Überweisung. Bei Überweisung ist das Stück erst nach Zahlungseingang reserviert.",
+    faqCollabQ: "Macht ihr Kollaborationen mit Künstler:innen oder Bands?",
+    faqCollabA:
+      "Ja: Künstlerdrucke und Siebdruck mit Künstler:innen und Bands. Ich bringe DIY-Platten-Erfahrung (limitierte Editionen, Merch, unabhängige Kreise) und Atelierarbeit in Bergamo mit — schreib über Kontakt.",
     faqWorkshopQ: "Wo finden Corpoceleste-Siebdruck-Workshops statt?",
   },
 } as const;
@@ -406,6 +421,7 @@ function faqBlock(locale: LlmLocale) {
     [t.faqNameQ, t.faqNameA],
     [t.faqShipQ, t.faqShipA],
     [t.faqPayQ, t.faqPayA],
+    [t.faqCollabQ, t.faqCollabA],
     [t.faqWorkshopQ, dict.workshops.waitlistBody],
     [
       locale === "en"
@@ -563,6 +579,7 @@ export function buildLlmsTxt(locale: LlmLocale) {
     `- [${t.workshops}](${abs(locale, "corsi/")}): ${workshopsIntro(locale) || t.workshopsNote}`,
     `- [${t.sizeGuide}](${abs(locale, "guida-taglie/")}): ${t.sizeGuideNote}`,
     `- [${t.bio}](${abs(locale, "bio/")}): ${t.bioNote}`,
+    `- ${t.collab}`,
     "",
     `## ${t.faq}`,
     "",
@@ -572,6 +589,7 @@ export function buildLlmsTxt(locale: LlmLocale) {
     `- ${t.faqNameQ} ${t.faqNameA}`,
     `- ${t.faqShipQ} ${t.faqShipA}`,
     `- ${t.faqPayQ} ${t.faqPayA}`,
+    `- ${t.faqCollabQ} ${t.faqCollabA}`,
     "",
     `## ${t.languages}`,
     "",
