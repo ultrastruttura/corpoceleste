@@ -1,18 +1,33 @@
 import { getAbsoluteLocaleUrl } from "astro:i18n";
+import { artistName } from "../data/artists";
 import { bioField, bioPage } from "../data/bio";
+import { commerce } from "../data/commerce";
+import { fitModels } from "../data/fit-models";
 import { news, newsField } from "../data/news";
 import {
-  artistName,
+  productDescription,
+  productHasSizes,
   productSeoDescription,
   type Product,
+  type ProductKind,
 } from "../data/products";
 import { localizedSetting } from "../data/settings";
-import { upcomingWorkshops } from "../data/workshops";
+import { site } from "../data/site";
+import { pastWorkshops, upcomingWorkshops } from "../data/workshops";
+import { ui } from "../i18n/dict";
 import type { Locale } from "../i18n/locales";
 import {
   discoveryArtists,
   discoveryProducts,
 } from "./discovery";
+import {
+  formatProductBlurb,
+  formatProductFacts,
+  note,
+  productBodyForAgents,
+  stripMarkdownLinks,
+} from "./llms-format";
+import { PICKUP_BERGAMO } from "./pickup";
 
 function abs(locale: Locale, path = "") {
   const p = path.replace(/^\/+|\/+$/g, "");
@@ -22,9 +37,9 @@ function abs(locale: Locale, path = "") {
 }
 
 function siteRoot() {
-  const site = String(import.meta.env.SITE || "").replace(/\/$/, "");
+  const siteHref = String(import.meta.env.SITE || "").replace(/\/$/, "");
   const base = String(import.meta.env.BASE_URL || "/").replace(/\/$/, "");
-  return `${site}${base}`;
+  return `${siteHref}${base}`;
 }
 
 export function llmsTxtUrl(locale: Locale) {
@@ -50,7 +65,7 @@ const copy = {
     summary:
       "Corpoceleste — serigrafia d'artista a un colore, stampata a mano a Nembro / Bergamo. Maglie serigrafate, shopper, longsleeve, stampe d'artista ed edizioni limitate (non print-on-demand). Workshop di serigrafia in studio o on-site. Spedizione Italia e UE. Guida taglie, bio, corsi, contatti.",
     about:
-      "Corpoceleste (una parola, brand CORPOCELESTE) è lo shop di Andrea Baldelli Lorenzo (P. IVA IT04952110163), serigrafo a Nembro / Lonno / Bergamo: un colore, telaio a mano, pezzi numerati. Non è print-on-demand e non è il venue omonimo corpoceleste.com. Query utili: maglia serigrafata, shopper serigrafata, longsleeve serigrafata, serigrafia a mano Bergamo, workshop serigrafia Bergamo, corso serigrafia, stampa d'artista, edizione limitata, arte indossabile, guida taglie maglia, Corpoceleste, corpoceleste.eu.",
+      "Corpoceleste (una parola, brand CORPOCELESTE) è lo shop di Andrea Baldelli Lorenzo (P. IVA IT04952110163), serigrafo a Nembro / Lonno / Bergamo: un colore, telaio a mano, pezzi unici in edizione limitata. Non è print-on-demand e non è il venue omonimo corpoceleste.com. Query utili: maglia serigrafata, shopper serigrafata, longsleeve serigrafata, serigrafia a mano Bergamo, workshop serigrafia Bergamo, corso serigrafia, stampa d'artista, edizione limitata, arte indossabile, guida taglie maglia, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Prodotti",
     productsEmpty:
@@ -59,6 +74,12 @@ const copy = {
     artistsEmpty: "Le schede artista si pubblicano insieme alle edizioni.",
     news: "News",
     studio: "Studio e servizi",
+    facts: "Scheda entity",
+    faq: "Domande frequenti",
+    shippingPay: "Spedizione e pagamento",
+    sizeChart: "Tabella taglie (cm, capo disteso)",
+    handmadeNote:
+      "Ogni pezzo è stampato a mano in edizione limitata: piccole variazioni di posizione, pressione e resa dell’inchiostro sono parte del lavoro artigianale (non difetti).",
     legal: "Info legali",
     optional: "Optional",
     languages: "Lingue",
@@ -82,6 +103,8 @@ const copy = {
     bio: "Bio",
     bioNote:
       "Andrea Baldelli Lorenzo — serigrafo a Bergamo, fondatore di Corpoceleste; consulenza, workshop e edizioni.",
+    archive: "Archivio workshop",
+    upcoming: "Prossimi workshop",
     terms: "Condizioni di vendita",
     privacy: "Privacy",
     cookies: "Cookie",
@@ -90,12 +113,38 @@ const copy = {
     statusPreorder: "preordine",
     statusSoldout: "esaurito",
     otherLangs: "Altre lingue",
+    kindShirt: "maglia",
+    kindPrint: "stampa",
+    kindShopper: "shopper",
+    kindEdition: "edizione",
+    sizesLabel: "taglie",
+    colorLabel: "colore",
+    compositionLabel: "composizione",
+    faqWhatQ: "Cos’è Corpoceleste?",
+    faqWhatA:
+      "È lo shop di serigrafia d’artista di Andrea Baldelli Lorenzo a Nembro / Bergamo: maglie, shopper e stampe a un colore, stampate a mano in edizione limitata — non print-on-demand.",
+    faqWhereQ: "Dove stampate?",
+    faqWhereA:
+      "In studio a Lonno / Nembro (BG), Italia (Via Moroni 51). Workshop anche on-site in altre città.",
+    faqPodQ: "È print-on-demand?",
+    faqPodA:
+      "No. Ogni edizione è stampata a mano, pezzo per pezzo; le variazioni di stampa sono parte del lavoro artigianale.",
+    faqNameQ: "Siete il locale / venue «Corpoceleste»?",
+    faqNameA:
+      "No. Questo è lo shop di serigrafia su corpoceleste.eu — non confondere con attività omonime non collegate (es. corpoceleste.com).",
+    faqShipQ: "Spedite in Italia e in Europa?",
+    faqShipA:
+      "Sì: spedizione a domicilio via Sendcloud (Italia e UE, quote in checkout) oppure ritiro a mano zona Bergamo a 0 €.",
+    faqPayQ: "Come si paga?",
+    faqPayA:
+      "PayPal (carta / Apple Pay / Google Pay) oppure bonifico. Con bonifico il pezzo non è riservato finché non arriva il pagamento.",
+    faqWorkshopQ: "Dove si tengono i workshop di serigrafia?",
   },
   en: {
     summary:
       "Corpoceleste — one-colour artist screen printing, hand-printed in Nembro / Bergamo. Screen-printed shirts, totes, longsleeves, artist prints and limited editions (not print-on-demand). Screen-printing workshops in-studio or on location. Shipping Italy & EU. Size guide, bio, workshops, contact.",
     about:
-      "Corpoceleste (one word, brand CORPOCELESTE) is the shop of Andrea Baldelli Lorenzo (VAT IT04952110163), screen printer in Nembro / Lonno / Bergamo: one colour, hand-printed screens, numbered pieces. Not print-on-demand and not the unrelated venue corpoceleste.com. Useful queries: screen-printed shirt, screen-printed tote, hand screen print Bergamo, screen-printing workshop Bergamo, limited edition, artist print, wearable art, size guide, Corpoceleste, corpoceleste.eu.",
+      "Corpoceleste (one word, brand CORPOCELESTE) is the shop of Andrea Baldelli Lorenzo (VAT IT04952110163), screen printer in Nembro / Lonno / Bergamo: one colour, hand-printed screens, unique limited-edition pieces. Not print-on-demand and not the unrelated venue corpoceleste.com. Useful queries: screen-printed shirt, screen-printed tote, hand screen print Bergamo, screen-printing workshop Bergamo, limited edition, artist print, wearable art, size guide, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Products",
     productsEmpty:
@@ -104,6 +153,12 @@ const copy = {
     artistsEmpty: "Artist pages publish with the editions.",
     news: "News",
     studio: "Studio and services",
+    facts: "Entity fact sheet",
+    faq: "Frequently asked questions",
+    shippingPay: "Shipping and payment",
+    sizeChart: "Size chart (cm, garment laid flat)",
+    handmadeNote:
+      "Every piece is hand-printed in a limited edition: small variations in placement, pressure and ink coverage are part of handmade work (not defects).",
     legal: "Legal",
     optional: "Optional",
     languages: "Languages",
@@ -127,6 +182,8 @@ const copy = {
     bio: "Bio",
     bioNote:
       "Andrea Baldelli Lorenzo — screen printer in Bergamo, founder of Corpoceleste; consulting, workshops and editions.",
+    archive: "Workshop archive",
+    upcoming: "Upcoming workshops",
     terms: "Terms of sale",
     privacy: "Privacy",
     cookies: "Cookies",
@@ -135,12 +192,38 @@ const copy = {
     statusPreorder: "pre-order",
     statusSoldout: "sold out",
     otherLangs: "Other languages",
+    kindShirt: "shirt",
+    kindPrint: "print",
+    kindShopper: "tote",
+    kindEdition: "edition",
+    sizesLabel: "sizes",
+    colorLabel: "colour",
+    compositionLabel: "composition",
+    faqWhatQ: "What is Corpoceleste?",
+    faqWhatA:
+      "It is Andrea Baldelli Lorenzo’s artist screen-printing shop in Nembro / Bergamo: one-colour shirts, totes and prints, hand-printed in limited editions — not print-on-demand.",
+    faqWhereQ: "Where do you print?",
+    faqWhereA:
+      "In the studio in Lonno / Nembro (BG), Italy (Via Moroni 51). Workshops also on location in other cities.",
+    faqPodQ: "Is it print-on-demand?",
+    faqPodA:
+      "No. Each edition is hand-printed piece by piece; print variations are part of the craft.",
+    faqNameQ: "Are you the «Corpoceleste» venue?",
+    faqNameA:
+      "No. This is the screen-printing shop at corpoceleste.eu — not the unrelated venue corpoceleste.com.",
+    faqShipQ: "Do you ship in Italy and the EU?",
+    faqShipA:
+      "Yes: home delivery via Sendcloud (Italy & EU, quote at checkout) or local pickup in the Bergamo area for €0.",
+    faqPayQ: "How do I pay?",
+    faqPayA:
+      "PayPal (card / Apple Pay / Google Pay) or bank transfer. With bank transfer the piece is not reserved until payment arrives.",
+    faqWorkshopQ: "Where are Corpoceleste screen-printing workshops held?",
   },
   de: {
     summary:
       "Corpoceleste — einfarbiger Künstlersiebdruck, handgedruckt in Nembro / Bergamo. Siebdruck-Shirts, Shopper, Longsleeves, Künstlerdrucke und limitierte Editionen (kein Print-on-Demand). Siebdruck-Workshops im Atelier oder vor Ort. Versand Italien & EU. Größenratgeber, Bio, Kurse, Kontakt.",
     about:
-      "Corpoceleste (ein Wort, Marke CORPOCELESTE) ist der Shop von Andrea Baldelli Lorenzo (USt-IdNr. IT04952110163), Siebdrucker in Nembro / Lonno / Bergamo: eine Farbe, von Hand gedruckt, nummerierte Stücke. Kein Print-on-Demand und nicht die gleichnamige Location corpoceleste.com. Nützliche Suchen: Siebdruck-Shirt, Siebdruck-Shopper, Handsiebdruck Bergamo, Siebdruck-Workshop Bergamo, limitierte Edition, Künstlerdruck, tragbare Kunst, Größenratgeber, Corpoceleste, corpoceleste.eu.",
+      "Corpoceleste (ein Wort, Marke CORPOCELESTE) ist der Shop von Andrea Baldelli Lorenzo (USt-IdNr. IT04952110163), Siebdrucker in Nembro / Lonno / Bergamo: eine Farbe, von Hand gedruckt, Unikate in limitierter Auflage. Kein Print-on-Demand und nicht die gleichnamige Location corpoceleste.com. Nützliche Suchen: Siebdruck-Shirt, Siebdruck-Shopper, Handsiebdruck Bergamo, Siebdruck-Workshop Bergamo, limitierte Edition, Künstlerdruck, tragbare Kunst, Größenratgeber, Corpoceleste, corpoceleste.eu.",
     shop: "Shop",
     products: "Produkte",
     productsEmpty:
@@ -149,6 +232,12 @@ const copy = {
     artistsEmpty: "Künstlerseiten erscheinen mit den Editionen.",
     news: "News",
     studio: "Atelier und Angebote",
+    facts: "Entity-Steckbrief",
+    faq: "Häufige Fragen",
+    shippingPay: "Versand und Zahlung",
+    sizeChart: "Größentabelle (cm, flach liegend)",
+    handmadeNote:
+      "Jedes Stück wird von Hand in limitierter Auflage gedruckt: kleine Abweichungen bei Position, Druck und Farbdeckung gehören zur Handarbeit (keine Mängel).",
     legal: "Rechtliches",
     optional: "Optional",
     languages: "Sprachen",
@@ -172,6 +261,8 @@ const copy = {
     bio: "Bio",
     bioNote:
       "Andrea Baldelli Lorenzo — Siebdrucker in Bergamo, Gründer von Corpoceleste; Beratung, Workshops und Editionen.",
+    archive: "Workshop-Archiv",
+    upcoming: "Nächste Workshops",
     terms: "Verkaufsbedingungen",
     privacy: "Datenschutz",
     cookies: "Cookies",
@@ -180,14 +271,36 @@ const copy = {
     statusPreorder: "Vorbestellung",
     statusSoldout: "ausverkauft",
     otherLangs: "Andere Sprachen",
+    kindShirt: "Shirt",
+    kindPrint: "Druck",
+    kindShopper: "Shopper",
+    kindEdition: "Edition",
+    sizesLabel: "Größen",
+    colorLabel: "Farbe",
+    compositionLabel: "Zusammensetzung",
+    faqWhatQ: "Was ist Corpoceleste?",
+    faqWhatA:
+      "Der Künstler-Siebdruck-Shop von Andrea Baldelli Lorenzo in Nembro / Bergamo: einfarbige Shirts, Shopper und Drucke, handgedruckt in limitierter Auflage — kein Print-on-Demand.",
+    faqWhereQ: "Wo wird gedruckt?",
+    faqWhereA:
+      "Im Atelier in Lonno / Nembro (BG), Italien (Via Moroni 51). Workshops auch vor Ort in anderen Städten.",
+    faqPodQ: "Ist es Print-on-Demand?",
+    faqPodA:
+      "Nein. Jede Edition wird Stück für Stück von Hand gedruckt; Druckabweichungen gehören zum Handwerk.",
+    faqNameQ: "Seid ihr die Location «Corpoceleste»?",
+    faqNameA:
+      "Nein. Dies ist der Siebdruck-Shop auf corpoceleste.eu — nicht die gleichnamige, unabhängige Location corpoceleste.com.",
+    faqShipQ: "Versendet ihr in Italien und der EU?",
+    faqShipA:
+      "Ja: Versand nach Hause über Sendcloud (Italien & EU, Angebot an der Kasse) oder Abholung in der Region Bergamo für 0 €.",
+    faqPayQ: "Wie zahle ich?",
+    faqPayA:
+      "PayPal (Karte / Apple Pay / Google Pay) oder Überweisung. Bei Überweisung ist das Stück erst nach Zahlungseingang reserviert.",
+    faqWorkshopQ: "Wo finden Corpoceleste-Siebdruck-Workshops statt?",
   },
 } as const;
 
 type LlmLocale = keyof typeof copy;
-
-function note(text: string) {
-  return text.replace(/\s+/g, " ").trim().replace(/[.]+$/, "");
-}
 
 function statusLabel(locale: LlmLocale, product: Product) {
   const t = copy[locale];
@@ -196,14 +309,64 @@ function statusLabel(locale: LlmLocale, product: Product) {
   return t.statusAvailable;
 }
 
+function kindLabel(locale: LlmLocale, kind: ProductKind) {
+  const t = copy[locale];
+  if (kind === "print") return t.kindPrint;
+  if (kind === "shopper") return t.kindShopper;
+  if (kind === "edition") return t.kindEdition;
+  return t.kindShirt;
+}
+
+function productFacts(locale: LlmLocale, product: Product) {
+  const t = copy[locale];
+  return formatProductFacts({
+    kindLabel: kindLabel(locale, product.kind),
+    colorLabel: t.colorLabel,
+    compositionLabel: t.compositionLabel,
+    sizesLabel: t.sizesLabel,
+    colorName: product.colorName,
+    composition: product.composition,
+    hasSizes: productHasSizes(product),
+    sizes: product.sizes,
+    artist: artistName(product.artistId),
+    title: product.title,
+    price: product.price,
+    statusLabel: statusLabel(locale, product),
+  });
+}
+
+function productBlurb(locale: LlmLocale, product: Product, max = 280) {
+  return formatProductBlurb({
+    seo: productSeoDescription(product, locale),
+    description: productDescription(product, locale),
+    facts: productFacts(locale, product),
+    max,
+  });
+}
+
 function productLine(locale: LlmLocale, product: Product) {
-  const desc = note(productSeoDescription(product, locale));
-  const artist = artistName(product.artistId);
-  const price = Number.isFinite(product.price) && product.price > 0 ? `${product.price} €` : "";
-  const bits = [desc, artist && artist !== product.title ? artist : "", price, statusLabel(locale, product)]
-    .filter(Boolean)
-    .join(" · ");
-  return `- [${product.title}](${abs(locale, `prodotto/${product.slug}/`)}): ${bits}`;
+  const blurb = productBlurb(locale, product);
+  const facts = productFacts(locale, product);
+  const tail = blurb === facts ? facts : `${blurb} · ${facts}`;
+  return `- [${product.title}](${abs(locale, `prodotto/${product.slug}/`)}): ${tail}`;
+}
+
+function productFullBlock(locale: LlmLocale, product: Product) {
+  const lines = [
+    `### [${product.title}](${abs(locale, `prodotto/${product.slug}/`)})`,
+    "",
+    productFacts(locale, product),
+  ];
+  const seo = note(productSeoDescription(product, locale));
+  const body = productBodyForAgents(productDescription(product, locale));
+  if (seo && seo !== body.slice(0, seo.length)) {
+    lines.push("", seo);
+  }
+  if (body) {
+    const clipped = body.length > 1200 ? `${body.slice(0, 1199).trim()}…` : body;
+    if (!seo || clipped !== seo) lines.push("", clipped);
+  }
+  return lines.join("\n");
 }
 
 function languageLinks(locale: LlmLocale) {
@@ -215,10 +378,121 @@ function languageLinks(locale: LlmLocale) {
     .join("\n");
 }
 
+function entityFacts(locale: LlmLocale) {
+  return [
+    `- Name: Corpoceleste (CORPOCELESTE)`,
+    `- Legal: ${commerce.legalName}`,
+    `- VAT: ${commerce.vatId}`,
+    `- Address: ${commerce.indirizzo || site.indirizzo}`,
+    `- Email: ${site.email}`,
+    commerce.pec ? `- PEC: ${commerce.pec}` : "",
+    commerce.sdiCode ? `- SDI: ${commerce.sdiCode}` : "",
+    `- Site: ${abs(locale)}`,
+    `- Instagram: ${site.instagram}`,
+    `- Related: ${site.ultrastruttura}`,
+    `- Previous editions project: CORPOC — ${site.corpoc}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function faqBlock(locale: LlmLocale) {
+  const t = copy[locale];
+  const dict = ui[locale];
+  const pairs = [
+    [t.faqWhatQ, t.faqWhatA],
+    [t.faqWhereQ, t.faqWhereA],
+    [t.faqPodQ, t.faqPodA],
+    [t.faqNameQ, t.faqNameA],
+    [t.faqShipQ, t.faqShipA],
+    [t.faqPayQ, t.faqPayA],
+    [t.faqWorkshopQ, dict.workshops.waitlistBody],
+    [
+      locale === "en"
+        ? "Can you run a workshop in my city?"
+        : locale === "de"
+          ? "Könnt ihr einen Workshop in meiner Stadt machen?"
+          : "Potete organizzare un workshop nella mia città?",
+      dict.workshops.onSiteBody,
+    ],
+    [dict.sizeGuide.faqMeasureQ, dict.sizeGuide.faqMeasureA],
+    [dict.sizeGuide.faqBetweenQ, dict.sizeGuide.faqBetweenA],
+    [dict.sizeGuide.faqUnitQ, dict.sizeGuide.faqUnitA],
+  ];
+  return pairs.map(([q, a]) => `### ${q}\n\n${note(a)}`).join("\n\n");
+}
+
+function sizeChartBlock(locale: LlmLocale) {
+  const model = fitModels[0];
+  const rows = model?.rows?.length
+    ? model.rows
+    : site.sizeChart.map((r) => ({
+        size: r.size,
+        chest: r.chest,
+        length: r.length,
+        sleeve: r.sleeve,
+      }));
+  const title = model?.name ? `${model.name}` : copy[locale].sizeGuideNote;
+  const lines = [`${title}:`, ""];
+  for (const r of rows) {
+    const sleeve = "sleeve" in r && Number(r.sleeve) > 0 ? `, C ${r.sleeve}` : "";
+    lines.push(`- ${r.size}: A ${r.chest} · B ${r.length}${sleeve}`);
+  }
+  return lines.join("\n");
+}
+
+function shippingPayBlock(locale: LlmLocale) {
+  const dict = ui[locale];
+  const days = commerce.shippingDays || site.shippingDays;
+  return [
+    note(dict.checkout.shippingBody),
+    "",
+    note(dict.checkout.vatIncluded),
+    "",
+    `- ${dict.checkout.deliveryCourier}: Sendcloud (IT / EU)`,
+    `- ${dict.checkout.deliveryPickup}: ${PICKUP_BERGAMO.serviceName} · 0 €`,
+    note(dict.checkout.deliveryPickupNote),
+    "",
+    `- ${dict.checkout.methodPaypal}`,
+    `- ${dict.checkout.bank}: ${note(dict.checkout.bankNote)}`,
+    `- ${locale === "en" ? "Indicative ship window" : locale === "de" ? "Richtwert Versand" : "Tempi spedizione indicativi"}: ~${days} ${locale === "en" ? "working days" : locale === "de" ? "Werktage" : "giorni lavorativi"}`,
+  ].join("\n");
+}
+
+function workshopsIntro(locale: LlmLocale) {
+  return note(ui[locale].workshops.intro.replace(/\n+/g, " "));
+}
+
+function upcomingBlock(locale: LlmLocale) {
+  if (!upcomingWorkshops.length) {
+    return note(ui[locale].workshops.upcomingEmpty);
+  }
+  return upcomingWorkshops
+    .map((w) => {
+      const noteBit = w.note ? ` — ${w.note}` : "";
+      const link = w.signupUrl ? `: ${w.signupUrl}` : "";
+      return `- ${w.when} — ${w.where} (${w.organizer})${noteBit}${link}`;
+    })
+    .join("\n");
+}
+
+function archiveBlock() {
+  if (!pastWorkshops.length) return "";
+  return pastWorkshops
+    .slice(0, 8)
+    .map((y) => {
+      const sample = y.items.slice(0, 6).join("; ");
+      const more = y.items.length > 6 ? ` (+${y.items.length - 6})` : "";
+      return `- ${y.year} (${y.items.length}): ${sample}${more}`;
+    })
+    .join("\n");
+}
+
 /** Compact Markdown llms.txt (spec llmstxt.org) — IT / EN / DE. */
 export function buildLlmsTxt(locale: LlmLocale) {
   const t = copy[locale];
   const meta = localizedSetting("metaDescription", locale) || t.summary;
+  const homeLede = localizedSetting("homeLede", locale);
   const listedProducts = discoveryProducts().sort((a, b) =>
     a.title.localeCompare(b.title, locale),
   );
@@ -231,10 +505,20 @@ export function buildLlmsTxt(locale: LlmLocale) {
     "",
     t.about,
     "",
+  ];
+
+  if (homeLede) {
+    lines.push(note(homeLede), "");
+  }
+
+  lines.push(t.handmadeNote, "", `## ${t.facts}`, "", entityFacts(locale));
+
+  lines.push(
+    "",
     `## ${t.shop}`,
     "",
     `- [${t.home}](${abs(locale)}): ${t.homeNote}`,
-  ];
+  );
 
   lines.push("", `## ${t.products}`, "");
   if (listedProducts.length) {
@@ -248,9 +532,14 @@ export function buildLlmsTxt(locale: LlmLocale) {
   if (listedArtists.length) {
     for (const a of listedArtists) {
       const desc = note(
-        a.seoDescription[locale] || a.seoDescription.it || a.bio[locale] || a.bio.it || a.name,
+        a.seoDescription[locale] ||
+          a.seoDescription.it ||
+          a.bio[locale] ||
+          a.bio.it ||
+          a.name,
       );
-      lines.push(`- [${a.name}](${abs(locale, `artisti/${a.slug}/`)}): ${desc}`);
+      const ig = a.instagram ? ` · ${a.instagram}` : "";
+      lines.push(`- [${a.name}](${abs(locale, `artisti/${a.slug}/`)}): ${desc}${ig}`);
     }
   } else {
     lines.push(t.artistsEmpty);
@@ -271,9 +560,18 @@ export function buildLlmsTxt(locale: LlmLocale) {
     `## ${t.studio}`,
     "",
     `- [${t.contact}](${abs(locale, "contatti/")}): ${t.contactNote}`,
-    `- [${t.workshops}](${abs(locale, "corsi/")}): ${t.workshopsNote}`,
+    `- [${t.workshops}](${abs(locale, "corsi/")}): ${workshopsIntro(locale) || t.workshopsNote}`,
     `- [${t.sizeGuide}](${abs(locale, "guida-taglie/")}): ${t.sizeGuideNote}`,
     `- [${t.bio}](${abs(locale, "bio/")}): ${t.bioNote}`,
+    "",
+    `## ${t.faq}`,
+    "",
+    `- ${t.faqWhatQ} ${t.faqWhatA}`,
+    `- ${t.faqWhereQ} ${t.faqWhereA}`,
+    `- ${t.faqPodQ} ${t.faqPodA}`,
+    `- ${t.faqNameQ} ${t.faqNameA}`,
+    `- ${t.faqShipQ} ${t.faqShipA}`,
+    `- ${t.faqPayQ} ${t.faqPayA}`,
     "",
     `## ${t.languages}`,
     "",
@@ -288,7 +586,6 @@ export function buildLlmsTxt(locale: LlmLocale) {
     `- [${t.withdrawal}](${abs(locale, "recesso/")}): ${t.withdrawal}`,
     `- [robots.txt](${robotsTxtUrl()})`,
     `- [Sitemap](${sitemapUrl()})`,
-    `- [${t.sizeGuide} URL](${abs(locale, "guida-taglie/")})`,
     "",
   );
 
@@ -298,44 +595,130 @@ export function buildLlmsTxt(locale: LlmLocale) {
 /** Longer companion file for agents that fetch extended context. */
 export function buildLlmsFullTxt(locale: LlmLocale) {
   const t = copy[locale];
-  const bioBody = note(bioField("body", locale)).slice(0, 1200);
-  const workshopLines =
-    upcomingWorkshops.length > 0
-      ? upcomingWorkshops
-          .map(
-            (w) =>
-              `- ${w.when} — ${w.where} (${w.organizer})${w.signupUrl ? `: ${w.signupUrl}` : ""}`,
-          )
-          .join("\n")
-      : "";
+  const meta = localizedSetting("metaDescription", locale) || t.summary;
+  const bioBody = note(stripMarkdownLinks(bioField("body", locale)));
+  const listedProducts = discoveryProducts().sort((a, b) =>
+    a.title.localeCompare(b.title, locale),
+  );
+  const listedArtists = discoveryArtists();
+  const archive = archiveBlock();
 
-  const lines = [
+  const lines: string[] = [
     "# Corpoceleste — full",
     "",
-    `> ${note(localizedSetting("metaDescription", locale) || t.summary)}`,
+    `> ${note(meta)}`,
     "",
     t.about,
     "",
+    t.handmadeNote,
+    "",
+    `## ${t.facts}`,
+    "",
+    entityFacts(locale),
+    "",
     `## ${t.bio}`,
+    "",
+    `Name: ${bioPage.name}`,
+    `Contact: ${site.email}`,
+    `Site: ${abs(locale)}`,
     "",
     bioBody || t.bioNote,
     "",
-    `Name: ${bioPage.name}`,
-    `Contact: info@corpoceleste.eu`,
-    `Site: ${abs(locale)}`,
+    `## ${t.faq}`,
     "",
-    `## ${t.workshops}`,
+    faqBlock(locale),
     "",
-    t.workshopsNote,
+    `## ${t.products}`,
+    "",
   ];
 
-  if (workshopLines) {
-    lines.push("", workshopLines);
+  if (listedProducts.length) {
+    for (const p of listedProducts) {
+      lines.push(productFullBlock(locale, p), "");
+    }
+  } else {
+    lines.push(t.productsEmpty, "");
+  }
+
+  lines.push(`## ${t.artists}`, "");
+  if (listedArtists.length) {
+    for (const a of listedArtists) {
+      const desc = note(
+        a.seoDescription[locale] || a.seoDescription.it || a.bio[locale] || a.bio.it || "",
+      );
+      const linked = discoveryProducts().filter((p) => p.artistId === a.id);
+      lines.push(`### [${a.name}](${abs(locale, `artisti/${a.slug}/`)})`, "");
+      if (desc) lines.push(desc, "");
+      if (a.instagram) lines.push(`Instagram: ${a.instagram}`, "");
+      if (linked.length) {
+        lines.push(
+          linked.map((p) => `- [${p.title}](${abs(locale, `prodotto/${p.slug}/`)})`).join("\n"),
+          "",
+        );
+      }
+    }
+  } else {
+    lines.push(t.artistsEmpty, "");
   }
 
   lines.push(
+    `## ${t.workshops}`,
+    "",
+    workshopsIntro(locale) || t.workshopsNote,
+    "",
+    `### ${t.upcoming}`,
+    "",
+    upcomingBlock(locale),
+    "",
+  );
+
+  if (archive) {
+    lines.push(`### ${t.archive}`, "", archive, "");
+  }
+
+  lines.push(
+    `## ${t.sizeGuide}`,
+    "",
+    note(ui[locale].sizeGuide.howBody),
+    "",
+    note(ui[locale].sizeGuide.howChest),
+    note(ui[locale].sizeGuide.howLength),
+    "",
+    note(ui[locale].sizeGuide.tipRegular),
+    "",
+    `### ${t.sizeChart}`,
+    "",
+    sizeChartBlock(locale),
+    "",
+    `## ${t.shippingPay}`,
+    "",
+    shippingPayBlock(locale),
+    "",
+  );
+
+  if (news.length) {
+    lines.push(`## ${t.news}`, "");
+    for (const n of [...news].sort((a, b) => b.date.localeCompare(a.date))) {
+      const title = newsField(n, locale, "title");
+      const excerpt = note(newsField(n, locale, "excerpt"));
+      const body = note(stripMarkdownLinks(newsField(n, locale, "body"))).slice(0, 800);
+      lines.push(`### [${title}](${abs(locale, `news/${n.slug}/`)})`, "", `${n.date} — ${excerpt}`);
+      if (body) lines.push("", body);
+      lines.push("");
+    }
+  }
+
+  lines.push(
+    `## ${t.legal}`,
+    "",
+    `- [${t.terms}](${abs(locale, "vendita/")})`,
+    `- [${t.privacy}](${abs(locale, "privacy/")})`,
+    `- [${t.cookies}](${abs(locale, "cookie/")})`,
+    `- [${t.withdrawal}](${abs(locale, "recesso/")})`,
     "",
     `See also the compact index: [llms.txt](${llmsTxtUrl(locale)})`,
+    `- [robots.txt](${robotsTxtUrl()})`,
+    `- [Sitemap](${sitemapUrl()})`,
     "",
   );
 
