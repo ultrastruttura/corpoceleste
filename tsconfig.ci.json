@@ -20,6 +20,7 @@
     "src/lib/ship-countries.ts",
     "src/lib/pickup.ts",
     "src/lib/product-status.ts",
+    "src/lib/llms-format.ts",
     "src/scripts/checkout-ship.ts",
     "tests/unit/**/*.ts"
   ]
