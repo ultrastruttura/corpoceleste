@@ -14,6 +14,8 @@ rows:
   - size: XL
     chest: 59
     length: 80
-  - {}
+  - size: XXL
+    chest: 65
+    length: 84
 ---
 
