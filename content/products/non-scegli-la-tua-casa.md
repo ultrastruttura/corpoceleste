@@ -185,8 +185,8 @@ description:
 
     EINIGE DINGE, DIE ZU BEACHTEN SIND: Jedes Shirt in diesem Shop ist ein Unikat, von Hand bedruckt in limitierter Auflage. Der manuelle Druck bringt unvermeidliche Abweichungen zwischen den einzelnen Kleidungsstücken mit sich: Position, Druck und Farbwiedergabe können sich von Shirt zu Shirt leicht unterscheiden. Diese Unterschiede sind keine Mängel, sondern die Signatur der handwerklichen Arbeit und machen jedes Stück einzigartig. Die Fotos dienen ausschließlich der Veranschaulichung. Das tatsächliche Produkt kann leichte Farb- und Texturunterschiede im Vergleich zur Darstellung online aufweisen. Mit dem Kauf erklärt der Kunde, sich der handwerklichen und limitierten Natur des Kleidungsstücks bewusst zu sein, und akzeptiert die beschriebenen Abweichungen als festen Bestandteil des Produktwerts. Solche Unterschiede stellen keinen Grund für Rückgabe, Widerruf oder Reklamation dar.
 seoDescription:
-  it: 'Maglia longsleeve serigrafata a mano «Non scegli la tua casa» di Lapis Niger — cotone nero, un colore, edizione Corpoceleste a Bergamo. Taglie S–XXL, spedizione Italia e UE.'
-  en: 'Hand screen-printed longsleeve “Non scegli la tua casa” by Lapis Niger — black cotton, one colour, Corpoceleste edition in Bergamo. Sizes S–XXL, shipping Italy & EU.'
-  de: 'Handsiebdruck-Longsleeve „Non scegli la tua casa“ von Lapis Niger — schwarze Baumwolle, eine Farbe, Corpoceleste-Edition in Bergamo. Größen S–XXL, Versand Italien & EU.'
+  it: 'Longsleeve nera in cotone 100% di lapis niger aka napo uochi toki: un viaggio illustrato da Plutone al Sole. Stampa a corrosione fatta a mano, solo 50 pezzi.'
+  en: 'Black 100% cotton longsleeve by lapis niger aka napo uochi toki: an illustrated journey from Pluto to the Sun. Hand-printed with discharge ink. Limited to 50.'
+  de: 'Schwarzes Longsleeve aus 100 % Baumwolle von lapis niger aka napo uochi toki: eine Reise von Pluto zur Sonne. Handbedruckt mit Ätzdruckfarbe, limitiert auf 50 Stück.'
 ---
 
