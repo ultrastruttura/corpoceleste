@@ -8,7 +8,9 @@ rows:
   - size: M
     chest: 50
     length: 76
-  - {}
+  - size: L
+    chest: 54
+    length: 78.5
   - {}
   - {}
 ---
