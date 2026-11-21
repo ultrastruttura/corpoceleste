@@ -26,6 +26,7 @@ description:
   it: |-
     Longsleeve in cotone nero, serigrafia a un colore di Lapis Niger. Stampata a mano a Bergamo da Corpoceleste — edizione limitata.
 
+    Dice l'artista descrivendo l'illustrazione su questa maglietta:
     "Plutone è stato dimenticato.
     È una distanza immane che si frappone tra te e qualsiasi cosa.
     La distanza che fa desistere.
@@ -74,6 +75,7 @@ description:
   en: |-
     Black cotton longsleeve with a one-colour Lapis Niger screen print. Hand-printed in Bergamo by Corpoceleste — limited edition.
 
+    The artist says, describing the illustration on this T-shirt:
     "Pluto has been forgotten.
     It is an immense distance that stands between you and everything else.
     The distance that makes you give up.
@@ -122,6 +124,7 @@ description:
   de: |-
     Schwarzes Baumwoll-Longsleeve mit einfarbigem Siebdruck von Lapis Niger. Handgedruckt in Bergamo von Corpoceleste — limitierte Edition.
 
+    Der Künstler sagt über die Illustration auf diesem T-Shirt:
     "Pluto wurde vergessen.
     Es ist eine ungeheure Distanz, die sich zwischen dich und alles andere schiebt.
     Die Distanz, die zum Aufgeben bringt.
