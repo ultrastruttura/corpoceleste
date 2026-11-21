@@ -14,7 +14,7 @@ stockM: 0
 stockL: 0
 stockXL: 0
 stockXXL: 0
-stockQty: 32
+stockQty: 30
 images:
   - /uploads/Shopper_logo_1080x1350.jpg
   - /uploads/Shopper_logo__2__1080x1350.jpg
