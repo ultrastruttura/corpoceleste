@@ -18,6 +18,9 @@ rows:
     chest: 60
     length: 80
     sleeve: 66
-  - {}
+  - size: XXL
+    chest: 65
+    length: 81
+    sleeve: 66
 ---
 
