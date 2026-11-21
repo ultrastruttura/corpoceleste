@@ -10,6 +10,9 @@ rows:
     chest: 57
     length: 70
     sleeve: 66
-  - {}
+  - size: L
+    chest: 59
+    length: 73
+    sleeve: 68
 ---
 
