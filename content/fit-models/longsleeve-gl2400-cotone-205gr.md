@@ -6,7 +6,10 @@ rows:
     chest: 46
     length: 71.5
     sleeve: 62
-  - {}
+  - size: M
+    chest: 50.5
+    length: 74
+    sleeve: 63
   - {}
   - {}
   - {}
