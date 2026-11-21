@@ -1,5 +1,5 @@
 ---
-name: T-shirt cotone 205gr
+name: T-shirt FedeCir365 cotone 205gr
 kind: shirt
 rows:
   - size: S
