@@ -17,7 +17,7 @@ sizes:
   - XXL
 stockS: 10
 stockM: 15
-stockL: 13
+stockL: 15
 stockXL: 8
 stockXXL: 2
 images:
