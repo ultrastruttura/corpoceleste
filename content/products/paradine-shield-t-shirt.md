@@ -1,13 +1,13 @@
 ---
-title: Paradine shield t-shirt
+colorName: Nero
+title: Paradine "scudo" t-shirt
 artist: content/artists/corpoceleste.md
 price: 25
-status: preorder
+status: available
 kind: shirt
-fitModel: ''
-nuovo: false
+fitModel: content/fit-models/t-shirt-gl5000-cotone-180g.md
+nuovo: true
 createdAt: 2026-11-16T13:04:09.114Z
-colorName: Nero
 sizes:
   - S
   - M
@@ -16,7 +16,7 @@ sizes:
   - XXL
 stockS: 5
 stockM: 8
-stockL: 8
+stockL: 7
 stockXL: 4
 stockXXL: 1
 images:
