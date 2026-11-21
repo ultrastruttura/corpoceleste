@@ -21,7 +21,10 @@ stockL: 13
 stockXL: 8
 stockXXL: 2
 images:
-  - ''
+  - /uploads/Lapis_non_scegli_EDIT.jpg
+  - /uploads/Lapis_non_scegli_4_EDIT.jpg
+  - /uploads/Lapis_non_scegli_3_EDIT.jpg
+  - /uploads/Lapis_non_scegli_2_EDIT.jpg
 description:
   it: |-
     Longsleeve 100% cotone 205gr, colore nero, 50 pezzi
