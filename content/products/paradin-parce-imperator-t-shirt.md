@@ -23,7 +23,7 @@ description:
   it: |-
     Maglia 100% cotone 180gr, colore nero, 25 pezzi
 
-    Stampa frontale (petto) e posteriore (collo): inchiostro all'acqua con pigmento rosso scuro.
+    Stampa frontale (cuore) e posteriore (schiena): inchiostro all'acqua con pigmento rosso scuro.
 
     Questa illustrazione di Claude Paradin (1512/1573) si intitola "Parce Imperator" ed è tratta dalla seconda edizione ampliata della sua opera "Devises Heroïques" (Lione, 1557)
     Il commento all'immagine, scritto dallo stesso Paradin e tradotto qui dal francese dell'epoca, recita:
@@ -32,7 +32,7 @@ description:
   en: |-
     T-shirt, 100% cotton, 180 gsm, black, 25 pieces
 
-    Front (chest) and back (neck) print: water-based ink with dark red pigment.
+    Front (over the heart) and back print: water-based ink with dark red pigment.
 
     This illustration by Claude Paradin (1512/1573) is titled "Parce Imperator" and is taken from the second, expanded edition of his Devises Heroïques (Lyon, 1557).
     The commentary on the image, written by Paradin himself and translated here from the French of the time, reads:
@@ -41,7 +41,7 @@ description:
   de: |-
     T-Shirt, 100 % Baumwolle, 180 g/m², Farbe Schwarz, 25 Stück
 
-    Druck vorne (Brust) und hinten (Nacken): wasserbasierte Farbe mit dunkelrotem Pigment.
+    Druck vorne (auf der Herzseite) und hinten (Rücken): wasserbasierte Farbe mit dunkelrotem Pigment.
 
     Diese Illustration von Claude Paradin (1512/1573) trägt den Titel „Parce Imperator“ und stammt aus der zweiten, erweiterten Ausgabe seines Werks Devises Heroïques (Lyon, 1557).
     Der Kommentar zum Bild, von Paradin selbst verfasst und hier aus dem damaligen Französisch übersetzt, lautet:
