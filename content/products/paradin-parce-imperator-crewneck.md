@@ -17,6 +17,11 @@ stockM: 2
 stockL: 1
 stockXL: 0
 stockXXL: -38
+images:
+  - /uploads/Paradine-Parce-imperator-1.jpg
+  - /uploads/Paradine-Parce-imperator-3.jpg
+  - /uploads/Paradine-Parce-imperator-2.jpg
+  - /uploads/IMG_5249.jpg
 description:
   it: |-
     Felpa 80% cotone 20% poliester 280gr, colore nero, 5 pezzi
