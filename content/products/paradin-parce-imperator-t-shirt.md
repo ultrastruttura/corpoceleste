@@ -48,8 +48,8 @@ description:
     „Marcus Cassius Scaeva, ein tapferer Soldat im Heer Julius Caesars, kämpfte in den Scharmützeln zwischen Caesar und Pompeius bei Dyrrhachium. Nachdem ihm ein Auge ausgestochen und sein Körper an sechs verschiedenen Stellen durchbohrt worden war, hatte er noch immer seinen Schild, in dem hundertzwanzig Pfeile steckten. Außerdem war dieser Schild (wie Caesar selbst schreibt) von nicht weniger als zweihundertdreißig Löchern durchschlagen. Dennoch verteidigte er das ihm anvertraute Tor des Kastells aufs Beste.
     Bei anderer Gelegenheit leistete der besagte Scaeva in einer Schlacht in Gallien allein Widerstand und stürzte sich auf die Feinde. Nachdem ihm ein Stoß durch den Oberschenkel gefahren war, sein Gesicht mit Steinwürfen zerschlagen, sein Helm auf dem Kopf zerbrochen, sein Schild völlig durchlöchert zu Boden gefallen und sein Schwert in Stücke gegangen war, warf er sich kühn ins Meer, gerüstet, wie er war, mit einem doppelten Brustpanzer. Durch die Wellen schwimmend (die er mit dem Blut der Feinde rot gefärbt hatte), erreichte er seine Gefährten. Als er sich dort seiner Waffen beraubt sah (was in der Kriegskunst unzulässig ist), rief er trotz aller Mühsal seines Schicksals seinem Feldherrn noch einmal zu: ‚Hauptmann, verzeiht mir, ich habe meine Waffen verloren.‘ Das also waren Tapferkeit und Tugend dieses Scaeva, der zum Lohn für seine Verdienste in Ehre und Rang eines Zenturio erhoben wurde."
 seoDescription:
-  it: ''
-  en: ''
-  de: ''
+  it: 'T-shirt nera serigrafata a mano con «Parce Imperator» di Claude Paradin (Lione, 1557): lo scudo trafitto da frecce. Edizione limitata di 25 pezzi.'
+  en: 'Hand screen-printed black tee with "Parce Imperator" by Claude Paradin (Lyon, 1557): a shield pierced by arrows. 100% cotton, limited edition of 25.'
+  de: 'Handsiebgedrucktes schwarzes T-Shirt mit „Parce Imperator“ von Claude Paradin (Lyon, 1557): ein von Pfeilen durchbohrter Schild. Limitiert auf 25 Stück.'
 ---
 
