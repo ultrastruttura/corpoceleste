@@ -19,6 +19,11 @@ stockM: 8
 stockL: 7
 stockXL: 4
 stockXXL: 1
+images:
+  - /uploads/Paradine-Parce-imperator-5.jpg
+  - /uploads/Paradine-Parce-imperator-4.jpg
+  - /uploads/Paradine-Parce-imperator-6.jpg
+  - /uploads/IMG_5249.jpg
 description:
   it: |-
     Maglia 100% cotone 180gr, colore nero, 25 pezzi
