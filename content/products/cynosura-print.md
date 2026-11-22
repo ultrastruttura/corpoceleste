@@ -1,4 +1,5 @@
 ---
+colorName: ''
 title: '"Cynosura" print'
 artist: content/artists/andrea-baldelli.md
 price: 50
@@ -7,17 +8,12 @@ kind: print
 fitModel: ''
 nuovo: false
 createdAt: 2026-11-16T12:48:05.439Z
-colorName: ''
-sizes:
-  - S
-  - M
-  - L
-  - XL
-stockS: 10
+sizes: []
 stockM: 0
 stockL: 0
 stockXL: 0
 stockXXL: 0
+stockQty: 10
 images:
   - /uploads/Cynosura-carta.jpg
 description:
