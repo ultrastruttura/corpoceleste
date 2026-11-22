@@ -85,7 +85,6 @@ description:
     Front print (chest) and back print (neck), plus both sleeves: water-based discharge ink, warm white/light yellow. Hand-printed.
 
     The artist describes the illustration on this shirt:
-
     "Pluto has been forgotten.
     It is an immense distance that stands between you and everything else.
     The distance that makes you give up.
@@ -139,7 +138,6 @@ description:
     Frontdruck (Brust) und Rückendruck (Nacken) sowie auf beiden Ärmeln: Wasserbasierte Ätzdruckfarbe (Discharge), warmes Weiß/leichtes Gelb. Handbedruckt.
 
     Die Künstlerin bzw. der Künstler beschreibt die Illustration auf diesem Shirt wie folgt:
-
     „Pluto wurde vergessen.
     Es ist eine gewaltige Distanz, die sich zwischen dich und alles andere schiebt.
     Die Distanz, die zum Aufgeben bringt.
