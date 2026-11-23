@@ -197,7 +197,17 @@ export async function sendNewsletterWelcomeEmail(opts: {
   return sendMail({ to: opts.email, subject, text });
 }
 
-export async function confirmNewsletterSubscriber(email: string, locale: string) {
+export type NewsletterConsentProof = {
+  ip?: string;
+  userAgent?: string;
+  privacyVersion?: string;
+};
+
+export async function confirmNewsletterSubscriber(
+  email: string,
+  locale: string,
+  proof: NewsletterConsentProof = {},
+) {
   const { portalConfigured, ensureSchema, getDb } = await import("./portal/db.js");
   if (!portalConfigured()) {
     return { stored: false as const, resend: false as const, welcomed: false as const };
@@ -206,6 +216,9 @@ export async function confirmNewsletterSubscriber(email: string, locale: string)
   const db = getDb();
   const normalized = email.toLowerCase();
   const loc = locale || "it";
+  const ip = String(proof.ip || "").slice(0, 64);
+  const ua = String(proof.userAgent || "").slice(0, 512);
+  const privacyVersion = String(proof.privacyVersion || "").slice(0, 32);
 
   const prior = await db.execute({
     sql: `SELECT unsubscribed_at FROM newsletter_subscribers WHERE email = ?`,
@@ -215,13 +228,19 @@ export async function confirmNewsletterSubscriber(email: string, locale: string)
   const alreadyActive = Boolean(priorRow && priorRow.unsubscribed_at == null);
 
   await db.execute({
-    sql: `INSERT INTO newsletter_subscribers (email, confirmed_at, locale, unsubscribed_at)
-          VALUES (?, datetime('now'), ?, NULL)
+    sql: `INSERT INTO newsletter_subscribers (
+            email, confirmed_at, locale, unsubscribed_at,
+            consent_ip, consent_ua, privacy_version
+          )
+          VALUES (?, datetime('now'), ?, NULL, ?, ?, ?)
           ON CONFLICT(email) DO UPDATE SET
             confirmed_at = datetime('now'),
             locale = excluded.locale,
-            unsubscribed_at = NULL`,
-    args: [normalized, loc],
+            unsubscribed_at = NULL,
+            consent_ip = excluded.consent_ip,
+            consent_ua = excluded.consent_ua,
+            privacy_version = excluded.privacy_version`,
+    args: [normalized, loc, ip, ua, privacyVersion],
   });
 
   let resendOk = false;

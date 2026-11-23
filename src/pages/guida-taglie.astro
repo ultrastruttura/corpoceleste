@@ -28,7 +28,7 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
 >
   <div class="wrap page-main">
     <header class="page-hero">
-      <h1>{g.title}</h1>
+      <h1 data-title-base={g.title}>{g.title}</h1>
     </header>
 
     <div class="prose page-main--article size-guide">
@@ -101,14 +101,6 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
       </ol>
     </div>
   </div>
-  {/* Static host: filter charts by ?model=<fitModelId> from the product page link. */}
-  <script is:inline>
-    (function () {
-      var id = new URLSearchParams(location.search).get("model");
-      if (!id) return;
-      document.querySelectorAll("[data-fit-model]").forEach(function (el) {
-        if (el.getAttribute("data-fit-model") !== id) el.setAttribute("hidden", "");
-      });
-    })();
-  </script>
+  {/* External file: CSP blocks inline scripts (same pattern as product-gallery.js). */}
+  <script is:inline src={asset("size-guide.js")}></script>
 </Base>

@@ -300,7 +300,7 @@ const it = {
   privacy: {
     title: "Privacy",
     lede: "Chi tratta i dati, perché, e a chi arrivano.",
-    updated: "Ultimo aggiornamento: 18 novembre 2026.",
+    updated: "Ultimo aggiornamento: 23 novembre 2026 (versione informativa 2026-11-23).",
     controller: "Titolare",
     controllerBody: (name: string, sede: string) =>
       `${name}, per il sito Corpoceleste. Sede: ${sede}.`,
@@ -308,11 +308,11 @@ const it = {
     contact: "Contatto:",
     cookies: "Cookie e storage",
     cookiesP1:
-      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Il carrello resta solo nel tuo browser. Umami Analytics conta le visite in forma aggregata, senza cookie sul dispositivo, e rispetta Do Not Track. Nell’area artisti usiamo un cookie tecnico di sessione HttpOnly (cc_portal_session), necessario al login.",
+      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner (Linee guida Garante 10/06/2021: banner solo se ci sono tracker non tecnici). Il carrello resta solo nel tuo browser. Umami Analytics produce statistiche aggregate su questo solo sito, senza cookie sul dispositivo e senza profilazione, e rispetta Do Not Track — configurato come analytics assimilabile a strumento tecnico. Nell’area artisti usiamo un cookie tecnico di sessione HttpOnly (cc_portal_session), necessario al login.",
     cookiesP3:
       "Il carrello e il riepilogo ordine stanno sul tuo dispositivo, non su un server nostro.",
     cookiesPaypal:
-      "La pagina di checkout carica gli script di PayPal (anche per carta e Apple Pay) e di Google Pay, necessari al pagamento: valgono i loro cookie e le loro informative",
+      "In checkout, solo dopo che accetti condizioni e privacy, carichiamo gli script di PayPal (anche carta e Apple Pay) e di Google Pay, necessari al pagamento: valgono i loro cookie e le loro informative",
     cookiesMore: "Dettaglio nella",
     cookiesMoreLink: "cookie policy",
     data: "Quali dati, perché",
@@ -322,7 +322,7 @@ const it = {
     dataPaypal: "se paghi con PayPal, carta, Apple Pay o Google Pay, i dati di pagamento li gestisce PayPal; nome, email, telefono e indirizzo arrivano anche a me per l’ordine e la spedizione.",
     dataForms: "nome, email, messaggio — per risponderti, poi li tolgo.",
     dataNewsletter: (email: string) =>
-      `solo l’email, se spunti la casella. Revoca quando vuoi scrivendo a ${email}.`,
+      `solo l’email, se spunti la casella. Conserviamo prova del consenso (data, versione informativa, IP e user-agent al momento della conferma). Revoca quando vuoi scrivendo a ${email} o dal link in fondo alle mail.`,
     noProfiling: "Niente profilazione a fini pubblicitari.",
     basis: "Perché trattiamo i dati e per quanto li teniamo",
     basisItems: [
@@ -332,7 +332,7 @@ const it = {
       "Newsletter — consenso (art. 6.1 a), fino alla disiscrizione. Dopo resta solo l’indirizzo segnato come «disiscritto», per non scriverti più.",
       "Area artisti — contratto con l’artista (art. 6.1 b), per la durata della collaborazione e poi 10 anni per i conti.",
       "Protezione da abusi dei moduli — legittimo interesse (art. 6.1 f). Indirizzo IP cancellato entro 24 ore.",
-      "Statistiche Umami — legittimo interesse (art. 6.1 f), dati aggregati e anonimi, nessun cookie; lo script rispetta Do Not Track del browser.",
+      "Statistiche Umami — analytics senza cookie, aggregate e limitate a questo sito, con Do Not Track; assimilabili a strumenti tecnici secondo le Linee guida Garante cookie 2021 (no profilazione, no ricombinazione con altri archivi nostri). Conservazione presso Umami secondo la loro informativa.",
     ],
     basisTail:
       "I dati d’ordine servono per spedire; tutto il resto è facoltativo. Nessuna decisione automatizzata.",
@@ -347,7 +347,7 @@ const it = {
     vercel: "webhook PayPal, magazzino, form del sito, area artisti, mail di conferma. Dati d’ordine, non la carta.",
     resend: "invio delle mail (ordini, recesso, contatti, newsletter, corsi), mittente Corpoceleste.",
     umami:
-      "statistiche di visita aggregate, senza cookie e senza profilazione; rispetta Do Not Track. Informativa:",
+      "statistiche aggregate su questo solo sito, senza cookie e senza profilazione; assimilabili a strumenti tecnici (Linee guida Garante 2021); rispetta Do Not Track. Informativa:",
     turso: "database di ordini, iscritti alla newsletter e area artisti.",
     sendcloud: "calcolo della spedizione in checkout (paese e CAP) ed etichette di spedizione (nome, indirizzo, telefono).",
     googlePay: "se paghi con Google Pay: il pagamento passa poi da PayPal.",
@@ -368,27 +368,70 @@ const it = {
   },
   cookiePolicy: {
     title: "Cookie policy",
-    lede: "Niente profilazione. Carrello nel browser. Analytics senza cookie. PayPal e Google Pay in checkout.",
-    updated: "Ultimo aggiornamento: 18 novembre 2026.",
+    lede: "Niente profilazione. Carrello nel browser. Analytics senza cookie. PayPal e Google Pay in checkout solo dopo l’accettazione.",
+    updated: "Ultimo aggiornamento: 23 novembre 2026.",
     noBanner: "Niente banner",
     noBannerBody:
-      "Niente cookie di profilazione o pubblicità: per questo non c’è un banner. Non usiamo Google Analytics né pixel pubblicitari. Umami rispetta Do Not Track del browser.",
+      "Niente cookie di profilazione o pubblicità e niente pixel ads: per questo non c’è un banner. Le Linee guida Garante (10/06/2021) richiedono il banner solo se si usano tracker non tecnici. Umami è configurato come analytics assimilabile a strumento tecnico (aggregato, un solo sito, senza cookie, Do Not Track).",
     onSite: "Sul tuo browser",
     onSiteBody:
       "Carrello e riepilogo dopo il checkout restano sul tuo dispositivo (localStorage / sessionStorage), non su un server nostro. Servono solo a far funzionare lo shop. Nell’area artisti, dopo il login, impostiamo un cookie tecnico HttpOnly di sessione (nome: cc_portal_session), necessario all’autenticazione e non di profilazione.",
     third: "Terze parti",
     thirdBody:
-      "Umami Analytics: statistiche di visita aggregate, senza cookie; se il browser ha Do Not Track attivo, lo script non traccia. La pagina di checkout carica gli script di PayPal e Google Pay necessari al pagamento: valgono i loro cookie e le loro informative. Se scrivi il CAP in checkout, solo paese e CAP vanno a zippopotam.us per suggerirti la città.",
+      "Umami Analytics: statistiche aggregate, senza cookie; con Do Not Track attivo lo script non traccia. In checkout, solo dopo condizioni e privacy, carichiamo gli script PayPal e Google Pay necessari al pagamento. Se scrivi il CAP, solo paese e CAP vanno a zippopotam.us per suggerirti la città.",
+    table: "Tabella strumenti",
+    colName: "Nome",
+    colCategory: "Categoria",
+    colDuration: "Durata",
+    colProvider: "Fornitore / dove",
+    rows: [
+      {
+        name: "Carrello / riepilogo (localStorage, sessionStorage)",
+        category: "Tecnico — strettamente necessario allo shop",
+        duration: "Fino a svuotamento carrello o cancellazione dati sito",
+        provider: "Solo sul tuo dispositivo (prima parte)",
+      },
+      {
+        name: "cc_portal_session",
+        category: "Tecnico — sessione area artisti",
+        duration: "Sessione / scadenza cookie di login",
+        provider: "Corpoceleste (HttpOnly, Vercel API)",
+      },
+      {
+        name: "Umami Analytics (script, senza cookie)",
+        category: "Analytics assimilabile a tecnico (Garante 2021)",
+        duration: "Nessun cookie sul dispositivo; retention lato Umami secondo la loro policy",
+        provider: "Umami Software, Inc. (USA) — umami.is/privacy",
+      },
+      {
+        name: "PayPal SDK / cookie di pagamento",
+        category: "Necessario al pagamento richiesto",
+        duration: "Secondo PayPal (spesso sessione + cookie account se sei loggato)",
+        provider: "PayPal — caricato in checkout solo dopo accettazione termini/privacy",
+      },
+      {
+        name: "Google Pay (pay.js)",
+        category: "Necessario al pagamento richiesto (se usi Google Pay)",
+        duration: "Secondo Google / PayPal",
+        provider: "Google — caricato in checkout solo dopo accettazione termini/privacy",
+      },
+      {
+        name: "zippopotam.us (richiesta CAP→città)",
+        category: "Tecnico — autocomplete indirizzo",
+        duration: "Transito; non conservato da Corpoceleste",
+        provider: "zippopotam.us — solo paese e CAP",
+      },
+    ],
     manage: "Come toglierli",
     manageBody:
-      "Impostazioni del browser → dati del sito. Oppure svuota il carrello da qui. Per l’area artisti, esci dall’account (il cookie di sessione scade). Per PayPal, gestisci i cookie dal tuo account o dalle impostazioni del browser. Puoi anche bloccare lo script Umami con un content blocker.",
+      "Impostazioni del browser → dati del sito. Oppure svuota il carrello da qui. Per l’area artisti, esci dall’account (il cookie di sessione scade). Per PayPal, gestisci i cookie dal tuo account o dalle impostazioni del browser. Per Umami puoi usare un content blocker oppure, in console: localStorage.setItem('umami.disabled', '1').",
     privacyLink: "Informativa privacy completa",
     contact: "Contatto titolare:",
   },
   terms: {
     title: "Condizioni di vendita",
     lede: "Chi vende, cosa compri, come si paga, come si recede.",
-    updated: "Ultimo aggiornamento: 18 novembre 2026.",
+    updated: "Ultimo aggiornamento: 23 novembre 2026.",
     seller: "Venditore",
     vatLabel: "Partita IVA:",
     reaLabel: "REA:",
@@ -398,6 +441,8 @@ const it = {
     ibanHolderLabel: "Intestatario:",
     vatMissing: "Partita IVA: la pubblico quando è attiva.",
     contactLabel: "Contatto:",
+    contactPrimaryEmail:
+      "Il contatto principale per informazioni precontrattuali e assistenza è l’email indicata (e la PEC, se pubblicata). Un numero di telefono verrà aggiunto qui quando disponibile.",
     scope: "Cosa regolano",
     scopeBody:
       "Queste condizioni valgono per gli acquisti fatti su questo sito. Sono scritte per chi compra come consumatore, cioè fuori da attività d’impresa o professione. Il sito e lo shop non sono destinati ai minori di 18 anni. Comprando accetti queste condizioni nella versione pubblicata al momento dell’ordine.",
@@ -761,7 +806,7 @@ const en: typeof it = {
   privacy: {
     title: "Privacy",
     lede: "Who processes the data, why, and who receives it.",
-    updated: "Last updated: 18 November 2026.",
+    updated: "Last updated: 23 November 2026 (notice version 2026-11-23).",
     controller: "Controller",
     controllerBody: (name: string, sede: string) =>
       `${name}, for the Corpoceleste site. Address: ${sede}.`,
@@ -769,11 +814,11 @@ const en: typeof it = {
     contact: "Contact:",
     cookies: "Cookies and storage",
     cookiesP1:
-      "No profiling or advertising cookies: that is why there is no banner. The cart stays only in your browser. Umami Analytics counts visits in aggregate, without cookies on your device, and respects Do Not Track. In the artist area we use a technical HttpOnly session cookie (cc_portal_session), required for login.",
+      "No profiling or advertising cookies: that is why there is no banner (Italian DPA guidelines of 10/06/2021: a banner is required only for non-technical trackers). The cart stays only in your browser. Umami Analytics produces aggregated statistics for this site only, without cookies on your device and without profiling, and respects Do Not Track — configured as analytics equivalent to a technical tool. In the artist area we use a technical HttpOnly session cookie (cc_portal_session), required for login.",
     cookiesP3:
       "The cart and order summary stay on your device, not on a server of ours.",
     cookiesPaypal:
-      "The checkout page loads the PayPal scripts (also for card and Apple Pay) and Google Pay, needed for payment; their cookies and privacy notices apply",
+      "At checkout, only after you accept the terms and privacy notice, we load the PayPal scripts (also for card and Apple Pay) and Google Pay, needed for payment; their cookies and privacy notices apply",
     cookiesMore: "Detail in the",
     cookiesMoreLink: "cookie policy",
     data: "What data, and why",
@@ -783,7 +828,7 @@ const en: typeof it = {
     dataPaypal: "if you pay with PayPal, card, Apple Pay or Google Pay, payment data is handled by PayPal; name, email, phone and address also reach me for the order and shipping.",
     dataForms: "name, email, message — to reply, then we delete them.",
     dataNewsletter: (email: string) =>
-      `email only, if you tick the box. Withdraw whenever you want by writing to ${email}.`,
+      `email only, if you tick the box. We keep proof of consent (date, notice version, IP and user-agent at confirmation). Withdraw whenever you want by writing to ${email} or via the link in emails.`,
     noProfiling: "No advertising profiling.",
     basis: "Why we process data and how long we keep it",
     basisItems: [
@@ -793,7 +838,7 @@ const en: typeof it = {
       "Newsletter — consent (art. 6(1)(a)), until you unsubscribe. Afterwards only the address marked “unsubscribed” is kept, so we never write again.",
       "Artist area — contract with the artist (art. 6(1)(b)), for the length of the collaboration and then 10 years for the accounts.",
       "Form abuse protection — legitimate interest (art. 6(1)(f)). IP address deleted within 24 hours.",
-      "Umami statistics — legitimate interest (art. 6(1)(f)), aggregated anonymous data, no cookies; the script respects browser Do Not Track.",
+      "Umami statistics — cookieless, aggregated analytics limited to this site, with Do Not Track; treated as equivalent to technical tools under the Italian DPA cookie guidelines 2021 (no profiling, not combined with our other files). Retention at Umami under their notice.",
     ],
     basisTail:
       "Order data is needed to ship; everything else is optional. No automated decision-making.",
@@ -808,7 +853,7 @@ const en: typeof it = {
     vercel: "PayPal webhook, stock, site forms, artist area, confirmation mail. Order data, not the card.",
     resend: "sends mail (orders, withdrawal, contact, newsletter, workshops), from Corpoceleste.",
     umami:
-      "aggregated visit statistics, no cookies and no profiling; respects Do Not Track. Notice:",
+      "aggregated statistics for this site only, no cookies and no profiling; treated as equivalent to technical tools (Italian DPA 2021); respects Do Not Track. Notice:",
     turso: "database for orders, newsletter subscribers and the artist area.",
     sendcloud: "shipping quote at checkout (country and postcode) and shipping labels (name, address, phone).",
     googlePay: "if you pay with Google Pay; the payment then goes through PayPal.",
@@ -829,27 +874,70 @@ const en: typeof it = {
   },
   cookiePolicy: {
     title: "Cookie policy",
-    lede: "No profiling. Cart in the browser. Cookieless analytics. PayPal and Google Pay at checkout.",
-    updated: "Last updated: 18 November 2026.",
+    lede: "No profiling. Cart in the browser. Cookieless analytics. PayPal and Google Pay at checkout only after acceptance.",
+    updated: "Last updated: 23 November 2026.",
     noBanner: "No banner",
     noBannerBody:
-      "No profiling or advertising cookies: that is why there is no banner. We do not use Google Analytics or advertising pixels. Umami respects browser Do Not Track.",
+      "No profiling or advertising cookies and no ad pixels: that is why there is no banner. The Italian DPA guidelines (10/06/2021) require a banner only for non-technical trackers. Umami is configured as analytics equivalent to a technical tool (aggregated, single site, no cookies, Do Not Track).",
     onSite: "On your browser",
     onSiteBody:
       "Cart and post-checkout summary stay on your device (localStorage / sessionStorage), not on a server of ours. They only make the shop work. In the artist area, after login, we set a technical HttpOnly session cookie (name: cc_portal_session), required for authentication and not for profiling.",
     third: "Third parties",
     thirdBody:
-      "Umami Analytics: aggregated visit statistics, no cookies; if the browser has Do Not Track on, the script does not track. The checkout page loads the PayPal and Google Pay scripts needed for payment: their cookies and notices apply. Typing a postcode at checkout sends only country and postcode to zippopotam.us to suggest the city.",
+      "Umami Analytics: aggregated statistics, no cookies; with Do Not Track on, the script does not track. At checkout, only after terms and privacy, we load the PayPal and Google Pay scripts needed for payment. Typing a postcode sends only country and postcode to zippopotam.us to suggest the city.",
+    table: "Tool table",
+    colName: "Name",
+    colCategory: "Category",
+    colDuration: "Duration",
+    colProvider: "Provider / where",
+    rows: [
+      {
+        name: "Cart / summary (localStorage, sessionStorage)",
+        category: "Technical — strictly necessary for the shop",
+        duration: "Until you empty the cart or clear site data",
+        provider: "Only on your device (first party)",
+      },
+      {
+        name: "cc_portal_session",
+        category: "Technical — artist-area session",
+        duration: "Session / login cookie expiry",
+        provider: "Corpoceleste (HttpOnly, Vercel API)",
+      },
+      {
+        name: "Umami Analytics (script, no cookies)",
+        category: "Analytics equivalent to technical (Italian DPA 2021)",
+        duration: "No cookie on device; retention at Umami under their policy",
+        provider: "Umami Software, Inc. (USA) — umami.is/privacy",
+      },
+      {
+        name: "PayPal SDK / payment cookies",
+        category: "Necessary for the requested payment",
+        duration: "Per PayPal (often session + account cookies if signed in)",
+        provider: "PayPal — loaded at checkout only after terms/privacy acceptance",
+      },
+      {
+        name: "Google Pay (pay.js)",
+        category: "Necessary for the requested payment (if you use Google Pay)",
+        duration: "Per Google / PayPal",
+        provider: "Google — loaded at checkout only after terms/privacy acceptance",
+      },
+      {
+        name: "zippopotam.us (postcode→city request)",
+        category: "Technical — address autocomplete",
+        duration: "Transit only; not stored by Corpoceleste",
+        provider: "zippopotam.us — country and postcode only",
+      },
+    ],
     manage: "How to remove them",
     manageBody:
-      "Browser settings → site data. Or empty the cart from here. For the artist area, sign out (the session cookie expires). For PayPal, manage cookies in your account or browser settings. You can also block the Umami script with a content blocker.",
+      "Browser settings → site data. Or empty the cart from here. For the artist area, sign out (the session cookie expires). For PayPal, manage cookies in your account or browser settings. For Umami you can use a content blocker or, in the console: localStorage.setItem('umami.disabled', '1').",
     privacyLink: "Full privacy notice",
     contact: "Controller contact:",
   },
   terms: {
     title: "Terms of sale",
     lede: "Who sells, what you buy, how you pay, how you withdraw.",
-    updated: "Last updated: 18 November 2026.",
+    updated: "Last updated: 23 November 2026.",
     seller: "Seller",
     vatLabel: "VAT number:",
     reaLabel: "Business register:",
@@ -859,6 +947,8 @@ const en: typeof it = {
     ibanHolderLabel: "Account holder:",
     vatMissing: "VAT number: I’ll publish it when it is active.",
     contactLabel: "Contact:",
+    contactPrimaryEmail:
+      "The main contact for pre-contract information and support is the email shown (and PEC, if published). A phone number will be added here when available.",
     scope: "What these terms cover",
     scopeBody:
       "These terms apply to purchases made on this site. They are written for people buying as consumers, that is outside a business or profession. The site and shop are not directed at anyone under 18. By ordering you accept the version published at the time of your order.",
@@ -1222,7 +1312,7 @@ const de: typeof it = {
   privacy: {
     title: "Datenschutz",
     lede: "Wer die Daten verarbeitet, wozu, und wer sie erhält.",
-    updated: "Stand: 18. November 2026.",
+    updated: "Stand: 23. November 2026 (Hinweisversion 2026-11-23).",
     controller: "Verantwortlicher",
     controllerBody: (name: string, sede: string) =>
       `${name}, für die Website Corpoceleste. Sitz: ${sede}.`,
@@ -1230,11 +1320,11 @@ const de: typeof it = {
     contact: "Kontakt:",
     cookies: "Cookies und Speicher",
     cookiesP1:
-      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Der Warenkorb bleibt nur in deinem Browser. Umami Analytics zählt Besuche aggregiert, ohne Cookies auf dem Gerät, und respektiert Do Not Track. Im Künstlerbereich nutzen wir ein technisches HttpOnly-Sitzungs-Cookie (cc_portal_session), nötig für den Login.",
+      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner (Leitlinien der italienischen Datenschutzbehörde vom 10.06.2021: Banner nur bei nicht technischen Trackern). Der Warenkorb bleibt nur in deinem Browser. Umami Analytics erzeugt aggregierte Statistiken nur für diese Website, ohne Cookies auf dem Gerät und ohne Profiling, und respektiert Do Not Track — konfiguriert als Analytics, die technischen Mitteln gleichgestellt sind. Im Künstlerbereich nutzen wir ein technisches HttpOnly-Sitzungs-Cookie (cc_portal_session), nötig für den Login.",
     cookiesP3:
       "Warenkorb und Bestellübersicht bleiben auf deinem Gerät, nicht auf einem Server von uns.",
     cookiesPaypal:
-      "Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal (auch für Karte und Apple Pay) und Google Pay; es gelten deren Cookies und Datenschutzhinweise",
+      "An der Kasse laden wir erst nach Annahme von AGB und Datenschutz die für die Zahlung nötigen Skripte von PayPal (auch Karte und Apple Pay) und Google Pay; es gelten deren Cookies und Datenschutzhinweise",
     cookiesMore: "Details in der",
     cookiesMoreLink: "Cookie-Richtlinie",
     data: "Welche Daten, wozu",
@@ -1244,7 +1334,7 @@ const de: typeof it = {
     dataPaypal: "zahlst du mit PayPal, Karte, Apple Pay oder Google Pay, verarbeitet PayPal die Zahlungsdaten; Name, E-Mail, Telefon und Adresse erhalte auch ich für Bestellung und Versand.",
     dataForms: "Name, E-Mail, Nachricht — zum Antworten, dann löschen wir sie.",
     dataNewsletter: (email: string) =>
-      `nur die E-Mail, wenn du das Kästchen ankreuzt. Widerruf jederzeit an ${email}.`,
+      `nur die E-Mail, wenn du das Kästchen ankreuzst. Wir speichern den Nachweis der Einwilligung (Datum, Hinweisversion, IP und User-Agent bei der Bestätigung). Widerruf jederzeit an ${email} oder über den Link in den Mails.`,
     noProfiling: "Kein Profiling für Werbung.",
     basis: "Warum wir Daten verarbeiten und wie lange wir sie speichern",
     basisItems: [
@@ -1254,7 +1344,7 @@ const de: typeof it = {
       "Newsletter — Einwilligung (Art. 6 Abs. 1 lit. a), bis zur Abmeldung. Danach bleibt nur die als „abgemeldet“ markierte Adresse, damit wir dir nicht mehr schreiben.",
       "Künstlerbereich — Vertrag mit dem Künstler (Art. 6 Abs. 1 lit. b), für die Dauer der Zusammenarbeit und danach 10 Jahre für die Abrechnung.",
       "Schutz der Formulare vor Missbrauch — berechtigtes Interesse (Art. 6 Abs. 1 lit. f). IP-Adresse innerhalb von 24 Stunden gelöscht.",
-      "Umami-Statistiken — berechtigtes Interesse (Art. 6 Abs. 1 lit. f), aggregierte anonyme Daten, keine Cookies; das Skript respektiert Do Not Track.",
+      "Umami-Statistiken — cookielose, aggregierte Analytics nur für diese Website mit Do Not Track; den technischen Mitteln gleichgestellt nach den Cookie-Leitlinien der italienischen Behörde 2021 (kein Profiling, keine Verknüpfung mit unseren anderen Dateien). Speicherung bei Umami gemäß deren Hinweis.",
     ],
     basisTail:
       "Bestelldaten sind für den Versand nötig; alles andere ist freiwillig. Keine automatisierten Entscheidungen.",
@@ -1269,7 +1359,7 @@ const de: typeof it = {
     vercel: "PayPal-Webhook, Bestand, Formulare, Künstlerbereich, Bestätigungsmails. Bestelldaten, keine Karte.",
     resend: "versendet Mails (Bestellung, Widerruf, Kontakt, Newsletter, Kurse), Absender Corpoceleste.",
     umami:
-      "aggregierte Besuchsstatistiken, ohne Cookies und ohne Profiling; respektiert Do Not Track. Hinweise:",
+      "aggregierte Statistiken nur für diese Website, ohne Cookies und ohne Profiling; technischen Mitteln gleichgestellt (italienische Behörde 2021); respektiert Do Not Track. Hinweise:",
     turso: "Datenbank für Bestellungen, Newsletter-Abonnenten und Künstlerbereich.",
     sendcloud: "Versandberechnung an der Kasse (Land und PLZ) und Versandetiketten (Name, Adresse, Telefon).",
     googlePay: "wenn du mit Google Pay zahlst; die Zahlung läuft dann über PayPal.",
@@ -1290,27 +1380,70 @@ const de: typeof it = {
   },
   cookiePolicy: {
     title: "Cookie-Richtlinie",
-    lede: "Kein Profiling. Warenkorb im Browser. Analytics ohne Cookies. PayPal und Google Pay an der Kasse.",
-    updated: "Stand: 18. November 2026.",
+    lede: "Kein Profiling. Warenkorb im Browser. Analytics ohne Cookies. PayPal und Google Pay an der Kasse erst nach Zustimmung.",
+    updated: "Stand: 23. November 2026.",
     noBanner: "Kein Banner",
     noBannerBody:
-      "Keine Profiling- oder Werbe-Cookies: deshalb gibt es kein Banner. Wir nutzen weder Google Analytics noch Werbe-Pixel. Umami respektiert Do Not Track im Browser.",
+      "Keine Profiling- oder Werbe-Cookies und keine Ad-Pixel: deshalb gibt es kein Banner. Die Leitlinien der italienischen Datenschutzbehörde (10.06.2021) verlangen ein Banner nur bei nicht technischen Trackern. Umami ist als Analytics konfiguriert, die technischen Mitteln gleichgestellt sind (aggregiert, eine Website, keine Cookies, Do Not Track).",
     onSite: "In deinem Browser",
     onSiteBody:
       "Warenkorb und Zusammenfassung nach dem Checkout bleiben auf deinem Gerät (localStorage / sessionStorage), nicht auf einem Server von uns. Sie dienen nur dem Shop. Im Künstlerbereich setzen wir nach dem Login ein technisches HttpOnly-Sitzungs-Cookie (Name: cc_portal_session), nötig zur Authentifizierung und nicht zum Profiling.",
     third: "Dritte",
     thirdBody:
-      "Umami Analytics: aggregierte Besuchsstatistiken, ohne Cookies; bei aktivem Do Not Track trackt das Skript nicht. Die Kasse lädt die für die Zahlung nötigen Skripte von PayPal und Google Pay: es gelten deren Cookies und Hinweise. Gibst du an der Kasse eine Postleitzahl ein, gehen nur Land und PLZ an zippopotam.us, um den Ort vorzuschlagen.",
+      "Umami Analytics: aggregierte Statistiken, ohne Cookies; bei aktivem Do Not Track trackt das Skript nicht. An der Kasse laden wir erst nach AGB und Datenschutz die für die Zahlung nötigen Skripte von PayPal und Google Pay. Gibst du eine PLZ ein, gehen nur Land und PLZ an zippopotam.us.",
+    table: "Tabelle der Werkzeuge",
+    colName: "Name",
+    colCategory: "Kategorie",
+    colDuration: "Dauer",
+    colProvider: "Anbieter / wo",
+    rows: [
+      {
+        name: "Warenkorb / Übersicht (localStorage, sessionStorage)",
+        category: "Technisch — für den Shop unbedingt nötig",
+        duration: "Bis zum Leeren des Warenkorbs oder Löschen der Website-Daten",
+        provider: "Nur auf deinem Gerät (erste Partei)",
+      },
+      {
+        name: "cc_portal_session",
+        category: "Technisch — Sitzung Künstlerbereich",
+        duration: "Sitzung / Ablauf des Login-Cookies",
+        provider: "Corpoceleste (HttpOnly, Vercel-API)",
+      },
+      {
+        name: "Umami Analytics (Skript, keine Cookies)",
+        category: "Analytics ≈ technisch (italienische Behörde 2021)",
+        duration: "Kein Cookie auf dem Gerät; Speicherung bei Umami laut deren Policy",
+        provider: "Umami Software, Inc. (USA) — umami.is/privacy",
+      },
+      {
+        name: "PayPal SDK / Zahlungs-Cookies",
+        category: "Für die angeforderte Zahlung nötig",
+        duration: "Laut PayPal (oft Sitzung + Konto-Cookies bei Login)",
+        provider: "PayPal — an der Kasse erst nach Annahme von AGB/Datenschutz",
+      },
+      {
+        name: "Google Pay (pay.js)",
+        category: "Für die angeforderte Zahlung nötig (bei Google Pay)",
+        duration: "Laut Google / PayPal",
+        provider: "Google — an der Kasse erst nach Annahme von AGB/Datenschutz",
+      },
+      {
+        name: "zippopotam.us (PLZ→Ort)",
+        category: "Technisch — Adress-Autocomplete",
+        duration: "Nur Transit; nicht von Corpoceleste gespeichert",
+        provider: "zippopotam.us — nur Land und PLZ",
+      },
+    ],
     manage: "Wie du sie entfernst",
     manageBody:
-      "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Im Künstlerbereich: abmelden (das Sitzungs-Cookie läuft ab). Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen verwalten. Du kannst das Umami-Skript auch mit einem Content-Blocker sperren.",
+      "Browser-Einstellungen → Website-Daten. Oder den Warenkorb hier leeren. Im Künstlerbereich: abmelden (das Sitzungs-Cookie läuft ab). Bei PayPal: Cookies im Konto oder in den Browser-Einstellungen. Für Umami Content-Blocker oder in der Konsole: localStorage.setItem('umami.disabled', '1').",
     privacyLink: "Vollständiger Datenschutzhinweis",
     contact: "Kontakt Verantwortlicher:",
   },
   terms: {
     title: "Verkaufsbedingungen",
     lede: "Wer verkauft, was du kaufst, wie bezahlt wird, wie du widerrufst.",
-    updated: "Stand: 18. November 2026.",
+    updated: "Stand: 23. November 2026.",
     seller: "Verkäufer",
     vatLabel: "USt-IdNr.:",
     reaLabel: "Handelsregister:",
@@ -1320,6 +1453,8 @@ const de: typeof it = {
     ibanHolderLabel: "Kontoinhaber:",
     vatMissing: "USt-IdNr.: ich veröffentliche sie, sobald sie aktiv ist.",
     contactLabel: "Kontakt:",
+    contactPrimaryEmail:
+      "Hauptkontakt für vorvertragliche Informationen und Support ist die angegebene E-Mail (und die PEC, falls veröffentlicht). Eine Telefonnummer wird hier ergänzt, sobald verfügbar.",
     scope: "Geltungsbereich",
     scopeBody:
       "Diese Bedingungen gelten für Käufe auf dieser Website. Sie sind für Verbraucher geschrieben, also für Käufe außerhalb einer gewerblichen oder beruflichen Tätigkeit. Website und Shop richten sich nicht an Personen unter 18 Jahren. Mit der Bestellung akzeptierst du die zum Zeitpunkt der Bestellung veröffentlichte Fassung.",

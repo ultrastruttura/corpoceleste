@@ -1141,6 +1141,31 @@ body.cart-open {
   margin-bottom: 8px;
 }
 
+.cookie-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 30px;
+}
+
+.cookie-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.cookie-table th,
+.cookie-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px 10px 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.cookie-table th {
+  font-weight: 500;
+  color: var(--muted);
+}
+
 /* Product page */
 .product-layout {
   display: grid;

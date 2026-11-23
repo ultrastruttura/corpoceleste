@@ -44,7 +44,7 @@ export async function ensureSchema() {
       args: ["schema_version"],
     });
     const current = String(ver.rows[0]?.value || "");
-    if (current !== "5") {
+    if (current !== "6") {
       for (const sql of [
         `ALTER TABLE shop_orders ADD COLUMN order_year INTEGER`,
         `ALTER TABLE shop_orders ADD COLUMN order_seq INTEGER`,
@@ -52,6 +52,9 @@ export async function ensureSchema() {
         `ALTER TABLE shop_orders ADD COLUMN shipped_at TEXT`,
         `ALTER TABLE newsletter_subscribers ADD COLUMN unsubscribed_at TEXT`,
         `ALTER TABLE newsletter_subscribers ADD COLUMN resend_contact_id TEXT`,
+        `ALTER TABLE newsletter_subscribers ADD COLUMN consent_ip TEXT NOT NULL DEFAULT ''`,
+        `ALTER TABLE newsletter_subscribers ADD COLUMN consent_ua TEXT NOT NULL DEFAULT ''`,
+        `ALTER TABLE newsletter_subscribers ADD COLUMN privacy_version TEXT NOT NULL DEFAULT ''`,
         `ALTER TABLE settlements ADD COLUMN deal_id TEXT`,
         // Nullable: NULL = legacy row, adopt Tina baseline on first sync without inventing sales.
         `ALTER TABLE stock_levels ADD COLUMN tina_base INTEGER`,
@@ -65,7 +68,7 @@ export async function ensureSchema() {
       await db.execute({
         sql: `INSERT INTO portal_meta (key, value) VALUES (?, ?)
               ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
-        args: ["schema_version", "5"],
+        args: ["schema_version", "6"],
       });
     }
     migrated = true;

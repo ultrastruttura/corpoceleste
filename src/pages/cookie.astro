@@ -30,6 +30,32 @@ const c = copy.cookiePolicy;
         (<a href="https://www.paypal.com/it/legalhub/paypal/privacy-full" rel="noopener noreferrer">paypal.com</a>).
       </p>
 
+      <h2>{c.table}</h2>
+      <div class="cookie-table-wrap">
+        <table class="cookie-table">
+          <thead>
+            <tr>
+              <th scope="col">{c.colName}</th>
+              <th scope="col">{c.colCategory}</th>
+              <th scope="col">{c.colDuration}</th>
+              <th scope="col">{c.colProvider}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              c.rows.map((row) => (
+                <tr>
+                  <td>{row.name}</td>
+                  <td>{row.category}</td>
+                  <td>{row.duration}</td>
+                  <td>{row.provider}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
       <h2>{c.manage}</h2>
       <p>{c.manageBody}</p>
 
