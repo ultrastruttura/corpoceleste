@@ -14,6 +14,7 @@ import {
   sizeInStock,
   stockOf,
 } from "../../data/products";
+import { productDescriptionHtml } from "../../lib/product-description";
 import { site } from "../../data/site";
 import { modelHasSleeve, sizeChartForProduct } from "../../data/fit-models";
 import { siteSettings } from "../../data/settings";
@@ -357,9 +358,7 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
 
       {
         description && (
-          <div class="product-copy">
-            {description.split(/\n\n+/).map((para) => <p>{para}</p>)}
-          </div>
+          <div class="product-copy" set:html={productDescriptionHtml(description)} />
         )
       }
 
@@ -406,7 +405,15 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
             </table>
             <p class="size-chart-note">{copy.product.sizeChartNote}</p>
             <p class="size-guide-link">
-              <a href={pageUrl(locale, "guida-taglie/")}>{copy.product.sizeGuideLink}</a>
+              <a
+                href={
+                  product.fitModelId
+                    ? `${pageUrl(locale, "guida-taglie/")}?model=${encodeURIComponent(product.fitModelId)}`
+                    : pageUrl(locale, "guida-taglie/")
+                }
+              >
+                {copy.product.sizeGuideLink}
+              </a>
             </p>
           </details>
         )

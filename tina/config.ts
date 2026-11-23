@@ -6,10 +6,16 @@ const branch =
   process.env.VERCEL_GIT_COMMIT_REF ||
   "main";
 
-const localizedText = (name: string, label: string, textarea = true) => ({
+const localizedText = (
+  name: string,
+  label: string,
+  textarea = true,
+  description?: string,
+) => ({
   type: "object" as const,
   name,
   label,
+  ...(description ? { description } : {}),
   // Optional object: empty IT/EN/DE must not block save / section navigation.
   required: false as const,
   fields: [
@@ -19,6 +25,7 @@ const localizedText = (name: string, label: string, textarea = true) => ({
       label: "Italiano",
       required: false as const,
       ...(textarea ? { ui: { component: "textarea" as const } } : {}),
+      ...(description ? { description } : {}),
     },
     {
       type: "string" as const,
@@ -26,6 +33,7 @@ const localizedText = (name: string, label: string, textarea = true) => ({
       label: "English",
       required: false as const,
       ...(textarea ? { ui: { component: "textarea" as const } } : {}),
+      ...(description ? { description } : {}),
     },
     {
       type: "string" as const,
@@ -33,6 +41,7 @@ const localizedText = (name: string, label: string, textarea = true) => ({
       label: "Deutsch",
       required: false as const,
       ...(textarea ? { ui: { component: "textarea" as const } } : {}),
+      ...(description ? { description } : {}),
     },
   ],
 });
@@ -206,7 +215,12 @@ export default defineConfig({
             list: true,
             required: false,
           },
-          localizedText("description", "Descrizione (pagina prodotto)"),
+          localizedText(
+            "description",
+            "Descrizione (pagina prodotto)",
+            true,
+            "Invio = a capo. Riga vuota = nuovo paragrafo. Formattazione: **grassetto**, *corsivo*, [testo](https://…)",
+          ),
           localizedText("seoDescription", "Meta SEO (max ~160 caratteri)"),
         ],
       },
