@@ -111,7 +111,10 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   confirmed_at TEXT NOT NULL DEFAULT (datetime('now')),
   locale TEXT NOT NULL DEFAULT 'it',
   unsubscribed_at TEXT,
-  resend_contact_id TEXT
+  resend_contact_id TEXT,
+  consent_ip TEXT NOT NULL DEFAULT '',
+  consent_ua TEXT NOT NULL DEFAULT '',
+  privacy_version TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS stock_holds (

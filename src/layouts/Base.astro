@@ -227,6 +227,7 @@ const umamiId = noAnalytics ? "" : siteSettings.umamiWebsiteId;
       import "../scripts/shop.ts";
     </script>
     {
+      /* Cookieless analytics; DNT honored. Declared as technical-equivalent in privacy/cookie policy. */
       umamiId && (
         <script
           is:inline
@@ -234,6 +235,7 @@ const umamiId = noAnalytics ? "" : siteSettings.umamiWebsiteId;
           src="https://cloud.umami.is/script.js"
           data-website-id={umamiId}
           data-do-not-track="true"
+          data-exclude-search="true"
         />
       )
     }

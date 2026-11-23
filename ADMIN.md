@@ -65,7 +65,9 @@ Email shop: **SEO e home** → *Email shop*. Su Vercel: `SHOP_EMAIL`, `RESEND_AP
 3. Copia il **Website ID** (è anche il `data-website-id` nello snippet).
 4. In Tina → **SEO e home** → *Umami Analytics — Website ID*, incolla e salva → push / publish.
 
-**Senza Website ID le visite non si vedono.** Dashboard: [cloud.umami.is](https://cloud.umami.is). Niente cookie → niente banner.
+**Senza Website ID le visite non si vedono.** Dashboard: [cloud.umami.is](https://cloud.umami.is). Niente cookie di profilazione → niente banner (Linee guida Garante); Umami è dichiarato come analytics assimilabile a tecnico. Opt-out: `localStorage.setItem('umami.disabled','1')`.
+
+Registro art. 30: [docs/registro-trattamenti.md](./docs/registro-trattamenti.md). Versione informativa privacy: `src/lib/privacy-version.ts` (aggiornare insieme a `dict.ts`).
 
 ## Dati legali (da compilare)
 
@@ -74,7 +76,8 @@ IBAN, P.IVA, REA, telefono, PayPal Client ID e URL Vercel si impostano in Tina �
 | Campo Tina | Cosa metterci |
 |------------|---------------|
 | Partita IVA / IBAN / indirizzo | Obbligatori in pratica per vendere |
-| REA / telefono | Se ce li hai; altrimenti lascia vuoti |
+| REA | Se sei iscritto al Registro Imprese, metti il REA; altrimenti lascia vuoto |
+| Telefono | Consigliato (Cod. consumo); se vuoto il sito dichiara email come contatto primario |
 | PayPal Client ID / URL API Vercel | Solo se cambi rispetto al default |
 
 I testi di **Condizioni** e **Recesso** stanno in `src/i18n/dict.ts` (IT/EN/DE): **falle firmare al commercialista/avvocato** prima di vendere.

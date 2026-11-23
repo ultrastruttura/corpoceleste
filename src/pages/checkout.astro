@@ -268,24 +268,6 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     // Checkout module runs before Base/shop.ts — hydrate catalog before any sanitizeCart.
     hydrateCatalog();
 
-    (function bootPayPalSdk() {
-      const boot = document.querySelector<HTMLElement>("[data-paypal-boot]");
-      if (!boot) return;
-      const clientId = boot.dataset.clientId || "";
-      const sdkLocale = boot.dataset.sdkLocale || "it_IT";
-      if (!clientId) return;
-      const s = document.createElement("script");
-      s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay,applepay&disable-funding=paylater,venmo`;
-      s.onerror = () => {
-        (window as Window & { __paypalSdkFailed?: boolean }).__paypalSdkFailed = true;
-      };
-      document.head.append(s);
-      const g = document.createElement("script");
-      g.src = "https://pay.google.com/gp/p/js/pay.js";
-      g.async = true;
-      document.head.append(g);
-    })();
-
     /** Browser-safe: do not import data/commerce (gray-matter → Buffer). */
     const apiBase = () =>
       (document.documentElement.dataset.api || "").replace(/\/$/, "");
@@ -304,6 +286,8 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
     let applePayReady: (() => void) | null = null;
     let createErrorShown = false;
     let buttonsMounted = false;
+    let paypalSdkBooted = false;
+    let paypalSdkWaitStarted = false;
     const page = document.querySelector<HTMLElement>(".checkout-page");
     const paypalClientId = page?.dataset.paypalClientId || "";
     const labels = {
@@ -510,12 +494,48 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       );
     }
 
+    /** Terms + privacy only — load payment SDKs after acceptance (not on page load). */
+    function legalAccepted() {
+      return Boolean(disclaimer?.checked && privacy?.checked);
+    }
+
+    function bootPayPalSdk() {
+      if (paypalSdkBooted || !paypalClientId) return;
+      const boot = document.querySelector<HTMLElement>("[data-paypal-boot]");
+      if (!boot) return;
+      const clientId = boot.dataset.clientId || paypalClientId;
+      const sdkLocale = boot.dataset.sdkLocale || "it_IT";
+      if (!clientId) return;
+      paypalSdkBooted = true;
+      const s = document.createElement("script");
+      s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&intent=capture&locale=${sdkLocale}&components=buttons,googlepay,applepay&disable-funding=paylater,venmo`;
+      s.onerror = () => {
+        (window as Window & { __paypalSdkFailed?: boolean }).__paypalSdkFailed = true;
+      };
+      document.head.append(s);
+      const g = document.createElement("script");
+      g.src = "https://pay.google.com/gp/p/js/pay.js";
+      g.async = true;
+      document.head.append(g);
+      if (!paypalSdkWaitStarted) {
+        paypalSdkWaitStarted = true;
+        const wait = () => {
+          const w = window as unknown as { paypal?: unknown; __paypalSdkFailed?: boolean };
+          if (w.paypal) tryMountButtons();
+          else if (w.__paypalSdkFailed) paypalUnavailable();
+          else setTimeout(wait, 80);
+        };
+        wait();
+      }
+    }
+
     function syncLock() {
       const ok = unlocked();
       payBox?.classList.toggle("is-locked", !ok);
       bankForm?.classList.toggle("is-locked", !ok);
       if (bankSubmit) bankSubmit.disabled = !ok;
       if (lockHint) lockHint.hidden = ok;
+      if (legalAccepted()) bootPayPalSdk();
     }
 
     function setStatus(text: string) {
@@ -1447,14 +1467,7 @@ const shipCountries = SHIP_COUNTRIES.map((code) => ({
       }
     }
 
-    if (paypalClientId) {
-      const wait = () => {
-        const w = window as unknown as { paypal?: unknown; __paypalSdkFailed?: boolean };
-        if (w.paypal) tryMountButtons();
-        else if (w.__paypalSdkFailed) paypalUnavailable();
-        else setTimeout(wait, 80);
-      };
-      wait();
-    }
+    // Payment SDKs load only after terms + privacy (see bootPayPalSdk / syncLock).
+    if (legalAccepted()) bootPayPalSdk();
   </script>
 </Base>

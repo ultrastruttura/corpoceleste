@@ -36,6 +36,7 @@ const shopEmail = siteSettings.shopEmail;
         )}
         {v.contactLabel} <a href={`mailto:${shopEmail}`}>{shopEmail}</a>
       </p>
+      {!commerce.telefono && <p>{v.contactPrimaryEmail}</p>}
 
       <h2>{v.scope}</h2>
       <p>{v.scopeBody}</p>

@@ -18,7 +18,9 @@ import {
   verifyNewsletterConfirm,
   verifyNewsletterUnsub,
 } from "../server/newsletter.js";
+import { PRIVACY_POLICY_VERSION } from "../src/lib/privacy-version.js";
 import { cors, requireSiteOrigin } from "../server/portal/http.js";
+import { clientIp } from "../server/portal/rate-limit.js";
 import {
   handleSendcloudWebhook,
   isSendcloudWebhookRequest,
@@ -143,7 +145,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       parsed.locale === "en" ? "/en" : parsed.locale === "de" ? "/de" : "";
     const thanks = `${siteBase()}${localePrefix}/grazie/?from=newsletter-confirmed`;
     try {
-      const result = await confirmNewsletterSubscriber(parsed.email, parsed.locale);
+      const ip = clientIp(req.headers as Record<string, string | string[] | undefined>);
+      const ua = String(req.headers["user-agent"] || "").slice(0, 512);
+      const result = await confirmNewsletterSubscriber(parsed.email, parsed.locale, {
+        ip,
+        userAgent: ua,
+        privacyVersion: PRIVACY_POLICY_VERSION,
+      });
       const shopTo = (process.env.SHOP_EMAIL || "").trim();
       if (shopTo) {
         await sendMail({
@@ -152,6 +160,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           text: [
             `Email: ${parsed.email}`,
             `Locale: ${parsed.locale}`,
+            `Privacy version: ${PRIVACY_POLICY_VERSION}`,
+            `IP conferma: ${ip || "—"}`,
             `Lista Turso: ${result.stored ? "sì" : "no (portal off)"}`,
             `Resend Segment: ${result.resend ? "sì" : result.resendError || "no"}`,
             `Benvenuto iscritto: ${result.welcomed ? "sì" : "no (già iscritto o mail fallita)"}`,
