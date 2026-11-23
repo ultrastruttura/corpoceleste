@@ -1,5 +1,8 @@
 import matter from "gray-matter";
+import { fitModelIdFromRef } from "../lib/fit-model-id";
 import { site } from "./site";
+
+export { fitModelIdFromRef };
 
 export type FitModelKind = "shirt" | "hoodie";
 
@@ -71,14 +74,6 @@ function parseRows(raw: unknown): FitModelRow[] {
     });
   }
   return out;
-}
-
-/** Tina reference `content/fit-models/tee-default.md` → `tee-default`. */
-export function fitModelIdFromRef(ref: unknown): string {
-  const s = String(ref ?? "").trim();
-  if (!s) return "";
-  const match = s.match(/fit-models\/([^/]+?)(?:\.md)?$/);
-  return match?.[1] ?? s.replace(/\.md$/, "");
 }
 
 const files = import.meta.glob("../../content/fit-models/*.md", {

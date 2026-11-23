@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fitModelIdFromRef } from "../../src/data/fit-models";
+import { fitModelIdFromRef } from "../../src/lib/fit-model-id";
 
 describe("fitModelIdFromRef", () => {
   it("extracts id from Tina content path", () => {
