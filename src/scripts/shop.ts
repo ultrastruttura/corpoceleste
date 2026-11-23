@@ -1,7 +1,12 @@
 import { isPurchasableStatus } from "../lib/product-status";
 import { bindAutoplayVideos } from "./autoplay-video";
 import { addItem } from "./cart";
-import { applyLiveStock, catalogProduct, hydrateCatalog } from "./catalog";
+import {
+  applyLiveStock,
+  catalogProduct,
+  catalogSizeInStock,
+  hydrateCatalog,
+} from "./catalog";
 import { bindNav } from "./nav";
 
 const base = import.meta.env.BASE_URL;
@@ -9,6 +14,32 @@ const base = import.meta.env.BASE_URL;
 /** Browser-safe: do not import data/commerce (pulls gray-matter → Buffer). */
 function commerceApiBase() {
   return (document.documentElement.dataset.api || "").replace(/\/$/, "");
+}
+
+/** Reflect live stock on product-page size radios (SSR HTML is build-time). */
+function syncProductSizeUi() {
+  document.querySelectorAll<HTMLFormElement>("[data-add-form]").forEach((form) => {
+    const id = String(form.querySelector<HTMLInputElement>('input[name="id"]')?.value || "");
+    const p = catalogProduct(id);
+    if (!p) return;
+    const radios = [
+      ...form.querySelectorAll<HTMLInputElement>('input[type="radio"][name="size"]'),
+    ];
+    let needReselect = false;
+    for (const input of radios) {
+      const available = catalogSizeInStock(p, input.value);
+      input.disabled = !available;
+      input.closest("label")?.classList.toggle("is-oos", !available);
+      if (!available && input.checked) {
+        input.checked = false;
+        needReselect = true;
+      }
+    }
+    if (needReselect) {
+      const next = radios.find((r) => !r.disabled);
+      if (next) next.checked = true;
+    }
+  });
 }
 
 async function refreshLiveStock() {
@@ -27,7 +58,10 @@ async function refreshLiveStock() {
         price?: number;
       }>;
     };
-    if (data.products?.length) applyLiveStock(data.products);
+    if (data.products?.length) {
+      applyLiveStock(data.products);
+      syncProductSizeUi();
+    }
   } catch {
     /* keep build-time catalog */
   }

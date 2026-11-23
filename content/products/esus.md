@@ -19,7 +19,7 @@ stockS: 10
 stockM: 16
 stockL: 15
 stockXL: 8
-stockXXL: 2
+stockXXL: 0
 images:
   - /uploads/108-Esus-EDIT-(2).jpg
   - /uploads/108-Esus-EDIT.jpg
