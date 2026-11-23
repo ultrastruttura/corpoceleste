@@ -37,7 +37,7 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
           const tip = model.tipKey === "stretch" ? g.tipStretch : g.tipRegular;
           const showSleeve = modelHasSleeve(model.rows);
           return (
-            <section class="size-guide__model">
+            <section class="size-guide__model" data-fit-model={model.id}>
               <h2>{model.name || g.modelFallback}</h2>
               <p>
                 <strong>{g.tipLabel}</strong> {tip}
@@ -101,4 +101,14 @@ const jsonLd = [crumbs, ...(faq ? [faq] : [])];
       </ol>
     </div>
   </div>
+  {/* Static host: filter charts by ?model=<fitModelId> from the product page link. */}
+  <script is:inline>
+    (function () {
+      var id = new URLSearchParams(location.search).get("model");
+      if (!id) return;
+      document.querySelectorAll("[data-fit-model]").forEach(function (el) {
+        if (el.getAttribute("data-fit-model") !== id) el.setAttribute("hidden", "");
+      });
+    })();
+  </script>
 </Base>

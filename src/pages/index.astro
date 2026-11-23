@@ -15,8 +15,11 @@ import { currentLocale, pageUrl, t } from "../i18n";
 const locale = currentLocale(Astro.currentLocale);
 const copy = t(locale);
 const available = availableProducts();
+// «Nuovo (porta in alto)»: last flagged / newest createdAt first, then shuffle the rest.
 const listed = [
-  ...available.filter((p) => p.nuovo),
+  ...available
+    .filter((p) => p.nuovo)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.slug.localeCompare(b.slug)),
   ...shuffle(available.filter((p) => !p.nuovo)),
 ];
 const sold = soldOutProducts();

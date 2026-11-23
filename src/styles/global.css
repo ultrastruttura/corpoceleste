@@ -1150,7 +1150,7 @@ body.cart-open {
 
 @media (min-width: 900px) {
   .product-layout {
-    grid-template-columns: minmax(0, 550px) minmax(260px, 340px);
+    grid-template-columns: minmax(0, 750px) minmax(280px, 680px);
     gap: 48px;
     align-items: start;
   }
@@ -1163,7 +1163,7 @@ body.cart-open {
 
 .product-stage {
   width: 100%;
-  max-width: 550px;
+  max-width: 750px;
   background: var(--white);
   overflow: hidden;
 }
