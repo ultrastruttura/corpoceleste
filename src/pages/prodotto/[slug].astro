@@ -309,12 +309,12 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
                           const available = sizeInStock(product, s);
                           const qty = stockOf(product, s);
                           return (
-                            <label class:list={{ "is-oos": !available }}>
+                            <label class:list={{ "is-oos": !available }} hidden={!available}>
                               <input
                                 type="radio"
                                 name="size"
                                 value={s}
-                                checked={s === defaultSize}
+                                checked={available && s === defaultSize}
                                 disabled={!available}
                               />
                               <span>

@@ -22,6 +22,7 @@ const urls = product.images[0] ? cardImageUrls(product.images[0]) : null;
   class:list={["card", sold && "is-sold", preorder && "is-preorder", lowStock && "is-low-stock"]}
   href={pageUrl(locale, `prodotto/${product.slug}/`)}
   data-product
+  data-product-id={product.id}
   data-nuovo={product.nuovo ? "1" : "0"}
   data-status={product.status}
 >

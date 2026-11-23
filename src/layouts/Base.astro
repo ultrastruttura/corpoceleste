@@ -115,7 +115,16 @@ const umamiId = noAnalytics ? "" : siteSettings.umamiWebsiteId;
 ---
 
 <!doctype html>
-<html lang={locale} data-locale={locale} data-locale-prefix={prefix} data-api={commerce.formApi || undefined}>
+<html
+  lang={locale}
+  data-locale={locale}
+  data-locale-prefix={prefix}
+  data-api={commerce.formApi || undefined}
+  data-low-stock-threshold={String(siteSettings.lowStockThreshold)}
+  data-badge-sold={copy.shop.soldBadge}
+  data-badge-low-stock={copy.shop.lowStockBadge}
+  data-badge-preorder={copy.shop.preorderBadge}
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

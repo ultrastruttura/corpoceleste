@@ -1398,15 +1398,9 @@ body.cart-open {
   outline-offset: 2px;
 }
 
+/* Sold-out sizes: hide (live-stock sync toggles .is-oos / hidden). */
 .size-row label.is-oos {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.size-row label.is-oos:has(input:checked) {
-  background: transparent;
-  color: inherit;
+  display: none;
 }
 
 .attrs {

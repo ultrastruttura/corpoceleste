@@ -3,6 +3,8 @@ import { bindAutoplayVideos } from "./autoplay-video";
 import { addItem } from "./cart";
 import {
   applyLiveStock,
+  catalogInStock,
+  catalogIsLowStock,
   catalogProduct,
   catalogSizeInStock,
   hydrateCatalog,
@@ -14,6 +16,11 @@ const base = import.meta.env.BASE_URL;
 /** Browser-safe: do not import data/commerce (pulls gray-matter → Buffer). */
 function commerceApiBase() {
   return (document.documentElement.dataset.api || "").replace(/\/$/, "");
+}
+
+function lowStockThreshold() {
+  const n = Number(document.documentElement.dataset.lowStockThreshold);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 5;
 }
 
 /** Reflect live stock on product-page size radios (SSR HTML is build-time). */
@@ -29,7 +36,9 @@ function syncProductSizeUi() {
     for (const input of radios) {
       const available = catalogSizeInStock(p, input.value);
       input.disabled = !available;
-      input.closest("label")?.classList.toggle("is-oos", !available);
+      const label = input.closest("label");
+      label?.classList.toggle("is-oos", !available);
+      if (label) label.hidden = !available;
       if (!available && input.checked) {
         input.checked = false;
         needReselect = true;
@@ -40,6 +49,45 @@ function syncProductSizeUi() {
       if (next) next.checked = true;
     }
   });
+}
+
+/** Home/shop cards: sold / low-stock / preorder badges from live totals. */
+function syncProductCardUi() {
+  const threshold = lowStockThreshold();
+  const root = document.documentElement.dataset;
+  const soldLabel = root.badgeSold || "Esaurito";
+  const lowLabel = root.badgeLowStock || "In esaurimento";
+  const preorderLabel = root.badgePreorder || "Pre-order";
+
+  document.querySelectorAll<HTMLElement>("[data-product-id]").forEach((card) => {
+    const id = card.dataset.productId || "";
+    const p = catalogProduct(id);
+    if (!p) return;
+
+    const sold = !catalogInStock(p);
+    const low = !sold && catalogIsLowStock(p, threshold);
+    const preorder = p.status === "preorder" && !sold && !low;
+
+    card.classList.toggle("is-sold", sold);
+    card.classList.toggle("is-low-stock", low);
+    card.classList.toggle("is-preorder", preorder);
+    card.dataset.status = p.status;
+
+    const frame = card.querySelector(".card-frame");
+    if (!frame) return;
+    frame.querySelectorAll(".badge").forEach((el) => el.remove());
+    if (sold || low || preorder) {
+      const badge = document.createElement("span");
+      badge.className = sold ? "badge" : "badge badge--quiet";
+      badge.textContent = sold ? soldLabel : low ? lowLabel : preorderLabel;
+      frame.insertBefore(badge, frame.firstChild);
+    }
+  });
+}
+
+function syncLiveStockUi() {
+  syncProductSizeUi();
+  syncProductCardUi();
 }
 
 async function refreshLiveStock() {
@@ -60,7 +108,7 @@ async function refreshLiveStock() {
     };
     if (data.products?.length) {
       applyLiveStock(data.products);
-      syncProductSizeUi();
+      syncLiveStockUi();
     }
   } catch {
     /* keep build-time catalog */
