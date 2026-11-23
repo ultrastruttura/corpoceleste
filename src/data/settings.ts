@@ -45,11 +45,11 @@ export const siteSettings = {
   umamiWebsiteId: String(data.umamiWebsiteId ?? "").trim(),
   /**
    * Badge “in esaurimento” quando i pezzi totali ≤ questa soglia.
-   * 0 = disattivato. Default 10.
+   * 0 = disattivato. Default 5 (totale pezzi tutte le taglie).
    */
   lowStockThreshold: (() => {
     const n = Number(data.lowStockThreshold);
-    if (!Number.isFinite(n) || n < 0) return 10;
+    if (!Number.isFinite(n) || n < 0) return 5;
     return Math.floor(n);
   })(),
   /** Commerce / legal overrides (empty = use fallbacks in site.ts). */

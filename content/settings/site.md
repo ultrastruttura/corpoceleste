@@ -44,7 +44,7 @@ andreaBio:
 
     Vor Corpoceleste: der Shop Corpoc (2012–2019). Ich male als Ultrastruttura.
 umamiWebsiteId: 546938a2-aa92-4654-bc29-85bba09323b4
-lowStockThreshold: 10
+lowStockThreshold: 5
 iban: IT02C03268223000EM002734005
 intestatario: Andrea Baldelli Lorenzo
 legalName: Andrea Baldelli Lorenzo

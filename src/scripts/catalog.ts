@@ -1,4 +1,5 @@
 import {
+  isPurchasableStatus,
   maxQtyForStatus,
   sizeSellable,
   type ProductStatus,
@@ -60,6 +61,26 @@ export function catalogMaxQty(p: CatalogProduct, size: string) {
 
 export function catalogSizeInStock(p: CatalogProduct, size: string) {
   return sizeSellable(p.status, catalogStock(p, size));
+}
+
+/** Total units across listed sizes (or all stock keys). */
+export function catalogTotalStock(p: CatalogProduct) {
+  const sizes = p.sizes?.length ? p.sizes : Object.keys(p.stock || {});
+  return sizes.reduce((sum, size) => sum + catalogStock(p, size), 0);
+}
+
+export function catalogInStock(p: CatalogProduct) {
+  if (!isPurchasableStatus(p.status)) return false;
+  const sizes = p.sizes?.length ? p.sizes : Object.keys(p.stock || {});
+  return sizes.some((size) => catalogSizeInStock(p, size));
+}
+
+/** Low-stock badge: purchasable and total units ≤ threshold. */
+export function catalogIsLowStock(p: CatalogProduct, threshold: number) {
+  if (!catalogInStock(p)) return false;
+  const limit = Math.floor(Number(threshold));
+  if (!Number.isFinite(limit) || limit < 1) return false;
+  return catalogTotalStock(p) <= limit;
 }
 
 /** Merge live GitHub stock into the build-time catalog (checkout / cart). */
