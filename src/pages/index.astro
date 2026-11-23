@@ -1,7 +1,11 @@
 ---
 import Base from "../layouts/Base.astro";
 import ProductGrid from "../components/ProductGrid.astro";
-import { availableProducts, soldOutProducts } from "../data/products";
+import {
+  availableProducts,
+  productSeoDescription,
+  soldOutProducts,
+} from "../data/products";
 import { localizedSetting, siteSettings } from "../data/settings";
 import { shuffle } from "../lib/shuffle";
 import { cardImageUrls } from "../lib/paths";
@@ -41,6 +45,7 @@ const collectionLd = collectionPageJsonLd({
     image: p.images[0],
     price: p.price,
     status: p.status,
+    description: productSeoDescription(p, locale),
   })),
 });
 ---

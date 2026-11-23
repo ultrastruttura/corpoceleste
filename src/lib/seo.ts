@@ -210,6 +210,8 @@ export function collectionPageJsonLd(opts: {
     image?: string;
     price: number;
     status?: string;
+    /** Product description for Google Product rich-result checks. */
+    description?: string;
   }>;
 }) {
   const origin = siteOrigin(opts.siteUrl);
@@ -232,12 +234,16 @@ export function collectionPageJsonLd(opts: {
         const url = p.path.startsWith("http")
           ? p.path
           : `${origin}${p.path.startsWith("/") ? p.path : `/${p.path}`}`;
+        const description =
+          metaSnippet(String(p.description || "").trim(), 300) ||
+          metaSnippet(`${p.name} — Corpoceleste`, 300);
         return {
           "@type": "ListItem",
           position: i + 1,
           item: {
             "@type": "Product",
             name: p.name,
+            description,
             url,
             ...(p.image ? { image: absoluteUrl(p.image, opts.siteUrl) } : {}),
             brand: { "@type": "Brand", name: "Corpoceleste" },
