@@ -38,7 +38,7 @@ function syncProductSizeUi() {
       input.disabled = !available;
       const label = input.closest("label");
       label?.classList.toggle("is-oos", !available);
-      if (label) label.hidden = !available;
+      if (label) label.hidden = false;
       if (!available && input.checked) {
         input.checked = false;
         needReselect = true;

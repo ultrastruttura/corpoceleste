@@ -39,7 +39,12 @@ const lowStock = !sold && isLowStock(product, siteSettings.lowStockThreshold);
 const preorder = product.status === "preorder" && !sold;
 const showSizes = productHasSizes(product);
 const alt = productImageAlt(product, artist, locale);
-const sizes = product.sizes.length ? product.sizes : [...site.sizes];
+// Always show full garment run (S–XXL); OOS sizes stay visible but disabled.
+const sizes = showSizes
+  ? [...site.sizes]
+  : product.sizes.length
+    ? product.sizes
+    : ["unica"];
 const inStockSizes = sizes.filter((s) => sizeInStock(product, s));
 const sizeChart = sizeChartForProduct(product.fitModelId);
 const sizeChartHasSleeve = modelHasSleeve(sizeChart.rows);
@@ -309,7 +314,7 @@ const jsonLd = product.hidden ? undefined : [productJsonLd, crumbs];
                           const available = sizeInStock(product, s);
                           const qty = stockOf(product, s);
                           return (
-                            <label class:list={{ "is-oos": !available }} hidden={!available}>
+                            <label class:list={{ "is-oos": !available }}>
                               <input
                                 type="radio"
                                 name="size"
