@@ -128,10 +128,11 @@ Aggiungi queste (Environment: **Production**, e anche Preview se vuoi testare i 
 | `SENDCLOUD_FROM_PHONE` | Telefono mittente |
 | `SENDCLOUD_FROM_EMAIL` | Email mittente (es. `info@corpoceleste.eu`) |
 | `SENDCLOUD_DEFAULT_TO_PHONE` | *(opzionale)* telefono destinazione se PayPal non lo passa |
-| `SENDCLOUD_CONTRACT_ID` | *(opzionale)* contract_id fisso su announce |
+| `SENDCLOUD_INTEGRATION_ID` | *(opzionale)* id integrazione API per Ordini in entrata; se assente si prende dalla lista `/integrations` |
+| `SENDCLOUD_CONTRACT_ID` | *(opzionale)* contract_id fisso su `ship_with` dell’ordine |
 | `SENDCLOUD_WEBHOOK_SECRET` | **Obbligatorio in production/preview** — secret HMAC webhook (`Sendcloud-Signature`). In locale, se assente, fallback a `SENDCLOUD_SECRET_KEY` |
 
-Serve un account **Sendcloud** con API keys e corrieri abilitati (quote + etichette). In integrazione: abilita Feedback Webhook → `https://corpoceleste.vercel.app/api/sendcloud-webhook` (firma `Sendcloud-Signature`). **Non** abilitare punti di ritiro (il checkout fa solo domicilio). Al pagamento PayPal il webhook PayPal crea la spedizione e, se pronta, mette tracking/etichetta nella mail shop.
+Serve un account **Sendcloud** con API keys e corrieri abilitati (quote + etichette). In integrazione: abilita Feedback Webhook → `https://corpoceleste.vercel.app/api/sendcloud-webhook` (firma `Sendcloud-Signature`). **Non** abilitare punti di ritiro (il checkout fa solo domicilio). Al pagamento PayPal il webhook crea un **ordine in entrata** (senza etichetta); Andrea crea l’etichetta dal pannello Sendcloud (preferenza dropoff / porta in posta).
 
 Salva, poi **Redeploy** l’ultimo deployment (Deployments → ⋮ → Redeploy), altrimenti le variabili non entrano in vigore.
 

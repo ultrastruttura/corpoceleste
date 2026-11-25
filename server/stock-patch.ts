@@ -133,6 +133,8 @@ export function formatShopOrderEmail(opts: {
   if (opts.packlinkRef) packlinkLines.push(`Sendcloud: ${opts.packlinkRef}`);
   if (opts.packlinkLabels?.length) {
     for (const url of opts.packlinkLabels) packlinkLines.push(`Etichetta: ${url}`);
+  } else if (opts.packlinkRef && !opts.packlinkError) {
+    packlinkLines.push("Etichetta: da creare in Sendcloud → Ordini in entrata");
   }
   if (opts.packlinkError) packlinkLines.push(`Sendcloud errore: ${opts.packlinkError}`);
   const address = String(opts.shippingAddress || "").trim();

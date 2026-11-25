@@ -1,5 +1,5 @@
 /**
- * Sendcloud API v3 — quote cheapest home delivery + announce shipment/labels.
+ * Sendcloud API v3 — quote home delivery (prefer dropoff) + create incoming order (no label).
  * Docs: https://sendcloud.dev — Basic Auth (public:secret).
  */
 
@@ -233,9 +233,9 @@ function addressPayload(
   return out;
 }
 
-function preferPickup(): boolean {
-  // Default on: ritiro in studio quando Sendcloud lo offre.
-  return envStr("SENDCLOUD_PREFER_PICKUP", "1") !== "0";
+function preferDropoff(): boolean {
+  // Default on: etichetta per portare il pacco in posta (no ritiro corriere in studio).
+  return envStr("SENDCLOUD_PREFER_DROPOFF", "1") !== "0";
 }
 
 export async function quoteCheapest(input: {
@@ -249,7 +249,7 @@ export async function quoteCheapest(input: {
   return sel?.chosen ?? null;
 }
 
-/** Full selection: preferred pickup vs dropoff comparison. */
+/** Full selection: preferred dropoff (bring to Poste) vs pickup comparison. */
 export async function quoteShipping(input: {
   toCountry: string;
   toZip: string;
@@ -317,7 +317,7 @@ export async function quoteShipping(input: {
     throw new Error("Sendcloud shipping-options: invalid JSON");
   }
   const options = parseShippingOptions(parsed, weightKg);
-  const selected = selectQuote(options, preferPickup());
+  const selected = selectQuote(options, preferDropoff());
   if (!selected) {
     const root = asRecord(parsed);
     const rawCount = Array.isArray(root?.data) ? root!.data.length : 0;
@@ -342,25 +342,44 @@ export async function quoteShipping(input: {
   return selected;
 }
 
-function labelUrlsFromAnnounce(shipment: Record<string, unknown>): string[] {
-  const urls: string[] = [];
-  const parcels = Array.isArray(shipment.parcels) ? shipment.parcels : [];
-  for (const p of parcels) {
-    const parcel = asRecord(p);
-    if (!parcel) continue;
-    const trackingUrl = str(parcel.tracking_url);
-    if (trackingUrl.startsWith("http")) urls.push(trackingUrl);
-    const docs = Array.isArray(parcel.documents) ? parcel.documents : [];
-    for (const d of docs) {
-      const doc = asRecord(d);
-      const link = str(doc?.link);
-      if (link.startsWith("http")) urls.push(link);
-    }
+let cachedIntegrationId: number | null = null;
+
+/** API integration id for Orders (“Ordini in entrata”). Env or first /integrations entry. */
+export async function resolveIntegrationId(): Promise<number> {
+  const fromEnv = Number(envStr("SENDCLOUD_INTEGRATION_ID"));
+  if (Number.isFinite(fromEnv) && fromEnv > 0) return fromEnv;
+  if (cachedIntegrationId != null) return cachedIntegrationId;
+
+  const res = await sendcloudFetch("/integrations");
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Sendcloud integrations: ${res.status} ${text.slice(0, 180)}`);
   }
-  return [...new Set(urls)];
+  const parsed = asRecord(await res.json()) || {};
+  const list = Array.isArray(parsed.data) ? parsed.data : [];
+  let chosen: Record<string, unknown> | null = null;
+  for (const row of list) {
+    const item = asRecord(row);
+    if (!item) continue;
+    if (str(item.type).toLowerCase() === "api") {
+      chosen = item;
+      break;
+    }
+    if (!chosen) chosen = item;
+  }
+  const id = Number(chosen?.id);
+  if (!Number.isFinite(id) || id <= 0) {
+    throw new Error("Sendcloud: missing integration id (set SENDCLOUD_INTEGRATION_ID)");
+  }
+  cachedIntegrationId = id;
+  return id;
 }
 
-export async function createShipmentAndLabels(input: {
+/**
+ * Create order in Sendcloud “Ordini in entrata” without announcing a label.
+ * Preferred dropoff shipping_option_code is stored on the order for later label creation.
+ */
+export async function createIncomingOrder(input: {
   serviceId: string | number;
   to: ShipAddress;
   packages: ShipPackage[];
@@ -369,10 +388,6 @@ export async function createShipmentAndLabels(input: {
   customReference?: string;
   contractId?: number;
 }): Promise<ShipShipmentResult> {
-  const from = originFromEnv();
-  if (!from.street1 || !from.city || !from.zip_code || !from.phone || !from.email) {
-    throw new Error("Sendcloud origin incomplete (SENDCLOUD_FROM_* env)");
-  }
   if (!input.to.city?.trim()) {
     throw new Error("Sendcloud: missing recipient city");
   }
@@ -393,77 +408,75 @@ export async function createShipmentAndLabels(input: {
     shipWithProps.contract_id = contractId;
   }
 
-  const body = {
-    label_details: {
-      mime_type: "application/pdf",
-      dpi: 72,
-    },
-    from_address: addressPayload(
-      {
-        name: from.name,
-        surname: from.surname,
-        company: from.company,
-        street1: from.street1,
-        zip_code: from.zip_code,
-        city: from.city,
-        country: from.country,
-        phone: from.phone,
-        email: from.email,
-      },
-      provinceForLabel(from.country, from.province),
-    ),
-    to_address: addressPayload(input.to, toProvince),
-    ship_with: {
-      type: "shipping_option_code",
-      properties: shipWithProps,
-    },
+  const priceValue = Math.round(input.contentValue * 100) / 100;
+  const weightKg = Math.max(
+    0.1,
+    Math.round(input.packages.reduce((n, p) => n + p.weight, 0) * 1000) / 1000,
+  );
+  const integrationId = await resolveIntegrationId();
+  const nowIso = new Date().toISOString();
+
+  const order = {
+    order_id: merchantReference,
     order_number: merchantReference,
-    total_order_price: {
-      currency: "EUR",
-      value: (Math.round(input.contentValue * 100) / 100).toFixed(2),
-    },
-    parcels: parcelsPayload(input.packages).map((p) => ({
-      ...p,
-      parcel_items: [
+    order_details: {
+      integration: { id: integrationId },
+      status: { code: "paid", message: "Pagato" },
+      order_created_at: nowIso,
+      order_items: [
         {
-          description: clip(input.content || "Abbigliamento", 100),
+          name: clip(input.content || "Abbigliamento", 100),
           quantity: 1,
-          weight: p.weight,
-          price: {
-            value: (Math.round(input.contentValue * 100) / 100).toFixed(2),
-            currency: "EUR",
-          },
-          origin_country: from.country,
+          total_price: { value: priceValue, currency: "EUR" },
+          measurement: { weight: { value: weightKg, unit: "kg" } },
         },
       ],
-    })),
+      notes: "Porta in posta (dropoff). Crea etichetta da Ordini in entrata.",
+    },
+    payment_details: {
+      total_price: { value: priceValue, currency: "EUR" },
+      status: { code: "paid", message: "Paid" },
+    },
+    customer_details: {
+      name: clip(
+        [input.to.name, input.to.surname].filter(Boolean).join(" ").trim() || "Cliente",
+        80,
+      ),
+      email: input.to.email.trim(),
+      phone_number: input.to.phone.trim(),
+    },
+    shipping_address: addressPayload(input.to, toProvince),
+    shipping_details: {
+      is_local_pickup: false,
+      delivery_indicator: optionCode,
+      measurement: { weight: { value: weightKg, unit: "kg" } },
+      ship_with: {
+        type: "shipping_option_code",
+        properties: shipWithProps,
+      },
+    },
   };
 
-  const createRes = await sendcloudFetch("/shipments/announce", {
+  const createRes = await sendcloudFetch("/orders", {
     method: "POST",
-    body: JSON.stringify(body),
+    body: JSON.stringify([order]),
   });
   if (!createRes.ok) {
     const text = await createRes.text();
-    throw new Error(`Sendcloud announce: ${createRes.status} ${text}`);
+    throw new Error(`Sendcloud orders: ${createRes.status} ${text}`);
   }
 
   const created = asRecord(await createRes.json()) || {};
-  const shipment = asRecord(created.data) || created;
-  const parcels = Array.isArray(shipment.parcels) ? shipment.parcels : [];
-  const first = asRecord(parcels[0]);
-  const tracking = str(first?.tracking_number);
-  const parcelId = first?.id != null ? String(first.id) : "";
-  const shipmentId = shipment.id != null ? String(shipment.id) : "";
-  const reference = tracking || parcelId || shipmentId || merchantReference;
-  if (!reference) throw new Error("Sendcloud announce: missing id/tracking");
-
-  const labelUrls = labelUrlsFromAnnounce(shipment);
+  const rows = Array.isArray(created.data) ? created.data : [];
+  const first = asRecord(rows[0]) || {};
+  const scId = first.id != null ? String(first.id) : "";
+  const orderId = str(first.order_id) || merchantReference;
+  const reference = scId ? `incoming:${scId}` : `incoming:${orderId}`;
 
   return {
     reference,
-    labelUrls,
-    orderReference: shipmentId || undefined,
-    merchantReference,
+    labelUrls: [],
+    orderReference: scId || undefined,
+    merchantReference: orderId,
   };
 }

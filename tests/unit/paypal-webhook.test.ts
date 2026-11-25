@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
   applyStockDecrementCheckpointed: vi.fn(),
   priceOrderLines: vi.fn(),
   notifyOrder: vi.fn(),
-  createShipmentAndLabels: vi.fn(),
+  createIncomingOrder: vi.fn(),
   alertMail: vi.fn(),
 }));
 
@@ -70,7 +70,7 @@ vi.mock("../../server/stock-patch.js", () => ({
 
 vi.mock("../../server/sendcloud.js", () => ({
   sendcloudConfigured: () => false,
-  createShipmentAndLabels: mocks.createShipmentAndLabels,
+  createIncomingOrder: mocks.createIncomingOrder,
   normalizeZip: (z: string) => z,
   packagesForQty: () => [],
   personFromFullName: (n: string) => ({ name: n }),
@@ -230,7 +230,7 @@ describe("paypal-webhook handler", () => {
     expect(res.body).toEqual({ ok: true, rejected: "underpay" });
     expect(mocks.applyStockDecrementCheckpointed).not.toHaveBeenCalled();
     expect(mocks.notifyOrder).not.toHaveBeenCalled();
-    expect(mocks.createShipmentAndLabels).not.toHaveBeenCalled();
+    expect(mocks.createIncomingOrder).not.toHaveBeenCalled();
   });
 
   it("short-circuits duplicate completed captures", async () => {
