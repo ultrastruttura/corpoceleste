@@ -1,5 +1,5 @@
 ---
-title: Zain
+title: Zain t-shirt
 artist: content/artists/totemica.md
 price: 40
 status: available
@@ -59,8 +59,8 @@ description:
     Der Handdruck bringt unvermeidliche Abweichungen zwischen den einzelnen Kleidungsstücken mit sich: Positionierung, Druckstärke und Farbauftrag können von Shirt zu Shirt leicht variieren. Diese Unterschiede sind keine Mängel, sondern das Kennzeichen von Handarbeit und machen jedes Teil zu einem Unikat.
     Die Fotos dienen lediglich der Veranschaulichung. Das tatsächliche Produkt kann geringfügige Farb- und Texturabweichungen gegenüber der Online-Darstellung aufweisen. Mit dem Kauf bestätigt der Kunde, über den handgefertigten und limitierten Charakter des Kleidungsstücks informiert zu sein, und akzeptiert die beschriebenen Abweichungen als integralen Bestandteil des Produktwerts. Solche Unterschiede stellen keinen Grund für Rückgabe, Widerruf oder Reklamation dar.
 seoDescription:
-  it: ''
-  en: ''
-  de: ''
+  it: 'Zain di Totemica: t-shirt nera ispirata alla carta degli Amanti dei tarocchi. Serigrafia a mano con inchiostro all''acqua, 100% cotone, 50 pezzi.'
+  en: 'Zain by Totemica: black tee inspired by the Lovers tarot card. Hand screen-printed with water-based ink, 100% cotton, limited to 50 pieces.'
+  de: 'Zain von Totemica: schwarzes T-Shirt nach der Tarotkarte Die Liebenden. Handsiebdruck mit Farbe auf Wasserbasis, 100 % Baumwolle, limitiert auf 50 Stück.'
 ---
 
