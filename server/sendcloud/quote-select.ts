@@ -131,15 +131,22 @@ export function parseShippingOptions(data: unknown, weightKg: number): ShippingQ
 
 export function selectQuote(
   options: ShippingQuote[],
-  preferPickup: boolean,
+  preferDropoff: boolean,
 ): QuoteSelection | null {
   if (!options.length) return null;
   const pickupPool = options.filter((q) => q.firstMile === "pickup" || q.firstMile === "either");
-  const dropoffPool = options.filter((q) => q.firstMile === "dropoff");
+  // either = si può portare al punto spedizione (Poste), non solo ritiro in studio.
+  const dropoffPool = options.filter((q) => q.firstMile === "dropoff" || q.firstMile === "either");
   const cheapestPickup = pickCheapest(pickupPool);
   const cheapestDropoff = pickCheapest(dropoffPool);
   const absoluteCheapest = pickCheapest(options);
-  const chosen = preferPickup && cheapestPickup ? cheapestPickup : absoluteCheapest;
+  const withoutPurePickup = pickCheapest(
+    options.filter((q) => q.firstMile !== "pickup"),
+  );
+  // Preferisci etichetta “porto in posta”; ritiro corriere in studio solo se non c’è alternativa.
+  const chosen = preferDropoff
+    ? cheapestDropoff || withoutPurePickup || absoluteCheapest
+    : absoluteCheapest;
   if (!chosen) return null;
   return { chosen, cheapestPickup, cheapestDropoff };
 }

@@ -36,7 +36,7 @@ describe("isParcelHomeDelivery", () => {
 });
 
 describe("parseShippingOptions + selectQuote", () => {
-  it("parses home rates and prefers pickup when asked", () => {
+  it("parses home rates and prefers dropoff when asked (even if more expensive)", () => {
     const data = {
       data: [
         option({
@@ -59,8 +59,25 @@ describe("parseShippingOptions + selectQuote", () => {
     const quotes = parseShippingOptions(data, 0.5);
     expect(quotes.map((q) => q.serviceId)).toEqual(["a:drop", "b:pick"]);
     const selected = selectQuote(quotes, true);
+    expect(selected?.chosen.serviceId).toBe("a:drop");
+    expect(selected?.cheapestPickup?.serviceId).toBe("b:pick");
+  });
+
+  it("falls back to pickup only when no dropoff/either exists", () => {
+    const quotes = parseShippingOptions(
+      {
+        data: [
+          option({
+            code: "b:pick",
+            functionalities: { first_mile: "pickup" },
+            quotes: [{ lead_time: 48, price: { total: { value: 6.5 } } }],
+          }),
+        ],
+      },
+      0.5,
+    );
+    const selected = selectQuote(quotes, true);
     expect(selected?.chosen.serviceId).toBe("b:pick");
-    expect(selected?.cheapestDropoff?.serviceId).toBe("a:drop");
   });
 
   it("returns null when no options", () => {

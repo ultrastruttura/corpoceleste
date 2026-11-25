@@ -20,7 +20,7 @@ import {
   priceOrderLines,
 } from "../server/order-pricing.js";
 import {
-  createShipmentAndLabels,
+  createIncomingOrder,
   normalizeZip,
   packagesForQty,
   personFromFullName,
@@ -162,7 +162,7 @@ async function ensureSendcloudShipment(opts: {
   const pieceCount = opts.priced.lines.reduce((n, l) => n + l.qty, 0);
 
   try {
-    const created = await createShipmentAndLabels({
+    const created = await createIncomingOrder({
       serviceId: opts.priced.packlink.serviceId,
       contractId: opts.priced.packlink.contractId,
       packages: packagesForQty(pieceCount),
@@ -184,13 +184,12 @@ async function ensureSendcloudShipment(opts: {
     });
     return {
       packlinkRef: created.reference,
-      packlinkLabels: created.labelUrls,
+      packlinkLabels: [],
       packlinkServiceId: opts.priced.packlink.serviceId,
-      packlinkError: created.labelUrls.length ? undefined : "Shipment created, labels pending",
     };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("sendcloud shipment", opts.captureId, msg);
+    console.error("sendcloud incoming order", opts.captureId, msg);
     return { packlinkError: msg, packlinkServiceId: opts.priced.packlink.serviceId };
   }
 }
@@ -198,7 +197,7 @@ async function ensureSendcloudShipment(opts: {
 /**
  * PayPal → Vercel webhook.
  * Event: PAYMENT.CAPTURE.COMPLETED
- * Verifies catalog prices + Sendcloud shipping, then stock + label + mail (resumable ledger).
+ * Verifies catalog prices + Sendcloud shipping, then stock + incoming order + mail (resumable ledger).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
@@ -428,7 +427,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         at: new Date().toISOString(),
         ...packlink,
       };
-      // Checkpoint label ref so retries do not create a second paid shipment.
+      // Checkpoint order ref so retries do not create a second Sendcloud order.
       await writeLedger(working);
     } else {
       packlink = {
